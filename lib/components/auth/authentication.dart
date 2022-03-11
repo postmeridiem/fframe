@@ -67,8 +67,8 @@ class AuthenticationComponents {
         }),
       ],
       showAuthActionSwitch: false,
-      headerBuilder: headerImage('assets/images/img.png'),
-      sideBuilder: sideImage('assets/images/logo.png'),
+      headerBuilder: headerImage('assets/images/flutter_mono.png'),
+      sideBuilder: sideImage('assets/images/flutter_mono.png'),
       subtitleBuilder: (context, action) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
