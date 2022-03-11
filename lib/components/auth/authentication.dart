@@ -81,9 +81,10 @@ class AuthenticationComponents {
       footerBuilder: (context, action) {
         return Center(
           child: Padding(
-            padding: const EdgeInsets.only(top: 16),
+            padding: const EdgeInsets.only(top: 20),
             child: Text(
-              action == AuthAction.signIn ? 'By signing in, you agree to our terms and conditions.<citation needed>' : 'SHOULD NEVER BE AVAILABLE',
+              // TODO: add a page for unauthenticated users for ToS
+              action == AuthAction.signIn ? 'By signing in, you agree to our terms and conditions.' : 'SHOULD NEVER BE AVAILABLE',
               style: const TextStyle(color: Colors.grey),
             ),
           ),
