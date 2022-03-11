@@ -6,11 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class suggestionScreen extends StatefulWidget {
-  const suggestionScreen({
-    Key? key,
-    required this.active,
-  }) : super(key: key);
-  final bool active;
+  const suggestionScreen({Key? key}) : super(key: key);
 
   @override
   State<suggestionScreen> createState() => _suggestionScreenState();
@@ -21,7 +17,7 @@ class _suggestionScreenState extends State<suggestionScreen> {
   Widget build(BuildContext context) {
     print("Rebuild suggestionScreen ");
     return DocumentScreen<Suggestion>(
-      query: SuggestionService().queryStream(active: widget.active),
+      query: SuggestionService().queryStream(),
       documentStream: (String? documentId) => SuggestionService().documentStream(documentId: documentId),
       autoSave: false,
       //Left hand (navigation/document selection pane)

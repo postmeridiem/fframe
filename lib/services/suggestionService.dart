@@ -2,9 +2,9 @@ import 'package:fframe/models/suggestion.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SuggestionService {
-  static String collection = "/adminui/suggestions/collection/";
-  Query<Suggestion> queryStream({required bool active}) {
-    return FirebaseFirestore.instance.collection(collection).where("active", isEqualTo: active).withConverter<Suggestion>(
+  static String collection = "suggestions";
+  Query<Suggestion> queryStream() {
+    return FirebaseFirestore.instance.collection(collection).withConverter<Suggestion>(
           fromFirestore: (snapshot, _) => Suggestion().fromFirestore(snapshot),
           toFirestore: (Suggestion suggestion, _) => {
             // Map<String,Object> documentData =  {
