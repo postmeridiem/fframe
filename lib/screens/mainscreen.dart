@@ -138,7 +138,7 @@ class MainBody extends ConsumerWidget {
     List<NavigationTarget>? _navigationTargets = List<NavigationTarget>.from(navigationTargets);
     _navigationTargets.retainWhere((navigationTarget) => navigationTarget.navigationRailDestination != null);
     return Scaffold(
-      body: _navigationTargets.length > 2
+      body: _navigationTargets.length > 1
           ? Row(
               children: <Widget>[
                 LayoutBuilder(
