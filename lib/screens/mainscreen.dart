@@ -1,5 +1,6 @@
 import 'dart:js' as js;
 
+import 'package:fframe/controllers/navigationStateController.dart';
 import 'package:fframe/providers/globalProviders.dart';
 import 'package:fframe/models/navigationTarget.dart';
 import 'package:flutter/material.dart';
@@ -41,9 +42,7 @@ class MainScreen extends StatelessWidget {
   }
 
   String _pageTitle(ActiveTarget activeTarget) {
-    return (activeTarget.parentTarget == null)
-        ? "${activeTarget.currentTarget.title}"
-        : "${activeTarget.parentTarget!.title} - ${activeTarget.currentTarget.title}";
+    return (activeTarget.parentTarget == null) ? "${activeTarget.currentTarget.title}" : "${activeTarget.parentTarget!.title} - ${activeTarget.currentTarget.title}";
   }
 
   @override
@@ -64,8 +63,7 @@ class MainScreen extends StatelessWidget {
           centerTitle: true,
           title: Consumer(
             builder: (context, ref, _) {
-              String subTitle =
-                  ref.watch(navigationStateProvider).currentTarget?.title != null ? ":: ${ref.watch(navigationStateProvider).currentTarget!.title}" : "";
+              String subTitle = ref.watch(navigationStateProvider).currentTarget?.title != null ? ":: ${ref.watch(navigationStateProvider).currentTarget!.title}" : "";
               return (subTitle.isEmpty) ? Text("${pageTitle}") : Text("${pageTitle} - ${subTitle}");
             },
           ),
@@ -75,8 +73,7 @@ class MainScreen extends StatelessWidget {
                 return IconButton(
                   onPressed: () {
                     FlutterClipboard.copy(Uri.base.toString()).then((_) {
-                      return ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Copied current location (${Uri.base.toString()}) to clipboard."), behavior: SnackBarBehavior.floating));
+                      return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Copied current location (${Uri.base.toString()}) to clipboard."), behavior: SnackBarBehavior.floating));
                     });
                   },
                   icon: Icon(Icons.share),
@@ -136,6 +133,8 @@ class MainBody extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     print("Build MainBody => ${state.queryParams.toString()} ${this.activeTarget.contentPane.toString()}");
 
+    NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
+
     List<NavigationTarget>? _navigationTargets = List<NavigationTarget>.from(navigationTargets);
     _navigationTargets.retainWhere((navigationTarget) => navigationTarget.navigationRailDestination != null);
     return Scaffold(
@@ -153,7 +152,7 @@ class MainBody extends ConsumerWidget {
                             child: NavigationRail(
                               selectedIndex: ref.read(navigationStateProvider).currentIndex,
                               onDestinationSelected: (int index) {
-                                ref.read(navigationStateProvider).currentIndex = index;
+                                navigationState.currentIndex = index;
                                 NavigationTarget navigationTarget = _navigationTargets[index];
                                 if (navigationTarget.navigationTabs == null) {
                                   context.go("/${navigationTarget.path}");
