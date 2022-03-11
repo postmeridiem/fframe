@@ -96,7 +96,11 @@ class NavigationStateNotifier with ChangeNotifier {
   }
 
   int get currentIndex => _currentIndex;
-  set currentIndex(int index) => _currentIndex = index;
+  set currentIndex(int index) {
+    _currentIndex = index;
+    _selectionState = SelectionState();
+  }
+
   NavigationTarget? get currentTarget => _currentTarget;
 
   SelectionState get selectionState => _selectionState;
