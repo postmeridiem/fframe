@@ -31,7 +31,7 @@ class UserDocument extends StatelessWidget {
         child: TextField(
           decoration: InputDecoration(
             border: OutlineInputBorder(),
-            labelText: 'Google Workspace Account',
+            labelText: 'User UID',
           ),
           readOnly: true,
           controller: TextEditingController.fromValue(TextEditingValue(text: user.id!)),

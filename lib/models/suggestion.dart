@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-class Scratchpad extends ChangeNotifier {
-  Scratchpad({this.id, this.name, this.active});
+class Suggestion extends ChangeNotifier {
+  Suggestion({this.id, this.name, this.active});
 
   fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
-    print("reading <Scratchpad>");
+    print("reading <Suggestion>");
 
     Map<String, dynamic> json = snapshot.data()!;
-    return Scratchpad(
+    return Suggestion(
       id: snapshot.id,
       name: json['name']! as String,
       active: json['active'] == null ? true : json['active'] as bool,
@@ -21,7 +21,7 @@ class Scratchpad extends ChangeNotifier {
   bool? active;
 
   Map<String, Object?> toFirestore() {
-    print("writing <Scratchpad>");
+    print("writing <Suggestion>");
     return {'active': active, 'name': name};
   }
 }

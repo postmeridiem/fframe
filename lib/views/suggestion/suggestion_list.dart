@@ -1,21 +1,21 @@
-import 'package:fframe/models/configuration.dart';
+import 'package:fframe/models/suggestion.dart';
 import 'package:flutter/material.dart';
 
-class configurationList extends StatelessWidget {
-  const configurationList({
-    required this.configuration,
+class suggestionList extends StatelessWidget {
+  const suggestionList({
+    required this.suggestion,
     required this.selected,
     Key? key,
   }) : super(key: key);
-  final Configuration configuration;
+  final Suggestion suggestion;
   final bool selected;
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
       selected: selected,
-      title: Text(configuration.name!),
-      leading: Icon(iconMap[configuration.icon]),
+      title: Text(suggestion.name!),
+      leading: Icon(iconMap[suggestion.icon]),
     );
   }
 }

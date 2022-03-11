@@ -86,9 +86,9 @@ class MainScreen extends StatelessWidget {
                 return IconButton(
                   onPressed: () {
                     // link to google feedback form
-                    js.context.callMethod('open', ['https://forms.gle/CYfiLAdzxbqbkGSt9']);
+                    js.context.callMethod('open', ['https://github.com/postmeridiem/fframe/issues']);
                   },
-                  icon: Icon(Icons.feedback),
+                  icon: Icon(Icons.pest_control),
                   tooltip: "Leave feedback...",
                 );
               },
