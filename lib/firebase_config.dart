@@ -8,15 +8,13 @@ class DefaultFirebaseConfig {
     if (kIsWeb) {
       // Web
       return const FirebaseOptions(
-        apiKey: "",
-        authDomain: "",
-        databaseURL: "",
-        projectId: "",
-        storageBucket: "",
-        messagingSenderId: "",
-        appId: "",
-        measurementId: "",
-      );
+          apiKey: "AIzaSyBWmy1m0VGbdM6gjKB2fAWCdni9ol6_hbI",
+          authDomain: "fframe-dev.firebaseapp.com",
+          projectId: "fframe-dev",
+          storageBucket: "fframe-dev.appspot.com",
+          messagingSenderId: "252859371693",
+          appId: "1:252859371693:web:5c67e3096937a7f1733624",
+          measurementId: "G-YM5SFM2J1X");
     } else if (Platform.isIOS || Platform.isMacOS) {
       // iOS and MacOS
       //JS/AZ => not configured
