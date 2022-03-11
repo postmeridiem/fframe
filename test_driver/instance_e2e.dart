@@ -10,7 +10,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pedantic/pedantic.dart';
 
 import './test_utils.dart';
 
@@ -321,8 +320,7 @@ void runInstanceTests() {
         const emailLink1 = 'https://www.example.com/action?mode=signIn&oobCode=oobCode';
         const emailLink2 = 'https://www.example.com/action?mode=verifyEmail&oobCode=oobCode';
         const emailLink3 = 'https://www.example.com/action?mode=signIn';
-        const emailLink4 =
-            'https://x59dg.app.goo.gl/?link=https://rnfirebase-b9ad4.firebaseapp.com/__/auth/action?apiKey%3Dfoo%26mode%3DsignIn%26oobCode%3Dbar';
+        const emailLink4 = 'https://x59dg.app.goo.gl/?link=https://rnfirebase-b9ad4.firebaseapp.com/__/auth/action?apiKey%3Dfoo%26mode%3DsignIn%26oobCode%3Dbar';
 
         expect(FirebaseAuth.instance.isSignInWithEmailLink(emailLink1), equals(true));
         expect(FirebaseAuth.instance.isSignInWithEmailLink(emailLink2), equals(false));
@@ -671,11 +669,9 @@ void runInstanceTests() {
     group('setSettings()', () {
       test('throws argument error if phoneNumber & smsCode have not been set simultaneously', () async {
         String message = "The [smsCode] and the [phoneNumber] must both be either 'null' or a 'String''.";
-        await expectLater(
-            FirebaseAuth.instance.setSettings(phoneNumber: '123456'), throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains(message))));
+        await expectLater(FirebaseAuth.instance.setSettings(phoneNumber: '123456'), throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains(message))));
 
-        await expectLater(
-            FirebaseAuth.instance.setSettings(smsCode: '123456'), throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains(message))));
+        await expectLater(FirebaseAuth.instance.setSettings(smsCode: '123456'), throwsA(isA<ArgumentError>().having((e) => e.message, 'message', contains(message))));
       }, skip: kIsWeb || defaultTargetPlatform != TargetPlatform.android);
     });
 

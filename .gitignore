@@ -38,3 +38,4 @@ doc/api/
 
 # IDE junk suppresion
 .idea
+test_driver/instance_e2e.dart
