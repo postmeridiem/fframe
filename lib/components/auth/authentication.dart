@@ -73,7 +73,7 @@ class AuthenticationComponents {
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: Text(
-            action == AuthAction.signIn ? 'Welcome to FlutFrame Admin.' : 'SHOULD NEVER BE AVAILABLE',
+            action == AuthAction.signIn ? 'Welcome to FlutFrame.' : 'SHOULD NEVER BE AVAILABLE',
             textAlign: TextAlign.center,
           ),
         );

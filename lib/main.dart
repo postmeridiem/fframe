@@ -41,7 +41,7 @@ Future<void> main() async {
 class App extends StatefulWidget {
   const App({Key? key}) : super(key: key);
 
-  static const title = "FlutFrame Admin";
+  static const title = "FlutFrame";
 
   @override
   State<App> createState() => _AppState();
