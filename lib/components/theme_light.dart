@@ -4,25 +4,14 @@ import 'package:flutter/material.dart';
 
 final ThemeData appLightTheme = ThemeData(
   fontFamily: 'Raleway',
-  primarySwatch: MaterialColor(4279185720, {
-    50: Color(0xffebf7fa),
-    100: Color(0xffd7eff4),
-    200: Color(0xffafdfe9),
-    300: Color(0xff86d0df),
-    400: Color(0xff5ec0d4),
-    500: Color(0xff36b0c9),
-    600: Color(0xff2b8da1),
-    700: Color(0xff206a79),
-    800: Color(0xff164650),
-    900: Color(0xff0b2328)
-  }),
+  scaffoldBackgroundColor: Color(0xFFfafafa),
   colorScheme: ColorScheme(
     brightness: Brightness.light,
-    primary: Color(0xff0f3138),
+    primary: Color(0xFF380417),
     onPrimary: Color(0xffffffff),
     secondary: Color(0xff36b0c9),
     onSecondary: Color(0xff000000),
-    surface: Color(0xffffffff),
+    surface: Color(0xFFE6E6E6),
     onSurface: Color(0xFF353535),
     background: Color(0xffafdfe9),
     onBackground: Color(0xffffffff),

@@ -73,17 +73,17 @@ class MainCanvas extends StatelessWidget {
                 Tab(
                     icon: Icon(
                   Icons.directions_car,
-                  color: Colors.cyanAccent.shade400,
+                  color: Colors.pink.shade900,
                 )),
                 Tab(
                     icon: Icon(
                   Icons.directions_transit,
-                  color: Colors.cyanAccent.shade400,
+                  color: Colors.pink.shade900,
                 )),
                 Tab(
                     icon: Icon(
                   Icons.directions_bike,
-                  color: Colors.cyanAccent.shade400,
+                  color: Colors.pink.shade900,
                 )),
               ],
             ),

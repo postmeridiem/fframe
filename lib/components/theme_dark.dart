@@ -2,39 +2,31 @@ import 'package:flutter/material.dart';
 
 final ThemeData appDarkTheme = ThemeData(
   fontFamily: 'Raleway',
-  primarySwatch: MaterialColor(4279185720, {
-    50: Color(0xffebf7fa),
-    100: Color(0xffd7eff4),
-    200: Color(0xffafdfe9),
-    300: Color(0xff86d0df),
-    400: Color(0xff5ec0d4),
-    500: Color(0xff36b0c9),
-    600: Color(0xff2b8da1),
-    700: Color(0xff206a79),
-    800: Color(0xff164650),
-    900: Color(0xff0b2328)
-  }),
-
+  scaffoldBackgroundColor: Color(0xFF111111),
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
     primary: Color(0xffffffff),
     primaryContainer: Color(0xFFD4D4D4),
-    onPrimary: Color(0xFF061316),
-    onPrimaryContainer: Color(0xFF061316),
-    secondary: Color(0xff64ffda),
-    secondaryContainer: Color(0xFF30AD90),
+    onPrimary: Color(0xFF880E4F),
+    onPrimaryContainer: Color(0xFF37474F),
+    secondary: Color(0xffe91e63),
+    secondaryContainer: Color(0xFFA11242),
     onSecondary: Color(0xff000000),
     onSecondaryContainer: Color(0xff000000),
-    surface: Color(0xFF061316),
-    surfaceVariant: Color(0xFF0C282E),
+    surface: Color(0xFF1B020B),
+    surfaceVariant: Color(0xFF455A64),
     onSurface: Color(0xffffffff),
     onSurfaceVariant: Color(0xffffffff),
-    background: Color(0xff616161),
+    background: Color(0xFF610E29),
     onBackground: Color(0xffffffff),
     error: Color(0xffd32f2f),
     onError: Color(0xff000000),
+    outline: Color(0xFFAA0C88),
   ),
-  dividerColor: Colors.grey[800],
+  cardTheme: CardTheme(
+    color: Color(0xFF222222),
+  ),
+  dividerColor: Color(0xFF121212),
   buttonTheme: ButtonThemeData(
     textTheme: ButtonTextTheme.normal,
     minWidth: 88,
@@ -419,7 +411,7 @@ final ThemeData appDarkTheme = ThemeData(
   ),
   tabBarTheme: TabBarTheme(
     indicatorSize: TabBarIndicatorSize.tab,
-    labelColor: Color(0xff64ffda),
+    labelColor: Color(0xFF880E4F),
     unselectedLabelColor: Color(0xB2E7E7E7),
   ),
   chipTheme: ChipThemeData(
