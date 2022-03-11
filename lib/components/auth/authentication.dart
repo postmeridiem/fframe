@@ -10,10 +10,10 @@ final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleAuthProvider googleProvider = GoogleAuthProvider();
 
 final providerConfigs = [
+  const GoogleProviderConfiguration(clientId: ''),
   // const EmailProviderConfiguration(),
   // emailLinkProviderConfig,
   // const PhoneProviderConfiguration(),
-  const GoogleProviderConfiguration(clientId: ''),
   // const AppleProviderConfiguration(),
   // const FacebookProviderConfiguration(clientId: FACEBOOK_CLIENT_ID),
   // const TwitterProviderConfiguration(
