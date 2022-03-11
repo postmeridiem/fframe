@@ -16,8 +16,6 @@ dependencies:
   google_sign_in:
   googleapis:
   googleapis_auth:
-  extension_google_sign_in_as_googleapis_auth:
-  gcloud:
   flutterfire_ui: 
   file_picker: 
   go_router: 
