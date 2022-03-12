@@ -24,6 +24,11 @@ final ThemeData appDarkTheme = ThemeData(
     onError: Color(0xff000000),
     outline: Color(0xFFAA0C88),
   ),
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    foregroundColor: Color(0xffffffff),
+    focusColor: Color(0xffffffff),
+  ),
+
   cardTheme: CardTheme(
     color: Color(0xFF222222),
   ),

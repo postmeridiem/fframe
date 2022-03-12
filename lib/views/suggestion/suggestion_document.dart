@@ -202,12 +202,12 @@ class MainCanvas extends StatelessWidget {
                     ),
                     ListTile(
                       leading: Icon(Icons.phone),
-                      title: Text('Phone'),
+                      title: Text('Phonelast'),
                     ),
                   ],
                 ),
               ),
-              Placeholder(),
+              SecondTab(),
               Icon(Icons.directions_bike),
             ],
           ),
@@ -217,20 +217,40 @@ class MainCanvas extends StatelessWidget {
           children: [
             ActionButton(
               onPressed: () => {},
-              icon: const Icon(
+              icon: Icon(
                 Icons.close,
+                color: Theme.of(context).floatingActionButtonTheme.foregroundColor,
               ),
             ),
             ActionButton(
               onPressed: () => {},
-              icon: const Icon(Icons.save, color: Colors.white),
+              icon: Icon(
+                Icons.save,
+                color: Theme.of(context).floatingActionButtonTheme.foregroundColor,
+              ),
             ),
             ActionButton(
               onPressed: () => {},
-              icon: const Icon(Icons.add, color: Colors.white),
+              icon: Icon(
+                Icons.add,
+                color: Theme.of(context).floatingActionButtonTheme.foregroundColor,
+              ),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class SecondTab extends StatelessWidget {
+  const SecondTab({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: SizedBox(
+        child: Placeholder(fallbackHeight: 2000),
       ),
     );
   }
