@@ -112,8 +112,12 @@ class HeaderControlWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(children: [
-      Text(""),
-      Text(" [ form controls ] "),
+      Card(
+        child: Text(""),
+      ),
+      Card(
+        child: Text(" [ form controls ] "),
+      ),
     ]);
   }
 }
