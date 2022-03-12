@@ -43,38 +43,22 @@ class ContentCanvas extends StatelessWidget {
     switch (setting.id) {
       case "01-generalsettings":
         {
-          return Row(
-            children: [
-              SettingsGeneralForm(),
-            ],
-          );
+          return Row(children: [SettingsGeneralForm()]);
         }
 
       case "02-managelists":
         {
-          return Row(
-            children: [
-              SettingsListsForm(),
-            ],
-          );
+          return Row(children: [SettingsListsForm()]);
         }
 
       case "99-advancedsettings":
         {
-          return Row(
-            children: [
-              SettingsAdvancedForm(),
-            ],
-          );
+          return Row(children: [SettingsAdvancedForm()]);
         }
 
       default:
         {
-          return Row(
-            children: [
-              Text("unconfigured"),
-            ],
-          );
+          return Row(children: [Text("unconfigured")]);
         }
     }
   }
@@ -116,14 +100,21 @@ class HeaderCanvas extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         DocumentTitle(context, title),
-        Row(
-          children: [
-            Text(" [ save blurb ] "),
-            Text(" [ form controls ] "),
-          ],
-        )
+        HeaderControlWidget(context),
       ],
     );
+  }
+}
+
+class HeaderControlWidget extends StatelessWidget {
+  const HeaderControlWidget(BuildContext context);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Text(""),
+      Text(" [ form controls ] "),
+    ]);
   }
 }
 

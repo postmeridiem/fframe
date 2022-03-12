@@ -229,14 +229,21 @@ class HeaderCanvas extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         DocumentTitle(context, title),
-        Row(
-          children: [
-            Text(" [ save blurb ] "),
-            Text(" [ form controls ] "),
-          ],
-        )
+        HeaderControlWidget(context),
       ],
     );
+  }
+}
+
+class HeaderControlWidget extends StatelessWidget {
+  const HeaderControlWidget(BuildContext context);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Text(" [ save blurb ] "),
+      Text(" [ form controls ] "),
+    ]);
   }
 }
 
