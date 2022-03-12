@@ -79,7 +79,7 @@ class _SettingsAdvancedFormState extends State<SettingsAdvancedForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('SettingsAdvancedForm'),
-            Text('stuff like \n<enable and set up email registration>,\n<enable or disable dark or light moden>,\n<show users in navigation>'),
+            Text('stuff like \n<enable and set up email registration>,\n<enable or disable dark or light mode>,\n<show users in navigation>'),
           ],
         ),
       ),

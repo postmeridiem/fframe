@@ -59,7 +59,7 @@ class ContentCanvas extends StatelessWidget {
           );
         }
 
-      case "09-advancedsettings":
+      case "99-advancedsettings":
         {
           return Row(
             children: [
