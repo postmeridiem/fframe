@@ -22,9 +22,9 @@ class suggestionDocument extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              HeaderCanvas(context, suggestion.name!),
+              HeaderCanvas(context, suggestion),
               Divider(),
-              ContentCanvas(context),
+              ContentCanvas(context, suggestion),
             ],
           ),
         ],
@@ -34,21 +34,23 @@ class suggestionDocument extends StatelessWidget {
 }
 
 class ContentCanvas extends StatelessWidget {
-  const ContentCanvas(BuildContext context);
+  const ContentCanvas(BuildContext context, this.suggestion);
+  final Suggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        MainCanvas(context),
-        ContextCanvas(context),
+        MainCanvas(context, suggestion),
+        ContextCanvas(context, suggestion),
       ],
     );
   }
 }
 
 class MainCanvas extends StatelessWidget {
-  const MainCanvas(BuildContext context);
+  const MainCanvas(BuildContext context, this.suggestion);
+  final Suggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
@@ -194,7 +196,8 @@ class MainCanvas extends StatelessWidget {
 }
 
 class ContextCanvas extends StatelessWidget {
-  const ContextCanvas(BuildContext context);
+  const ContextCanvas(BuildContext context, this.suggestion);
+  final Suggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
@@ -220,36 +223,66 @@ class ContextCanvas extends StatelessWidget {
 }
 
 class HeaderCanvas extends StatelessWidget {
-  const HeaderCanvas(BuildContext context, this.title);
-  final String title;
+  const HeaderCanvas(BuildContext context, this.suggestion);
+  final Suggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        DocumentTitle(context, title),
-        HeaderControlWidget(context),
+        DocumentTitle(context, suggestion.name!),
+        HeaderControlWidget(context, suggestion),
       ],
     );
   }
 }
 
 class HeaderControlWidget extends StatelessWidget {
-  const HeaderControlWidget(BuildContext context);
+  const HeaderControlWidget(BuildContext context, this.suggestion);
+  final Suggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
     return Row(children: [
-      Text(" [ save blurb ] "),
-      Text(" [ form controls ] "),
+      Card(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text(
+              "created on ${suggestion.creationDate}",
+              style: TextStyle(fontSize: 10),
+              textAlign: TextAlign.left,
+            ),
+            Text(
+              "by ${suggestion.createdBy}",
+              style: TextStyle(fontSize: 10),
+              textAlign: TextAlign.left,
+            ),
+          ],
+        ),
+      ),
+      Card(
+        child: ButtonBar(
+          children: <Widget>[
+            OutlinedButton(
+              child: Text('Save'),
+              onPressed: () {/** */},
+            ),
+            OutlinedButton(
+              child: Text('Reset'),
+              onPressed: () {/** */},
+            ),
+          ],
+        ),
+      ),
     ]);
   }
 }
 
 class DocumentTitle extends StatelessWidget {
-  const DocumentTitle(BuildContext context, this.title);
-  final String title;
+  const DocumentTitle(BuildContext context, this.name);
+  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -259,7 +292,7 @@ class DocumentTitle extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Text(
-            "${title.toUpperCase()}  ",
+            "${name.toUpperCase()}  ",
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ),
