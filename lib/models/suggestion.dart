@@ -12,7 +12,7 @@ class Suggestion extends ChangeNotifier {
       id: snapshot.id,
       name: json['name']! as String,
       active: json['active'] == null ? true : json['active'] as bool,
-      icon: json['icon']! as String,
+      icon: json['icon'] == '' ? 'ee93' : json['icon'] as String,
     );
   }
 
