@@ -54,7 +54,7 @@ class ContentCanvas extends StatelessWidget {
         {
           return Row(
             children: [
-              Text("lists"),
+              SettingsListsForm(),
             ],
           );
         }
@@ -63,7 +63,7 @@ class ContentCanvas extends StatelessWidget {
         {
           return Row(
             children: [
-              Text("advanced"),
+              SettingsAdvancedForm(),
             ],
           );
         }
