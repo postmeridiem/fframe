@@ -1,15 +1,6 @@
-import 'package:flutter_highlight/themes/solarized-dark.dart';
-import 'package:http/http.dart' as http;
-// import 'dart:async';
-// import 'package:extension_google_sign_in_as_googleapis_auth/extension_google_sign_in_as_googleapis_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-
 import 'package:flutter/material.dart';
 import 'package:fframe/models/suggestion.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:googleapis/iap/v1.dart';
-
-import 'package:flutter_highlight/flutter_highlight.dart';
 
 class suggestionDocument extends StatelessWidget {
   const suggestionDocument({
