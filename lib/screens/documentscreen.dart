@@ -74,8 +74,10 @@ class _DocumentBody<T> extends ConsumerWidget {
 
     DocumentSnapshot<T>? documentSnapshot = navigationState.selectionState.queryDocumentSnapshot as DocumentSnapshot<T>?;
     Map<String, String>? queryParams = navigationState.selectionState.queryParams;
-    if (documentSnapshot != null && queryParams != null && documentStream != null) {
-      Stream<DocumentSnapshot<T>> _documentStream = documentStream!(documentSnapshot.id) as Stream<DocumentSnapshot<T>>;
+    if ((documentSnapshot != null && queryParams != null && documentStream != null) || (queryParams != null && queryParams.containsKey("id"))) {
+      String docId = documentSnapshot?.id ?? queryParams['id']!;
+
+      Stream<DocumentSnapshot<T>> _documentStream = documentStream!(docId) as Stream<DocumentSnapshot<T>>;
 
       return StreamBuilder<DocumentSnapshot<T>>(
         initialData: documentSnapshot,
@@ -102,8 +104,10 @@ class _DocumentBody<T> extends ConsumerWidget {
           }
         },
       );
-    } else if (documentSnapshot == null && queryParams != null) {
-      return WaitScreen();
+    } else {
+      if (documentSnapshot == null && queryParams != null) {
+        return WaitScreen();
+      }
     }
     return EmptyScreen();
   }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:fframe/controllers/appUserStateController.dart';
+import 'package:fframe/controllers/navigationStateController.dart';
 import 'package:fframe/models/navigationTarget.dart';
 import 'package:fframe/navigation.dart';
 import 'package:fframe/screens/screens.dart';
@@ -60,8 +61,7 @@ class _AppState extends State<App> with RestorationMixin {
   List<NavigationTarget> _navigationTargets(UserState userState) {
     //Get the current auth state
     bool isSignedIn = userState.runtimeType == UserStateSignedIn;
-    List<NavigationTarget> _navigationTargets =
-        isSignedIn ? List<NavigationTarget>.from(authenticatedNavigationTargets) : List<NavigationTarget>.from(unAuthenticatedNavigationTargets);
+    List<NavigationTarget> _navigationTargets = isSignedIn ? List<NavigationTarget>.from(authenticatedNavigationTargets) : List<NavigationTarget>.from(unAuthenticatedNavigationTargets);
     NavigationTarget _initialNavigationTarget;
     //Return if unauthed
 
@@ -177,6 +177,15 @@ class _AppState extends State<App> with RestorationMixin {
         if (goRouterState.subloc == "/" && goRouterState.subloc != _initialLocation) {
           print("<c> Redirect to $_initialLocation");
           return "$_initialLocation";
+        }
+
+        if (goRouterState.queryParams.length != 0) {
+          print("Process redirect");
+          String? routeId = goRouterState.queryParams['id'];
+          if (routeId != null) {
+            SelectionState selectionState = SelectionState(queryDocumentSnapshot: null, queryParams: {"id": routeId}, cardId: routeId);
+            ref.read(navigationStateProvider.notifier).selectionState = selectionState;
+          }
         }
         print("No redirection");
         return null;
