@@ -34,7 +34,7 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
         SizedBox(
           width: 250,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(0.0),
             child: _DocumentList<T>(
               query: widget.query,
               documentListBuilder: widget.documentListBuilder,
@@ -45,7 +45,7 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
         // This is the main content.
         Expanded(
           child: Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(0.0),
               child: _DocumentBody(
                 documentBuilder: widget.documentBuilder,
                 documentStream: widget.documentStream,

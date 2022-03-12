@@ -18,7 +18,7 @@ final suggestionNavigationTargets = NavigationTarget(
   //   )
   // ],
 
-  contentPane: suggestionScreen(),
+  contentPane: SuggestionScreen(),
   navigationRailDestination: NavigationRailDestination(
     icon: Icon(Icons.pest_control),
     label: Text('Suggestions'),

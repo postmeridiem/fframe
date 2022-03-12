@@ -5,14 +5,14 @@ import 'package:fframe/views/suggestion/suggestion.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class suggestionScreen extends StatefulWidget {
-  const suggestionScreen({Key? key}) : super(key: key);
+class SuggestionScreen extends StatefulWidget {
+  const SuggestionScreen({Key? key}) : super(key: key);
 
   @override
-  State<suggestionScreen> createState() => _suggestionScreenState();
+  State<SuggestionScreen> createState() => _SuggestionScreenState();
 }
 
-class _suggestionScreenState extends State<suggestionScreen> {
+class _SuggestionScreenState extends State<SuggestionScreen> {
   @override
   Widget build(BuildContext context) {
     print("Rebuild suggestionScreen ");
@@ -34,7 +34,7 @@ class _suggestionScreenState extends State<suggestionScreen> {
 
         // roles.contains("suggestionEditor")
 
-        return suggestionDocument(
+        return SuggestionDocument(
           documentReference: documentReference!,
           suggestion: suggestion,
           // allowEdit: roles.contains("suggestionEditor"),
