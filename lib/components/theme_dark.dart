@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/constants/colors.dart';
+import 'package:fframe/constants/fonts.dart';
 
 final ThemeData appDarkTheme = ThemeData(
   fontFamily: mainFontFamily,
-  scaffoldBackgroundColor: Color(0xFF111111),
+  scaffoldBackgroundColor: constBackgroundColorDark,
   indicatorColor: constPrimaryAccentColorDark,
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
@@ -19,22 +20,21 @@ final ThemeData appDarkTheme = ThemeData(
     onSecondaryContainer: constOnSecondaryColorDark,
     background: constBackgroundColorDark,
     onBackground: constPrimaryAccentColorDark,
-    surfaceVariant: Color(0xFF455A64),
-    onSurfaceVariant: Color(0xffffffff),
+    surfaceVariant: Color(0xFFFF00DD),
+    onSurfaceVariant: Color(0xFFFFFFFF),
     error: Color(0xffd32f2f),
     onError: Color(0xff000000),
-    outline: Color(0xFF690D55),
+    outline: Color(0xFFFF00C8),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     foregroundColor: constPrimaryAccentColorDark,
     focusColor: constOnPrimaryColorDark,
     backgroundColor: constPrimaryColorDark,
   ),
-
   cardTheme: CardTheme(
     color: constSecondaryColorDark,
   ),
-  dividerColor: Color(0xFF121212),
+  dividerColor: constDividerColorDark,
   buttonTheme: ButtonThemeData(
     textTheme: ButtonTextTheme.normal,
     minWidth: 88,
@@ -69,7 +69,82 @@ final ThemeData appDarkTheme = ThemeData(
       onError: Color(0xff000000),
     ),
   ),
-  //   textTheme: TextTheme(
+  iconTheme: IconThemeData(
+    color: Color(0xffffffff),
+    opacity: 1,
+    size: 24,
+  ),
+  primaryIconTheme: IconThemeData(
+    color: Color(0xffffffff),
+    opacity: 1,
+    size: 24,
+  ),
+  sliderTheme: SliderThemeData(
+    activeTrackColor: null,
+    inactiveTrackColor: null,
+    disabledActiveTrackColor: null,
+    disabledInactiveTrackColor: null,
+    activeTickMarkColor: null,
+    inactiveTickMarkColor: null,
+    disabledActiveTickMarkColor: null,
+    disabledInactiveTickMarkColor: null,
+    thumbColor: null,
+    disabledThumbColor: null,
+    thumbShape: null,
+    overlayColor: null,
+    valueIndicatorColor: null,
+    valueIndicatorShape: null,
+    showValueIndicator: null,
+    valueIndicatorTextStyle: TextStyle(
+      color: Color(0xdd000000),
+      fontSize: null,
+      fontWeight: FontWeight.w400,
+      fontStyle: FontStyle.normal,
+    ),
+  ),
+  tabBarTheme: TabBarTheme(
+    indicatorSize: TabBarIndicatorSize.tab,
+    labelColor: constPrimaryAccentColorDark,
+    unselectedLabelColor: constUnselectedColorDark,
+  ),
+  chipTheme: ChipThemeData(
+    backgroundColor: Color(0x1fffffff),
+    brightness: Brightness.dark,
+    deleteIconColor: Color(0xdeffffff),
+    disabledColor: Color(0x0cffffff),
+    labelPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 8),
+    labelStyle: TextStyle(
+      color: Color(0xdeffffff),
+      fontSize: null,
+      fontWeight: FontWeight.w400,
+      fontStyle: FontStyle.normal,
+    ),
+    padding: EdgeInsets.only(top: 4, bottom: 4, left: 4, right: 4),
+    secondaryLabelStyle: TextStyle(
+      color: Color(0x3dffffff),
+      fontSize: null,
+      fontWeight: FontWeight.w400,
+      fontStyle: FontStyle.normal,
+    ),
+    secondarySelectedColor: Color(0x3d212121),
+    selectedColor: Color(0x3dffffff),
+    shape: StadiumBorder(
+        side: BorderSide(
+      color: Color(0xff000000),
+      width: 0,
+      style: BorderStyle.none,
+    )),
+  ),
+  dialogTheme: DialogTheme(
+      shape: RoundedRectangleBorder(
+    side: BorderSide(
+      color: Color(0xff000000),
+      width: 0,
+      style: BorderStyle.none,
+    ),
+    borderRadius: BorderRadius.all(Radius.circular(0.0)),
+  )),
+//   textTheme: TextTheme(
   //     display4: TextStyle(
   //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
@@ -384,79 +459,4 @@ final ThemeData appDarkTheme = ThemeData(
   //     borderRadius: BorderRadius.all(Radius.circular(4.0)),
   //   ),
   // ),
-  iconTheme: IconThemeData(
-    color: Color(0xffffffff),
-    opacity: 1,
-    size: 24,
-  ),
-  primaryIconTheme: IconThemeData(
-    color: Color(0xffffffff),
-    opacity: 1,
-    size: 24,
-  ),
-  sliderTheme: SliderThemeData(
-    activeTrackColor: null,
-    inactiveTrackColor: null,
-    disabledActiveTrackColor: null,
-    disabledInactiveTrackColor: null,
-    activeTickMarkColor: null,
-    inactiveTickMarkColor: null,
-    disabledActiveTickMarkColor: null,
-    disabledInactiveTickMarkColor: null,
-    thumbColor: null,
-    disabledThumbColor: null,
-    thumbShape: null,
-    overlayColor: null,
-    valueIndicatorColor: null,
-    valueIndicatorShape: null,
-    showValueIndicator: null,
-    valueIndicatorTextStyle: TextStyle(
-      color: Color(0xdd000000),
-      fontSize: null,
-      fontWeight: FontWeight.w400,
-      fontStyle: FontStyle.normal,
-    ),
-  ),
-  tabBarTheme: TabBarTheme(
-    indicatorSize: TabBarIndicatorSize.tab,
-    labelColor: constPrimaryAccentColorDark,
-    unselectedLabelColor: constUnselectedColorDark,
-  ),
-  chipTheme: ChipThemeData(
-    backgroundColor: Color(0x1fffffff),
-    brightness: Brightness.dark,
-    deleteIconColor: Color(0xdeffffff),
-    disabledColor: Color(0x0cffffff),
-    labelPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 8),
-    labelStyle: TextStyle(
-      color: Color(0xdeffffff),
-      fontSize: null,
-      fontWeight: FontWeight.w400,
-      fontStyle: FontStyle.normal,
-    ),
-    padding: EdgeInsets.only(top: 4, bottom: 4, left: 4, right: 4),
-    secondaryLabelStyle: TextStyle(
-      color: Color(0x3dffffff),
-      fontSize: null,
-      fontWeight: FontWeight.w400,
-      fontStyle: FontStyle.normal,
-    ),
-    secondarySelectedColor: Color(0x3d212121),
-    selectedColor: Color(0x3dffffff),
-    shape: StadiumBorder(
-        side: BorderSide(
-      color: Color(0xff000000),
-      width: 0,
-      style: BorderStyle.none,
-    )),
-  ),
-  dialogTheme: DialogTheme(
-      shape: RoundedRectangleBorder(
-    side: BorderSide(
-      color: Color(0xff000000),
-      width: 0,
-      style: BorderStyle.none,
-    ),
-    borderRadius: BorderRadius.all(Radius.circular(0.0)),
-  )),
 );

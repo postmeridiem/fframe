@@ -1,25 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/constants/colors.dart';
-
-//TODO: update colorScheme variables to what is listed in dark_theme
+import 'package:fframe/constants/fonts.dart';
 
 final ThemeData appLightTheme = ThemeData(
   fontFamily: mainFontFamily,
-  scaffoldBackgroundColor: Color(0xFFfafafa),
+  scaffoldBackgroundColor: constBackgroundColorLight,
+  indicatorColor: constPrimaryColorLight,
   colorScheme: ColorScheme(
     brightness: Brightness.light,
-    primary: Color(0xFF380417),
-    onPrimary: Color(0xffffffff),
-    secondary: Color(0xff36b0c9),
-    onSecondary: Color(0xff000000),
-    surface: Color(0xFFE6E6E6),
-    onSurface: Color(0xFF353535),
-    background: Color(0xffafdfe9),
-    onBackground: Color(0xffffffff),
+    primary: constPrimaryColorLight,
+    onPrimary: constOnPrimaryColorLight,
+    secondary: constSecondaryColorLight,
+    onSecondary: constOnSecondaryColorLight,
+    surface: constSecondaryColorLight,
+    onSurface: constOnSecondaryColorLight,
+    primaryContainer: constPrimaryColorLight,
+    onPrimaryContainer: constOnPrimaryColorLight,
+    secondaryContainer: constSecondaryColorLight,
+    onSecondaryContainer: constOnSecondaryColorLight,
+    background: constBackgroundColorLight,
+    onBackground: constPrimaryAccentColorLight,
+    surfaceVariant: Color(0xFFFF00DD),
+    onSurfaceVariant: Color(0xFFFFFFFF),
     error: Color(0xffd32f2f),
-    onError: Color(0xffffffff),
+    onError: Color(0xff000000),
+    outline: Color(0xFFFF00C8),
   ),
-  dividerColor: Colors.grey[300],
+  floatingActionButtonTheme: FloatingActionButtonThemeData(
+    foregroundColor: constPrimaryAccentColorLight,
+    focusColor: constOnPrimaryColorLight,
+    backgroundColor: constPrimaryColorLight,
+  ),
+  cardTheme: CardTheme(
+    color: constSecondaryColorLight,
+  ),
+  dividerColor: constDividerColorLight,
   buttonTheme: ButtonThemeData(
     textTheme: ButtonTextTheme.normal,
     minWidth: 88,
@@ -54,7 +69,82 @@ final ThemeData appLightTheme = ThemeData(
       brightness: Brightness.light,
     ),
   ),
-  // textTheme: TextTheme(
+  iconTheme: IconThemeData(
+    color: Color(0xdd000000),
+    opacity: 1,
+    size: 24,
+  ),
+  primaryIconTheme: IconThemeData(
+    color: Color(0xffffffff),
+    opacity: 1,
+    size: 24,
+  ),
+  sliderTheme: SliderThemeData(
+    activeTrackColor: null,
+    inactiveTrackColor: null,
+    disabledActiveTrackColor: null,
+    disabledInactiveTrackColor: null,
+    activeTickMarkColor: null,
+    inactiveTickMarkColor: null,
+    disabledActiveTickMarkColor: null,
+    disabledInactiveTickMarkColor: null,
+    thumbColor: null,
+    disabledThumbColor: null,
+    thumbShape: null,
+    overlayColor: null,
+    valueIndicatorColor: null,
+    valueIndicatorShape: null,
+    showValueIndicator: null,
+    valueIndicatorTextStyle: TextStyle(
+      color: Color(0xdd000000),
+      fontSize: null,
+      fontWeight: FontWeight.w400,
+      fontStyle: FontStyle.normal,
+    ),
+  ),
+  tabBarTheme: TabBarTheme(
+    indicatorSize: TabBarIndicatorSize.tab,
+    labelColor: constPrimaryColorLight,
+    unselectedLabelColor: constUnselectedColorLight,
+  ),
+  chipTheme: ChipThemeData(
+    backgroundColor: Color(0x1f000000),
+    brightness: Brightness.light,
+    deleteIconColor: Color(0xde000000),
+    disabledColor: Color(0x0c000000),
+    labelPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 8),
+    labelStyle: TextStyle(
+      color: Color(0xde000000),
+      fontSize: null,
+      fontWeight: FontWeight.w400,
+      fontStyle: FontStyle.normal,
+    ),
+    padding: EdgeInsets.only(top: 4, bottom: 4, left: 4, right: 4),
+    secondaryLabelStyle: TextStyle(
+      color: Color(0x3d000000),
+      fontSize: null,
+      fontWeight: FontWeight.w400,
+      fontStyle: FontStyle.normal,
+    ),
+    secondarySelectedColor: Color(0x3d0f3138),
+    selectedColor: Color(0x3d000000),
+    shape: StadiumBorder(
+        side: BorderSide(
+      color: Color(0xff000000),
+      width: 0,
+      style: BorderStyle.none,
+    )),
+  ),
+  dialogTheme: DialogTheme(
+      shape: RoundedRectangleBorder(
+    side: BorderSide(
+      color: Color(0xff000000),
+      width: 0,
+      style: BorderStyle.none,
+    ),
+    borderRadius: BorderRadius.all(Radius.circular(0.0)),
+  )),
+// textTheme: TextTheme(
   //   display4: TextStyle(
   //     color: Color(0x8a000000),
   //     fontSize: null,
@@ -393,79 +483,4 @@ final ThemeData appLightTheme = ThemeData(
   //     borderRadius: BorderRadius.all(Radius.circular(4.0)),
   //   ),
   // ),
-  iconTheme: IconThemeData(
-    color: Color(0xdd000000),
-    opacity: 1,
-    size: 24,
-  ),
-  primaryIconTheme: IconThemeData(
-    color: Color(0xffffffff),
-    opacity: 1,
-    size: 24,
-  ),
-  sliderTheme: SliderThemeData(
-    activeTrackColor: null,
-    inactiveTrackColor: null,
-    disabledActiveTrackColor: null,
-    disabledInactiveTrackColor: null,
-    activeTickMarkColor: null,
-    inactiveTickMarkColor: null,
-    disabledActiveTickMarkColor: null,
-    disabledInactiveTickMarkColor: null,
-    thumbColor: null,
-    disabledThumbColor: null,
-    thumbShape: null,
-    overlayColor: null,
-    valueIndicatorColor: null,
-    valueIndicatorShape: null,
-    showValueIndicator: null,
-    valueIndicatorTextStyle: TextStyle(
-      color: Color(0xdd000000),
-      fontSize: null,
-      fontWeight: FontWeight.w400,
-      fontStyle: FontStyle.normal,
-    ),
-  ),
-  tabBarTheme: TabBarTheme(
-    indicatorSize: TabBarIndicatorSize.tab,
-    labelColor: Color(0xff0f3138),
-    unselectedLabelColor: Color(0xFF2C2C2C),
-  ),
-  chipTheme: ChipThemeData(
-    backgroundColor: Color(0x1f000000),
-    brightness: Brightness.light,
-    deleteIconColor: Color(0xde000000),
-    disabledColor: Color(0x0c000000),
-    labelPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 8),
-    labelStyle: TextStyle(
-      color: Color(0xde000000),
-      fontSize: null,
-      fontWeight: FontWeight.w400,
-      fontStyle: FontStyle.normal,
-    ),
-    padding: EdgeInsets.only(top: 4, bottom: 4, left: 4, right: 4),
-    secondaryLabelStyle: TextStyle(
-      color: Color(0x3d000000),
-      fontSize: null,
-      fontWeight: FontWeight.w400,
-      fontStyle: FontStyle.normal,
-    ),
-    secondarySelectedColor: Color(0x3d0f3138),
-    selectedColor: Color(0x3d000000),
-    shape: StadiumBorder(
-        side: BorderSide(
-      color: Color(0xff000000),
-      width: 0,
-      style: BorderStyle.none,
-    )),
-  ),
-  dialogTheme: DialogTheme(
-      shape: RoundedRectangleBorder(
-    side: BorderSide(
-      color: Color(0xff000000),
-      width: 0,
-      style: BorderStyle.none,
-    ),
-    borderRadius: BorderRadius.all(Radius.circular(0.0)),
-  )),
 );
