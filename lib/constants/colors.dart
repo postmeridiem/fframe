@@ -35,7 +35,7 @@ Color constSecondaryColorLight = Color(0xFFFFF8FB);
 Color constOnSecondaryColorLight = Color(0xB21D1D1D);
 
 // color that sets the primary accent color
-Color constPrimaryAccentColorLight = Color(0xFF008381);
+Color constPrimaryAccentColorLight = Color(0xFF00B8B5);
 
 // color for unselected elements
 Color constUnselectedColorLight = Color(0xB2474747);
