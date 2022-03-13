@@ -221,7 +221,9 @@ class BarButtonFeedback extends StatelessWidget {
 
 class BarButtonProfile extends StatelessWidget {
   const BarButtonProfile(BuildContext context);
-
+// TODO: fix visibility when not authenticated and make it a true profile
+// is named BarButtonProfile, but only does sign out.
+// Should open a popout with the profile info and a signout button
   @override
   Widget build(BuildContext context) {
     return Builder(
