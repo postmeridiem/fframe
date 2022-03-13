@@ -42,7 +42,9 @@ class MainScreen extends StatelessWidget {
   }
 
   String _pageTitle(ActiveTarget activeTarget) {
-    return (activeTarget.parentTarget == null) ? "${activeTarget.currentTarget.title}" : "${activeTarget.parentTarget!.title} - ${activeTarget.currentTarget.title}";
+    return (activeTarget.parentTarget == null)
+        ? "${activeTarget.currentTarget.title}"
+        : "${activeTarget.parentTarget!.title} - ${activeTarget.currentTarget.title}";
   }
 
   @override
@@ -63,45 +65,15 @@ class MainScreen extends StatelessWidget {
           centerTitle: true,
           title: Consumer(
             builder: (context, ref, _) {
-              String subTitle = ref.watch(navigationStateProvider).currentTarget?.title != null ? ":: ${ref.watch(navigationStateProvider).currentTarget!.title}" : "";
+              String subTitle =
+                  ref.watch(navigationStateProvider).currentTarget?.title != null ? ":: ${ref.watch(navigationStateProvider).currentTarget!.title}" : "";
               return (subTitle.isEmpty) ? Text("${pageTitle}") : Text("${pageTitle} - ${subTitle}");
             },
           ),
           actions: [
-            Builder(
-              builder: (BuildContext context) {
-                return IconButton(
-                  onPressed: () {
-                    FlutterClipboard.copy(Uri.base.toString()).then((_) {
-                      return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Copied current location (${Uri.base.toString()}) to clipboard."), behavior: SnackBarBehavior.floating));
-                    });
-                  },
-                  icon: Icon(Icons.share),
-                  tooltip: "Copy the current location to the paste buffer...",
-                );
-              },
-            ),
-            Builder(
-              builder: (BuildContext context) {
-                return IconButton(
-                  onPressed: () {
-                    // link to google feedback form
-                    js.context.callMethod('open', ['https://github.com/postmeridiem/fframe/issues']);
-                  },
-                  icon: Icon(Icons.pest_control),
-                  tooltip: "Leave feedback...",
-                );
-              },
-            ),
-            Builder(
-              builder: (BuildContext context) {
-                return IconButton(
-                  onPressed: _signOut,
-                  icon: Icon(Icons.logout_outlined),
-                  tooltip: "Log out...",
-                );
-              },
-            ),
+            BarButtonShare(context),
+            BarButtonFeedback(context),
+            BarButtonProfile(context),
           ],
         ),
         body: MainBody(
@@ -203,6 +175,65 @@ class ActiveTarget {
   final NavigationTarget? parentTarget;
 
   ActiveTarget({required this.currentTarget, this.parentTarget});
+}
+
+class BarButtonShare extends StatelessWidget {
+  const BarButtonShare(BuildContext context);
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (BuildContext context) {
+        return IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(Uri.base.toString()).then((_) {
+              return ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text("Copied current location (${Uri.base.toString()}) to clipboard."), behavior: SnackBarBehavior.floating));
+            });
+          },
+          icon: Icon(Icons.share),
+          tooltip: "Copy the current location to the paste buffer...",
+        );
+      },
+    );
+  }
+}
+
+class BarButtonFeedback extends StatelessWidget {
+  const BarButtonFeedback(BuildContext context);
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (BuildContext context) {
+        return IconButton(
+          onPressed: () {
+            // link to google feedback form
+            js.context.callMethod('open', ['https://github.com/postmeridiem/fframe/issues']);
+          },
+          icon: Icon(Icons.pest_control),
+          tooltip: "Leave feedback...",
+        );
+      },
+    );
+  }
+}
+
+class BarButtonProfile extends StatelessWidget {
+  const BarButtonProfile(BuildContext context);
+
+  @override
+  Widget build(BuildContext context) {
+    return Builder(
+      builder: (BuildContext context) {
+        return IconButton(
+          onPressed: _signOut,
+          icon: Icon(Icons.logout_outlined),
+          tooltip: "Log out...",
+        );
+      },
+    );
+  }
 }
 
 Future<void> _signOut() async {
