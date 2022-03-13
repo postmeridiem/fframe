@@ -1,36 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:fframe/constants/colors.dart';
 
 final ThemeData appDarkTheme = ThemeData(
-  fontFamily: 'Raleway',
+  fontFamily: mainFontFamily,
   scaffoldBackgroundColor: Color(0xFF111111),
-  indicatorColor: Color(0xFF880E4F),
+  indicatorColor: constPrimaryAccentColorDark,
   colorScheme: ColorScheme(
     brightness: Brightness.dark,
-    primary: Color(0xffffffff),
-    primaryContainer: Color(0xFFD4D4D4),
-    onPrimary: Color(0xFF880E4F),
-    onPrimaryContainer: Color(0xFF37474F),
-    secondary: Color(0xFF1B020B),
-    secondaryContainer: Color.fromARGB(255, 88, 133, 90),
-    onSecondary: Color(0xffffffff),
-    onSecondaryContainer: Color(0xff000000),
-    surface: Color(0xFF1B020B),
+    primary: constOnPrimaryColorDark,
+    onPrimary: constPrimaryColorDark,
+    secondary: constSecondaryColorDark,
+    onSecondary: constOnSecondaryColorDark,
+    surface: constPrimaryColorDark,
+    onSurface: constOnPrimaryColorDark,
+    primaryContainer: constPrimaryColorDark,
+    onPrimaryContainer: constOnPrimaryColorDark,
+    secondaryContainer: constSecondaryColorDark,
+    onSecondaryContainer: constOnSecondaryColorDark,
+    background: constBackgroundColorDark,
+    onBackground: constPrimaryAccentColorDark,
     surfaceVariant: Color(0xFF455A64),
-    onSurface: Color(0xffffffff),
     onSurfaceVariant: Color(0xffffffff),
-    background: Color(0xFF610E29),
-    onBackground: Color(0xffffffff),
     error: Color(0xffd32f2f),
     onError: Color(0xff000000),
-    outline: Color(0xFFAA0C88),
+    outline: Color(0xFF690D55),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    foregroundColor: Color(0xffffffff),
-    focusColor: Color(0xffffffff),
+    foregroundColor: constPrimaryAccentColorDark,
+    focusColor: constOnPrimaryColorDark,
+    backgroundColor: constPrimaryColorDark,
   ),
 
   cardTheme: CardTheme(
-    color: Color(0xFF222222),
+    color: constSecondaryColorDark,
   ),
   dividerColor: Color(0xFF121212),
   buttonTheme: ButtonThemeData(
@@ -417,8 +419,8 @@ final ThemeData appDarkTheme = ThemeData(
   ),
   tabBarTheme: TabBarTheme(
     indicatorSize: TabBarIndicatorSize.tab,
-    labelColor: Color(0xFF880E4F),
-    unselectedLabelColor: Color(0xB2E7E7E7),
+    labelColor: constPrimaryAccentColorDark,
+    unselectedLabelColor: constUnselectedColorDark,
   ),
   chipTheme: ChipThemeData(
     backgroundColor: Color(0x1fffffff),

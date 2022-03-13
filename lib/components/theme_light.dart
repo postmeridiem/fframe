@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:fframe/constants/colors.dart';
 
 //TODO: update colorScheme variables to what is listed in dark_theme
 
 final ThemeData appLightTheme = ThemeData(
-  fontFamily: 'Raleway',
+  fontFamily: mainFontFamily,
   scaffoldBackgroundColor: Color(0xFFfafafa),
   colorScheme: ColorScheme(
     brightness: Brightness.light,

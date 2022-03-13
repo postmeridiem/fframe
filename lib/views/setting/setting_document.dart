@@ -16,20 +16,18 @@ class settingDocument extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: ListView(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              HeaderCanvas(context, setting.name!),
-              Divider(),
-              ContentCanvas(context, setting),
-            ],
-          ),
-        ],
-      ),
+    return ListView(
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            HeaderCanvas(context, setting.name!),
+            Divider(),
+            ContentCanvas(context, setting),
+          ],
+        ),
+      ],
     );
   }
 }
