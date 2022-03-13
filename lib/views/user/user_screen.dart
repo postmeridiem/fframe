@@ -1,7 +1,7 @@
 import 'package:fframe/models/user.dart';
 import 'package:fframe/screens/documentscreen.dart';
 import 'package:fframe/services/userService.dart';
-import 'package:fframe/views/users/user.dart';
+import 'package:fframe/views/user/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 

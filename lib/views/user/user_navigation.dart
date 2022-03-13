@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/models/navigationTarget.dart';
-import 'package:fframe/views/users/user.dart';
+import 'package:fframe/views/user/user.dart';
 
 final usersNavigationTargets = NavigationTarget(
   path: "users",
