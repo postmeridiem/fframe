@@ -1,3 +1,5 @@
+This license applies to the OpenSans, RobotoMono and Raleway fonts included in FlutFrame. 
+The license for the Poppins font is included separately
 
                                  Apache License
                            Version 2.0, January 2004
