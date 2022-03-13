@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:fframe/models/suggestion.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math' as math;
+import 'package:fframe/helpers/fillers.dart';
+import 'package:fframe/constants/colors.dart';
 
 class SuggestionDocument extends StatelessWidget {
   const SuggestionDocument({
@@ -16,8 +18,7 @@ class SuggestionDocument extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        child: Row(
+    return Row(
       children: [
         Flexible(
           child: MainCanvas(context, suggestion),
@@ -27,20 +28,7 @@ class SuggestionDocument extends StatelessWidget {
           child: ContextCanvas(context, suggestion),
         ),
       ],
-    )
-        // child: Column(
-        //   // crossAxisAlignment: CrossAxisAlignment.start,
-        //   // mainAxisAlignment: MainAxisAlignment.start,
-        //   children: [
-        //     //   SizedBox(
-        //     //     height: 100,
-        //     //     child: HeaderCanvas(context, suggestion),
-        //     //   ),
-        //     //   Divider(),
-        //     Expanded(child: ContentCanvas(context, suggestion)),
-        //   ],
-        // ),
-        );
+    );
   }
 }
 
@@ -74,6 +62,7 @@ class MainCanvas extends StatelessWidget {
       length: 3,
       child: Scaffold(
         primary: false,
+        backgroundColor: Theme.of(context).colorScheme.secondary,
         body: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
@@ -84,6 +73,7 @@ class MainCanvas extends StatelessWidget {
                 pinned: false,
                 snap: true,
                 automaticallyImplyLeading: false,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
                 bottom: new TabBar(
                   tabs: <Tab>[
                     Tab(
@@ -105,110 +95,9 @@ class MainCanvas extends StatelessWidget {
           },
           body: TabBarView(
             children: [
-              Container(
-                child: ListView(
-                  children: [
-                    ListTile(
-                      leading: Icon(Icons.map),
-                      title: Text('Map'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.photo_album),
-                      title: Text('Album'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.phone),
-                      title: Text('Phone'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.map),
-                      title: Text('Map'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.photo_album),
-                      title: Text('Album'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.phone),
-                      title: Text('Phone'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.map),
-                      title: Text('Map'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.photo_album),
-                      title: Text('Album'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.phone),
-                      title: Text('Phone'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.map),
-                      title: Text('Map'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.photo_album),
-                      title: Text('Album'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.phone),
-                      title: Text('Phone'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.map),
-                      title: Text('Map'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.photo_album),
-                      title: Text('Album'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.phone),
-                      title: Text('Phone'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.map),
-                      title: Text('Map'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.photo_album),
-                      title: Text('Album'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.phone),
-                      title: Text('Phone'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.map),
-                      title: Text('Map'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.photo_album),
-                      title: Text('Album'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.phone),
-                      title: Text('Phone'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.map),
-                      title: Text('Map'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.photo_album),
-                      title: Text('Album'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.phone),
-                      title: Text('Phonelast'),
-                    ),
-                  ],
-                ),
-              ),
+              ALongListView(context),
               SecondTab(),
-              Icon(Icons.directions_bike),
+              Icon(Icons.check),
             ],
           ),
         ),
@@ -268,12 +157,13 @@ class ContextCanvas extends StatelessWidget {
         child: SizedBox(
           width: 250,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(4.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text('context widget'),
-                // Expanded(child: IgnorePointer()),
+                ContextWidgetCard(context, "title 1 number"),
+                ContextWidgetCard(context, "second"),
+                ContextWidgetCard(context, "1 a 2 b 3 c 4 d"),
               ],
             ),
           ),
@@ -576,12 +466,12 @@ class ActionButton extends StatelessWidget {
     return Material(
       shape: const CircleBorder(),
       clipBehavior: Clip.antiAlias,
-      color: theme.colorScheme.secondary,
+      color: theme.colorScheme.primaryContainer,
       elevation: 4.0,
       child: IconButton(
         onPressed: onPressed,
         icon: icon,
-        color: theme.colorScheme.secondary,
+        color: theme.colorScheme.primaryContainer,
       ),
     );
   }
@@ -604,6 +494,39 @@ class FakeItem extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(Radius.circular(8.0)),
         color: Colors.grey.shade300,
+      ),
+    );
+  }
+}
+
+class ContextWidgetCard extends StatelessWidget {
+  const ContextWidgetCard(BuildContext context, this.title);
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: Theme.of(context).colorScheme.primaryContainer,
+      child: SizedBox(
+        width: double.infinity,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+          child: Column(children: [
+            Text(title,
+                style: TextStyle(
+                  fontFamily: mainFontFamily,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                )),
+            Divider(color: Theme.of(context).colorScheme.onBackground),
+            Text(
+              "injected widget goes here",
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            ),
+          ]),
+        ),
       ),
     );
   }
