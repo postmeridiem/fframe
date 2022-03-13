@@ -21,7 +21,7 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('SettingsGeneralForm'),
-            Text('stuff like \n<feedback url link in top bar> \n<show logout button>'),
+            Text('stuff like \n<feedback url link in top bar> \n<toggle logout button> visibility'),
           ],
         ),
       ),

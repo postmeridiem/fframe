@@ -56,7 +56,7 @@ class MainCanvas extends StatelessWidget {
                 snap: true,
                 automaticallyImplyLeading: false,
                 backgroundColor: Theme.of(context).colorScheme.secondary,
-                // TODO: figure out how to het the appbar here without the tabs
+                // TODO: figure out how to get the appbar here without the tabs
                 bottom: new TabBar(
                   tabs: <Tab>[
                     Tab(
