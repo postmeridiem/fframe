@@ -39,4 +39,5 @@ doc/api/
 # IDE junk suppresion
 .idea
 .firebaserc
+.firebase
 .github
