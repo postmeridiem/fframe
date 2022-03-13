@@ -1,11 +1,5 @@
 import 'package:flutter/material.dart';
 
-// FONTS
-// Main font (changing this needs the font assets to be added to the project)
-String mainFontFamily = 'OpenSans';
-// Monospace font (changing this needs the font assets to be added to the project)
-String monoFontFamily = 'RobotoMono';
-
 // DARK MODE =======
 // color that sets the appbar, navrail, contextwidgets and FAB
 Color constPrimaryColorDark = Color(0xFF1B020B);
