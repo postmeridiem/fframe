@@ -21,7 +21,7 @@ final ThemeData appDarkTheme = ThemeData(
     background: constBackgroundColorDark,
     onBackground: constPrimaryAccentColorDark,
     surfaceVariant: Color(0xFFFF00DD),
-    onSurfaceVariant: Color(0xFFFFFFFF),
+    onSurfaceVariant: constOnBackgroundColorFadedDark,
     error: Color(0xffd32f2f),
     onError: Color(0xff000000),
     outline: Color(0xFFFF00C8),

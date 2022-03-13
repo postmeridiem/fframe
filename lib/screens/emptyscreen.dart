@@ -8,8 +8,8 @@ class EmptyScreen extends StatelessWidget {
           children: [
             Icon(
               Icons.coffee,
-              color: Colors.grey,
-              size: 24.0,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              size: 128.0,
             ),
             // SelectableText("No content to show"),
           ],
