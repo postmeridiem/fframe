@@ -1,21 +1,21 @@
 import 'dart:math' as math;
 
-import 'package:flutter/material.dart';
-import 'package:fframe/models/setting.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fframe/constants/fonts.dart';
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-import 'package:fframe/views/setting/setting.dart';
+import 'package:fframe/models/home.dart';
+import 'package:fframe/views/home/home_form.dart';
 
-class SettingDocument extends StatelessWidget {
-  const SettingDocument({
-    required this.setting,
+class HomeDocument extends StatelessWidget {
+  const HomeDocument({
+    required this.home,
     required this.documentReference,
     Key? key,
   }) : super(key: key);
 
   // Fields in a Widget subclass are always marked "final".
-  final Setting setting;
+  final Home home;
   final DocumentReference documentReference;
 
   @override
@@ -23,11 +23,11 @@ class SettingDocument extends StatelessWidget {
     return Row(
       children: [
         Flexible(
-          child: MainCanvas(context, setting),
+          child: MainCanvas(context, home, documentReference),
         ),
         SizedBox(
           width: 250,
-          child: ContextCanvas(context, setting),
+          child: ContextCanvas(context, home),
         ),
       ],
     );
@@ -35,8 +35,9 @@ class SettingDocument extends StatelessWidget {
 }
 
 class MainCanvas extends StatelessWidget {
-  const MainCanvas(BuildContext context, this.setting);
-  final Setting setting;
+  const MainCanvas(BuildContext context, this.home, this.documentReference);
+  final Home home;
+  final DocumentReference documentReference;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +51,7 @@ class MainCanvas extends StatelessWidget {
             return <Widget>[
               new SliverAppBar(
                 primary: false,
-                title: DocumentTitle(context, setting.name!),
+                title: DocumentTitle(context, home.name!),
                 floating: true,
                 pinned: false,
                 snap: true,
@@ -71,7 +72,7 @@ class MainCanvas extends StatelessWidget {
           },
           body: TabBarView(
             children: [
-              SettingsFormSelector(context, setting),
+              HomeForm(home: home, documentReference: documentReference),
             ],
           ),
         ),
@@ -106,40 +107,9 @@ class MainCanvas extends StatelessWidget {
   }
 }
 
-class SettingsFormSelector extends StatelessWidget {
-  const SettingsFormSelector(BuildContext context, this.setting);
-  final Setting setting;
-
-  @override
-  Widget build(BuildContext context) {
-    switch (setting.id) {
-      case "01-generalsettings":
-        {
-          return SettingsGeneralForm();
-        }
-      case "02-managelists":
-        {
-          return SettingsListsForm();
-        }
-      case "03-managepages":
-        {
-          return SettingsPagesForm();
-        }
-      case "99-advancedsettings":
-        {
-          return SettingsAdvancedForm();
-        }
-      default:
-        {
-          return Text("unconfigured");
-        }
-    }
-  }
-}
-
 class ContextCanvas extends StatelessWidget {
-  const ContextCanvas(BuildContext context, this.setting);
-  final Setting setting;
+  const ContextCanvas(BuildContext context, this.home);
+  final Home home;
 
   @override
   Widget build(BuildContext context) {
@@ -152,47 +122,12 @@ class ContextCanvas extends StatelessWidget {
             padding: const EdgeInsets.all(4.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                ContextWidgetCard(context, "sidewidget 1"),
-                ContextWidgetCard(context, "sidewidget 2"),
-              ],
+              children: [],
             ),
           ),
         ),
       ),
     );
-  }
-}
-
-class HeaderCanvas extends StatelessWidget {
-  const HeaderCanvas(BuildContext context, this.title);
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        DocumentTitle(context, title),
-        HeaderControlWidget(context),
-      ],
-    );
-  }
-}
-
-class HeaderControlWidget extends StatelessWidget {
-  const HeaderControlWidget(BuildContext context);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(children: [
-      Card(
-        child: Text(""),
-      ),
-      Card(
-        child: Text(" [ form controls ] "),
-      ),
-    ]);
   }
 }
 

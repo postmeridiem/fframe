@@ -1,5 +1,6 @@
 import 'package:fframe/models/navigationTarget.dart';
 import 'package:fframe/views/signInPage/signInPage.dart';
+import 'package:fframe/views/home/home.dart';
 import 'package:fframe/views/suggestion/suggestion.dart';
 import 'package:fframe/views/setting/setting.dart';
 import 'package:fframe/views/user/user.dart';
@@ -7,6 +8,7 @@ import 'package:fframe/views/user/user.dart';
 //The order here reflects the order in the siderail.
 // Omit the navigationRailDestination hide the item from the navigationrail.
 final List<NavigationTarget> authenticatedNavigationTargets = [
+  homeNavigationTargets,
   suggestionNavigationTargets,
   settingNavigationTargets,
   usersNavigationTargets,

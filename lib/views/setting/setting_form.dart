@@ -58,6 +58,36 @@ class _SettingsListsFormState extends State<SettingsListsForm> {
   }
 }
 
+class SettingsPagesForm extends StatefulWidget {
+  const SettingsPagesForm({Key? key}) : super(key: key);
+
+  @override
+  State<SettingsPagesForm> createState() => _SettingsPagesFormState();
+}
+
+class _SettingsPagesFormState extends State<SettingsPagesForm> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    print("presenting SettingsPagesForm");
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.all(6.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('SettingsPagesForm'),
+            Text('manage any navigation entity that needs to exist w/o a left navgrid'),
+            Text('<manage what happens on the home page>\n<manage any pages that need to be public>'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class SettingsAdvancedForm extends StatefulWidget {
   const SettingsAdvancedForm({Key? key}) : super(key: key);
 
