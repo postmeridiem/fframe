@@ -38,6 +38,8 @@ doc/api/
 
 # IDE junk suppresion
 .idea
+.github
+
+# Firebase components
 .firebaserc
 .firebase
-.github
