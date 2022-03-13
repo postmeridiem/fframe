@@ -40,11 +40,29 @@ flutter:
         - asset: assets/fonts/Raleway-Regular.ttf
         - asset: assets/fonts/Raleway-Italic.ttf
           style: italic
+        - asset: assets/fonts/Raleway-Bold.ttf
+          weight: 900
+    - family: OpenSans
+      fonts:
+        - asset: assets/fonts/OpenSans-Light.ttf
+        - asset: assets/fonts/OpenSans-LightItalic.ttf
+          style: italic
+        - asset: assets/fonts/OpenSans-Regular.ttf
+          weight: 900
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Light.ttf
+        - asset: assets/fonts/Poppins-LightItalic.ttf
+          style: italic
+        - asset: assets/fonts/Poppins-Light.ttf
+          weight: 900
     - family: RobotoMono
       fonts:
         - asset: assets/fonts/RobotoMono-Regular.ttf
+        - asset: assets/fonts/RobotoMono-Italic.ttf
+          style: italic
         - asset: assets/fonts/RobotoMono-Bold.ttf
-          weight: 700
+          weight: 900
 
   assets:
     - assets/images/
