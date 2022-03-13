@@ -11,7 +11,7 @@ final GoogleAuthProvider googleProvider = GoogleAuthProvider();
 
 final providerConfigs = [
   const GoogleProviderConfiguration(clientId: ''),
-  // const EmailProviderConfiguration(),
+  const EmailProviderConfiguration(),
   // emailLinkProviderConfig,
   // const PhoneProviderConfiguration(),
   // const AppleProviderConfiguration(),
