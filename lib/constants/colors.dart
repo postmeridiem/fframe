@@ -22,7 +22,7 @@ Color constDividerColorDark = Color(0xB21B1B1B);
 // color that sets the main background behind everything
 Color constBackgroundColorDark = Color(0xFF0E0D0D);
 Color constOnBackgroundColorDark = Color(0xFFEEEEEE);
-Color constOnBackgroundColorFadedDark = Color(0xFF20010E);
+Color constOnBackgroundColorFadedDark = Color(0xFF330216);
 
 // LIGHT MODE =======
 // color that sets the appbar, navrail, contextwidgets and FAB
