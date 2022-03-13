@@ -21,6 +21,16 @@ class Setting extends ChangeNotifier {
   bool? active;
   String? icon;
 
+  // TODO: integrate conversion to flutter icon into a model function
+
+  //  Icon(
+  //       IconData(
+  //         // icon codes match with here https://api.flutter.dev/flutter/material/Icons-class.html#constants
+  //         int.parse("0x${setting.icon}"),
+  //         fontFamily: 'MaterialIcons',
+  //       ),
+  //     ),
+
   Map<String, Object?> toFirestore() {
     print("writing <Setting>");
     return {'active': active, 'name': name, 'icon': icon};

@@ -1,9 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:fframe/models/suggestion.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'dart:math' as math;
-import 'package:fframe/helpers/fillers.dart';
 import 'package:fframe/constants/fonts.dart';
+import 'package:fframe/helpers/fillers.dart';
 
 class SuggestionDocument extends StatelessWidget {
   const SuggestionDocument({
@@ -77,17 +78,20 @@ class MainCanvas extends StatelessWidget {
                 bottom: new TabBar(
                   tabs: <Tab>[
                     Tab(
-                        icon: Icon(
-                      Icons.directions_car,
-                    )),
+                      icon: Icon(
+                        Icons.directions_car,
+                      ),
+                    ),
                     Tab(
-                        icon: Icon(
-                      Icons.directions_transit,
-                    )),
+                      icon: Icon(
+                        Icons.directions_transit,
+                      ),
+                    ),
                     Tab(
-                        icon: Icon(
-                      Icons.directions_bike,
-                    )),
+                      icon: Icon(
+                        Icons.directions_bike,
+                      ),
+                    ),
                   ], // <-- total of 2 tabs
                 ),
               ),

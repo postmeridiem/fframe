@@ -34,7 +34,7 @@ class _settingScreenState extends State<settingScreen> {
 
         // roles.contains("settingEditor")
 
-        return settingDocument(
+        return SettingDocument(
           documentReference: documentReference!,
           setting: setting,
           // allowEdit: roles.contains("settingEditor"),

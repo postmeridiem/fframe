@@ -25,6 +25,16 @@ class Suggestion extends ChangeNotifier {
   Timestamp? creationDate;
   String? createdBy;
 
+  // TODO: integrate conversion to flutter icon into a model function
+
+  //  Icon(
+  //       IconData(
+  //         // icon codes match with here https://api.flutter.dev/flutter/material/Icons-class.html#constants
+  //         int.parse("0x${suggestion.icon}"),
+  //         fontFamily: 'MaterialIcons',
+  //       ),
+  //     ),
+
   Map<String, Object?> toFirestore() {
     print("writing <Suggestion>");
     return {
