@@ -26,7 +26,7 @@ Color constOnBackgroundColorFadedDark = Color(0xFF330216);
 
 // LIGHT MODE =======
 // color that sets the appbar, navrail, contextwidgets and FAB
-Color constPrimaryColorLight = Color(0xFF310414);
+Color constPrimaryColorLight = Color(0xFF610525);
 Color constOnPrimaryColorLight = Color(0xFFFFFFFF);
 
 // color that sets 'secondary' level control widgets
