@@ -123,46 +123,13 @@ class ContextCanvas extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                ContextWidgetCard(context, "sidewidget 1"),
-                ContextWidgetCard(context, "sidewidget 2"),
+                ContextWidgetCard(context, "user side widget"),
               ],
             ),
           ),
         ),
       ),
     );
-  }
-}
-
-class HeaderCanvas extends StatelessWidget {
-  const HeaderCanvas(BuildContext context, this.title);
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        DocumentTitle(context, title),
-        HeaderControlWidget(context),
-      ],
-    );
-  }
-}
-
-class HeaderControlWidget extends StatelessWidget {
-  const HeaderControlWidget(BuildContext context);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(children: [
-      Card(
-        child: Text(""),
-      ),
-      Card(
-        child: Text(" [ form controls ] "),
-      ),
-    ]);
   }
 }
 
