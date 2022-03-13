@@ -3,7 +3,7 @@ import 'package:fframe/models/suggestion.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:math' as math;
 import 'package:fframe/helpers/fillers.dart';
-import 'package:fframe/constants/colors.dart';
+import 'package:fframe/constants/fonts.dart';
 
 class SuggestionDocument extends StatelessWidget {
   const SuggestionDocument({
@@ -263,7 +263,11 @@ class DocumentTitle extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             "${name.toUpperCase()}",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
           ),
         ),
       ),
@@ -517,12 +521,14 @@ class ContextWidgetCard extends StatelessWidget {
                   fontFamily: mainFontFamily,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onPrimaryContainer,
                 )),
             Divider(color: Theme.of(context).colorScheme.onBackground),
             Text(
               "injected widget goes here",
               style: TextStyle(
                 fontSize: 14,
+                color: Theme.of(context).colorScheme.onPrimaryContainer,
               ),
             ),
           ]),
