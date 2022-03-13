@@ -1,6 +1,7 @@
 import 'package:fframe/models/user.dart';
 import 'package:flutter/material.dart';
 
+// TODO: add the active inactive filter back in
 class UserList extends StatelessWidget {
   const UserList({
     required this.user,
