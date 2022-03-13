@@ -77,19 +77,23 @@ class MainCanvas extends StatelessWidget {
                 backgroundColor: Theme.of(context).colorScheme.secondary,
                 bottom: new TabBar(
                   tabs: <Tab>[
+                    // TODO: align text right from icon
                     Tab(
+                      text: "A Long List",
                       icon: Icon(
-                        Icons.directions_car,
+                        Icons.view_list,
                       ),
                     ),
                     Tab(
+                      text: "Placeholder",
                       icon: Icon(
-                        Icons.directions_transit,
+                        Icons.settings_overscan,
                       ),
                     ),
                     Tab(
+                      text: "Ok or Not?",
                       icon: Icon(
-                        Icons.directions_bike,
+                        Icons.flaky,
                       ),
                     ),
                   ], // <-- total of 2 tabs
