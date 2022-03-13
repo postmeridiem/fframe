@@ -61,7 +61,7 @@ class MainCanvas extends StatelessWidget {
                   tabs: <Tab>[
                     Tab(
                       icon: Icon(
-                        Icons.directions_car,
+                        Icons.settings,
                       ),
                     ),
                   ], // <-- total of 2 tabs
