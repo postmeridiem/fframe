@@ -4,14 +4,12 @@
            "name": "Flutter Web Chrome @ 8080",
            "request": "launch",
            "type": "dart",
-           "program": "fframe_demo/lib/main.dart",
            "args": ["-d", "chrome","--web-port", "8000"],
        },
        {
         "name": "Flutter Web WebServer @ 8080",
         "request": "launch",
         "type": "dart",
-        "program": "fframe_demo/bin/main.dart",
         "args": ["-d", "web-server","--web-port", "8000"],
     }
    ]}

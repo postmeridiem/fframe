@@ -1,0 +1,14 @@
+import 'package:flutter/material.dart';
+import 'package:fframe/models/navigation_target.dart';
+import 'package:fframe_demo/views/suggestion/suggestion.dart';
+
+final suggestionNavigationTargets = NavigationTarget(
+  path: "suggestions",
+  title: "Suggestions",
+  contentPane: const SuggestionScreen(),
+  navigationRailDestination: const NavigationRailDestination(
+    icon: Icon(Icons.pest_control),
+    label: Text('Suggestions'),
+  ),
+  roles: ['user'],
+);
