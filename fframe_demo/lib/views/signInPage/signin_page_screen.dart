@@ -2,10 +2,10 @@ import 'package:fframe/components/auth/authentication.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatelessWidget {
-  const SignInPage({Key? key}) : super(key: key);
-
+  const SignInPage({Key? key, required this.title}) : super(key: key);
+  final String title;
   @override
   Widget build(BuildContext context) {
-    return AuthenticationComponents(context).signInScreen();
+    return AuthenticationComponents(context, title).signInScreen();
   }
 }

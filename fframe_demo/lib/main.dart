@@ -31,6 +31,7 @@ class MyApp extends StatelessWidget {
     ];
 
     return Fframe(
+      title: "WutFrame",
       firebaseOptions: DefaultFirebaseConfig.platformOptions,
       authenticatedNavigationTargets: authenticatedNavigationTargets,
       unAuthenticatedNavigationTargets: unAuthenticatedNavigationTargets,

@@ -43,8 +43,9 @@ final emailLinkProviderConfig = EmailLinkProviderConfiguration(
 
 class AuthenticationComponents {
   final BuildContext context;
+  final String title;
 
-  AuthenticationComponents(this.context);
+  AuthenticationComponents(this.context, this.title);
 
   Widget signInScreen() {
     return SignInScreen(
@@ -73,7 +74,7 @@ class AuthenticationComponents {
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: Text(
-            action == AuthAction.signIn ? 'Welcome to FlutFrame.' : 'SHOULD NEVER BE AVAILABLE',
+            action == AuthAction.signIn ? title : 'Welcome',
             textAlign: TextAlign.center,
           ),
         );
