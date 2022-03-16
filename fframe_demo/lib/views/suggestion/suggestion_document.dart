@@ -33,31 +33,91 @@ class SuggestionDocument extends StatelessWidget {
   }
 }
 
-class ContentCanvas extends StatelessWidget {
-  const ContentCanvas({Key? key, required this.suggestion}) : super(key: key);
+// class ContentCanvas extends StatelessWidget {
+//   const ContentCanvas({Key? key, required this.suggestion}) : super(key: key);
 
-  final Suggestion suggestion;
+//   final Suggestion suggestion;
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Flexible(
-          child: MainCanvas(suggestion: suggestion),
-        ),
-        SizedBox(
-          width: 250,
-          child: ContextCanvas(suggestion: suggestion),
-        ),
-      ],
-    );
-  }
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: [
+//         Flexible(
+//           child: MainCanvas(suggestion: suggestion),
+//         ),
+//         SizedBox(
+//           width: 250,
+//           child: ContextCanvas(suggestion: suggestion),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+class DocumentTab {
+  final Tab tab;
+  final Widget child;
+
+  DocumentTab({required this.tab, required this.child});
 }
 
 class MainCanvas extends StatelessWidget {
-  const MainCanvas({Key? key, required this.suggestion}) : super(key: key);
+  MainCanvas({Key? key, required this.suggestion}) : super(key: key);
 
   final Suggestion suggestion;
+
+  final List<DocumentTab> documentTabs = [
+    DocumentTab(
+      tab: const Tab(
+        text: "A Long List",
+        icon: Icon(
+          Icons.view_list,
+        ),
+      ),
+      child: const ALongListView(),
+    ),
+    DocumentTab(
+      tab: const Tab(
+        text: "Placeholder",
+        icon: Icon(
+          Icons.settings_overscan,
+        ),
+      ),
+      child: const SecondTab(),
+    ),
+    DocumentTab(
+      tab: const Tab(
+        text: "Ok or Not?",
+        icon: Icon(
+          Icons.flaky,
+        ),
+      ),
+      child: const Icon(Icons.check),
+    ),
+  ];
+  final List<ActionButton> actionButtons = [
+    ActionButton(
+      onPressed: () => {},
+      icon: const Icon(
+        Icons.close,
+        // color: Theme.of(context).floatingActionButtonTheme.foregroundColor,
+      ),
+    ),
+    ActionButton(
+      onPressed: () => {},
+      icon: const Icon(
+        Icons.save,
+        // color: Theme.of(context).floatingActionButtonTheme.foregroundColor,
+      ),
+    ),
+    ActionButton(
+      onPressed: () => {},
+      icon: const Icon(
+        Icons.add,
+        // color: Theme.of(context).floatingActionButtonTheme.foregroundColor,
+      ),
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -77,65 +137,19 @@ class MainCanvas extends StatelessWidget {
                 snap: true,
                 automaticallyImplyLeading: false,
                 backgroundColor: Theme.of(context).colorScheme.secondary,
-                bottom: const TabBar(
-                  tabs: <Tab>[
-                    // TODO: align text right from icon
-                    Tab(
-                      text: "A Long List",
-                      icon: Icon(
-                        Icons.view_list,
-                      ),
-                    ),
-                    Tab(
-                      text: "Placeholder",
-                      icon: Icon(
-                        Icons.settings_overscan,
-                      ),
-                    ),
-                    Tab(
-                      text: "Ok or Not?",
-                      icon: Icon(
-                        Icons.flaky,
-                      ),
-                    ),
-                  ], // <-- total of 2 tabs
+                bottom: TabBar(
+                  tabs: documentTabs.map((documentTab) => documentTab.tab).toList(),
                 ),
               ),
             ];
           },
-          body: const TabBarView(
-            children: [
-              ALongListView(),
-              SecondTab(),
-              Icon(Icons.check),
-            ],
+          body: TabBarView(
+            children: documentTabs.map((documentTab) => documentTab.child).toList(),
           ),
         ),
         floatingActionButton: ExpandableFab(
           distance: 112.0,
-          children: [
-            ActionButton(
-              onPressed: () => {},
-              icon: Icon(
-                Icons.close,
-                color: Theme.of(context).floatingActionButtonTheme.foregroundColor,
-              ),
-            ),
-            ActionButton(
-              onPressed: () => {},
-              icon: Icon(
-                Icons.save,
-                color: Theme.of(context).floatingActionButtonTheme.foregroundColor,
-              ),
-            ),
-            ActionButton(
-              onPressed: () => {},
-              icon: Icon(
-                Icons.add,
-                color: Theme.of(context).floatingActionButtonTheme.foregroundColor,
-              ),
-            ),
-          ],
+          children: actionButtons,
         ),
       ),
     );
