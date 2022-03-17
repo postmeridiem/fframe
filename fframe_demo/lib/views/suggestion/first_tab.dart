@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ALongListView extends StatelessWidget {
-  const ALongListView({Key? key}) : super(key: key);
+class FirstTab extends StatelessWidget {
+  const FirstTab({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,7 @@
 library fframe;
 
 import 'dart:async';
+import 'dart:math' as math;
 import 'package:fframe/controllers/app_user_state_controller.dart';
 import 'package:fframe/controllers/navigation_state_controller.dart';
 import 'package:fframe/models/navigation_target.dart';
@@ -16,3 +17,4 @@ import 'package:flutterfire_ui/firestore.dart';
 
 part 'main.dart';
 part 'screens/documentscreen.dart';
+part 'helpers/expandable_fab.dart';

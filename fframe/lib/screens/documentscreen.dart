@@ -1,13 +1,11 @@
 part of fframe;
 
-// import 'package:fframe/controllers/navigation_state_controller.dart';
-// import 'package:fframe/providers/global_providers.dart';
-// import 'package:fframe/screens/screens.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-// import 'package:flutterfire_ui/firestore.dart';
-// import 'package:go_router/go_router.dart';
+class DocumentTab {
+  final Tab tab;
+  final Widget child;
+
+  DocumentTab({required this.tab, required this.child});
+}
 
 class DocumentScreen<T> extends StatefulWidget {
   const DocumentScreen({
