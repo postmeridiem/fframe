@@ -1,40 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:fframe/constants/colors.dart';
-import 'package:fframe/constants/fonts.dart';
+import 'package:fframe_demo/themes/fonts.dart';
+import 'package:fframe_demo/themes/colors.dart';
 
-final ThemeData appLightTheme = ThemeData(
+final ThemeData appDarkTheme = ThemeData(
   fontFamily: mainFontFamily,
-  scaffoldBackgroundColor: constBackgroundColorLight,
-  indicatorColor: constPrimaryColorLight,
+  scaffoldBackgroundColor: constBackgroundColorDark,
+  indicatorColor: constPrimaryAccentColorDark,
   colorScheme: ColorScheme(
-    brightness: Brightness.light,
-    primary: constPrimaryColorLight,
-    onPrimary: constOnPrimaryColorLight,
-    secondary: constSecondaryColorLight,
-    onSecondary: constOnSecondaryColorLight,
-    surface: constSecondaryColorLight,
-    onSurface: constOnSecondaryColorLight,
-    primaryContainer: constPrimaryColorLight,
-    onPrimaryContainer: constOnPrimaryColorLight,
-    secondaryContainer: constSecondaryColorLight,
-    onSecondaryContainer: constOnSecondaryColorLight,
-    background: constBackgroundColorLight,
-    onBackground: constPrimaryAccentColorLight,
+    brightness: Brightness.dark,
+    primary: constOnPrimaryColorDark,
+    onPrimary: constPrimaryColorDark,
+    secondary: constSecondaryColorDark,
+    onSecondary: constOnSecondaryColorDark,
+    surface: constPrimaryColorDark,
+    onSurface: constOnPrimaryColorDark,
+    primaryContainer: constPrimaryColorDark,
+    onPrimaryContainer: constOnPrimaryColorDark,
+    secondaryContainer: constSecondaryColorDark,
+    onSecondaryContainer: constOnSecondaryColorDark,
+    background: constBackgroundColorDark,
+    onBackground: constPrimaryAccentColorDark,
     surfaceVariant: const Color(0xFFFF00DD),
-    onSurfaceVariant: constOnBackgroundColorFadedLight,
+    onSurfaceVariant: constOnBackgroundColorFadedDark,
     error: const Color(0xffd32f2f),
     onError: const Color(0xff000000),
     outline: const Color(0xFFFF00C8),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    foregroundColor: constPrimaryAccentColorLight,
-    focusColor: constOnPrimaryColorLight,
-    backgroundColor: constPrimaryColorLight,
+    foregroundColor: constPrimaryAccentColorDark,
+    focusColor: constOnPrimaryColorDark,
+    backgroundColor: constPrimaryColorDark,
   ),
   cardTheme: CardTheme(
-    color: constSecondaryColorLight,
+    color: constSecondaryColorDark,
   ),
-  dividerColor: constDividerColorLight,
+  dividerColor: constDividerColorDark,
   buttonTheme: const ButtonThemeData(
     textTheme: ButtonTextTheme.normal,
     minWidth: 88,
@@ -49,28 +49,28 @@ final ThemeData appLightTheme = ThemeData(
       borderRadius: BorderRadius.all(Radius.circular(2.0)),
     ),
     alignedDropdown: false,
-    buttonColor: Color(0xffe0e0e0),
-    disabledColor: Color(0x61000000),
-    highlightColor: Color(0x29000000),
-    splashColor: Color(0x1f000000),
-    focusColor: Color(0x1f000000),
-    hoverColor: Color(0x0a000000),
+    buttonColor: Color(0xff2b8da1),
+    disabledColor: Color(0x61ffffff),
+    highlightColor: Color(0x29ffffff),
+    splashColor: Color(0x1fffffff),
+    focusColor: Color(0x1fffffff),
+    hoverColor: Color(0x0affffff),
     colorScheme: ColorScheme(
+      brightness: Brightness.dark,
       primary: Color(0xff0f3138),
       onPrimary: Color(0xffffffff),
-      secondary: Color(0xff36b0c9),
+      secondary: Color(0xff64ffda),
       onSecondary: Color(0xff000000),
-      surface: Color(0xffffffff),
-      onSurface: Color(0xff000000),
-      background: Color(0xffafdfe9),
+      surface: Color(0xff616161),
+      onSurface: Color(0xffffffff),
+      background: Color(0xff616161),
       onBackground: Color(0xffffffff),
       error: Color(0xffd32f2f),
-      onError: Color(0xffffffff),
-      brightness: Brightness.light,
+      onError: Color(0xff000000),
     ),
   ),
   iconTheme: const IconThemeData(
-    color: Color(0xdd000000),
+    color: Color(0xffffffff),
     opacity: 1,
     size: 24,
   ),
@@ -104,30 +104,30 @@ final ThemeData appLightTheme = ThemeData(
   ),
   tabBarTheme: TabBarTheme(
     indicatorSize: TabBarIndicatorSize.tab,
-    labelColor: constPrimaryColorLight,
-    unselectedLabelColor: constUnselectedColorLight,
+    labelColor: constPrimaryAccentColorDark,
+    unselectedLabelColor: constUnselectedColorDark,
   ),
   chipTheme: const ChipThemeData(
-    backgroundColor: Color(0x1f000000),
-    brightness: Brightness.light,
-    deleteIconColor: Color(0xde000000),
-    disabledColor: Color(0x0c000000),
+    backgroundColor: Color(0x1fffffff),
+    brightness: Brightness.dark,
+    deleteIconColor: Color(0xdeffffff),
+    disabledColor: Color(0x0cffffff),
     labelPadding: EdgeInsets.only(top: 0, bottom: 0, left: 8, right: 8),
     labelStyle: TextStyle(
-      color: Color(0xde000000),
+      color: Color(0xdeffffff),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
     padding: EdgeInsets.only(top: 4, bottom: 4, left: 4, right: 4),
     secondaryLabelStyle: TextStyle(
-      color: Color(0x3d000000),
+      color: Color(0x3dffffff),
       fontSize: null,
       fontWeight: FontWeight.w400,
       fontStyle: FontStyle.normal,
     ),
-    secondarySelectedColor: Color(0x3d0f3138),
-    selectedColor: Color(0x3d000000),
+    secondarySelectedColor: Color(0x3d212121),
+    selectedColor: Color(0x3dffffff),
     shape: StadiumBorder(
         side: BorderSide(
       color: Color(0xff000000),
@@ -144,267 +144,267 @@ final ThemeData appLightTheme = ThemeData(
     ),
     borderRadius: BorderRadius.all(Radius.circular(0.0)),
   )),
-// textTheme: TextTheme(
-  //   display4: TextStyle(
-  //     color: Color(0x8a000000),
+//   textTheme: TextTheme(
+  //     display4: TextStyle(
+  //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   display3: TextStyle(
-  //     color: Color(0x8a000000),
+  //     display3: TextStyle(
+  //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   display2: TextStyle(
-  //     color: Color(0x8a000000),
+  //     display2: TextStyle(
+  //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   display1: TextStyle(
-  //     color: Color(0x8a000000),
+  //     display1: TextStyle(
+  //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   headline: TextStyle(
-  //     color: Color(0xdd000000),
+  //     headline: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   title: TextStyle(
-  //     color: Color(0xdd000000),
+  //     title: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   subhead: TextStyle(
-  //     color: Color(0xdd000000),
+  //     subhead: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   body2: TextStyle(
-  //     color: Color(0xdd000000),
+  //     body2: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   body1: TextStyle(
-  //     color: Color(0xdd000000),
+  //     body1: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   caption: TextStyle(
-  //     color: Color(0x8a000000),
+  //     caption: TextStyle(
+  //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   button: TextStyle(
-  //     color: Color(0xdd000000),
+  //     button: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   subtitle: TextStyle(
-  //     color: Color(0xff000000),
+  //     subtitle: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   overline: TextStyle(
-  //     color: Color(0xff000000),
+  //     overline: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  // ),
-  // primaryTextTheme: TextTheme(
-  //   display4: TextStyle(
-  //     color: Color(0xb3ffffff),
+  //   ),
+  //   primaryTextTheme: TextTheme(
+  //     display4: TextStyle(
+  //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   display3: TextStyle(
-  //     color: Color(0xb3ffffff),
+  //     display3: TextStyle(
+  //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   display2: TextStyle(
-  //     color: Color(0xb3ffffff),
+  //     display2: TextStyle(
+  //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   display1: TextStyle(
-  //     color: Color(0xb3ffffff),
+  //     display1: TextStyle(
+  //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   headline: TextStyle(
-  //     color: Color(0xffffffff),
+  //     headline: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   title: TextStyle(
-  //     color: Color(0xffffffff),
+  //     title: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   subhead: TextStyle(
-  //     color: Color(0xffffffff),
+  //     subhead: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   body2: TextStyle(
-  //     color: Color(0xffffffff),
+  //     body2: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   body1: TextStyle(
-  //     color: Color(0xffffffff),
+  //     body1: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   caption: TextStyle(
-  //     color: Color(0xb3ffffff),
+  //     caption: TextStyle(
+  //     color: Color( 0xb3ffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   button: TextStyle(
-  //     color: Color(0xffffffff),
+  //     button: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   subtitle: TextStyle(
-  //     color: Color(0xffffffff),
+  //     subtitle: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   overline: TextStyle(
-  //     color: Color(0xffffffff),
+  //     overline: TextStyle(
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  // ),
-  // accentTextTheme: TextTheme(
-  //   display4: TextStyle(
-  //     color: Color(0x8a000000),
+  //   ),
+  //   accentTextTheme: TextTheme(
+  //     display4: TextStyle(
+  //     color: Color( 0x8a000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   display3: TextStyle(
-  //     color: Color(0x8a000000),
+  //     display3: TextStyle(
+  //     color: Color( 0x8a000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   display2: TextStyle(
-  //     color: Color(0x8a000000),
+  //     display2: TextStyle(
+  //     color: Color( 0x8a000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   display1: TextStyle(
-  //     color: Color(0x8a000000),
+  //     display1: TextStyle(
+  //     color: Color( 0x8a000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   headline: TextStyle(
-  //     color: Color(0xdd000000),
+  //     headline: TextStyle(
+  //     color: Color( 0xdd000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   title: TextStyle(
-  //     color: Color(0xdd000000),
+  //     title: TextStyle(
+  //     color: Color( 0xdd000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   subhead: TextStyle(
-  //     color: Color(0xdd000000),
+  //     subhead: TextStyle(
+  //     color: Color( 0xdd000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   body2: TextStyle(
-  //     color: Color(0xdd000000),
+  //     body2: TextStyle(
+  //     color: Color( 0xdd000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   body1: TextStyle(
-  //     color: Color(0xdd000000),
+  //     body1: TextStyle(
+  //     color: Color( 0xdd000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   caption: TextStyle(
-  //     color: Color(0x8a000000),
+  //     caption: TextStyle(
+  //     color: Color( 0x8a000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   button: TextStyle(
-  //     color: Color(0xdd000000),
+  //     button: TextStyle(
+  //     color: Color( 0xdd000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   subtitle: TextStyle(
-  //     color: Color(0xff000000),
+  //     subtitle: TextStyle(
+  //     color: Color( 0xff000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  //   overline: TextStyle(
-  //     color: Color(0xff000000),
+  //     overline: TextStyle(
+  //     color: Color( 0xff000000 ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
-  // ),
-  // inputDecorationTheme: InputDecorationTheme(
+  //   ),
+  //   inputDecorationTheme:   InputDecorationTheme(
   //   labelStyle: TextStyle(
-  //     color: Color(0xdd000000),
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
   //   helperStyle: TextStyle(
-  //     color: Color(0xdd000000),
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
   //   hintStyle: TextStyle(
-  //     color: Color(0xdd000000),
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
   //   errorStyle: TextStyle(
-  //     color: Color(0xdd000000),
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
@@ -412,74 +412,50 @@ final ThemeData appLightTheme = ThemeData(
   //   errorMaxLines: null,
   //   hasFloatingPlaceholder: true,
   //   isDense: false,
-  //   contentPadding: EdgeInsets.only(top: 12, bottom: 12, left: 0, right: 0),
-  //   isCollapsed: false,
+  //   contentPadding: EdgeInsets.only(top:12,bottom:12,left:0, right:0),
+  //   isCollapsed : false,
   //   prefixStyle: TextStyle(
-  //     color: Color(0xdd000000),
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
   //   suffixStyle: TextStyle(
-  //     color: Color(0xdd000000),
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
   //   counterStyle: TextStyle(
-  //     color: Color(0xdd000000),
+  //     color: Color( 0xffffffff ),
   //     fontSize: null,
   //     fontWeight: FontWeight.w400,
   //     fontStyle: FontStyle.normal,
   //   ),
   //   filled: false,
-  //   fillColor: Color(0x00000000),
+  //   fillColor: Color( 0x00000000 ),
   //   errorBorder: UnderlineInputBorder(
-  //     borderSide: BorderSide(
-  //       color: Color(0xff000000),
-  //       width: 1,
-  //       style: BorderStyle.solid,
-  //     ),
+  //     borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
   //     borderRadius: BorderRadius.all(Radius.circular(4.0)),
   //   ),
   //   focusedBorder: UnderlineInputBorder(
-  //     borderSide: BorderSide(
-  //       color: Color(0xff000000),
-  //       width: 1,
-  //       style: BorderStyle.solid,
-  //     ),
+  //     borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
   //     borderRadius: BorderRadius.all(Radius.circular(4.0)),
   //   ),
   //   focusedErrorBorder: UnderlineInputBorder(
-  //     borderSide: BorderSide(
-  //       color: Color(0xff000000),
-  //       width: 1,
-  //       style: BorderStyle.solid,
-  //     ),
+  //     borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
   //     borderRadius: BorderRadius.all(Radius.circular(4.0)),
   //   ),
   //   disabledBorder: UnderlineInputBorder(
-  //     borderSide: BorderSide(
-  //       color: Color(0xff000000),
-  //       width: 1,
-  //       style: BorderStyle.solid,
-  //     ),
+  //     borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
   //     borderRadius: BorderRadius.all(Radius.circular(4.0)),
   //   ),
   //   enabledBorder: UnderlineInputBorder(
-  //     borderSide: BorderSide(
-  //       color: Color(0xff000000),
-  //       width: 1,
-  //       style: BorderStyle.solid,
-  //     ),
+  //     borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
   //     borderRadius: BorderRadius.all(Radius.circular(4.0)),
   //   ),
   //   border: UnderlineInputBorder(
-  //     borderSide: BorderSide(
-  //       color: Color(0xff000000),
-  //       width: 1,
-  //       style: BorderStyle.solid,
-  //     ),
+  //     borderSide: BorderSide(color: Color( 0xff000000 ), width: 1, style: BorderStyle.solid, ),
   //     borderRadius: BorderRadius.all(Radius.circular(4.0)),
   //   ),
   // ),

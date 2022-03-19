@@ -14,13 +14,21 @@ class DocumentScreen<T> extends StatefulWidget {
     required this.documentStream,
     required this.documentListBuilder,
     required this.documentBuilder,
+    required this.titleBuilder,
+    required this.documentTabs,
+    this.actionButtons,
+    this.contextWidgets,
     this.autoSave = true,
   }) : super(key: key);
   final Query<T> query;
   final DocumentStream documentStream;
   final DocumentListBuilder<T> documentListBuilder;
   final DocumentBuilder<T> documentBuilder;
+  final TitleBuilder<T> titleBuilder;
   final bool autoSave;
+  final List<DocumentTab> documentTabs;
+  final List<ActionButton>? actionButtons;
+  final List<Widget>? contextWidgets;
 
   @override
   State<DocumentScreen<T>> createState() => _DocumentScreenState<T>();
@@ -29,6 +37,31 @@ class DocumentScreen<T> extends StatefulWidget {
 class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
   @override
   Widget build(BuildContext context) {
+    List<ActionButton> actionButtons = [
+      ActionButton(
+        onPressed: () => {},
+        icon: const Icon(
+          Icons.close,
+        ),
+      ),
+      ActionButton(
+        onPressed: () => {},
+        icon: const Icon(
+          Icons.save,
+        ),
+      ),
+      ActionButton(
+        onPressed: () => {},
+        icon: const Icon(
+          Icons.add,
+        ),
+      ),
+    ];
+
+    if (widget.actionButtons != null) {
+      actionButtons.addAll(widget.actionButtons!);
+    }
+
     return Row(
       children: [
         SizedBox(
@@ -49,7 +82,10 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
               child: _DocumentBody(
                 documentBuilder: widget.documentBuilder,
                 documentStream: widget.documentStream,
-                autoSave: widget.autoSave,
+                actionButtons: actionButtons,
+                titleBuilder: widget.titleBuilder,
+                documentTabs: widget.documentTabs,
+                contextWidgets: widget.contextWidgets,
               )),
         ),
       ],
@@ -60,13 +96,23 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
 class _DocumentBody<T> extends ConsumerWidget {
   const _DocumentBody({
     Key? key,
+    this.title,
     required this.documentBuilder,
+    required this.titleBuilder,
     required this.documentStream,
-    required this.autoSave,
+    // required this.autoSave,
+    required this.actionButtons,
+    required this.documentTabs,
+    this.contextWidgets,
   }) : super(key: key);
   final DocumentBuilder<T> documentBuilder;
+  final TitleBuilder<T> titleBuilder;
   final DocumentStream? documentStream;
-  final bool autoSave;
+  // final bool autoSave;
+  final String? title;
+  final List<ActionButton> actionButtons;
+  final List<DocumentTab> documentTabs;
+  final List<Widget>? contextWidgets;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -83,7 +129,6 @@ class _DocumentBody<T> extends ConsumerWidget {
         initialData: documentSnapshot,
         stream: _documentStream,
         builder: (context, AsyncSnapshot<DocumentSnapshot<T>> asyncSnapshot) {
-          print("Async builder ${asyncSnapshot.connectionState.toString()}");
           switch (asyncSnapshot.connectionState) {
             case ConnectionState.none:
               return const EmptyScreen();
@@ -93,13 +138,17 @@ class _DocumentBody<T> extends ConsumerWidget {
             case ConnectionState.done:
               if (asyncSnapshot.hasError) return ErrorScreen(error: Exception(asyncSnapshot.error));
               if (!asyncSnapshot.hasData) return const WaitScreen();
+              print("Load DocumentCanvas");
               return Scaffold(
-                body: documentBuilder(context, asyncSnapshot.data!.reference, asyncSnapshot.data!.data()!),
-                // bottomNavigationBar: Row(
-                //   children: [
-                //     IconButton(onPressed: () {}, icon: Icon(Icons.save)),
-                //   ],
-                // ),
+                primary: false,
+                // body: documentBuilder(context, asyncSnapshot.data!.reference, asyncSnapshot.data!.data()!),
+                body: DocumentCanvas(
+                  titleBuilder: titleBuilder,
+                  data: asyncSnapshot.data!.data()!,
+                  documentTabs: documentTabs,
+                  actionButtons: actionButtons,
+                  contextWidgets: contextWidgets,
+                ),
               );
           }
         },
@@ -110,6 +159,184 @@ class _DocumentBody<T> extends ConsumerWidget {
       }
     }
     return const EmptyScreen();
+  }
+}
+
+class DocumentCanvas<T> extends StatelessWidget {
+  DocumentCanvas({
+    Key? key,
+    this.titleBuilder,
+    required this.data,
+    required this.actionButtons,
+    required this.documentTabs,
+    this.contextWidgets,
+  }) : super(key: key);
+
+  // final Suggestion suggestion;
+  final GlobalKey<ScaffoldState> _key = GlobalKey();
+  final T data;
+  final TitleBuilder<T>? titleBuilder;
+  final List<ActionButton> actionButtons;
+  final List<DocumentTab> documentTabs;
+  final List<Widget>? contextWidgets;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final bool collapsed = constraints.maxWidth > 1000;
+
+        return Row(
+          children: [
+            Flexible(
+              fit: FlexFit.tight,
+              child: DefaultTabController(
+                length: documentTabs.length,
+                child: Scaffold(
+                  key: _key,
+                  endDrawer: (contextWidgets != null && contextWidgets!.isNotEmpty)
+                      ? ContextCanvas(
+                          contextWidgets: contextWidgets!,
+                        )
+                      : null,
+                  primary: false,
+                  backgroundColor: Theme.of(context).colorScheme.secondary,
+                  body: NestedScrollView(
+                    headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                      return <Widget>[
+                        SliverAppBar(
+                          actions: const [IgnorePointer()], //To surpess the hamburger
+                          primary: false,
+                          title: titleBuilder != null ? titleBuilder!(data) : const Text("New"),
+                          floating: true,
+                          pinned: false,
+                          snap: true,
+                          automaticallyImplyLeading: false,
+                          backgroundColor: Theme.of(context).colorScheme.secondary,
+                          bottom: documentTabs.length != 1
+                              ? TabBar(
+                                  tabs: documentTabs.map((documentTab) => documentTab.tab).toList(),
+                                )
+                              : null,
+                        ),
+                      ];
+                    },
+                    body: TabBarView(
+                      children: documentTabs.map((documentTab) => documentTab.child).toList(),
+                    ),
+                  ),
+                  floatingActionButton: ExpandableFab(
+                    distance: 112.0,
+                    children: actionButtons,
+                  ),
+                ),
+              ),
+            ),
+            if (contextWidgets != null && contextWidgets!.isNotEmpty)
+              collapsed
+                  ? SizedBox(
+                      width: 250,
+                      child: ContextCanvas(
+                        contextWidgets: contextWidgets!,
+                      ),
+                    )
+                  : DrawerButton(scaffoldKey: _key),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class DrawerButton extends StatefulWidget {
+  const DrawerButton({Key? key, required this.scaffoldKey}) : super(key: key);
+  final GlobalKey<ScaffoldState> scaffoldKey;
+  @override
+  State<DrawerButton> createState() => _DrawerButtonState();
+}
+
+class _DrawerButtonState extends State<DrawerButton> {
+  @override
+  Widget build(BuildContext context) {
+    if (widget.scaffoldKey.currentState != null && widget.scaffoldKey.currentState!.hasEndDrawer) {
+      return LimitedBox(
+        maxWidth: 12,
+        child: Center(
+          child: AnimatedSwitcher(
+            duration: const Duration(
+              seconds: 2,
+            ),
+            child: widget.scaffoldKey.currentState!.isEndDrawerOpen
+                ? IconButton(
+                    onPressed: () => setState(
+                      () => widget.scaffoldKey.currentState!.openDrawer(),
+                    ),
+                    icon: const Icon(Icons.arrow_forward_ios),
+                    iconSize: 10,
+                    splashRadius: 12,
+                  )
+                : IconButton(
+                    onPressed: () => setState(
+                      () => widget.scaffoldKey.currentState!.openEndDrawer(),
+                    ),
+                    icon: const Icon(Icons.arrow_back_ios_new),
+                    iconSize: 10,
+                    splashRadius: 12,
+                  ),
+
+            // ? const Icon(Icons.arrow_forward_ios) : const Icon(Icons.arrow_back_ios_new),
+          ),
+        ),
+      );
+    }
+    return IgnorePointer();
+  }
+}
+
+class ContextCanvas extends StatelessWidget {
+  const ContextCanvas({Key? key, required this.contextWidgets}) : super(key: key);
+  final List<Widget> contextWidgets;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: Card(
+        child: SizedBox(
+          width: 250,
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: contextWidgets,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DocumentTitle extends StatelessWidget {
+  const DocumentTitle({Key? key, required, required this.title}) : super(key: key);
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.center,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -185,6 +412,12 @@ typedef DocumentListBuilder<T> = Widget Function(
 typedef DocumentBuilder<T> = Widget Function(
   BuildContext context,
   DocumentReference<T> documentReference,
+  T data,
+  // List<ActionButton> actionButtons,
+  // List<DocumentTab> documentTabs,
+  // List<Widget>? contextWidgets,
+);
+typedef TitleBuilder<T> = Widget Function(
   T data,
 );
 

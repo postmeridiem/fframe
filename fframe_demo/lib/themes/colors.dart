@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+class DarkMode{
+  Color constPrimaryColorDark = const Color(0xFF1B020B);
+  Color constOnPrimaryColorDark = const Color(0xffffffff);
+
+}
 // DARK MODE =======
 // color that sets the appbar, navrail, contextwidgets and FAB
 Color constPrimaryColorDark = const Color(0xFF1B020B);

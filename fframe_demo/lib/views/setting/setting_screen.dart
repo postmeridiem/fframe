@@ -20,6 +20,8 @@ class _SettingScreenState extends State<SettingScreen> {
       query: SettingService().queryStream(),
       documentStream: (String? documentId) => SettingService().documentStream(documentId: documentId),
       autoSave: false,
+      documentTabs: const [],
+
       //Left hand (navigation/document selection pane)
       documentListBuilder: (context, bool selected, Setting setting) {
         //List Tile per setting
@@ -28,14 +30,24 @@ class _SettingScreenState extends State<SettingScreen> {
           selected: selected,
         );
       },
+      titleBuilder: (Setting setting) {
+        return Text(setting.name ?? "New Setting");
+      },
       //Right hand (document) pane
-      documentBuilder: (context, DocumentReference<Setting>? documentReference, Setting setting) {
+      documentBuilder: (
+        BuildContext context,
+        DocumentReference<Setting> documentReference,
+        Setting setting,
+        // List<ActionButton> actionButtons,
+        // List<DocumentTab> documentTabs,
+        // List<Widget>? contextWidgets,
+      ) {
         // var roles = ['', ''];
 
         // roles.contains("settingEditor")
 
         return SettingDocument(
-          documentReference: documentReference!,
+          documentReference: documentReference,
           setting: setting,
           // allowEdit: roles.contains("settingEditor"),
         );

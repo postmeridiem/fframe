@@ -1,33 +1,5 @@
 part of fframe;
 
-// Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(
-//     options: DefaultFirebaseConfig.platformOptions,
-//   );
-//   // await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-//   // GoRouter.setUrlPathStrategy(UrlPathStrategy.path);
-
-//   runApp(
-//     RootRestorationScope(
-//       restorationId: 'root',
-//       child: ProviderScope(
-//         child: Consumer(
-//           builder: (context, ref, child) {
-//             UserState userState = ref.watch(userStateNotifierProvider);
-
-//             if (userState.runtimeType != UserStateSignedIn && userState.runtimeType != UserStateSignedOut) {
-//               return const UnknownStateLoader();
-//             }
-
-//             return const App();
-//           },
-//         ),
-//       ),
-//     ),
-//   );
-// }
-
 class Fframe extends StatefulWidget {
   const Fframe({
     Key? key,
@@ -35,11 +7,15 @@ class Fframe extends StatefulWidget {
     required this.firebaseOptions,
     required this.authenticatedNavigationTargets,
     required this.unAuthenticatedNavigationTargets,
+    required this.darkMode,
+    required this.lightMode,
   }) : super(key: key);
   final String title;
   final FirebaseOptions firebaseOptions;
   final List<NavigationTarget> authenticatedNavigationTargets;
   final List<NavigationTarget> unAuthenticatedNavigationTargets;
+  final ThemeData darkMode;
+  final ThemeData lightMode;
 
   @override
   State<Fframe> createState() => _FframeState();
@@ -77,6 +53,8 @@ class _FframeState extends State<Fframe> {
                       title: widget.title,
                       authenticatedNavigationTargets: widget.authenticatedNavigationTargets,
                       unAuthenticatedNavigationTargets: widget.unAuthenticatedNavigationTargets,
+                      lightMode: widget.lightMode,
+                      darkMode: widget.darkMode,
                     );
                   },
                 ),
@@ -90,11 +68,20 @@ class _FframeState extends State<Fframe> {
 }
 
 class App extends StatefulWidget {
-  const App({Key? key, required this.title, required this.authenticatedNavigationTargets, required this.unAuthenticatedNavigationTargets}) : super(key: key);
+  const App({
+    Key? key,
+    required this.title,
+    required this.authenticatedNavigationTargets,
+    required this.unAuthenticatedNavigationTargets,
+    required this.darkMode,
+    required this.lightMode,
+  }) : super(key: key);
 
   final String title;
   final List<NavigationTarget> authenticatedNavigationTargets;
   final List<NavigationTarget> unAuthenticatedNavigationTargets;
+  final ThemeData darkMode;
+  final ThemeData lightMode;
   @override
   State<App> createState() => _AppState();
 }
@@ -249,6 +236,8 @@ class _AppState extends State<App> with RestorationMixin {
           child: child,
           state: state,
           navigationTargets: _navigationTargets(userState),
+          lightMode: widget.lightMode,
+          darkMode: widget.darkMode,
         );
       },
     );

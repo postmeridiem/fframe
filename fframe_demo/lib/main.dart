@@ -1,5 +1,7 @@
 import 'package:fframe/models/navigation_target.dart';
 import 'package:fframe_demo/firebase_config.dart';
+import 'package:fframe_demo/themes/theme_dark.dart';
+import 'package:fframe_demo/themes/theme_light.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
@@ -31,10 +33,12 @@ class MyApp extends StatelessWidget {
     ];
 
     return Fframe(
-      title: "FFrame",
+      title: "FFrame Demo",
       firebaseOptions: DefaultFirebaseConfig.platformOptions,
       authenticatedNavigationTargets: authenticatedNavigationTargets,
       unAuthenticatedNavigationTargets: unAuthenticatedNavigationTargets,
+      lightMode: appLightTheme,
+      darkMode: appDarkTheme,
     );
   }
 }

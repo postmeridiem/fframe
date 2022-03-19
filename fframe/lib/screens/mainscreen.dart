@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:clipboard/clipboard.dart';
-import 'package:fframe/components/theme_light.dart';
-import 'package:fframe/components/theme_dark.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -15,12 +13,16 @@ class MainScreen extends StatelessWidget {
   final Widget child;
   final GoRouterState state;
   final List<NavigationTarget> navigationTargets;
+  final ThemeData darkMode;
+  final ThemeData lightMode;
   const MainScreen({
     Key? key,
     required this.appTitle,
     required this.child,
     required this.state,
     required this.navigationTargets,
+    required this.darkMode,
+    required this.lightMode,
   }) : super(key: key);
 
   ActiveTarget getActiveTarget() {
@@ -54,8 +56,8 @@ class MainScreen extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: appTitle,
-      theme: appLightTheme,
-      darkTheme: appDarkTheme,
+      theme: lightMode,
+      darkTheme: darkMode,
       themeMode: ThemeMode.system,
       home: Scaffold(
         key: _scaffoldKey,

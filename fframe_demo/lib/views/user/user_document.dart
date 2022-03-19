@@ -1,6 +1,4 @@
 import 'dart:math' as math;
-
-import 'package:fframe_demo/constants/fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -400,7 +398,6 @@ class ContextWidgetCard extends StatelessWidget {
           child: Column(children: [
             Text(title,
                 style: TextStyle(
-                  fontFamily: mainFontFamily,
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onPrimaryContainer,

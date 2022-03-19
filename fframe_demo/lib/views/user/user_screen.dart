@@ -16,6 +16,7 @@ class UsersScreen extends StatelessWidget {
       key: key,
       query: UserService().userByMakeStream,
       documentStream: (String? documentId) => UserService().documentStream(documentId: documentId),
+      documentTabs: const [],
       //Left hand (navigation/document selection pane)
       documentListBuilder: (context, bool selected, User user) {
         //List Tile per user
@@ -24,8 +25,20 @@ class UsersScreen extends StatelessWidget {
           selected: selected,
         );
       },
-      //Right hand (document) pane
-      documentBuilder: (context, DocumentReference<User> documentReference, User user) {
+      titleBuilder: (User user) {
+        return Text(user.name ?? "New User");
+      },
+      // Right hand (document) pane
+      documentBuilder: (
+        BuildContext context,
+        DocumentReference<User> documentReference,
+        User user,
+        // List actionButtons,
+        // List<DocumentTab> documentTabs,
+        // List<Widget>? contextWidgets,
+      )
+          // documentBuilder: (context, DocumentReference<User> documentReference, User user)
+          {
         return UserDocument(
           user: user,
           documentReference: documentReference,

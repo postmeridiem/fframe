@@ -16,6 +16,7 @@ class HomeScreen extends StatelessWidget {
       key: key,
       query: HomeService().homeByMakeStream,
       documentStream: (String? documentId) => HomeService().documentStream(documentId: documentId),
+      documentTabs: const [],
       //Left hand (navigation/document selection pane)
       documentListBuilder: (context, bool selected, Home home) {
         //List Tile per home
@@ -24,8 +25,18 @@ class HomeScreen extends StatelessWidget {
           selected: selected,
         );
       },
+      titleBuilder: (Home home) {
+        return const Text("Home");
+      },
       //Right hand (document) pane
-      documentBuilder: (context, DocumentReference<Home> documentReference, Home home) {
+      documentBuilder: (
+        BuildContext context,
+        DocumentReference<Home> documentReference,
+        Home home,
+        // List<ActionButton> actionButtons,
+        // List<DocumentTab> documentTabs,
+        // List<Widget>? contextWidgets,
+      ) {
         return HomeDocument(
           home: home,
           documentReference: documentReference,
