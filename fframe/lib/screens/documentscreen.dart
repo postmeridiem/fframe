@@ -1,34 +1,27 @@
 part of fframe;
 
-class DocumentTab {
-  final Tab tab;
-  final Widget child;
-
-  DocumentTab({required this.tab, required this.child});
-}
-
 class DocumentScreen<T> extends StatefulWidget {
   const DocumentScreen({
     Key? key,
     required this.query,
     required this.documentStream,
     required this.documentListBuilder,
-    required this.documentBuilder,
-    required this.titleBuilder,
+    this.documentBuilder,
+    this.titleBuilder,
     required this.documentTabs,
     this.actionButtons,
-    this.contextWidgets,
+    this.contextCardBuilders,
     this.autoSave = true,
   }) : super(key: key);
   final Query<T> query;
   final DocumentStream documentStream;
   final DocumentListBuilder<T> documentListBuilder;
-  final DocumentBuilder<T> documentBuilder;
-  final TitleBuilder<T> titleBuilder;
+  final DocumentBuilder<T>? documentBuilder;
+  final TitleBuilder<T>? titleBuilder;
   final bool autoSave;
   final List<DocumentTab> documentTabs;
   final List<ActionButton>? actionButtons;
-  final List<Widget>? contextWidgets;
+  final List<ContextCardBuilder>? contextCardBuilders;
 
   @override
   State<DocumentScreen<T>> createState() => _DocumentScreenState<T>();
@@ -80,12 +73,11 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
           child: Padding(
               padding: const EdgeInsets.all(0.0),
               child: _DocumentBody(
-                documentBuilder: widget.documentBuilder,
                 documentStream: widget.documentStream,
                 actionButtons: actionButtons,
                 titleBuilder: widget.titleBuilder,
                 documentTabs: widget.documentTabs,
-                contextWidgets: widget.contextWidgets,
+                contextCardBuilders: widget.contextCardBuilders,
               )),
         ),
       ],
@@ -96,23 +88,17 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
 class _DocumentBody<T> extends ConsumerWidget {
   const _DocumentBody({
     Key? key,
-    this.title,
-    required this.documentBuilder,
-    required this.titleBuilder,
+    this.titleBuilder,
     required this.documentStream,
-    // required this.autoSave,
     required this.actionButtons,
     required this.documentTabs,
-    this.contextWidgets,
+    this.contextCardBuilders,
   }) : super(key: key);
-  final DocumentBuilder<T> documentBuilder;
-  final TitleBuilder<T> titleBuilder;
+  final TitleBuilder<T>? titleBuilder;
   final DocumentStream? documentStream;
-  // final bool autoSave;
-  final String? title;
   final List<ActionButton> actionButtons;
   final List<DocumentTab> documentTabs;
-  final List<Widget>? contextWidgets;
+  final List<ContextCardBuilder>? contextCardBuilders;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -147,7 +133,7 @@ class _DocumentBody<T> extends ConsumerWidget {
                   data: asyncSnapshot.data!.data()!,
                   documentTabs: documentTabs,
                   actionButtons: actionButtons,
-                  contextWidgets: contextWidgets,
+                  contextCardBuilders: contextCardBuilders,
                 ),
               );
           }
@@ -169,7 +155,7 @@ class DocumentCanvas<T> extends StatelessWidget {
     required this.data,
     required this.actionButtons,
     required this.documentTabs,
-    this.contextWidgets,
+    this.contextCardBuilders,
   }) : super(key: key);
 
   // final Suggestion suggestion;
@@ -178,7 +164,7 @@ class DocumentCanvas<T> extends StatelessWidget {
   final TitleBuilder<T>? titleBuilder;
   final List<ActionButton> actionButtons;
   final List<DocumentTab> documentTabs;
-  final List<Widget>? contextWidgets;
+  final List<ContextCardBuilder>? contextCardBuilders;
 
   @override
   Widget build(BuildContext context) {
@@ -194,9 +180,13 @@ class DocumentCanvas<T> extends StatelessWidget {
                 length: documentTabs.length,
                 child: Scaffold(
                   key: _key,
-                  endDrawer: (contextWidgets != null && contextWidgets!.isNotEmpty)
+                  endDrawer: (contextCardBuilders != null && contextCardBuilders!.isNotEmpty)
                       ? ContextCanvas(
-                          contextWidgets: contextWidgets!,
+                          contextWidgets: contextCardBuilders!
+                              .map(
+                                (contextCardBuilder) => contextCardBuilder(data),
+                              )
+                              .toList(),
                         )
                       : null,
                   primary: false,
@@ -207,22 +197,35 @@ class DocumentCanvas<T> extends StatelessWidget {
                         SliverAppBar(
                           actions: const [IgnorePointer()], //To surpess the hamburger
                           primary: false,
-                          title: titleBuilder != null ? titleBuilder!(data) : const Text("New"),
+                          title: titleBuilder != null ? titleBuilder!(data) : null,
                           floating: true,
                           pinned: false,
                           snap: true,
+                          centerTitle: true,
                           automaticallyImplyLeading: false,
                           backgroundColor: Theme.of(context).colorScheme.secondary,
                           bottom: documentTabs.length != 1
                               ? TabBar(
-                                  tabs: documentTabs.map((documentTab) => documentTab.tab).toList(),
+                                  tabs: documentTabs
+                                      .map(
+                                        (documentTab) => documentTab.documentTabBuilder(),
+                                      )
+                                      .toList(),
                                 )
                               : null,
                         ),
                       ];
                     },
                     body: TabBarView(
-                      children: documentTabs.map((documentTab) => documentTab.child).toList(),
+                      // children: [],
+                      children: documentTabs.map(
+                        (documentTab) {
+                          return Form(
+                            key: documentTab.formKey,
+                            child: documentTab.documentTabChildBuilder(data),
+                          );
+                        },
+                      ).toList(),
                     ),
                   ),
                   floatingActionButton: ExpandableFab(
@@ -232,12 +235,16 @@ class DocumentCanvas<T> extends StatelessWidget {
                 ),
               ),
             ),
-            if (contextWidgets != null && contextWidgets!.isNotEmpty)
+            if (contextCardBuilders != null && contextCardBuilders!.isNotEmpty)
               collapsed
                   ? SizedBox(
                       width: 250,
                       child: ContextCanvas(
-                        contextWidgets: contextWidgets!,
+                        contextWidgets: contextCardBuilders!
+                            .map(
+                              (contextCardBuilder) => contextCardBuilder(data),
+                            )
+                            .toList(),
                       ),
                     )
                   : DrawerButton(scaffoldKey: _key),
@@ -289,7 +296,7 @@ class _DrawerButtonState extends State<DrawerButton> {
         ),
       );
     }
-    return IgnorePointer();
+    return const IgnorePointer();
   }
 }
 
@@ -413,12 +420,33 @@ typedef DocumentBuilder<T> = Widget Function(
   BuildContext context,
   DocumentReference<T> documentReference,
   T data,
-  // List<ActionButton> actionButtons,
-  // List<DocumentTab> documentTabs,
-  // List<Widget>? contextWidgets,
 );
+
 typedef TitleBuilder<T> = Widget Function(
   T data,
 );
 
-typedef DocumentStream = Stream<DocumentSnapshot> Function(String? documentId);
+typedef ContextCardBuilder<T> = Widget Function(
+  T data,
+);
+
+typedef DocumentTabBuilder = Widget Function();
+
+typedef DocumentTabChildBuilder<T> = Widget Function(
+  dynamic data,
+);
+
+typedef DocumentStream = Stream<DocumentSnapshot> Function(
+  String? documentId,
+);
+
+class DocumentTab<T> {
+  final DocumentTabBuilder documentTabBuilder;
+  final DocumentTabChildBuilder<T> documentTabChildBuilder;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  DocumentTab({
+    required this.documentTabBuilder,
+    required this.documentTabChildBuilder,
+  });
+}

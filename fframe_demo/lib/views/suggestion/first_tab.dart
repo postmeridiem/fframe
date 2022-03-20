@@ -1,107 +1,117 @@
+import 'package:fframe_demo/models/suggestion.dart';
 import 'package:flutter/material.dart';
 
 class FirstTab extends StatelessWidget {
-  const FirstTab({Key? key}) : super(key: key);
+  const FirstTab({Key? key, required this.suggestion}) : super(key: key);
+  final Suggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: const [
-        ListTile(
-          leading: Icon(Icons.map),
-          title: Text('Map'),
-        ),
-        ListTile(
-          leading: Icon(Icons.photo_album),
-          title: Text('Album'),
-        ),
-        ListTile(
-          leading: Icon(Icons.phone),
-          title: Text('Phone'),
-        ),
-        ListTile(
-          leading: Icon(Icons.map),
-          title: Text('Map'),
-        ),
-        ListTile(
-          leading: Icon(Icons.photo_album),
-          title: Text('Album'),
-        ),
-        ListTile(
-          leading: Icon(Icons.phone),
-          title: Text('Phone'),
-        ),
-        ListTile(
-          leading: Icon(Icons.map),
-          title: Text('Map'),
-        ),
-        ListTile(
-          leading: Icon(Icons.photo_album),
-          title: Text('Album'),
-        ),
-        ListTile(
-          leading: Icon(Icons.phone),
-          title: Text('Phone'),
-        ),
-        ListTile(
-          leading: Icon(Icons.map),
-          title: Text('Map'),
-        ),
-        ListTile(
-          leading: Icon(Icons.photo_album),
-          title: Text('Album'),
-        ),
-        ListTile(
-          leading: Icon(Icons.phone),
-          title: Text('Phone'),
-        ),
-        ListTile(
-          leading: Icon(Icons.map),
-          title: Text('Map'),
-        ),
-        ListTile(
-          leading: Icon(Icons.photo_album),
-          title: Text('Album'),
-        ),
-        ListTile(
-          leading: Icon(Icons.phone),
-          title: Text('Phone'),
-        ),
-        ListTile(
-          leading: Icon(Icons.map),
-          title: Text('Map'),
-        ),
-        ListTile(
-          leading: Icon(Icons.photo_album),
-          title: Text('Album'),
-        ),
-        ListTile(
-          leading: Icon(Icons.phone),
-          title: Text('Phone'),
-        ),
-        ListTile(
-          leading: Icon(Icons.map),
-          title: Text('Map'),
-        ),
-        ListTile(
-          leading: Icon(Icons.photo_album),
-          title: Text('Album'),
-        ),
-        ListTile(
-          leading: Icon(Icons.phone),
-          title: Text('Phone'),
-        ),
-        ListTile(
-          leading: Icon(Icons.map),
-          title: Text('Map'),
-        ),
-        ListTile(
-          leading: Icon(Icons.photo_album),
-          title: Text('Album'),
-        ),
-        ListTile(
-          leading: Icon(Icons.phone),
-          title: Text('Phonelast'),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text("Author: ${suggestion.createdBy ?? "unknown"}"),
+        Expanded(
+          child: ListView(
+            children: const [
+              ListTile(
+                leading: Icon(Icons.map),
+                title: Text('Map'),
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_album),
+                title: Text('Album'),
+              ),
+              ListTile(
+                leading: Icon(Icons.phone),
+                title: Text('Phone'),
+              ),
+              ListTile(
+                leading: Icon(Icons.map),
+                title: Text('Map'),
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_album),
+                title: Text('Album'),
+              ),
+              ListTile(
+                leading: Icon(Icons.phone),
+                title: Text('Phone'),
+              ),
+              ListTile(
+                leading: Icon(Icons.map),
+                title: Text('Map'),
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_album),
+                title: Text('Album'),
+              ),
+              ListTile(
+                leading: Icon(Icons.phone),
+                title: Text('Phone'),
+              ),
+              ListTile(
+                leading: Icon(Icons.map),
+                title: Text('Map'),
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_album),
+                title: Text('Album'),
+              ),
+              ListTile(
+                leading: Icon(Icons.phone),
+                title: Text('Phone'),
+              ),
+              ListTile(
+                leading: Icon(Icons.map),
+                title: Text('Map'),
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_album),
+                title: Text('Album'),
+              ),
+              ListTile(
+                leading: Icon(Icons.phone),
+                title: Text('Phone'),
+              ),
+              ListTile(
+                leading: Icon(Icons.map),
+                title: Text('Map'),
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_album),
+                title: Text('Album'),
+              ),
+              ListTile(
+                leading: Icon(Icons.phone),
+                title: Text('Phone'),
+              ),
+              ListTile(
+                leading: Icon(Icons.map),
+                title: Text('Map'),
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_album),
+                title: Text('Album'),
+              ),
+              ListTile(
+                leading: Icon(Icons.phone),
+                title: Text('Phone'),
+              ),
+              ListTile(
+                leading: Icon(Icons.map),
+                title: Text('Map'),
+              ),
+              ListTile(
+                leading: Icon(Icons.photo_album),
+                title: Text('Album'),
+              ),
+              ListTile(
+                leading: Icon(Icons.phone),
+                title: Text('Phonelast'),
+              ),
+            ],
+          ),
         ),
       ],
     );
