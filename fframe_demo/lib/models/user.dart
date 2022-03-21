@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class User extends ChangeNotifier {
-  User({this.id, this.name});
+  User({this.id, this.name, this.creationDate});
 
   fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
     print("reading <User>");
@@ -11,14 +11,16 @@ class User extends ChangeNotifier {
     return User(
       id: snapshot.id,
       name: json['name']! as String,
+      creationDate: json['creationDate']! as Timestamp,
     );
   }
 
   final String? id;
   String? name;
+  Timestamp? creationDate;
 
   Map<String, Object?> toFirestore() {
     print("writing <User>");
-    return {'name': name};
+    return {'name': name, 'creationDate': creationDate};
   }
 }
