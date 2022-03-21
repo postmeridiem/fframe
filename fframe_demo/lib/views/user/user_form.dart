@@ -18,26 +18,69 @@ class UserForm extends StatelessWidget {
     return ListView(children: [
       Padding(
         padding: const EdgeInsets.all(8.0),
-        child: TextField(
+        child: TextFormField(
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             labelText: 'Name',
           ),
-          readOnly: true,
+          readOnly: false,
           controller: TextEditingController.fromValue(TextEditingValue(text: user.name!)),
+          validator: (email) {
+            if (validName(email)) {
+              return null;
+            } else {
+              return 'Enter a valid email address';
+            }
+          },
         ),
       ),
       Padding(
         padding: const EdgeInsets.all(8.0),
-        child: TextField(
+        child: TextFormField(
           decoration: const InputDecoration(
             border: OutlineInputBorder(),
             labelText: 'User UID',
           ),
-          readOnly: true,
+          readOnly: false,
           controller: TextEditingController.fromValue(TextEditingValue(text: user.id!)),
+          validator: (email) {
+            if (validUUID(email)) {
+              return null;
+            } else {
+              return 'Enter a valid UUID address';
+            }
+          },
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextFormField(
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            labelText: "Email",
+          ),
+          controller: TextEditingController.fromValue(TextEditingValue(text: user.creationDate!.toDate().toString())),
+          validator: (email) {
+            if (validEmail(email)) {
+              return null;
+            } else {
+              return 'Enter a valid email address';
+            }
+          },
         ),
       ),
     ]);
+  }
+
+  bool validName(String? email) {
+    return true;
+  }
+
+  bool validUUID(String? email) {
+    return true;
+  }
+
+  bool validEmail(String? email) {
+    return true;
   }
 }
