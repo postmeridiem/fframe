@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'package:fframe/helpers/validator.dart';
+
 import 'package:fframe_demo/models/user.dart';
 import 'package:fframe_demo/services/user_service.dart';
 
@@ -10,11 +12,12 @@ class UserForm extends StatelessWidget {
   final DocumentReference documentReference;
   final User user;
   final UserService usersService = UserService();
-  // bool _toggled = false; //Dit kan niet... en zit op het verkeerde nivo. Toggled is niet een state van het document maar
-  //is een state van de toggle-switch. Dus die ziet in de allClaims Loop
 
   @override
   Widget build(BuildContext context) {
+    // register shared validator class for common patterns
+    var validator = Validator();
+
     return ListView(children: [
       Padding(
         padding: const EdgeInsets.all(8.0),
@@ -25,8 +28,8 @@ class UserForm extends StatelessWidget {
           ),
           readOnly: false,
           controller: TextEditingController.fromValue(TextEditingValue(text: user.name!)),
-          validator: (email) {
-            if (validName(email)) {
+          validator: (curValue) {
+            if (validator.validName(curValue)) {
               return null;
             } else {
               return 'Enter a valid email address';
@@ -43,8 +46,8 @@ class UserForm extends StatelessWidget {
           ),
           readOnly: false,
           controller: TextEditingController.fromValue(TextEditingValue(text: user.id!)),
-          validator: (email) {
-            if (validUUID(email)) {
+          validator: (curValue) {
+            if (validator.validUUID(curValue)) {
               return null;
             } else {
               return 'Enter a valid UUID address';
@@ -60,8 +63,8 @@ class UserForm extends StatelessWidget {
             labelText: "Email",
           ),
           controller: TextEditingController.fromValue(TextEditingValue(text: user.creationDate!.toDate().toString())),
-          validator: (email) {
-            if (validEmail(email)) {
+          validator: (curValue) {
+            if (validator.validEmail(curValue)) {
               return null;
             } else {
               return 'Enter a valid email address';
@@ -70,17 +73,5 @@ class UserForm extends StatelessWidget {
         ),
       ),
     ]);
-  }
-
-  bool validName(String? email) {
-    return true;
-  }
-
-  bool validUUID(String? email) {
-    return true;
-  }
-
-  bool validEmail(String? email) {
-    return true;
   }
 }
