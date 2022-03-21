@@ -29,7 +29,7 @@ class UserForm extends StatelessWidget {
           readOnly: false,
           controller: TextEditingController.fromValue(TextEditingValue(text: user.name!)),
           validator: (curValue) {
-            if (validator.validName(curValue)) {
+            if (validator.validString(curValue)) {
               return null;
             } else {
               return 'Enter a valid email address';
