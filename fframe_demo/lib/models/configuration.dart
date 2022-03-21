@@ -5,7 +5,7 @@ class Configuration extends ChangeNotifier {
   Configuration({this.id, this.name, this.active, this.icon, this.order});
 
   fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
-    print("reading <Configuration>");
+    debugPrint("reading <Configuration>");
 
     Map<String, dynamic> json = snapshot.data()!;
     return Configuration(
@@ -24,7 +24,7 @@ class Configuration extends ChangeNotifier {
   int? order;
 
   Map<String, Object?> toFirestore() {
-    print("writing <Configuration>");
+    debugPrint("writing <Configuration>");
     return {'active': active, 'name': name, 'icon': icon, 'order': order};
   }
 }

@@ -5,7 +5,7 @@ class Run extends ChangeNotifier {
   Run({this.id, this.active, this.clientId, this.createdDate, this.runId, this.runconfigId, this.stepCurrent});
 
   fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
-    print("reading <Run>");
+    debugPrint("reading <Run>");
 
     Map<String, dynamic> json = snapshot.data()!;
     return Run(
@@ -27,7 +27,7 @@ class Run extends ChangeNotifier {
   final String? stepCurrent;
 
   Map<String, Object?> toFirestore() {
-    print("writing <Run>");
+    debugPrint("writing <Run>");
     return {'active': active, 'clientId': clientId, 'createdDate': createdDate, 'runconfigId': runconfigId, 'stepCurrent': stepCurrent};
   }
 }

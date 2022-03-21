@@ -29,7 +29,7 @@ class SettingService {
   }
 
   void applyChanges({required Setting setting, required DocumentReference documentReference}) {
-    print("SettingService => applyChanges to ${documentReference.id}");
+    debugPrint("SettingService => applyChanges to ${documentReference.id}");
     documentReference.update(setting.toFirestore());
   }
 }

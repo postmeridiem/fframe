@@ -31,7 +31,7 @@ class _FframeState extends State<Fframe> {
       ),
       // initialData: InitialData,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        print(snapshot.connectionState.toString());
+        debugPrint(snapshot.connectionState.toString());
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.active:
@@ -200,32 +200,32 @@ class _AppState extends State<App> with RestorationMixin {
       ],
       redirect: (goRouterState) {
         if (!isSignedIn && goRouterState.subloc != '/' && goRouterState.subloc != _initialLocation) {
-          print("<a> Redirect to $_initialLocation with deeplink to ${goRouterState.subloc}");
+          debugPrint("<a> Redirect to $_initialLocation with deeplink to ${goRouterState.subloc}");
           ref.read(navigationStateProvider).redirectState = goRouterState.subloc;
         }
 
         if (isSignedIn && goRouterState.queryParams.containsKey('redirectTo')) {
-          print("<b> Redirect to queryParam instuction ${goRouterState.queryParams["redirectTo"]}");
+          debugPrint("<b> Redirect to queryParam instuction ${goRouterState.queryParams["redirectTo"]}");
           return goRouterState.queryParams["redirectTo"];
         }
         // String _deepLink =  ? '?redirectTo=${goRouterState.subloc}' : '';
 
-        // print("RedirectRequest to ${goRouterState.subloc} _initialLocation: $_initialLocation deepLink: $_deepLink");
+        // debugPrint("RedirectRequest to ${goRouterState.subloc} _initialLocation: $_initialLocation deepLink: $_deepLink");
 
         if (goRouterState.subloc == "/" && goRouterState.subloc != _initialLocation) {
-          print("<c> Redirect to $_initialLocation");
+          debugPrint("<c> Redirect to $_initialLocation");
           return _initialLocation;
         }
 
         if (goRouterState.queryParams.isNotEmpty) {
-          print("Process redirect");
+          debugPrint("Process redirect");
           String? routeId = goRouterState.queryParams['id'];
           if (routeId != null) {
             SelectionState selectionState = SelectionState(queryDocumentSnapshot: null, queryParams: {"id": routeId}, cardId: routeId);
             ref.read(navigationStateProvider.notifier).selectionState = selectionState;
           }
         }
-        print("No redirection");
+        debugPrint("No redirection");
         return null;
       },
       errorBuilder: (context, state) => ErrorScreen(error: state.error!, initiallLocation: _initialLocation),

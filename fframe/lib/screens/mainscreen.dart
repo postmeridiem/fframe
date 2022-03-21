@@ -47,7 +47,7 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Build mainScreen ${state.location} ${state.queryParams.toString()}");
+    debugPrint("Build mainScreen ${state.location} ${state.queryParams.toString()}");
     ActiveTarget _activeTargets = getActiveTarget();
     final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -102,7 +102,7 @@ class MainBody extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print("Build MainBody => ${state.queryParams.toString()} ${activeTarget.contentPane.toString()}");
+    debugPrint("Build MainBody => ${state.queryParams.toString()} ${activeTarget.contentPane.toString()}");
 
     NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
 

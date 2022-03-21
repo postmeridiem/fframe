@@ -124,7 +124,7 @@ class _DocumentBody<T> extends ConsumerWidget {
             case ConnectionState.done:
               if (asyncSnapshot.hasError) return ErrorScreen(error: Exception(asyncSnapshot.error));
               if (!asyncSnapshot.hasData) return const WaitScreen();
-              print("Load DocumentCanvas");
+              debugPrint("Load DocumentCanvas");
               return Scaffold(
                 primary: false,
                 // body: documentBuilder(context, asyncSnapshot.data!.reference, asyncSnapshot.data!.data()!),
@@ -360,7 +360,7 @@ class _DocumentList<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("Build DocumentList $runtimeType ${key.toString()}");
+    debugPrint("Build DocumentList $runtimeType ${key.toString()}");
     return FirestoreListView<T>(
       query: query,
       itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
@@ -394,7 +394,7 @@ class _CardList<T> extends ConsumerWidget {
       child: GestureDetector(
         onTap: () {
           String documentPath = GoRouter.of(context).location;
-          print("Update document to ${document.reference.path}");
+          debugPrint("Update document to ${document.reference.path}");
           NavigationStateNotifier navigationState = ref.read(navigationStateProvider.notifier);
           SelectionState<T> selectionState = SelectionState<T>(queryDocumentSnapshot: document, queryParams: {"id": document.id}, cardId: document.id);
           navigationState.selectionState = selectionState;
@@ -403,7 +403,7 @@ class _CardList<T> extends ConsumerWidget {
         },
         child: Consumer(builder: (context, ref, child) {
           String activeCard = ref.watch(navigationStateProvider).selectionState.cardId;
-          // print("Draw card ${document.id} active card: $activeCard");
+          // debugPrint("Draw card ${document.id} active card: $activeCard");
           return documentListBuilder(context, activeCard == document.id, document.data());
         }),
       ),

@@ -26,7 +26,7 @@ class NavigationStateNotifier with ChangeNotifier {
 
   //Setters and getters to preserve toe initial state (before signing amd apply it after initial load)
   set redirectState(String? redirectState) {
-    print("Registered redirect to $redirectState");
+    debugPrint("Registered redirect to $redirectState");
     _redirectState = redirectState;
   }
 
@@ -106,7 +106,7 @@ class NavigationStateNotifier with ChangeNotifier {
 
   SelectionState get selectionState => _selectionState;
   set selectionState(SelectionState selectionState) {
-    print("NavigationStateNotifier: new selectionState: ${selectionState.queryParams}");
+    debugPrint("NavigationStateNotifier: new selectionState: ${selectionState.queryParams}");
     _selectionState = selectionState;
     notifyListeners();
   }

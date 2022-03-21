@@ -5,7 +5,7 @@ class User extends ChangeNotifier {
   User({this.id, this.name, this.creationDate});
 
   fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
-    print("reading <User>");
+    debugPrint("reading <User>");
 
     Map<String, dynamic> json = snapshot.data()!;
     return User(
@@ -20,7 +20,7 @@ class User extends ChangeNotifier {
   Timestamp? creationDate;
 
   Map<String, Object?> toFirestore() {
-    print("writing <User>");
+    debugPrint("writing <User>");
     return {'name': name, 'creationDate': creationDate};
   }
 }

@@ -39,13 +39,13 @@ class UserStateSignedIn extends UserState {
 //Notifier class
 class UserStateNotifier extends StateNotifier<UserState> {
   UserStateNotifier() : super(const UserStateUnknown()) {
-    print("UserStateNotifier constructor");
+    debugPrint("UserStateNotifier constructor");
     FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       if (user == null || user.isAnonymous) {
-        // print('User is currently signed out or anonymous!');
+        // debugPrint('User is currently signed out or anonymous!');
         state = const UserStateSignedOut();
       } else {
-        // print("User is signed in as ${user.uid}::${user.displayName}");
+        // debugPrint("User is signed in as ${user.uid}::${user.displayName}");
         IdTokenResult idTokenResult = await user.getIdTokenResult(true);
         Map<String, dynamic>? claims = idTokenResult.claims;
         state = UserStateSignedIn(AppUser.fromFirebaseUser(user, claims));

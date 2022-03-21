@@ -5,7 +5,7 @@ class Suggestion extends ChangeNotifier {
   Suggestion({this.id, this.name, this.active, this.icon, this.creationDate, this.createdBy});
 
   fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
-    print("reading <Suggestion>");
+    debugPrint("reading <Suggestion>");
 
     Map<String, dynamic> json = snapshot.data()!;
     return Suggestion(
@@ -36,7 +36,7 @@ class Suggestion extends ChangeNotifier {
   //     ),
 
   Map<String, Object?> toFirestore() {
-    print("writing <Suggestion>");
+    debugPrint("writing <Suggestion>");
     return {
       'active': active,
       'name': name,

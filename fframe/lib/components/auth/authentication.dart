@@ -38,8 +38,8 @@ final emailLinkProviderConfig = EmailLinkProviderConfiguration(
 // var _googleSignIn = GoogleSignIn();
 // final result = await _googleSignIn.signIn();
 // final ggAuth = await result!.authentication;
-// print(ggAuth.idToken);
-// print(ggAuth.accessToken);
+// debugPrint(ggAuth.idToken);
+// debugPrint(ggAuth.accessToken);
 
 class AuthenticationComponents {
   final BuildContext context;
@@ -221,7 +221,7 @@ class GoogleSignInWidgetState extends State<GoogleSignInWidget> {
         content: Text('Sign In ${user!.uid} with Google'),
       ));
     } catch (e) {
-      print(e);
+      debugPrint(e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to sign in with Google: $e'),

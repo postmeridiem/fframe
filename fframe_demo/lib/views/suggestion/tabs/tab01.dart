@@ -23,11 +23,12 @@ class Tab01 extends StatelessWidget {
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
                   readOnly: true,
+                  initialValue: suggestion.createdBy ?? "unknown",
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: "Author",
                   ),
-                  controller: TextEditingController.fromValue(TextEditingValue(text: (suggestion.createdBy ?? "unknown"))),
+                  // controller: TextEditingController.fromValue(TextEditingValue(text: (suggestion.createdBy ?? "unknown"))),
                 ),
               ),
               Padding(
