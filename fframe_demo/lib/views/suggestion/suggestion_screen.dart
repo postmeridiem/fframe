@@ -26,7 +26,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         documentTabChildBuilder: (
           suggestion,
         ) {
-          return FirstTab(
+          return Tab01(
             suggestion: suggestion,
           );
         },
@@ -41,7 +41,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           );
         },
         documentTabChildBuilder: (suggestion) {
-          return const SecondTab();
+          return const Tab02();
         },
       ),
       DocumentTab<Suggestion>(
@@ -54,7 +54,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           );
         },
         documentTabChildBuilder: (suggestion) {
-          return const ThirdTab();
+          return const Tab03();
         },
       ),
     ];
