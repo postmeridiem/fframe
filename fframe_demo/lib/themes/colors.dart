@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 
-class DarkMode{
+class DarkMode {
   Color constPrimaryColorDark = const Color(0xFF1B020B);
   Color constOnPrimaryColorDark = const Color(0xffffffff);
-
 }
+
 // DARK MODE =======
+// color that sets the primary accent color
+Color constPrimaryAccentColorDark = const Color(0xFF008381);
+
 // color that sets the appbar, navrail, contextwidgets and FAB
 Color constPrimaryColorDark = const Color(0xFF1B020B);
 Color constOnPrimaryColorDark = const Color(0xffffffff);
@@ -15,8 +18,10 @@ Color constOnPrimaryColorDark = const Color(0xffffffff);
 Color constSecondaryColorDark = const Color(0xFF310414);
 Color constOnSecondaryColorDark = const Color(0xFFEEEEEE);
 
-// color that sets the primary accent color
-Color constPrimaryAccentColorDark = const Color(0xFF008381);
+// color that sets 'secondary' level control widgets
+// (the background of fields and the text that goes in there)
+Color constTertiaryColorDark = const Color(0xFF160209);
+Color constOnTertiaryColorDark = const Color(0xFFEEEEEE);
 
 // color for unselected elements
 Color constUnselectedColorDark = const Color(0xB2E7E7E7);
@@ -30,17 +35,23 @@ Color constOnBackgroundColorDark = const Color(0xFFEEEEEE);
 Color constOnBackgroundColorFadedDark = const Color(0xFF330216);
 
 // LIGHT MODE =======
+// color that sets the primary accent color
+Color constPrimaryAccentColorLight = const Color(0xFF00B8B5);
+
 // color that sets the appbar, navrail, contextwidgets and FAB
 Color constPrimaryColorLight = const Color(0xFF610525);
 Color constOnPrimaryColorLight = const Color(0xFFFFFFFF);
 
 // color that sets 'secondary' level control widgets
 // (application surfaces and things that are not navrail, contextwidgets, FAB or appbar...)
+// Color constSecondaryColorLight = const Color(0xFFEBB3CB);
 Color constSecondaryColorLight = const Color(0xFFFFF8FB);
 Color constOnSecondaryColorLight = const Color(0xB21D1D1D);
 
-// color that sets the primary accent color
-Color constPrimaryAccentColorLight = const Color(0xFF00B8B5);
+// color that sets 'secondary' level control widgets
+// (the background of fields and the text that goes in there)
+Color constTertiaryColorLight = const Color(0xFFFFFFFF);
+Color constOnTertiaryColorLight = const Color(0xB247138B);
 
 // color for unselected elements
 Color constUnselectedColorLight = const Color(0xB2474747);
