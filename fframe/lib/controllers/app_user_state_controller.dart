@@ -39,7 +39,6 @@ class UserStateSignedIn extends UserState {
 //Notifier class
 class UserStateNotifier extends StateNotifier<UserState> {
   UserStateNotifier() : super(const UserStateUnknown()) {
-    debugPrint("UserStateNotifier constructor");
     FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       if (user == null || user.isAnonymous) {
         // debugPrint('User is currently signed out or anonymous!');

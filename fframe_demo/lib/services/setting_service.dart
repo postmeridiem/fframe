@@ -29,7 +29,6 @@ class SettingService {
   }
 
   void applyChanges({required Setting setting, required DocumentReference documentReference}) {
-    debugPrint("SettingService => applyChanges to ${documentReference.id}");
     documentReference.update(setting.toFirestore());
   }
 }

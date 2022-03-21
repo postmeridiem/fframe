@@ -29,7 +29,6 @@ class SuggestionService {
   }
 
   void applyChanges({required Suggestion suggestion, required DocumentReference documentReference}) {
-    debugPrint("SuggestionService => applyChanges to ${documentReference.id}");
     documentReference.update(suggestion.toFirestore());
   }
 }

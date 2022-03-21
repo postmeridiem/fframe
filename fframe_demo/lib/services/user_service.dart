@@ -23,7 +23,6 @@ class UserService {
   }
 
   void applyChanges({required User user, required DocumentReference documentReference}) {
-    debugPrint("userService => applyChanges to ${documentReference.id}");
     documentReference.update(user.toFirestore());
   }
 }

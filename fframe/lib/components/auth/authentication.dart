@@ -221,7 +221,7 @@ class GoogleSignInWidgetState extends State<GoogleSignInWidget> {
         content: Text('Sign In ${user!.uid} with Google'),
       ));
     } catch (e) {
-      debugPrint(e);
+      debugPrint(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to sign in with Google: $e'),

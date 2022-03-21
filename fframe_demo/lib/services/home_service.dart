@@ -23,7 +23,6 @@ class HomeService {
   }
 
   void applyChanges({required Home home, required DocumentReference documentReference}) {
-    debugPrint("homeService => applyChanges to ${documentReference.id}");
     documentReference.update(home.toFirestore());
   }
 }
