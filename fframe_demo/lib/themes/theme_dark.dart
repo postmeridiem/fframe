@@ -26,6 +26,28 @@ final ThemeData appDarkTheme = ThemeData(
     onError: const Color(0xff000000),
     outline: const Color(0xFFFF00C8),
   ),
+  inputDecorationTheme: InputDecorationTheme(
+    labelStyle: TextStyle(
+      backgroundColor: constTertiaryColorDark,
+      color: constOnTertiaryColorDark,
+    ),
+    floatingLabelStyle: TextStyle(
+      backgroundColor: constTertiaryColorDark,
+      color: constOnTertiaryColorDark,
+    ),
+    helperStyle: TextStyle(
+      backgroundColor: constTertiaryColorDark,
+      color: constOnTertiaryColorDark,
+    ),
+    hintStyle: TextStyle(
+      backgroundColor: constTertiaryColorDark,
+      color: constOnTertiaryColorDark,
+    ),
+    errorStyle: TextStyle(
+      backgroundColor: constTertiaryColorDark,
+      color: constOnTertiaryColorDark,
+    ),
+  ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     foregroundColor: constPrimaryAccentColorDark,
     focusColor: constOnPrimaryColorDark,
