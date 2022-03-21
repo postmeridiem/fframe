@@ -1,7 +1,8 @@
-import 'package:fframe_demo/models/suggestion.dart';
-import 'package:fframe/fframe.dart';
-import 'package:fframe_demo/services/suggestion_service.dart';
 import 'package:flutter/material.dart';
+import 'package:fframe/fframe.dart';
+
+import 'package:fframe_demo/services/suggestion_service.dart';
+import 'package:fframe_demo/models/suggestion.dart';
 import 'suggestion.dart';
 
 class SuggestionScreen extends StatefulWidget {
@@ -17,9 +18,9 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       DocumentTab<Suggestion>(
         documentTabBuilder: () {
           return const Tab(
-            text: "A Long List",
+            text: "Suggestion",
             icon: Icon(
-              Icons.view_list,
+              Icons.pest_control,
             ),
           );
         },
