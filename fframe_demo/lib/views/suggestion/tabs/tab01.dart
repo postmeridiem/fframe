@@ -25,12 +25,30 @@ class Tab01 extends StatelessWidget {
                     border: OutlineInputBorder(),
                     labelText: "Name",
                   ),
-                  controller: TextEditingController.fromValue(TextEditingValue(text: suggestion.creationDate!.toDate().toString())),
+                  controller: TextEditingController.fromValue(TextEditingValue(text: suggestion.name!)),
                   validator: (curValue) {
-                    if (validator.validName(curValue)) {
+                    if (validator.validString(curValue)) {
                       return null;
                     } else {
                       return 'Enter a valid name';
+                    }
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  decoration: const InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: "Icon",
+                  ),
+                  controller: TextEditingController.fromValue(TextEditingValue(text: suggestion.icon!)),
+                  validator: (curValue) {
+                    // TODO @AZ: can this be moved into a validator class function entirely to avoid repeating patterns?
+                    if (validator.validIcon(curValue)) {
+                      return null;
+                    } else {
+                      return 'Enter a valid icon string';
                     }
                   },
                 ),
