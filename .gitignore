@@ -41,5 +41,4 @@ doc/api/
 .github
 
 # Firebase components
-.firebaserc
 .firebase
