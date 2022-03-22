@@ -1,0 +1,45 @@
+# Adjusted from automatically generated settings 
+# (022-03-22 UTC from https://codemagic.io/app/6239925e854b7232c0c86393/settings)
+
+workflows:
+  default-workflow:
+    name: fFrame Build Web
+    max_build_duration: 30
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: '*'
+          include: true
+          source: true
+      tag_patterns:
+        - pattern: '*'
+          include: true
+    scripts:
+      - 
+        # run pub get
+        cd fframe
+        flutter packages pub get
+        cd ..
+        cd fframe_demo
+        flutter packages pub get
+      - flutter config --enable-web
+      - |
+        # build web
+        flutter build web --release
+        cd build/web
+        7z a -r ../web.zip ./*
+    artifacts:
+      - build/web.zip
+      - '*.snap'
+      - build/windows/**/*.msix
+      - flutter_drive.log
+    publishing:
+      email:
+        recipients:
+          - jeroen.schweitzer@postmeridiem.net
+          - arno@zwaag.net

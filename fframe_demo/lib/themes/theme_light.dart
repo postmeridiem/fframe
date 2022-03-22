@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:fframe_demo/themes/fonts.dart';
 import 'package:fframe_demo/themes/colors.dart';
 
-
 final ThemeData appLightTheme = ThemeData(
   fontFamily: mainFontFamily,
   scaffoldBackgroundColor: constBackgroundColorLight,
   indicatorColor: constPrimaryColorLight,
+  dividerColor: constDividerColorLight,
   colorScheme: ColorScheme(
     brightness: Brightness.light,
     primary: constPrimaryColorLight,
@@ -27,6 +27,28 @@ final ThemeData appLightTheme = ThemeData(
     onError: const Color(0xff000000),
     outline: const Color(0xFFFF00C8),
   ),
+  inputDecorationTheme: InputDecorationTheme(
+    labelStyle: TextStyle(
+      backgroundColor: constTertiaryColorLight,
+      color: constOnTertiaryColorLight,
+    ),
+    floatingLabelStyle: TextStyle(
+      backgroundColor: constTertiaryColorLight,
+      color: constOnTertiaryColorLight,
+    ),
+    helperStyle: TextStyle(
+      backgroundColor: constTertiaryColorLight,
+      color: constOnTertiaryColorLight,
+    ),
+    hintStyle: TextStyle(
+      backgroundColor: constTertiaryColorLight,
+      color: constOnTertiaryColorLight,
+    ),
+    errorStyle: TextStyle(
+      backgroundColor: constTertiaryColorLight,
+      color: constOnTertiaryColorLight,
+    ),
+  ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
     foregroundColor: constPrimaryAccentColorLight,
     focusColor: constOnPrimaryColorLight,
@@ -35,7 +57,6 @@ final ThemeData appLightTheme = ThemeData(
   cardTheme: CardTheme(
     color: constSecondaryColorLight,
   ),
-  dividerColor: constDividerColorLight,
   buttonTheme: const ButtonThemeData(
     textTheme: ButtonTextTheme.normal,
     minWidth: 88,
