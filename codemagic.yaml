@@ -20,11 +20,16 @@ workflows:
         - pattern: '*'
           include: true
     scripts:
-      - flutter packages pub get
+      - 
+        # run pub get
+        cd fframe
+        flutter packages pub get
+        cd ..
+        cd fframe_demo
+        flutter packages pub get
       - flutter config --enable-web
       - |
         # build web
-        cd fframe_demo/
         flutter build web --release
         cd build/web
         7z a -r ../web.zip ./*
