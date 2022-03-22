@@ -3,23 +3,21 @@ part of fframe;
 class DocumentScreen<T> extends StatefulWidget {
   const DocumentScreen({
     Key? key,
-    required this.query,
-    required this.documentStream,
-    required this.documentListBuilder,
+    // required this.query,
+
+    this.documentList,
     this.documentBuilder,
     this.titleBuilder,
-    required this.documentTabs,
+    required this.document,
     this.actionButtons,
     this.contextCardBuilders,
-    this.autoSave = true,
   }) : super(key: key);
-  final Query<T> query;
-  final DocumentStream documentStream;
-  final DocumentListBuilder<T> documentListBuilder;
+  // final Query<T> query;
+
+  final DocumentList<T>? documentList;
   final DocumentBuilder<T>? documentBuilder;
   final TitleBuilder<T>? titleBuilder;
-  final bool autoSave;
-  final List<DocumentTab> documentTabs;
+  final Document document;
   final List<ActionButton>? actionButtons;
   final List<ContextCardBuilder>? contextCardBuilders;
 
@@ -55,33 +53,44 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
       actionButtons.addAll(widget.actionButtons!);
     }
 
-    return Row(
-      children: [
-        SizedBox(
-          width: 250,
-          child: Padding(
-            padding: const EdgeInsets.all(0.0),
-            child: _DocumentList<T>(
-              query: widget.query,
-              documentListBuilder: widget.documentListBuilder,
+    _DocumentBody<T> documentBody = _DocumentBody(
+      documentStream: widget.document.documentStream,
+      actionButtons: actionButtons,
+      titleBuilder: widget.titleBuilder,
+      document: widget.document,
+      contextCardBuilders: widget.contextCardBuilders,
+    );
+
+    //Check if a documentList is to be loaded
+    if (widget.documentList != null) {
+      return Row(
+        children: [
+          SizedBox(
+            width: 250,
+            child: Padding(
+              padding: const EdgeInsets.all(0.0),
+              child: _DocumentList<T>(
+                query: widget.documentList!.query,
+                documentListItemBuilder: widget.documentList!.builder,
+              ),
             ),
           ),
-        ),
-        const VerticalDivider(thickness: 1, width: 1),
-        // This is the main content.
-        Expanded(
-          child: Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: _DocumentBody(
-                documentStream: widget.documentStream,
-                actionButtons: actionButtons,
-                titleBuilder: widget.titleBuilder,
-                documentTabs: widget.documentTabs,
-                contextCardBuilders: widget.contextCardBuilders,
-              )),
-        ),
-      ],
-    );
+          const VerticalDivider(thickness: 1, width: 1),
+          // This is the main content.
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: documentBody,
+            ),
+          ),
+        ],
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: documentBody,
+      );
+    }
   }
 }
 
@@ -91,60 +100,82 @@ class _DocumentBody<T> extends ConsumerWidget {
     this.titleBuilder,
     required this.documentStream,
     required this.actionButtons,
-    required this.documentTabs,
+    required this.document,
     this.contextCardBuilders,
   }) : super(key: key);
   final TitleBuilder<T>? titleBuilder;
   final DocumentStream? documentStream;
   final List<ActionButton> actionButtons;
-  final List<DocumentTab> documentTabs;
+  final Document document;
   final List<ContextCardBuilder>? contextCardBuilders;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    NavigationStateNotifier navigationState = ref.watch(navigationStateProvider);
+    try {
+      NavigationStateNotifier navigationState = ref.watch(navigationStateProvider);
 
-    DocumentSnapshot<T>? documentSnapshot = navigationState.selectionState.queryDocumentSnapshot as DocumentSnapshot<T>?;
-    Map<String, String>? queryParams = navigationState.selectionState.queryParams;
-    if ((documentSnapshot != null && queryParams != null && documentStream != null) || (queryParams != null && queryParams.containsKey("id"))) {
-      String docId = documentSnapshot?.id ?? queryParams['id']!;
+      DocumentSnapshot<T>? documentSnapshot = navigationState.selectionState.queryDocumentSnapshot as DocumentSnapshot<T>?;
+      Map<String, String>? queryParams = navigationState.selectionState.queryParams;
+      if ((documentSnapshot != null && queryParams != null && documentStream != null) || (queryParams != null && queryParams.containsKey("id"))) {
+        String docId = documentSnapshot?.id ?? queryParams['id']!;
 
-      Stream<DocumentSnapshot<T>> _documentStream = documentStream!(docId) as Stream<DocumentSnapshot<T>>;
+        Stream<DocumentSnapshot<T>> _documentStream = documentStream!(docId) as Stream<DocumentSnapshot<T>>;
 
-      return StreamBuilder<DocumentSnapshot<T>>(
-        initialData: documentSnapshot,
-        stream: _documentStream,
-        builder: (context, AsyncSnapshot<DocumentSnapshot<T>> asyncSnapshot) {
-          switch (asyncSnapshot.connectionState) {
-            case ConnectionState.none:
-              return const EmptyScreen();
-            case ConnectionState.waiting:
-              return const WaitScreen();
-            case ConnectionState.active:
-            case ConnectionState.done:
-              if (asyncSnapshot.hasError) return ErrorScreen(error: Exception(asyncSnapshot.error));
-              if (!asyncSnapshot.hasData) return const WaitScreen();
-              debugPrint("Load DocumentCanvas");
-              return Scaffold(
-                primary: false,
-                // body: documentBuilder(context, asyncSnapshot.data!.reference, asyncSnapshot.data!.data()!),
-                body: DocumentCanvas(
-                  titleBuilder: titleBuilder,
-                  data: asyncSnapshot.data!.data()!,
-                  documentTabs: documentTabs,
-                  actionButtons: actionButtons,
-                  contextCardBuilders: contextCardBuilders,
-                ),
-              );
-          }
-        },
-      );
-    } else {
-      if (documentSnapshot == null && queryParams != null) {
-        return const WaitScreen();
+        return StreamBuilder<DocumentSnapshot<T>>(
+          initialData: documentSnapshot,
+          stream: _documentStream,
+          builder: (context, AsyncSnapshot<DocumentSnapshot<T>> asyncSnapshot) {
+            switch (asyncSnapshot.connectionState) {
+              case ConnectionState.none:
+                return const EmptyScreen();
+              case ConnectionState.waiting:
+                return const WaitScreen();
+              case ConnectionState.active:
+              case ConnectionState.done:
+                if (asyncSnapshot.hasError) return ErrorScreen(error: Exception(asyncSnapshot.error));
+                if (!asyncSnapshot.hasData) return const WaitScreen();
+                debugPrint("Load DocumentCanvas");
+
+                try {
+                  T? snapshotData = asyncSnapshot.data!.data();
+
+                  if (snapshotData != null) {
+                    return Scaffold(
+                      primary: false,
+                      // body: documentBuilder(context, asyncSnapshot.data!.reference, asyncSnapshot.data!.data()!),
+                      body: DocumentCanvas<T>(
+                        titleBuilder: titleBuilder,
+                        data: snapshotData,
+                        document: document,
+                        actionButtons: actionButtons,
+                        contextCardBuilders: contextCardBuilders,
+                      ),
+                    );
+                  } else {
+                    return ErrorScreen(
+                      error: Exception("Unable to convert documentdata to modeldata."),
+                    );
+                  }
+                } catch (e) {
+                  return ErrorScreen(
+                    error: Exception("${e.toString()} in ${asyncSnapshot.data?.reference.path ?? 'unknowmn path'} ${{asyncSnapshot.data?.reference}}"),
+                    externalLocation: "https://console.firebase.google.com/project/${asyncSnapshot.data?.reference.firestore.app.name}/firestore/data/~2Fusers~2F1U1O47tW48W5K5PpEXWc1QRRWxt1",
+                  );
+                }
+            }
+          },
+        );
+      } else {
+        if (documentSnapshot == null && queryParams != null) {
+          return const WaitScreen();
+        }
       }
+      return const EmptyScreen();
+    } catch (e) {
+      return ErrorScreen(
+        error: Exception(e.toString()),
+      );
     }
-    return const EmptyScreen();
   }
 }
 
@@ -154,7 +185,7 @@ class DocumentCanvas<T> extends StatelessWidget {
     this.titleBuilder,
     required this.data,
     required this.actionButtons,
-    required this.documentTabs,
+    required this.document,
     this.contextCardBuilders,
   }) : super(key: key);
 
@@ -163,7 +194,7 @@ class DocumentCanvas<T> extends StatelessWidget {
   final T data;
   final TitleBuilder<T>? titleBuilder;
   final List<ActionButton> actionButtons;
-  final List<DocumentTab> documentTabs;
+  final Document document;
   final List<ContextCardBuilder>? contextCardBuilders;
 
   @override
@@ -177,7 +208,7 @@ class DocumentCanvas<T> extends StatelessWidget {
             Flexible(
               fit: FlexFit.tight,
               child: DefaultTabController(
-                length: documentTabs.length,
+                length: document.tabs.length,
                 child: Scaffold(
                   key: _key,
                   endDrawer: (contextCardBuilders != null && contextCardBuilders!.isNotEmpty)
@@ -197,18 +228,18 @@ class DocumentCanvas<T> extends StatelessWidget {
                         SliverAppBar(
                           actions: const [IgnorePointer()], //To surpess the hamburger
                           primary: false,
-                          title: titleBuilder != null ? titleBuilder!(data) : null,
+                          title: titleBuilder != null ? titleBuilder!(context, data) : null,
                           floating: true,
                           pinned: false,
                           snap: true,
                           centerTitle: true,
                           automaticallyImplyLeading: false,
                           backgroundColor: Theme.of(context).colorScheme.secondary,
-                          bottom: documentTabs.length != 1
+                          bottom: document.tabs.length != 1
                               ? TabBar(
-                                  tabs: documentTabs
+                                  tabs: document.tabs
                                       .map(
-                                        (documentTab) => documentTab.documentTabBuilder(),
+                                        (documentTab) => documentTab.tabBuilder(),
                                       )
                                       .toList(),
                                 )
@@ -218,11 +249,11 @@ class DocumentCanvas<T> extends StatelessWidget {
                     },
                     body: TabBarView(
                       // children: [],
-                      children: documentTabs.map(
+                      children: document.tabs.map(
                         (documentTab) {
                           return Form(
                             key: documentTab.formKey,
-                            child: documentTab.documentTabChildBuilder(data),
+                            child: documentTab.childBuilder(data),
                           );
                         },
                       ).toList(),
@@ -351,11 +382,11 @@ class _DocumentList<T> extends StatelessWidget {
   const _DocumentList({
     Key? key,
     required this.query,
-    required this.documentListBuilder,
+    required this.documentListItemBuilder,
     // required this.notifier,
   }) : super(key: key);
   final Query<T> query;
-  final DocumentListBuilder<T> documentListBuilder;
+  final DocumentListItemBuilder<T> documentListItemBuilder;
   // final ValueNotifier<QueryDocumentSnapshot<T>?> notifier;
 
   @override
@@ -368,7 +399,7 @@ class _DocumentList<T> extends StatelessWidget {
         return _CardList(
           document: queryDocumentSnapshot,
           // notifier: notifier,
-          documentListBuilder: documentListBuilder,
+          documentListItemBuilder: documentListItemBuilder,
         );
       },
       loadingBuilder: (context) => const WaitScreen(),
@@ -382,40 +413,53 @@ class _CardList<T> extends ConsumerWidget {
   const _CardList({
     required this.document,
     // required this.notifier,
-    required this.documentListBuilder,
+    required this.documentListItemBuilder,
   });
 
   final QueryDocumentSnapshot<T> document;
   // final ValueNotifier<QueryDocumentSnapshot<T>?> notifier;
-  final DocumentListBuilder<T> documentListBuilder;
+  final DocumentListItemBuilder<T> documentListItemBuilder;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Card(
-      child: GestureDetector(
-        onTap: () {
-          String documentPath = GoRouter.of(context).location;
-          debugPrint("Update document to ${document.reference.path}");
-          NavigationStateNotifier navigationState = ref.read(navigationStateProvider.notifier);
-          SelectionState<T> selectionState = SelectionState<T>(queryDocumentSnapshot: document, queryParams: {"id": document.id}, cardId: document.id);
-          navigationState.selectionState = selectionState;
-          documentPath = documentPath.split("?")[0];
-          GoRouter.of(context).go('$documentPath?id=${document.id}', extra: selectionState);
-        },
-        child: Consumer(builder: (context, ref, child) {
-          String activeCard = ref.watch(navigationStateProvider).selectionState.cardId;
-          // debugPrint("Draw card ${document.id} active card: $activeCard");
-          return documentListBuilder(context, activeCard == document.id, document.data());
-        }),
-      ),
-    );
+    try {
+      return Card(
+        child: GestureDetector(
+          onTap: () {
+            String documentPath = GoRouter.of(context).location;
+            debugPrint("Update document to ${document.reference.path}");
+            NavigationStateNotifier navigationState = ref.read(navigationStateProvider.notifier);
+            SelectionState<T> selectionState = SelectionState<T>(queryDocumentSnapshot: document, queryParams: {"id": document.id}, cardId: document.id);
+            navigationState.selectionState = selectionState;
+            documentPath = documentPath.split("?")[0];
+            GoRouter.of(context).go('$documentPath?id=${document.id}', extra: selectionState);
+          },
+          child: Consumer(builder: (context, ref, child) {
+            String activeCard = ref.watch(navigationStateProvider).selectionState.cardId;
+            // debugPrint("Draw card ${document.id} active card: $activeCard");
+            try {
+              return documentListItemBuilder(context, activeCard == document.id, document.data());
+            } catch (e) {
+              return Card(
+                child: ListTile(
+                  leading: const Icon(Icons.warning, color: Colors.amberAccent),
+                  subtitle: Text("Data Issue: ${e.toString()} in ${document.reference.path}"),
+                ),
+              );
+            }
+          }),
+        ),
+      );
+    } catch (e) {
+      return const Card(
+        child: ListTile(
+          leading: Icon(Icons.warning, color: Colors.amberAccent),
+        ),
+      );
+    }
   }
 }
 
-typedef DocumentListBuilder<T> = Widget Function(
-  BuildContext context,
-  bool selected,
-  T data,
-);
 typedef DocumentBuilder<T> = Widget Function(
   BuildContext context,
   DocumentReference<T> documentReference,
@@ -423,6 +467,13 @@ typedef DocumentBuilder<T> = Widget Function(
 );
 
 typedef TitleBuilder<T> = Widget Function(
+  BuildContext context,
+  T data,
+);
+
+typedef DocumentListItemBuilder<T> = Widget Function(
+  BuildContext context,
+  bool selected,
   T data,
 );
 
@@ -441,12 +492,27 @@ typedef DocumentStream = Stream<DocumentSnapshot> Function(
 );
 
 class DocumentTab<T> {
-  final DocumentTabBuilder documentTabBuilder;
-  final DocumentTabChildBuilder<T> documentTabChildBuilder;
+  final DocumentTabBuilder tabBuilder;
+  final DocumentTabChildBuilder<T> childBuilder;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   DocumentTab({
-    required this.documentTabBuilder,
-    required this.documentTabChildBuilder,
+    required this.tabBuilder,
+    required this.childBuilder,
   });
+}
+
+class Document {
+  Document({
+    this.key,
+    required this.tabs,
+    required this.documentStream,
+    this.contextCards,
+    this.autoSave = false,
+  });
+  final Key? key;
+  final DocumentStream documentStream;
+  final List<DocumentTab> tabs;
+  final List<ContextCardBuilder>? contextCards;
+  bool autoSave;
 }

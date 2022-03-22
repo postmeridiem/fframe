@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fframe/helpers/validator.dart';
 
 import 'package:fframe_demo/models/suggestion.dart';
+// ignore: unused_import
 import 'package:fframe_demo/services/suggestion_service.dart';
 
 class Tab01 extends StatelessWidget {
@@ -28,7 +29,6 @@ class Tab01 extends StatelessWidget {
                     border: OutlineInputBorder(),
                     labelText: "Author",
                   ),
-                  // controller: TextEditingController.fromValue(TextEditingValue(text: (suggestion.createdBy ?? "unknown"))),
                 ),
               ),
               Padding(
@@ -40,9 +40,8 @@ class Tab01 extends StatelessWidget {
                     border: OutlineInputBorder(),
                     labelText: "Name",
                   ),
-                  controller: TextEditingController.fromValue(TextEditingValue(text: suggestion.name!)),
+                  initialValue: suggestion.name!,
                   validator: (curValue) {
-                    // TODO @AZ: should this be moved into a validator class function entirely to avoid repeating patterns?
                     if (validator.validString(curValue)) {
                       suggestion.name = curValue;
                       return null;
@@ -59,7 +58,7 @@ class Tab01 extends StatelessWidget {
                     border: OutlineInputBorder(),
                     labelText: "Icon",
                   ),
-                  controller: TextEditingController.fromValue(TextEditingValue(text: suggestion.icon!)),
+                  initialValue: suggestion.icon!,
                   validator: (curValue) {
                     if (validator.validIcon(curValue)) {
                       // apply value to the model

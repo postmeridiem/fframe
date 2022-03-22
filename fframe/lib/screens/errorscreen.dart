@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ErrorScreen extends StatelessWidget {
-  const ErrorScreen({required this.error, this.initiallLocation, Key? key}) : super(key: key);
+  const ErrorScreen({
+    required this.error,
+    this.initiallLocation,
+    this.externalLocation,
+    Key? key,
+  }) : super(key: key);
   final Exception error;
   final String? initiallLocation;
+  final String? externalLocation;
 
   @override
   Widget build(BuildContext context) => Center(
@@ -21,6 +28,12 @@ class ErrorScreen extends StatelessWidget {
                 ? TextButton(
                     onPressed: () => context.go(initiallLocation!),
                     child: const Text('Home'),
+                  )
+                : const IgnorePointer(),
+            externalLocation != null
+                ? TextButton(
+                    onPressed: () => launch(externalLocation!),
+                    child: const Text('Launch external reference'),
                   )
                 : const IgnorePointer(),
           ],

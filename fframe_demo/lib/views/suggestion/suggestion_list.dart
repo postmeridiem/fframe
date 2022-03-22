@@ -15,7 +15,6 @@ class SuggestionListItem extends StatelessWidget {
     return ListTile(
       selected: selected,
       title: Text(suggestion.name!, style: TextStyle(decoration: selected ? TextDecoration.underline : TextDecoration.none)),
-      subtitle: Center(child: Text("\\----------------------/")),
       leading: Icon(
         IconData(
           // icon codes match with here https://api.flutter.dev/flutter/material/Icons-class.html#constants

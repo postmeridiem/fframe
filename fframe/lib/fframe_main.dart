@@ -223,22 +223,43 @@ class _AppState extends State<App> with RestorationMixin {
           if (routeId != null) {
             SelectionState selectionState = SelectionState(queryDocumentSnapshot: null, queryParams: {"id": routeId}, cardId: routeId);
             ref.read(navigationStateProvider.notifier).selectionState = selectionState;
+            return null;
           }
         }
-        debugPrint("No redirection");
+        debugPrint("No redirection, return Null");
         return null;
       },
       errorBuilder: (context, state) => ErrorScreen(error: state.error!, initiallLocation: _initialLocation),
       navigatorBuilder: (context, state, child) {
-        return MainScreen(
-          key: state.pageKey,
-          appTitle: widget.title,
-          child: child,
-          state: state,
-          navigationTargets: _navigationTargets(userState),
-          lightMode: widget.lightMode,
-          darkMode: widget.darkMode,
-        );
+        try {
+          debugPrint(state.pageKey.toString());
+          debugPrint(widget.title.toString());
+          debugPrint(child.toString());
+          debugPrint(state.toString());
+          debugPrint(_navigationTargets(userState).toString());
+          debugPrint(state.pageKey.toString());
+
+          List<NavigationTarget> navigationTargets = _navigationTargets(userState);
+
+          if (navigationTargets.isNotEmpty) {
+            return MainScreen(
+              key: state.pageKey,
+              appTitle: widget.title,
+              child: child,
+              state: state,
+              navigationTargets: _navigationTargets(userState),
+              lightMode: widget.lightMode,
+              darkMode: widget.darkMode,
+            );
+          } else {
+            return ErrorScreen(error: Exception("Nowhere to route to."));
+          }
+        } catch (e) {
+          return ErrorScreen(
+            error: Exception(e),
+            initiallLocation: _initialLocation,
+          );
+        }
       },
     );
   }

@@ -1,6 +1,7 @@
 import 'package:fframe/controllers/navigation_state_controller.dart';
 import 'package:fframe/providers/global_providers.dart';
 import 'package:fframe/models/navigation_target.dart';
+import 'package:fframe/screens/errorscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +33,22 @@ class MainScreen extends StatelessWidget {
 
     //Remove any targets which are not currently loaded....
     _navigationTargets.removeWhere((NavigationTarget navigationTarget) => navigationTarget.path != subloc.first);
+    if (_navigationTargets.isEmpty) {
+      debugPrint("_navigationTargets should not be empty.");
+      for (var navigationTarget in _navigationTargets) {
+        debugPrint(" ${navigationTarget.path != subloc.first} => ${navigationTarget.path}");
+      }
+      return ActiveTarget(
+        currentTarget: NavigationTarget(
+          title: "Error",
+          path: "/error",
+          contentPane: ErrorScreen(
+            error: Exception("Navigation target could not be located or is not accesible for your account."),
+          ),
+        ),
+      );
+    }
+
     if (_navigationTargets.length == 1 && subloc.length == 1) return ActiveTarget(currentTarget: _navigationTargets.first);
     //This is the only applicable target
 
@@ -69,10 +86,10 @@ class MainScreen extends StatelessWidget {
               return (subTitle.isEmpty) ? Text(pageTitle) : Text("$pageTitle - $subTitle");
             },
           ),
-          actions: const [
-            BarButtonShare(),
-            BarButtonFeedback(),
-            BarButtonProfile(),
+          actions: [
+            const BarButtonShare(),
+            // const BarButtonFeedback(),
+            if (FirebaseAuth.instance.currentUser != null) const BarButtonProfile(),
           ],
         ),
         body: MainBody(
@@ -220,19 +237,12 @@ class BarButtonFeedback extends StatelessWidget {
 
 class BarButtonProfile extends StatelessWidget {
   const BarButtonProfile({Key? key}) : super(key: key);
-// TODO: fix visibility when not authenticated and make it a true profile
-// is named BarButtonProfile, but only does sign out.
-// Should open a popout with the profile info and a signout button
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (BuildContext context) {
-        return const IconButton(
-          onPressed: _signOut,
-          icon: Icon(Icons.logout_outlined),
-          tooltip: "Log out...",
-        );
-      },
+    return const IconButton(
+      onPressed: _signOut,
+      icon: Icon(Icons.logout_outlined),
+      tooltip: "Log out...",
     );
   }
 }

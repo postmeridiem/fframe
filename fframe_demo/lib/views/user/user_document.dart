@@ -56,7 +56,6 @@ class MainCanvas extends StatelessWidget {
                 snap: true,
                 automaticallyImplyLeading: false,
                 backgroundColor: Theme.of(context).colorScheme.secondary,
-                // TODO: figure out how to get the appbar here without the tabs
                 bottom: const TabBar(
                   tabs: <Tab>[
                     Tab(

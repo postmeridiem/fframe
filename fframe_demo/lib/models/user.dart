@@ -11,7 +11,8 @@ class User extends ChangeNotifier {
     return User(
       id: snapshot.id,
       name: json['name']! as String,
-      creationDate: json['creationDate']! as Timestamp,
+      creationDate: json['creationDate'] as Timestamp,
+      // creationDate: json['creationDate'] != null ? json['creationDate'] as Timestamp : Timestamp.now(),
     );
   }
 

@@ -26,8 +26,7 @@ dependencies:
   flutter_riverpod:
   clipboard:
   cloud_functions:
-  flutter_highlight: 
-
+  url_launcher: ^6.0.20
 
 dev_dependencies:
   flutter_test:
