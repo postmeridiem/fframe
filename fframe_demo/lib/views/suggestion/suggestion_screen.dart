@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
-import 'package:fframe_demo/services/suggestion_service.dart';
+// import 'package:fframe_demo/services/suggestion_service.dart';
 import 'package:fframe_demo/models/suggestion.dart';
 import 'suggestion.dart';
 
@@ -16,6 +16,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
   @override
   Widget build(BuildContext context) {
     return DocumentScreen<Suggestion>(
+      //Indicate where the documents are located and how to convert them to and fromt their models.
+      collection: "suggestions",
+      fromFirestore: Suggestion.fromFirestore,
+      toFirestore: (suggestion, options) => suggestion.toFirestore(),
       //Optional title widget
       titleBuilder: (context, data) {
         return Text(data.name ?? "New Suggestion");
@@ -29,7 +33,6 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             selected: selected,
           );
         },
-        query: SuggestionService().queryStream(),
       ),
 
       // Center part, shows a fireatore doc. Tabs possible
@@ -39,7 +42,6 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
   Document _document() {
     return Document(
-      documentStream: (String? documentId) => SuggestionService().documentStream(documentId: documentId),
       autoSave: false,
       tabs: [
         DocumentTab<Suggestion>(
@@ -69,7 +71,9 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             );
           },
           childBuilder: (suggestion) {
-            return const Tab02();
+            return Tab02(
+              suggestion: suggestion,
+            );
           },
         ),
         DocumentTab<Suggestion>(
@@ -82,7 +86,9 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             );
           },
           childBuilder: (suggestion) {
-            return const Tab03();
+            return Tab03(
+              suggestion: suggestion,
+            );
           },
         ),
       ],

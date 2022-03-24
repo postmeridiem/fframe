@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fframe/helpers/validator.dart';
 
 import 'package:fframe_demo/models/suggestion.dart';
-// ignore: unused_import
-import 'package:fframe_demo/services/suggestion_service.dart';
 
 class Tab01 extends StatelessWidget {
   const Tab01({Key? key, required this.suggestion}) : super(key: key);
@@ -12,7 +10,7 @@ class Tab01 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // register shared validator class for common patterns
-    var validator = Validator();
+    Validator validator = Validator();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,17 +54,15 @@ class Tab01 extends StatelessWidget {
                 child: TextFormField(
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
-                    labelText: "Icon",
+                    labelText: "tab1 value",
                   ),
-                  initialValue: suggestion.icon!,
-                  validator: (curValue) {
-                    if (validator.validIcon(curValue)) {
-                      // apply value to the model
-                      suggestion.icon = curValue;
-                      return null;
-                    } else {
-                      return 'Enter a valid icon string';
+                  initialValue: suggestion.fieldTab1 ?? '',
+                  validator: (value) {
+                    if (!validator.validString(value)) {
+                      return 'Enter a valid value';
                     }
+                    suggestion.fieldTab1 = value;
+                    return null;
                   },
                 ),
               ),
@@ -77,101 +73,3 @@ class Tab01 extends StatelessWidget {
     );
   }
 }
-
-
-              // ListTile(
-              //   leading: Icon(Icons.map),
-              //   title: Text('Map'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.photo_album),
-              //   title: Text('Album'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.phone),
-              //   title: Text('Phone'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.map),
-              //   title: Text('Map'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.photo_album),
-              //   title: Text('Album'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.phone),
-              //   title: Text('Phone'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.map),
-              //   title: Text('Map'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.photo_album),
-              //   title: Text('Album'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.phone),
-              //   title: Text('Phone'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.map),
-              //   title: Text('Map'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.photo_album),
-              //   title: Text('Album'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.phone),
-              //   title: Text('Phone'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.map),
-              //   title: Text('Map'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.photo_album),
-              //   title: Text('Album'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.phone),
-              //   title: Text('Phone'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.map),
-              //   title: Text('Map'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.photo_album),
-              //   title: Text('Album'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.phone),
-              //   title: Text('Phone'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.map),
-              //   title: Text('Map'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.photo_album),
-              //   title: Text('Album'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.phone),
-              //   title: Text('Phone'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.map),
-              //   title: Text('Map'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.photo_album),
-              //   title: Text('Album'),
-              // ),
-              // ListTile(
-              //   leading: Icon(Icons.phone),
-              //   title: Text('Phonelast'),
-              // ),

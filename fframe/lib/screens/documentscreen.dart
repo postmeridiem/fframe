@@ -4,13 +4,14 @@ class DocumentScreen<T> extends StatefulWidget {
   const DocumentScreen({
     Key? key,
     // required this.query,
-
+    required this.collection,
+    required this.fromFirestore,
+    required this.toFirestore,
     this.documentList,
     this.documentBuilder,
     this.titleBuilder,
     required this.document,
-    this.actionButtons,
-    this.contextCardBuilders,
+    this.extraActionButtons,
   }) : super(key: key);
   // final Query<T> query;
 
@@ -18,8 +19,11 @@ class DocumentScreen<T> extends StatefulWidget {
   final DocumentBuilder<T>? documentBuilder;
   final TitleBuilder<T>? titleBuilder;
   final Document document;
-  final List<ActionButton>? actionButtons;
-  final List<ContextCardBuilder>? contextCardBuilders;
+  final List<ActionButton>? extraActionButtons;
+
+  final String collection;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
 
   @override
   State<DocumentScreen<T>> createState() => _DocumentScreenState<T>();
@@ -28,37 +32,13 @@ class DocumentScreen<T> extends StatefulWidget {
 class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
   @override
   Widget build(BuildContext context) {
-    List<ActionButton> actionButtons = [
-      ActionButton(
-        onPressed: () => {},
-        icon: const Icon(
-          Icons.close,
-        ),
-      ),
-      ActionButton(
-        onPressed: () => {},
-        icon: const Icon(
-          Icons.save,
-        ),
-      ),
-      ActionButton(
-        onPressed: () => {},
-        icon: const Icon(
-          Icons.add,
-        ),
-      ),
-    ];
-
-    if (widget.actionButtons != null) {
-      actionButtons.addAll(widget.actionButtons!);
-    }
-
     _DocumentBody<T> documentBody = _DocumentBody(
-      documentStream: widget.document.documentStream,
-      actionButtons: actionButtons,
+      collection: widget.collection,
+      fromFirestore: widget.fromFirestore,
+      toFirestore: widget.toFirestore,
+      extraActionButtons: widget.extraActionButtons,
       titleBuilder: widget.titleBuilder,
       document: widget.document,
-      contextCardBuilders: widget.contextCardBuilders,
     );
 
     //Check if a documentList is to be loaded
@@ -70,8 +50,10 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
             child: Padding(
               padding: const EdgeInsets.all(0.0),
               child: _DocumentList<T>(
-                query: widget.documentList!.query,
-                documentListItemBuilder: widget.documentList!.builder,
+                collection: widget.collection,
+                fromFirestore: widget.fromFirestore,
+                toFirestore: widget.toFirestore,
+                documentList: widget.documentList!,
               ),
             ),
           ),
@@ -97,15 +79,20 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
 class _DocumentBody<T> extends ConsumerWidget {
   const _DocumentBody({
     Key? key,
+    required this.collection,
+    required this.fromFirestore,
+    required this.toFirestore,
     this.titleBuilder,
-    required this.documentStream,
-    required this.actionButtons,
+    this.extraActionButtons,
     required this.document,
     this.contextCardBuilders,
   }) : super(key: key);
+  final String collection;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
+
   final TitleBuilder<T>? titleBuilder;
-  final DocumentStream? documentStream;
-  final List<ActionButton> actionButtons;
+  final List<ActionButton>? extraActionButtons;
   final Document document;
   final List<ContextCardBuilder>? contextCardBuilders;
 
@@ -114,16 +101,20 @@ class _DocumentBody<T> extends ConsumerWidget {
     try {
       NavigationStateNotifier navigationState = ref.watch(navigationStateProvider);
 
-      DocumentSnapshot<T>? documentSnapshot = navigationState.selectionState.queryDocumentSnapshot as DocumentSnapshot<T>?;
+      // DocumentSnapshot<T>? documentSnapshot = navigationState.selectionState.queryDocumentSnapshot as DocumentSnapshot<T>?;
       Map<String, String>? queryParams = navigationState.selectionState.queryParams;
-      if ((documentSnapshot != null && queryParams != null && documentStream != null) || (queryParams != null && queryParams.containsKey("id"))) {
-        String docId = documentSnapshot?.id ?? queryParams['id']!;
+      if ((queryParams != null && queryParams.containsKey("id"))) {
+        // String docId = documentSnapshot?.id ?? queryParams['id']!;
 
-        Stream<DocumentSnapshot<T>> _documentStream = documentStream!(docId) as Stream<DocumentSnapshot<T>>;
+        // Stream<DocumentSnapshot<T>> _documentStream = documentStream!(docId) as Stream<DocumentSnapshot<T>>;
 
         return StreamBuilder<DocumentSnapshot<T>>(
-          initialData: documentSnapshot,
-          stream: _documentStream,
+          stream: DatabaseService<T>().documentStream(
+            collection: "suggestions",
+            documentId: queryParams['id']!,
+            fromFirestore: fromFirestore,
+            toFirestore: toFirestore,
+          ),
           builder: (context, AsyncSnapshot<DocumentSnapshot<T>> asyncSnapshot) {
             switch (asyncSnapshot.connectionState) {
               case ConnectionState.none:
@@ -146,9 +137,11 @@ class _DocumentBody<T> extends ConsumerWidget {
                       body: DocumentCanvas<T>(
                         titleBuilder: titleBuilder,
                         data: snapshotData,
+                        documentSnapshot: asyncSnapshot.data!,
                         document: document,
-                        actionButtons: actionButtons,
-                        contextCardBuilders: contextCardBuilders,
+                        extraActionButtons: extraActionButtons,
+                        toFirestore: toFirestore,
+                        fromFirestore: fromFirestore,
                       ),
                     );
                   } else {
@@ -165,10 +158,10 @@ class _DocumentBody<T> extends ConsumerWidget {
             }
           },
         );
-      } else {
-        if (documentSnapshot == null && queryParams != null) {
-          return const WaitScreen();
-        }
+        // } else {
+        //   if (documentSnapshot == null && queryParams != null) {
+        //     return const WaitScreen();
+        //   }
       }
       return const EmptyScreen();
     } catch (e) {
@@ -184,104 +177,170 @@ class DocumentCanvas<T> extends StatelessWidget {
     Key? key,
     this.titleBuilder,
     required this.data,
-    required this.actionButtons,
+    required this.documentSnapshot,
     required this.document,
-    this.contextCardBuilders,
+    required this.fromFirestore,
+    required this.toFirestore,
+    this.extraActionButtons,
   }) : super(key: key);
 
   // final Suggestion suggestion;
   final GlobalKey<ScaffoldState> _key = GlobalKey();
+  final DocumentSnapshot documentSnapshot;
   final T data;
   final TitleBuilder<T>? titleBuilder;
-  final List<ActionButton> actionButtons;
+  final List<ActionButton>? extraActionButtons;
   final Document document;
-  final List<ContextCardBuilder>? contextCardBuilders;
-
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final bool collapsed = constraints.maxWidth > 1000;
+    _save() {
+      // if (documentSnapshot.exists) {
+      //   bool validationResult = document.tabs
+      //       .map((documentTab) {
+      //         return documentTab.formKey.currentState!.validate();
+      //       })
+      //       .toList()
+      //       .contains(false);
+      //   if (validationResult == true) {
+      debugPrint("Update ${documentSnapshot.id}");
+      documentSnapshot.reference.update(toFirestore(data, null)).then(
+        (value) {
+          debugPrint("Success");
+        },
+      ).onError(
+        (error, stackTrace) {
+          debugPrint(error.toString());
+        },
+      );
+      // } else {
+      //   debugPrint("Create new");
+      // }
+      // }
+    }
 
-        return Row(
-          children: [
-            Flexible(
-              fit: FlexFit.tight,
-              child: DefaultTabController(
-                length: document.tabs.length,
-                child: Scaffold(
-                  key: _key,
-                  endDrawer: (contextCardBuilders != null && contextCardBuilders!.isNotEmpty)
-                      ? ContextCanvas(
-                          contextWidgets: contextCardBuilders!
-                              .map(
-                                (contextCardBuilder) => contextCardBuilder(data),
+    List<ActionButton> actionButtons = [
+      ...?extraActionButtons,
+      ActionButton(
+        onPressed: () => {},
+        icon: const Icon(
+          Icons.close,
+        ),
+      ),
+      ActionButton(
+        onPressed: _save,
+        icon: const Icon(
+          Icons.save,
+        ),
+      ),
+      ActionButton(
+        onPressed: () => {},
+        icon: const Icon(
+          Icons.add,
+        ),
+      ),
+    ];
+
+    return DefaultTabController(
+      length: document.tabs.length,
+      // The Builder widget is used to have a different BuildContext to access
+      // closest DefaultTabController.
+      child: Builder(
+        builder: (BuildContext context) {
+          final TabController tabController = DefaultTabController.of(context)!;
+          tabController.addListener(() {
+            if (!tabController.indexIsChanging) {
+              // Your code goes here.
+              // To get index of current tab use tabController.index
+            }
+          });
+          return LayoutBuilder(
+            builder: (context, constraints) {
+              final bool collapsed = constraints.maxWidth > 1000;
+
+              return Row(
+                children: [
+                  Flexible(
+                    fit: FlexFit.tight,
+                    child: DefaultTabController(
+                      length: document.tabs.length,
+                      child: Scaffold(
+                        key: _key,
+                        endDrawer: (document.contextCards != null && document.contextCards!.isNotEmpty)
+                            ? ContextCanvas(
+                                contextWidgets: document.contextCards!
+                                    .map(
+                                      (contextCardBuilder) => contextCardBuilder(data),
+                                    )
+                                    .toList(),
                               )
-                              .toList(),
-                        )
-                      : null,
-                  primary: false,
-                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                  body: NestedScrollView(
-                    headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                      return <Widget>[
-                        SliverAppBar(
-                          actions: const [IgnorePointer()], //To surpess the hamburger
-                          primary: false,
-                          title: titleBuilder != null ? titleBuilder!(context, data) : null,
-                          floating: true,
-                          pinned: false,
-                          snap: true,
-                          centerTitle: true,
-                          automaticallyImplyLeading: false,
-                          backgroundColor: Theme.of(context).colorScheme.secondary,
-                          bottom: document.tabs.length != 1
-                              ? TabBar(
-                                  tabs: document.tabs
-                                      .map(
-                                        (documentTab) => documentTab.tabBuilder(),
+                            : null,
+                        primary: false,
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
+                        body: NestedScrollView(
+                          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                            return <Widget>[
+                              SliverAppBar(
+                                actions: const [IgnorePointer()], //To surpess the hamburger
+                                primary: false,
+                                title: titleBuilder != null ? titleBuilder!(context, data) : null,
+                                floating: true,
+                                pinned: false,
+                                snap: true,
+                                centerTitle: true,
+                                automaticallyImplyLeading: false,
+                                backgroundColor: Theme.of(context).colorScheme.secondary,
+                                bottom: document.tabs.length != 1
+                                    ? TabBar(
+                                        tabs: document.tabs
+                                            .map(
+                                              (documentTab) => documentTab.tabBuilder(),
+                                            )
+                                            .toList(),
                                       )
-                                      .toList(),
-                                )
-                              : null,
+                                    : null,
+                              ),
+                            ];
+                          },
+                          body: TabBarView(
+                            // children: [],
+                            children: document.tabs.map(
+                              (documentTab) {
+                                return Form(
+                                  key: documentTab.formKey,
+                                  child: documentTab.childBuilder(data),
+                                );
+                              },
+                            ).toList(),
+                          ),
                         ),
-                      ];
-                    },
-                    body: TabBarView(
-                      // children: [],
-                      children: document.tabs.map(
-                        (documentTab) {
-                          return Form(
-                            key: documentTab.formKey,
-                            child: documentTab.childBuilder(data),
-                          );
-                        },
-                      ).toList(),
+                        floatingActionButton: ExpandableFab(
+                          distance: 112.0,
+                          children: actionButtons,
+                        ),
+                      ),
                     ),
                   ),
-                  floatingActionButton: ExpandableFab(
-                    distance: 112.0,
-                    children: actionButtons,
-                  ),
-                ),
-              ),
-            ),
-            if (contextCardBuilders != null && contextCardBuilders!.isNotEmpty)
-              collapsed
-                  ? SizedBox(
-                      width: 250,
-                      child: ContextCanvas(
-                        contextWidgets: contextCardBuilders!
-                            .map(
-                              (contextCardBuilder) => contextCardBuilder(data),
-                            )
-                            .toList(),
-                      ),
-                    )
-                  : DrawerButton(scaffoldKey: _key),
-          ],
-        );
-      },
+                  if (document.contextCards != null && document.contextCards!.isNotEmpty)
+                    collapsed
+                        ? SizedBox(
+                            width: 250,
+                            child: ContextCanvas(
+                              contextWidgets: document.contextCards!
+                                  .map(
+                                    (contextCardBuilder) => contextCardBuilder(data),
+                                  )
+                                  .toList(),
+                            ),
+                          )
+                        : DrawerButton(scaffoldKey: _key),
+                ],
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
@@ -381,25 +440,34 @@ class DocumentTitle extends StatelessWidget {
 class _DocumentList<T> extends StatelessWidget {
   const _DocumentList({
     Key? key,
-    required this.query,
-    required this.documentListItemBuilder,
-    // required this.notifier,
+    required this.collection,
+    required this.fromFirestore,
+    required this.toFirestore,
+    required this.documentList,
   }) : super(key: key);
-  final Query<T> query;
-  final DocumentListItemBuilder<T> documentListItemBuilder;
-  // final ValueNotifier<QueryDocumentSnapshot<T>?> notifier;
+  final DocumentList<T> documentList;
+  final String collection;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
 
   @override
   Widget build(BuildContext context) {
     debugPrint("Build DocumentList $runtimeType ${key.toString()}");
+
+    Query<T> q = DatabaseService<T>().query(
+      collection: collection,
+      fromFirestore: fromFirestore,
+      toFirestore: toFirestore, //List does not support updates
+    );
+
     return FirestoreListView<T>(
-      query: query,
+      query: q,
       itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
         // return documentListBuilder(context, queryDocumentSnapshot);
         return _CardList(
           document: queryDocumentSnapshot,
           // notifier: notifier,
-          documentListItemBuilder: documentListItemBuilder,
+          documentListItemBuilder: documentList.builder,
         );
       },
       loadingBuilder: (context) => const WaitScreen(),
@@ -432,7 +500,7 @@ class _CardList<T> extends ConsumerWidget {
             SelectionState<T> selectionState = SelectionState<T>(queryDocumentSnapshot: document, queryParams: {"id": document.id}, cardId: document.id);
             navigationState.selectionState = selectionState;
             documentPath = documentPath.split("?")[0];
-            GoRouter.of(context).go('$documentPath?id=${document.id}', extra: selectionState);
+            // GoRouter.of(context).go('$documentPath?id=${document.id}', extra: selectionState); //Disables until we figure out how to prevent a full rebuild when changing the query-string
           },
           child: Consumer(builder: (context, ref, child) {
             String activeCard = ref.watch(navigationStateProvider).selectionState.cardId;
@@ -506,12 +574,12 @@ class Document {
   Document({
     this.key,
     required this.tabs,
-    required this.documentStream,
-    this.contextCards,
+    // required this.documentStream,
+    required this.contextCards,
     this.autoSave = false,
   });
   final Key? key;
-  final DocumentStream documentStream;
+  // final DocumentStream documentStream;
   final List<DocumentTab> tabs;
   final List<ContextCardBuilder>? contextCards;
   bool autoSave;
