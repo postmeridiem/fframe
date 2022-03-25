@@ -16,6 +16,7 @@ import 'package:fframe/providers/global_providers.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterfire_ui/firestore.dart';
+import 'package:preload_page_view/preload_page_view.dart';
 
 part 'fframe_main.dart';
 part 'screens/documentscreen.dart';

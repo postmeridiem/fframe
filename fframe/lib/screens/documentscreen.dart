@@ -152,7 +152,7 @@ class _DocumentBody<T> extends ConsumerWidget {
                 } catch (e) {
                   return ErrorScreen(
                     error: Exception("${e.toString()} in ${asyncSnapshot.data?.reference.path ?? 'unknowmn path'} ${{asyncSnapshot.data?.reference}}"),
-                    externalLocation: "https://console.firebase.google.com/project/${asyncSnapshot.data?.reference.firestore.app.name}/firestore/data/~2Fusers~2F1U1O47tW48W5K5PpEXWc1QRRWxt1",
+                    // externalLocation: "https://console.firebase.google.com/project/${asyncSnapshot.data?.reference.firestore.app.name}/firestore/data/~2Fusers~2F1U1O47tW48W5K5PpEXWc1QRRWxt1",
                   );
                 }
             }
@@ -193,55 +193,22 @@ class DocumentCanvas<T> extends StatelessWidget {
   final Document document;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
+
+  // final PreloadPageController _pageController = PreloadPageController(initialPage: 0, keepPage: true, viewportFraction: 0.99);
+  // bool _canChange = true;
+
+  // void changePage({required index, required TabController tabController, page = false, tab = false}) async {
+  //   if (page) {
+  //     _canChange = false;
+  //     await _pageController.animateToPage(index, duration: const Duration(milliseconds: 500), curve: Curves.ease);
+  //     _canChange = true;
+  //   } else {
+  //     tabController.animateTo(index);
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
-    _save() {
-      // if (documentSnapshot.exists) {
-      //   bool validationResult = document.tabs
-      //       .map((documentTab) {
-      //         return documentTab.formKey.currentState!.validate();
-      //       })
-      //       .toList()
-      //       .contains(false);
-      //   if (validationResult == true) {
-      debugPrint("Update ${documentSnapshot.id}");
-      documentSnapshot.reference.update(toFirestore(data, null)).then(
-        (value) {
-          debugPrint("Success");
-        },
-      ).onError(
-        (error, stackTrace) {
-          debugPrint(error.toString());
-        },
-      );
-      // } else {
-      //   debugPrint("Create new");
-      // }
-      // }
-    }
-
-    List<ActionButton> actionButtons = [
-      ...?extraActionButtons,
-      ActionButton(
-        onPressed: () => {},
-        icon: const Icon(
-          Icons.close,
-        ),
-      ),
-      ActionButton(
-        onPressed: _save,
-        icon: const Icon(
-          Icons.save,
-        ),
-      ),
-      ActionButton(
-        onPressed: () => {},
-        icon: const Icon(
-          Icons.add,
-        ),
-      ),
-    ];
-
     return DefaultTabController(
       length: document.tabs.length,
       // The Builder widget is used to have a different BuildContext to access
@@ -249,10 +216,66 @@ class DocumentCanvas<T> extends StatelessWidget {
       child: Builder(
         builder: (BuildContext context) {
           final TabController tabController = DefaultTabController.of(context)!;
+          PreloadPageController preloadPageController = PreloadPageController(initialPage: 0);
+
+          _save() {
+            if (documentSnapshot.exists) {
+              List<bool> validationResults = document.tabs.map((documentTab) {
+                bool isValid = documentTab.formKey.currentState!.validate();
+                // if (isValid == false && firstInvalid == null) {
+                //   document.tabs[documentTab].
+                // }
+                return isValid;
+              }).toList();
+              bool validationResult = validationResults.contains(false);
+
+              if (validationResult == false) {
+                debugPrint("Update ${documentSnapshot.id}");
+                documentSnapshot.reference.update(toFirestore(data, null)).then(
+                  (value) {
+                    debugPrint("Success");
+                  },
+                ).onError(
+                  (error, stackTrace) {
+                    debugPrint(error.toString());
+                  },
+                );
+              } else {
+                debugPrint("Validation failed");
+                //Navigate to the first tab with an error
+                int failedTab = validationResults.indexWhere((validationResult) => validationResult == false);
+                preloadPageController.animateToPage(failedTab, duration: const Duration(microseconds: 100), curve: Curves.easeOutCirc);
+              }
+            }
+          }
+
+          List<ActionButton> actionButtons = [
+            ...?extraActionButtons,
+            ActionButton(
+              onPressed: () => {},
+              icon: const Icon(
+                Icons.close,
+              ),
+            ),
+            ActionButton(
+              onPressed: _save,
+              icon: const Icon(
+                Icons.save,
+              ),
+            ),
+            ActionButton(
+              onPressed: () => {},
+              icon: const Icon(
+                Icons.add,
+              ),
+            ),
+          ];
+
           tabController.addListener(() {
             if (!tabController.indexIsChanging) {
-              // Your code goes here.
-              // To get index of current tab use tabController.index
+              debugPrint("Navigate to tab ${tabController.index}");
+              preloadPageController.animateToPage(tabController.index, duration: const Duration(microseconds: 100), curve: Curves.easeOutCirc);
+              // changePage(index: tabController.index, tabController: tabController, page: true);
             }
           });
           return LayoutBuilder(
@@ -293,6 +316,7 @@ class DocumentCanvas<T> extends StatelessWidget {
                                 backgroundColor: Theme.of(context).colorScheme.secondary,
                                 bottom: document.tabs.length != 1
                                     ? TabBar(
+                                        controller: tabController,
                                         tabs: document.tabs
                                             .map(
                                               (documentTab) => documentTab.tabBuilder(),
@@ -303,17 +327,53 @@ class DocumentCanvas<T> extends StatelessWidget {
                               ),
                             ];
                           },
-                          body: TabBarView(
-                            // children: [],
-                            children: document.tabs.map(
-                              (documentTab) {
-                                return Form(
-                                  key: documentTab.formKey,
-                                  child: documentTab.childBuilder(data),
-                                );
-                              },
-                            ).toList(),
+
+                          body: PreloadPageView.builder(
+                            itemCount: document.tabs.length,
+                            preloadPagesCount: document.tabs.length,
+                            itemBuilder: (BuildContext context, int position) {
+                              debugPrint("Build tab $position");
+                              return Form(
+                                key: document.tabs[position].formKey,
+                                child: document.tabs[position].childBuilder(data),
+                              );
+                            },
+                            controller: preloadPageController,
+                            onPageChanged: (int position) {
+                              debugPrint('page changed. current: $position');
+                            },
                           ),
+
+                          // body: PreloadPageView.builder(
+                          //   preloadPagesCount: document.tabs.length,
+                          //   physics: const AlwaysScrollableScrollPhysics(),
+                          //   controller: _pageController,
+                          //   onPageChanged: (index) {
+                          //     if (_canChange) {
+                          //       changePage(index: index, tabController: tabController);
+                          //     }
+                          //   },
+                          //   children: document.tabs.map(
+                          //     (documentTab) {
+                          //       return Form(
+                          //         key: documentTab.formKey,
+                          //         child: documentTab.childBuilder(data),
+                          //       );
+                          //     },
+                          //   ).toList(),
+                          // ),
+
+                          // body: TabBarView(
+                          //   // children: [],
+                          //   children: document.tabs.map(
+                          //     (documentTab) {
+                          //       return Form(
+                          //         key: documentTab.formKey,
+                          //         child: documentTab.childBuilder(data),
+                          //       );
+                          //     },
+                          //   ).toList(),
+                          // ),
                         ),
                         floatingActionButton: ExpandableFab(
                           distance: 112.0,
