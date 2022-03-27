@@ -15,6 +15,14 @@ class DocumentScreen<T> extends StatefulWidget {
   }) : super(key: key);
   // final Query<T> query;
 
+  /// this is a fFrame Document Screen
+  /// we have not documented this yet
+  /// we failed to document succesfully, one might say.
+  /// the [documentList] should have things and the
+  /// [documentBuilder] is picky in other ways.
+  ///
+  /// don't forget the [document]!
+
   final DocumentList<T>? documentList;
   final DocumentBuilder<T>? documentBuilder;
   final TitleBuilder<T>? titleBuilder;
@@ -620,6 +628,9 @@ typedef DocumentStream = Stream<DocumentSnapshot> Function(
 );
 
 class DocumentTab<T> {
+  /// this is a fFrame Document Tab
+  ///
+  ///
   final DocumentTabBuilder tabBuilder;
   final DocumentTabChildBuilder<T> childBuilder;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
