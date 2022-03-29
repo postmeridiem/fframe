@@ -20,6 +20,8 @@ class Suggestion extends ChangeNotifier {
   /// check [name] for the name
   ///
   /// this documentation is a lie
+  ///
+
   // fromFirestore<Suggestion>(DocumentSnapshot<Map<String, dynamic>> snapshot) {
   factory Suggestion.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? snapshotOptions) {
     debugPrint("reading <Suggestion>");
