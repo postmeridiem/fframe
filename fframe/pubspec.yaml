@@ -17,8 +17,8 @@ dependencies:
   uuid:  #to generate uids
   flutter_signin_button: 
   google_sign_in:
-  googleapis:
-  googleapis_auth:
+  # googleapis:
+  # googleapis_auth:
   flutterfire_ui: 
   file_picker: 
   go_router: 

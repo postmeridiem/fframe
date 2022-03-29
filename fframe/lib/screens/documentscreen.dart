@@ -1,10 +1,16 @@
 part of fframe;
 
 class DocumentScreen<T> extends StatefulWidget {
+  /// Creates a 1, 2 3 pane layout for easy access and layout for  Firestore data .
+  ///
+  /// The [length] argument is typically greater than one. The [length] must
+  /// match [TabBar.tabs]'s and [TabBarView.children]'s length.
+  ///
+  /// The [initialIndex] argument must not be null.
   const DocumentScreen({
     Key? key,
-    // required this.query,
     required this.collection,
+    required this.createNew,
     required this.fromFirestore,
     required this.toFirestore,
     this.documentList,
@@ -32,6 +38,7 @@ class DocumentScreen<T> extends StatefulWidget {
   final String collection;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
+  final T Function() createNew;
 
   @override
   State<DocumentScreen<T>> createState() => _DocumentScreenState<T>();
@@ -44,6 +51,7 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
       collection: widget.collection,
       fromFirestore: widget.fromFirestore,
       toFirestore: widget.toFirestore,
+      createNew: widget.createNew,
       extraActionButtons: widget.extraActionButtons,
       titleBuilder: widget.titleBuilder,
       document: widget.document,
@@ -94,11 +102,14 @@ class _DocumentBody<T> extends ConsumerWidget {
     this.extraActionButtons,
     required this.document,
     this.contextCardBuilders,
+    required this.createNew,
+    this.createDocumentId,
   }) : super(key: key);
   final String collection;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
-
+  final T Function() createNew;
+  final String? Function(T)? createDocumentId;
   final TitleBuilder<T>? titleBuilder;
   final List<ActionButton>? extraActionButtons;
   final Document document;
@@ -108,14 +119,77 @@ class _DocumentBody<T> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     try {
       NavigationStateNotifier navigationState = ref.watch(navigationStateProvider);
+      UserState userState = ref.watch(userStateNotifierProvider);
 
-      // DocumentSnapshot<T>? documentSnapshot = navigationState.selectionState.queryDocumentSnapshot as DocumentSnapshot<T>?;
+      _callClose() {
+        navigationState.selectionState = SelectionState(
+          data: null,
+          queryParams: null,
+          queryDocumentSnapshot: null,
+        );
+      }
+
+      _callCreateNew() {
+        navigationState.selectionState = SelectionState(
+          data: createNew(),
+          queryParams: null,
+          queryDocumentSnapshot: null,
+        );
+      }
+
+      Future<bool> _callSave(String? documentId, T data) async {
+        try {
+          if (createDocumentId != null) {
+            debugPrint("Request a new documentId");
+            documentId = createDocumentId!(data);
+          }
+          documentId = documentId ?? const Uuid().v4();
+
+          if (await DatabaseService<T>().updateData(
+            collection: collection,
+            documentId: documentId,
+            data: data,
+            fromFirestore: fromFirestore,
+            toFirestore: toFirestore,
+          )) {
+            //Success
+            debugPrint("Save was successfull ");
+            return true;
+          } else {
+            debugPrint("Save failed");
+            return false;
+          } // Failed
+
+        } catch (error) {
+          debugPrint(error.toString());
+        }
+        return false;
+      }
+
       Map<String, String>? queryParams = navigationState.selectionState.queryParams;
-      if ((queryParams != null && queryParams.containsKey("id"))) {
-        // String docId = documentSnapshot?.id ?? queryParams['id']!;
+      T? data = navigationState.selectionState.data;
+      if (data != null) {
+        //Return injected type
 
-        // Stream<DocumentSnapshot<T>> _documentStream = documentStream!(docId) as Stream<DocumentSnapshot<T>>;
-
+        return Scaffold(
+          primary: false,
+          body: DocumentCanvas<T>(
+            key: ObjectKey(data),
+            titleBuilder: titleBuilder,
+            data: data,
+            userState: userState,
+            collection: collection,
+            // documentSnapshot: null,
+            document: document,
+            extraActionButtons: extraActionButtons,
+            toFirestore: toFirestore,
+            fromFirestore: fromFirestore,
+            callCreateNew: _callCreateNew,
+            callClose: _callClose,
+            callSave: _callSave,
+          ),
+        );
+      } else if ((queryParams != null && queryParams.containsKey("id"))) {
         return StreamBuilder<DocumentSnapshot<T>>(
           stream: DatabaseService<T>().documentStream(
             collection: "suggestions",
@@ -141,15 +215,20 @@ class _DocumentBody<T> extends ConsumerWidget {
                   if (snapshotData != null) {
                     return Scaffold(
                       primary: false,
-                      // body: documentBuilder(context, asyncSnapshot.data!.reference, asyncSnapshot.data!.data()!),
                       body: DocumentCanvas<T>(
+                        key: ObjectKey(data),
                         titleBuilder: titleBuilder,
                         data: snapshotData,
-                        documentSnapshot: asyncSnapshot.data!,
+                        userState: userState,
+                        collection: collection,
+                        documentId: queryParams['id']!,
                         document: document,
                         extraActionButtons: extraActionButtons,
                         toFirestore: toFirestore,
                         fromFirestore: fromFirestore,
+                        callCreateNew: _callCreateNew,
+                        callClose: _callClose,
+                        callSave: _callSave,
                       ),
                     );
                   } else {
@@ -166,10 +245,6 @@ class _DocumentBody<T> extends ConsumerWidget {
             }
           },
         );
-        // } else {
-        //   if (documentSnapshot == null && queryParams != null) {
-        //     return const WaitScreen();
-        //   }
       }
       return const EmptyScreen();
     } catch (e) {
@@ -185,25 +260,40 @@ class DocumentCanvas<T> extends StatelessWidget {
     Key? key,
     this.titleBuilder,
     required this.data,
-    required this.documentSnapshot,
+    required this.userState,
+    this.documentId,
     required this.document,
+    required this.collection,
     required this.fromFirestore,
     required this.toFirestore,
     this.extraActionButtons,
+    required this.callCreateNew,
+    required this.callClose,
+    required this.callSave,
   }) : super(key: key);
 
-  // final Suggestion suggestion;
   final GlobalKey<ScaffoldState> _key = GlobalKey();
-  final DocumentSnapshot documentSnapshot;
+  final String? documentId;
   final T data;
+  final String collection;
+  final UserState userState;
   final TitleBuilder<T>? titleBuilder;
   final List<ActionButton>? extraActionButtons;
   final Document document;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
+  final Function() callCreateNew;
+  final Function() callClose;
+  final Future<bool> Function(String?, T) callSave;
 
   @override
   Widget build(BuildContext context) {
+    if (userState.runtimeType == UserStateSignedIn) {
+      UserStateSignedIn _userState = userState as UserStateSignedIn;
+      // _userState.appUser
+    }
+    // DocumentSnapshot<T>? _documentSnapshot = documentSnapshot;
+
     return DefaultTabController(
       length: document.tabs.length,
       // The Builder widget is used to have a different BuildContext to access
@@ -213,53 +303,56 @@ class DocumentCanvas<T> extends StatelessWidget {
           final TabController tabController = DefaultTabController.of(context)!;
           PreloadPageController preloadPageController = PreloadPageController(initialPage: 0);
 
-          _save() {
-            if (documentSnapshot.exists) {
-              List<bool> validationResults = document.tabs.map((documentTab) {
-                bool isValid = documentTab.formKey.currentState!.validate();
-                // if (isValid == false && firstInvalid == null) {
-                //   document.tabs[documentTab].
-                // }
-                return isValid;
-              }).toList();
-              bool validationResult = validationResults.contains(false);
-
-              if (validationResult == false) {
-                debugPrint("Update ${documentSnapshot.id}");
-                documentSnapshot.reference.update(toFirestore(data, null)).then(
-                  (value) {
-                    debugPrint("Success");
-                  },
-                ).onError(
-                  (error, stackTrace) {
-                    debugPrint(error.toString());
-                  },
-                );
-              } else {
-                debugPrint("Validation failed");
-                //Navigate to the first tab with an error
-                int failedTab = validationResults.indexWhere((validationResult) => validationResult == false);
-                preloadPageController.animateToPage(failedTab, duration: const Duration(microseconds: 100), curve: Curves.easeOutCirc);
-              }
-            }
-          }
-
           List<ActionButton> actionButtons = [
             ...?extraActionButtons,
             ActionButton(
-              onPressed: () => {},
+              onPressed: callClose,
               icon: const Icon(
                 Icons.close,
               ),
             ),
             ActionButton(
-              onPressed: _save,
+              onPressed: () async {
+                List<bool> validationResults = document.tabs.map((documentTab) {
+                  bool isValid = documentTab.formKey.currentState!.validate();
+                  return isValid;
+                }).toList();
+
+                if (validationResults.contains(false)) {
+                  //Validation has failed
+                  int failedTab = validationResults.indexWhere((validationResult) => validationResult == false);
+                  preloadPageController.animateToPage(failedTab, duration: const Duration(microseconds: 100), curve: Curves.easeOutCirc);
+                } else {
+                  //Save this document
+                  if ((await callSave(documentId, data)) == true) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: Text('Saved succesfully'),
+                    ));
+                    callClose();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: ListTile(
+                        leading: Icon(
+                          Icons.warning,
+                          color: Colors.amberAccent,
+                        ),
+                        title: Text(
+                          "Save failed succesfully",
+                        ),
+                        tileColor: Colors.redAccent,
+                      ),
+                    ));
+                  }
+                }
+              },
               icon: const Icon(
                 Icons.save,
               ),
             ),
             ActionButton(
-              onPressed: () => {},
+              onPressed: callCreateNew,
               icon: const Icon(
                 Icons.add,
               ),
@@ -322,7 +415,6 @@ class DocumentCanvas<T> extends StatelessWidget {
                               ),
                             ];
                           },
-
                           body: PreloadPageView.builder(
                             itemCount: document.tabs.length,
                             preloadPagesCount: document.tabs.length,
@@ -330,7 +422,10 @@ class DocumentCanvas<T> extends StatelessWidget {
                               debugPrint("Build tab $position");
                               return Form(
                                 key: document.tabs[position].formKey,
-                                child: document.tabs[position].childBuilder(data),
+                                child: Container(
+                                  key: ObjectKey(data),
+                                  child: document.tabs[position].childBuilder(data),
+                                ),
                               );
                             },
                             controller: preloadPageController,
@@ -338,37 +433,6 @@ class DocumentCanvas<T> extends StatelessWidget {
                               debugPrint('page changed. current: $position');
                             },
                           ),
-
-                          // body: PreloadPageView.builder(
-                          //   preloadPagesCount: document.tabs.length,
-                          //   physics: const AlwaysScrollableScrollPhysics(),
-                          //   controller: _pageController,
-                          //   onPageChanged: (index) {
-                          //     if (_canChange) {
-                          //       changePage(index: index, tabController: tabController);
-                          //     }
-                          //   },
-                          //   children: document.tabs.map(
-                          //     (documentTab) {
-                          //       return Form(
-                          //         key: documentTab.formKey,
-                          //         child: documentTab.childBuilder(data),
-                          //       );
-                          //     },
-                          //   ).toList(),
-                          // ),
-
-                          // body: TabBarView(
-                          //   // children: [],
-                          //   children: document.tabs.map(
-                          //     (documentTab) {
-                          //       return Form(
-                          //         key: documentTab.formKey,
-                          //         child: documentTab.childBuilder(data),
-                          //       );
-                          //     },
-                          //   ).toList(),
-                          // ),
                         ),
                         floatingActionButton: ExpandableFab(
                           distance: 112.0,
@@ -604,13 +668,11 @@ typedef ContextCardBuilder<T> = Widget Function(
   T data,
 );
 
-typedef DocumentTabBuilder = Widget Function();
+typedef DocumentTabBuilder<T> = Widget Function();
 
-typedef DocumentTabChildBuilder<T> = Widget Function(
-  dynamic data,
-);
+typedef DocumentTabChildBuilder<T> = Widget Function(T data); //, AppUser appUser);
 
-typedef DocumentStream = Stream<DocumentSnapshot> Function(
+typedef DocumentStream<T> = Stream<DocumentSnapshot> Function(
   String? documentId,
 );
 
@@ -618,8 +680,8 @@ class DocumentTab<T> {
   /// this is a fFrame Document Tab
   ///
   ///
-  final DocumentTabBuilder tabBuilder;
-  final DocumentTabChildBuilder<T> childBuilder;
+  final DocumentTabBuilder<T> tabBuilder;
+  final DocumentTabChildBuilder childBuilder;
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   DocumentTab({
@@ -628,16 +690,14 @@ class DocumentTab<T> {
   });
 }
 
-class Document {
+class Document<T> {
   Document({
     this.key,
     required this.tabs,
-    // required this.documentStream,
     required this.contextCards,
     this.autoSave = false,
   });
   final Key? key;
-  // final DocumentStream documentStream;
   final List<DocumentTab> tabs;
   final List<ContextCardBuilder>? contextCards;
   bool autoSave;

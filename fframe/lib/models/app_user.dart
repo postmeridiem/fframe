@@ -1,7 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
-// ignore: unused_import
-import 'package:flutter/foundation.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+part of fframe;
 
 class AppUser extends StateNotifier {
   AppUser({required this.uid, this.displayName, this.email, this.photoUrl, required this.metaData, this.claims}) : super(null);
