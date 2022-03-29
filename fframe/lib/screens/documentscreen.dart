@@ -202,19 +202,6 @@ class DocumentCanvas<T> extends StatelessWidget {
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
 
-  // final PreloadPageController _pageController = PreloadPageController(initialPage: 0, keepPage: true, viewportFraction: 0.99);
-  // bool _canChange = true;
-
-  // void changePage({required index, required TabController tabController, page = false, tab = false}) async {
-  //   if (page) {
-  //     _canChange = false;
-  //     await _pageController.animateToPage(index, duration: const Duration(milliseconds: 500), curve: Curves.ease);
-  //     _canChange = true;
-  //   } else {
-  //     tabController.animateTo(index);
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
