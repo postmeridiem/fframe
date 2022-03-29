@@ -5,10 +5,12 @@ import 'package:flutter/foundation.dart';
 class SelectionState<T> {
   final QueryDocumentSnapshot<T>? queryDocumentSnapshot;
   final Map<String, String>? queryParams;
+  final T? data;
   final String cardId;
   SelectionState({
     this.queryDocumentSnapshot,
     this.cardId = "",
+    this.data,
     this.queryParams,
   });
 }

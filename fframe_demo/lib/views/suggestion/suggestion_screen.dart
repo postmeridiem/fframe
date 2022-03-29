@@ -5,7 +5,7 @@ import 'package:fframe/fframe.dart';
 import 'package:fframe_demo/models/suggestion.dart';
 import 'suggestion.dart';
 
-class SuggestionScreen extends StatefulWidget {
+class SuggestionScreen<Suggestion> extends StatefulWidget {
   const SuggestionScreen({Key? key}) : super(key: key);
 
   @override
@@ -20,6 +20,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       collection: "suggestions",
       fromFirestore: Suggestion.fromFirestore,
       toFirestore: (suggestion, options) => suggestion.toFirestore(),
+      createNew: () => Suggestion(),
       //Optional title widget
       titleBuilder: (context, data) {
         return Text(data.name ?? "New Suggestion");
@@ -40,8 +41,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
     );
   }
 
-  Document _document() {
-    return Document(
+  Document<Suggestion> _document() {
+    return Document<Suggestion>(
       autoSave: false,
       tabs: [
         DocumentTab<Suggestion>(
@@ -53,11 +54,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
               ),
             );
           },
-          childBuilder: (
-            suggestion,
-          ) {
+          childBuilder: (suggestion) {
             return Tab01(
               suggestion: suggestion,
+              // user: user,
             );
           },
         ),

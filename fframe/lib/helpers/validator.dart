@@ -1,3 +1,5 @@
+part of fframe;
+
 class Validator {
   bool validString(String? rawvalue) {
     // checks if a string is not empty,

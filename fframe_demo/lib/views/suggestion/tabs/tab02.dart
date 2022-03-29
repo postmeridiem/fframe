@@ -1,6 +1,6 @@
+import 'package:fframe/fframe.dart';
 import 'package:fframe_demo/models/suggestion.dart';
 import 'package:flutter/material.dart';
-import 'package:fframe/helpers/validator.dart';
 
 class Tab02 extends StatelessWidget {
   const Tab02({

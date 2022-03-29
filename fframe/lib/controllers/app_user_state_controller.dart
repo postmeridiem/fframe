@@ -1,4 +1,4 @@
-import 'package:fframe/models/app_user.dart';
+import 'package:fframe/fframe.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,10 +38,11 @@ class UserStateSignedIn extends UserState {
 
 //Notifier class
 class UserStateNotifier extends StateNotifier<UserState> {
+  // AppUser? appUser;
+
   UserStateNotifier() : super(const UserStateUnknown()) {
     FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       if (user == null || user.isAnonymous) {
-        // debugPrint('User is currently signed out or anonymous!');
         state = const UserStateSignedOut();
       } else {
         // debugPrint("User is signed in as ${user.uid}::${user.displayName}");

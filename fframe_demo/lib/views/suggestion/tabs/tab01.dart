@@ -1,16 +1,21 @@
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:fframe/helpers/validator.dart';
 
 import 'package:fframe_demo/models/suggestion.dart';
 
 class Tab01 extends StatelessWidget {
-  const Tab01({Key? key, required this.suggestion}) : super(key: key);
+  const Tab01({
+    Key? key,
+    required this.suggestion,
+  }) : super(key: key);
   final Suggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
     // register shared validator class for common patterns
     Validator validator = Validator();
+
+    debugPrint("Loading suggestion: ${suggestion.name ?? 'new'}");
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -38,7 +43,7 @@ class Tab01 extends StatelessWidget {
                     border: OutlineInputBorder(),
                     labelText: "Name",
                   ),
-                  initialValue: suggestion.name!,
+                  initialValue: suggestion.name ?? '',
                   validator: (curValue) {
                     if (validator.validString(curValue)) {
                       suggestion.name = curValue;

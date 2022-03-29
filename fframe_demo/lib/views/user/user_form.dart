@@ -1,7 +1,6 @@
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:fframe/helpers/validator.dart';
 
 import 'package:fframe_demo/models/user.dart';
 import 'package:fframe_demo/services/user_service.dart';
