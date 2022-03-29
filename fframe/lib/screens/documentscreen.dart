@@ -330,6 +330,20 @@ class DocumentCanvas<T> extends StatelessWidget {
                       content: Text('Saved succesfully'),
                     ));
                     callClose();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      behavior: SnackBarBehavior.floating,
+                      content: ListTile(
+                        leading: Icon(
+                          Icons.warning,
+                          color: Colors.amberAccent,
+                        ),
+                        title: Text(
+                          "Save failed succesfully",
+                        ),
+                        tileColor: Colors.redAccent,
+                      ),
+                    ));
                   }
                 }
               },
