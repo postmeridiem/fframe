@@ -21,6 +21,26 @@ class Suggestion extends ChangeNotifier {
   ///
   /// this documentation is a lie
   ///
+  /// =================
+  ///
+  /// [String] id - suggestion id
+  ///
+  /// [String] fieldTab1 - value
+  ///
+  /// [String] fieldTab2 - value
+  ///
+  /// [String] fieldTab3 - value
+  ///
+  /// [String] name - name of the suggestion
+  ///
+  /// [bool] active - is the suggestion active
+  ///
+  /// [String] icon - suggestion material icon id
+  ///
+  /// [Timestamp] creationDate - creation date of suggestion
+  ///
+  /// [String] createdBy - creator of the suggestion
+  ///
 
   // fromFirestore<Suggestion>(DocumentSnapshot<Map<String, dynamic>> snapshot) {
   factory Suggestion.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? snapshotOptions) {
