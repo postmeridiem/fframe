@@ -1,5 +1,5 @@
-import 'package:fframe/models/navigation_target.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fframe/fframe.dart';
 import 'package:flutter/foundation.dart';
 
 class SelectionState<T> {

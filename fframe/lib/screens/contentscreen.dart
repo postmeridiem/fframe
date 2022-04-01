@@ -1,4 +1,4 @@
-import 'package:fframe/models/navigation_target.dart';
+import 'package:fframe/fframe.dart';
 import 'package:fframe/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
