@@ -285,6 +285,15 @@ class _AppState extends State<App> with RestorationMixin {
             ),
           ),
           locale: const Locale('en'),
+          builder: (BuildContext context, Widget? widget) {
+            debugPrint("builder");
+            Widget error = const Text('...rendering error...');
+            if (widget is Scaffold || widget is Navigator) {
+              error = Scaffold(body: Center(child: error));
+            }
+            ErrorWidget.builder = (FlutterErrorDetails errorDetails) => error;
+            return widget!;
+          },
         );
       },
     );

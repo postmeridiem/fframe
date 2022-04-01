@@ -14,10 +14,11 @@ class User extends ChangeNotifier {
     debugPrint("reading <User>");
 
     Map<String, dynamic> json = snapshot.data()!;
-    return User(uid: snapshot.id, displayName: json['displayName']! as String?, email: json['email'] as String?, photoURL: json["photoURL"] as String?
-        //creationDate: json['metadata.creationTime'] as Timestamp?,
-        // creationDate: json['creationDate'] != null ? json['creationDate'] as Timestamp : Timestamp.now(),
-        );
+    return User(
+      uid: snapshot.id, displayName: json['displayName'] as String?, email: json['email'] as String?, photoURL: json["photoURL"] as String?,
+      //creationDate: json['metadata.creationTime'] as Timestamp?,
+      // creationDate: json['creationDate'] != null ? json['creationDate'] as Timestamp : Timestamp.now(),
+    );
   }
 
   final String? uid;

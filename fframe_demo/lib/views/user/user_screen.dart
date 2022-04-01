@@ -1,7 +1,6 @@
 import 'package:fframe_demo/models/user.dart';
 import 'package:fframe/fframe.dart';
 import 'package:fframe_demo/views/user/user.dart';
-import 'package:fframe_demo/views/user/user_document.dart';
 import 'package:flutter/material.dart';
 
 class UsersScreen extends StatelessWidget {
@@ -31,39 +30,6 @@ class UsersScreen extends StatelessWidget {
           );
         },
       ),
-      //   key: key,
-      //   query: UserService().userByMakeStream,
-      //   documentStream: (String? documentId) => UserService().documentStream(documentId: documentId),
-      //   // documentTabs: const [],
-      //   //Left hand (navigation/document selection pane)
-      //   documentListItem: DocumentListItem(
-      //     builder: (context, bool selected, User user) {
-      //       //List Tile per user
-      //       return UserList(
-      //         user: user,
-      //         selected: selected,
-      //       );
-      //     },
-      //   ),
-      //   titleBuilder: (User user) {
-      //     return Text(user.name ?? "New User");
-      //   },
-      //   // Right hand (document) pane
-      //   documentBuilder: (
-      //     BuildContext context,
-      //     DocumentReference<User> documentReference,
-      //     User user,
-      //     // List actionButtons,
-      //     // List<DocumentTab> documentTabs,
-      //     // List<Widget>? contextWidgets,
-      //   )
-      //       // documentBuilder: (context, DocumentReference<User> documentReference, User user)
-      //       {
-      //     return UserDocument(
-      //       user: user,
-      //       documentReference: documentReference,
-      //     );
-      //   },
     );
   }
 
@@ -83,22 +49,21 @@ class UsersScreen extends StatelessWidget {
           childBuilder: (user) {
             return UserDocument(
               user: user,
-              // user: user,
             );
           },
         ),
       ],
-      contextCards: [
-        // (user) => ContextCard(
-        //       user: user,
-        //     ),
-        // (user) => ContextCard(
-        //       user: user,
-        //     ),
-        // (user) => ContextCard(
-        //       user: user,
-        //     ),
-      ],
+      // contextCards: [
+      //   // (user) => ContextCard(
+      //   //       user: user,
+      //   //     ),
+      //   // (user) => ContextCard(
+      //   //       user: user,
+      //   //     ),
+      //   // (user) => ContextCard(
+      //   //       user: user,
+      //   //     ),
+      // ],
     );
   }
 }

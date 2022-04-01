@@ -192,7 +192,7 @@ class _DocumentBody<T> extends ConsumerWidget {
       } else if ((queryParams != null && queryParams.containsKey("id"))) {
         return StreamBuilder<DocumentSnapshot<T>>(
           stream: DatabaseService<T>().documentStream(
-            collection: "suggestions",
+            collection: collection,
             documentId: queryParams['id']!,
             fromFirestore: fromFirestore,
             toFirestore: toFirestore,
@@ -210,7 +210,8 @@ class _DocumentBody<T> extends ConsumerWidget {
                 debugPrint("Load DocumentCanvas");
 
                 try {
-                  T? snapshotData = asyncSnapshot.data!.data();
+                  // T? snapshotData = asyncSnapshot.data!.data();
+                  DocumentSnapshot<T>? snapshotData = asyncSnapshot.data;
 
                   if (snapshotData != null) {
                     return Scaffold(
@@ -218,7 +219,7 @@ class _DocumentBody<T> extends ConsumerWidget {
                       body: DocumentCanvas<T>(
                         key: ObjectKey(data),
                         titleBuilder: titleBuilder,
-                        data: snapshotData,
+                        data: snapshotData.data()!,
                         userState: userState,
                         collection: collection,
                         documentId: queryParams['id']!,
@@ -694,7 +695,7 @@ class Document<T> {
   Document({
     this.key,
     required this.tabs,
-    required this.contextCards,
+    this.contextCards,
     this.autoSave = false,
   });
   final Key? key;
