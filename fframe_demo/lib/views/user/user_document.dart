@@ -1,27 +1,23 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:fframe_demo/models/user.dart';
 import 'package:fframe_demo/views/user/user_form.dart';
 
 class UserDocument extends StatelessWidget {
   const UserDocument({
     required this.user,
-    required this.documentReference,
     Key? key,
   }) : super(key: key);
 
   // Fields in a Widget subclass are always marked "final".
   final User user;
-  final DocumentReference documentReference;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Flexible(
-          child: MainCanvas(user: user, documentReference: documentReference),
+          child: MainCanvas(user: user),
         ),
         SizedBox(
           width: 250,
@@ -33,10 +29,9 @@ class UserDocument extends StatelessWidget {
 }
 
 class MainCanvas extends StatelessWidget {
-  const MainCanvas({Key? key, required this.user, required this.documentReference}) : super(key: key);
+  const MainCanvas({Key? key, required this.user}) : super(key: key);
 
   final User user;
-  final DocumentReference documentReference;
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +45,7 @@ class MainCanvas extends StatelessWidget {
             return <Widget>[
               SliverAppBar(
                 primary: false,
-                title: DocumentTitle(name: user.name!),
+                title: DocumentTitle(name: user.displayName ?? "??"),
                 floating: true,
                 pinned: false,
                 snap: true,
@@ -70,7 +65,7 @@ class MainCanvas extends StatelessWidget {
           },
           body: TabBarView(
             children: [
-              UserForm(user: user, documentReference: documentReference),
+              UserForm(user: user),
             ],
           ),
         ),

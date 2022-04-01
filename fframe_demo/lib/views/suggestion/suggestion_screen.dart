@@ -19,8 +19,16 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       //Indicate where the documents are located and how to convert them to and fromt their models.
       collection: "suggestions",
       fromFirestore: Suggestion.fromFirestore,
-      toFirestore: (suggestion, options) => suggestion.toFirestore(),
-      createNew: () => Suggestion(),
+      toFirestore: (suggestion, options) {
+        return suggestion.toFirestore();
+      },
+      // createDocumentId: (suggestion) {
+      //   return "${suggestion.name}";
+      // },
+
+      createNew: () => Suggestion(
+        name: "fietsbel",
+      ),
       //Optional title widget
       titleBuilder: (context, data) {
         return Text(data.name ?? "New Suggestion");

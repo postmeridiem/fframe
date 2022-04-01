@@ -2,26 +2,35 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class User extends ChangeNotifier {
-  User({this.id, this.name, this.creationDate});
+  User({
+    this.uid,
+    this.displayName,
+    this.email,
+    this.photoURL,
+    this.creationDate,
+  });
 
-  fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+  factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? snapshotOptions) {
     debugPrint("reading <User>");
 
     Map<String, dynamic> json = snapshot.data()!;
-    return User(
-      id: snapshot.id,
-      name: json['name']! as String,
-      creationDate: json['creationDate'] as Timestamp,
-      // creationDate: json['creationDate'] != null ? json['creationDate'] as Timestamp : Timestamp.now(),
-    );
+    return User(uid: snapshot.id, displayName: json['displayName']! as String?, email: json['email'] as String?, photoURL: json["photoURL"] as String?
+        //creationDate: json['metadata.creationTime'] as Timestamp?,
+        // creationDate: json['creationDate'] != null ? json['creationDate'] as Timestamp : Timestamp.now(),
+        );
   }
 
-  final String? id;
-  String? name;
+  final String? uid;
+  String? displayName;
+  String? email;
+  String? photoURL;
   Timestamp? creationDate;
 
   Map<String, Object?> toFirestore() {
     debugPrint("writing <User>");
-    return {'name': name, 'creationDate': creationDate};
+    return {
+      // 'name': displayName,
+      // 'creationDate': creationDate,
+    };
   }
 }

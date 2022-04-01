@@ -1,5 +1,6 @@
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:fframe/models/navigation_target.dart';
+
 import 'package:fframe_demo/views/suggestion/suggestion.dart';
 
 final suggestionNavigationTargets = NavigationTarget(

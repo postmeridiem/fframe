@@ -1,16 +1,11 @@
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'package:fframe_demo/models/user.dart';
-import 'package:fframe_demo/services/user_service.dart';
 
 // //Shows the selected customer in the right hand pane
 class UserForm extends StatelessWidget {
-  UserForm({required this.user, required this.documentReference, Key? key}) : super(key: key);
-  final DocumentReference documentReference;
+  const UserForm({required this.user, Key? key}) : super(key: key);
   final User user;
-  final UserService usersService = UserService();
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +21,7 @@ class UserForm extends StatelessWidget {
             labelText: 'Name',
           ),
           readOnly: false,
-          controller: TextEditingController.fromValue(TextEditingValue(text: user.name!)),
+          controller: TextEditingController.fromValue(TextEditingValue(text: user.displayName!)),
           validator: (curValue) {
             if (validator.validString(curValue)) {
               return null;
@@ -44,7 +39,7 @@ class UserForm extends StatelessWidget {
             labelText: 'User UID',
           ),
           readOnly: false,
-          controller: TextEditingController.fromValue(TextEditingValue(text: user.id!)),
+          controller: TextEditingController.fromValue(TextEditingValue(text: user.uid ?? '')),
           validator: (curValue) {
             if (validator.validUUID(curValue)) {
               return null;

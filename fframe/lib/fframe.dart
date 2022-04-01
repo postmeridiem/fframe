@@ -4,7 +4,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'package:fframe/controllers/app_user_state_controller.dart';
 import 'package:fframe/controllers/navigation_state_controller.dart';
-import 'package:fframe/models/navigation_target.dart';
+// import 'package:fframe/models/navigation_target.dart';
 
 import 'package:fframe/screens/screens.dart';
 import 'package:fframe/services/database_service.dart';
@@ -27,3 +27,4 @@ part 'screens/document_parts/document_title.dart';
 part 'helpers/expandable_fab.dart';
 part 'helpers/validator.dart';
 part 'models/app_user.dart';
+part 'models/navigation_target.dart';

@@ -1,4 +1,3 @@
-import 'package:fframe/models/navigation_target.dart';
 import 'package:fframe_demo/firebase_config.dart';
 import 'package:fframe_demo/themes/theme_dark.dart';
 import 'package:fframe_demo/themes/theme_light.dart';
