@@ -200,6 +200,7 @@ const Map<String, IconData> iconMap = <String, IconData>{
   'color_lens': Icons.color_lens,
   'colorize': Icons.colorize,
   'comment': Icons.comment,
+  'comments_disabled': Icons.comments_disabled,
   'compare': Icons.compare,
   'compare_arrows': Icons.compare_arrows,
   'computer': Icons.computer,

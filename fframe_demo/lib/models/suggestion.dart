@@ -43,7 +43,9 @@ class Suggestion extends ChangeNotifier {
   ///
 
   // fromFirestore<Suggestion>(DocumentSnapshot<Map<String, dynamic>> snapshot) {
-  factory Suggestion.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? snapshotOptions) {
+  factory Suggestion.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> snapshot,
+      SnapshotOptions? snapshotOptions) {
     debugPrint("reading <Suggestion>");
 
     Map<String, dynamic> json = snapshot.data()!;
@@ -54,8 +56,10 @@ class Suggestion extends ChangeNotifier {
       fieldTab2: json['fieldTab2'] as String?,
       fieldTab3: json['fieldTab3'] as String?,
       active: json['active'] == null ? true : json['active'] as bool,
-      icon: json['icon'] == null ? 'ee93' : json['icon'] as String,
-      creationDate: json['creationDate'] != null ? json['creationDate'] as Timestamp : null,
+      icon: json['icon'] == null ? 'question_mark' : json['icon'] as String,
+      creationDate: json['creationDate'] != null
+          ? json['creationDate'] as Timestamp
+          : null,
       createdBy: json['createdBy'] != null ? json['createdBy'] as String : null,
     );
 
@@ -73,7 +77,8 @@ class Suggestion extends ChangeNotifier {
   String? createdBy;
 
   Map<String, Object?> toFirestore() {
-    String updatedBy = FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous";
+    String updatedBy =
+        FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous";
 
     final Map<String, Timestamp> changeHistory = {updatedBy: Timestamp.now()};
 
@@ -86,7 +91,9 @@ class Suggestion extends ChangeNotifier {
       "fieldTab2": fieldTab2,
       "fieldTab3": fieldTab3,
       "creationDate": creationDate ?? Timestamp.now(),
-      "createdBy": createdBy ?? FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous",
+      "createdBy": createdBy ??
+          FirebaseAuth.instance.currentUser?.displayName ??
+          "Anonymous",
       "changeHistory": FieldValue.arrayUnion([changeHistory]),
     };
   }
