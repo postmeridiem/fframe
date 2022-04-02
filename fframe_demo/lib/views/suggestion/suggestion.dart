@@ -1,5 +1,5 @@
-export 'suggestion_list.dart';
-export 'suggestion_navigation.dart';
-export 'suggestion_screen.dart';
-export 'context_card.dart';
+export 'list.dart';
+export 'navigation.dart';
+export 'screen.dart';
+export 'context.dart';
 export 'tabs/tabs.dart';
