@@ -219,12 +219,9 @@ class _AppState extends State<App> with RestorationMixin {
 
         if (goRouterState.queryParams.isNotEmpty) {
           debugPrint("Process redirect");
-          String? routeId = goRouterState.queryParams['id'];
-          if (routeId != null) {
-            SelectionState selectionState = SelectionState(queryDocumentSnapshot: null, queryParams: {"id": routeId}, cardId: routeId);
-            ref.read(navigationStateProvider.notifier).selectionState = selectionState;
-            return null;
-          }
+          SelectionState selectionState = SelectionState(queryDocumentSnapshot: null, queryParams: goRouterState.queryParams);
+          ref.read(navigationStateProvider.notifier).selectionState = selectionState;
+          return null;
         }
         debugPrint("No redirection, return Null");
         return null;

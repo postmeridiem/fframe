@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:clipboard/clipboard.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MainScreen extends StatelessWidget {
   final String appTitle;
@@ -88,7 +89,8 @@ class MainScreen extends StatelessWidget {
           ),
           actions: [
             const BarButtonShare(),
-            // const BarButtonFeedback(),
+            const BarButtonDuplicate(),
+            const BarButtonFeedback(),
             if (FirebaseAuth.instance.currentUser != null) const BarButtonProfile(),
           ],
         ),
@@ -193,23 +195,50 @@ class ActiveTarget {
   ActiveTarget({required this.currentTarget, this.parentTarget});
 }
 
-class BarButtonShare extends StatelessWidget {
+class BarButtonShare extends ConsumerWidget {
   const BarButtonShare({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Builder(
-      builder: (BuildContext context) {
-        return IconButton(
-          onPressed: () {
-            FlutterClipboard.copy(Uri.base.toString()).then((_) {
-              return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Copied current location (${Uri.base.toString()}) to clipboard."), behavior: SnackBarBehavior.floating));
-            });
-          },
-          icon: const Icon(Icons.share),
-          tooltip: "Copy the current location to the paste buffer...",
-        );
+  Widget build(BuildContext context, WidgetRef ref) {
+    NavigationStateNotifier navigationState = ref.watch(navigationStateProvider);
+    Map<String, String>? queryParams = navigationState.selectionState.queryParams;
+    String? queryString;
+    if (queryParams != null) {
+      queryString = "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
+    }
+    return IconButton(
+      onPressed: () {
+        String url = "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
+        FlutterClipboard.copy(url).then((_) {
+          return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Copied current location ($url) to clipboard."), behavior: SnackBarBehavior.floating));
+        });
       },
+      icon: const Icon(Icons.share),
+      tooltip: "Copy the current location to the paste buffer...",
+    );
+  }
+}
+
+class BarButtonDuplicate extends ConsumerWidget {
+  const BarButtonDuplicate({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    NavigationStateNotifier navigationState = ref.watch(navigationStateProvider);
+    Map<String, String>? queryParams = navigationState.selectionState.queryParams;
+    String? queryString;
+    if (queryParams != null) {
+      queryString = "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
+    }
+    return IconButton(
+      onPressed: () {
+        String url = "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
+        launch(url).then((_) {
+          return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Opened current location ($url) in new tab."), behavior: SnackBarBehavior.floating));
+        });
+      },
+      icon: const Icon(Icons.open_in_new),
+      tooltip: "Open the current page in a new tab...",
     );
   }
 }
@@ -223,9 +252,10 @@ class BarButtonFeedback extends StatelessWidget {
       builder: (BuildContext context) {
         return IconButton(
           onPressed: () {
-            // link to google feedback form
-            //TODO: FIX THIS LINK
-            // js.context.callMethod('open', ['https://github.com/postmeridiem/fframe/issues']);
+            String url = "https://github.com/postmeridiem/fframe/issues";
+            launch(url).then((_) {
+              return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Opened GitHub issue tracker in a new tab."), behavior: SnackBarBehavior.floating));
+            });
           },
           icon: const Icon(Icons.pest_control),
           tooltip: "Leave feedback...",
