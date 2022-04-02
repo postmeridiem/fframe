@@ -6,6 +6,7 @@ import 'package:fframe/fframe.dart';
 
 import 'package:fframe_demo/views/signInPage/signin_page.dart';
 import 'package:fframe_demo/views/suggestion/suggestion.dart';
+import 'package:fframe_demo/views/setting/setting.dart';
 import 'package:fframe_demo/views/user/user.dart';
 
 void main() {
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
     final List<NavigationTarget> authenticatedNavigationTargets = [
       // homeNavigationTargets,
       suggestionNavigationTargets,
-      // settingNavigationTargets,
+      settingNavigationTargets,
       usersNavigationTargets,
     ];
 
