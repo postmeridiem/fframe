@@ -12,14 +12,18 @@ class RolesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String>? avatarText = user.displayName
-        ?.split(' ')
-        .map((part) => part.trim().substring(0, 1))
-        .toList();
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: const [Text("manage roles here")],
+      child: Card(
+        color: Theme.of(context).colorScheme.tertiary,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              Text("current roles: ${user.customClaims!['roles'] ?? ''}")
+            ],
+          ),
+        ),
       ),
     );
   }

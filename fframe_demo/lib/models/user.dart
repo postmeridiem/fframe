@@ -6,6 +6,7 @@ class User extends ChangeNotifier {
     this.uid,
     this.displayName,
     this.active,
+    this.customClaims,
     this.email,
     this.photoURL,
     this.creationDate,
@@ -20,6 +21,7 @@ class User extends ChangeNotifier {
       uid: snapshot.id,
       displayName: json['displayName'] as String?,
       active: json['active'] == null ? true : json['active'] as bool,
+      customClaims: json['customClaims'],
       email: json['email'] as String?,
       photoURL: json["photoURL"] as String?,
       //creationDate: json['metadata.creationTime'] as Timestamp?,
@@ -30,6 +32,7 @@ class User extends ChangeNotifier {
   final String? uid;
   String? displayName;
   bool? active;
+  Map<String, dynamic>? customClaims;
   String? email;
   String? photoURL;
   Timestamp? creationDate;
