@@ -13,6 +13,8 @@ final ThemeData appLightTheme = ThemeData(
     onPrimary: constOnPrimaryColorLight,
     secondary: constSecondaryColorLight,
     onSecondary: constOnSecondaryColorLight,
+    tertiary: constTertiaryColorLight,
+    onTertiary: constOnTertiaryColorLight,
     surface: constSecondaryColorLight,
     onSurface: constOnSecondaryColorLight,
     primaryContainer: constPrimaryColorLight,

@@ -12,6 +12,8 @@ final ThemeData appDarkTheme = ThemeData(
     onPrimary: constPrimaryColorDark,
     secondary: constSecondaryColorDark,
     onSecondary: constOnSecondaryColorDark,
+    tertiary: constTertiaryColorDark,
+    onTertiary: constOnTertiaryColorDark,
     surface: constPrimaryColorDark,
     onSurface: constOnPrimaryColorDark,
     primaryContainer: constPrimaryColorDark,
