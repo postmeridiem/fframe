@@ -57,6 +57,21 @@ class UsersScreen extends StatelessWidget {
         DocumentTab<User>(
           tabBuilder: () {
             return const Tab(
+              text: "Settings",
+              icon: Icon(
+                Icons.settings,
+              ),
+            );
+          },
+          childBuilder: (user) {
+            return SettingsTab(
+              user: user,
+            );
+          },
+        ),
+        DocumentTab<User>(
+          tabBuilder: () {
+            return const Tab(
               text: "Roles",
               icon: Icon(
                 Icons.lock_open,
