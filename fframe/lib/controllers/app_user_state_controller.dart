@@ -1,4 +1,5 @@
 import 'package:fframe/fframe.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -45,10 +46,22 @@ class UserStateNotifier extends StateNotifier<UserState> {
       if (user == null || user.isAnonymous) {
         state = const UserStateSignedOut();
       } else {
-        // debugPrint("User is signed in as ${user.uid}::${user.displayName}");
-        IdTokenResult idTokenResult = await user.getIdTokenResult(true);
-        Map<String, dynamic>? claims = idTokenResult.claims;
-        state = UserStateSignedIn(AppUser.fromFirebaseUser(user, claims));
+        IdTokenResult idTokenResult = await user.getIdTokenResult();
+        List<String>? roles;
+
+        Map<String, dynamic>? _claims = idTokenResult.claims;
+        if (_claims != null && _claims.containsKey("roles") == true) {
+          if (List<dynamic> == _claims["roles"].runtimeType || List<String> == _claims["roles"].runtimeType) {
+            roles = List<String>.from(_claims["roles"]);
+          } else {
+            //Legacy mode... it's a map...
+            Map<String, dynamic>? _rolesMap = Map<String, dynamic>.from(_claims["roles"]);
+            _rolesMap.removeWhere((key, value) => value == false);
+            roles = List<String>.from(_rolesMap.keys);
+          }
+        }
+        debugPrint("User is signed in as ${user.uid} ${user.displayName} with roles: ${roles?.join(", ") ?? "-"}");
+        state = UserStateSignedIn(AppUser.fromFirebaseUser(firebaseUser: user, roles: roles));
       }
     });
   }

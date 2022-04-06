@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class MainScreen extends StatelessWidget {
   final String appTitle;
+  final String? issuePageLink;
   final Widget child;
   final GoRouterState state;
   final List<NavigationTarget> navigationTargets;
@@ -25,6 +26,7 @@ class MainScreen extends StatelessWidget {
     required this.navigationTargets,
     required this.darkMode,
     required this.lightMode,
+    this.issuePageLink,
   }) : super(key: key);
 
   ActiveTarget getActiveTarget() {
@@ -90,7 +92,7 @@ class MainScreen extends StatelessWidget {
           actions: [
             const BarButtonShare(),
             const BarButtonDuplicate(),
-            const BarButtonFeedback(),
+            BarButtonFeedback(issuePageLink: issuePageLink),
             if (FirebaseAuth.instance.currentUser != null) const BarButtonProfile(),
           ],
         ),
@@ -244,16 +246,19 @@ class BarButtonDuplicate extends ConsumerWidget {
 }
 
 class BarButtonFeedback extends StatelessWidget {
-  const BarButtonFeedback({Key? key}) : super(key: key);
-
+  const BarButtonFeedback({
+    Key? key,
+    this.issuePageLink,
+  }) : super(key: key);
+  final String? issuePageLink;
   @override
   Widget build(BuildContext context) {
+    if (issuePageLink == null) return const IgnorePointer();
     return Builder(
       builder: (BuildContext context) {
         return IconButton(
           onPressed: () {
-            String url = "https://github.com/postmeridiem/fframe/issues";
-            launch(url).then((_) {
+            launch(issuePageLink!).then((_) {
               return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Opened GitHub issue tracker in a new tab."), behavior: SnackBarBehavior.floating));
             });
           },

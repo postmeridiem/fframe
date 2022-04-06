@@ -36,6 +36,7 @@ class MyApp extends StatelessWidget {
       unAuthenticatedNavigationTargets: unAuthenticatedNavigationTargets,
       lightMode: appLightTheme,
       darkMode: appDarkTheme,
+      issuePageLink: "https://github.com/postmeridiem/fframe/issues",
     );
   }
 }

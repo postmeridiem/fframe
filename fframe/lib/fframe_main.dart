@@ -9,8 +9,10 @@ class Fframe extends StatefulWidget {
     required this.unAuthenticatedNavigationTargets,
     required this.darkMode,
     required this.lightMode,
+    this.issuePageLink,
   }) : super(key: key);
   final String title;
+  final String? issuePageLink;
   final FirebaseOptions firebaseOptions;
   final List<NavigationTarget> authenticatedNavigationTargets;
   final List<NavigationTarget> unAuthenticatedNavigationTargets;
@@ -23,6 +25,11 @@ class Fframe extends StatefulWidget {
 
 class _FframeState extends State<Fframe> {
   @override
+  initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
     return FutureBuilder(
@@ -31,7 +38,7 @@ class _FframeState extends State<Fframe> {
       ),
       // initialData: InitialData,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        debugPrint(snapshot.connectionState.toString());
+        // debugPrint(snapshot.connectionState.toString());
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.active:
@@ -51,6 +58,7 @@ class _FframeState extends State<Fframe> {
 
                     return App(
                       title: widget.title,
+                      issuePageLink: widget.issuePageLink,
                       authenticatedNavigationTargets: widget.authenticatedNavigationTargets,
                       unAuthenticatedNavigationTargets: widget.unAuthenticatedNavigationTargets,
                       lightMode: widget.lightMode,
@@ -75,9 +83,11 @@ class App extends StatefulWidget {
     required this.unAuthenticatedNavigationTargets,
     required this.darkMode,
     required this.lightMode,
+    this.issuePageLink,
   }) : super(key: key);
 
   final String title;
+  final String? issuePageLink;
   final List<NavigationTarget> authenticatedNavigationTargets;
   final List<NavigationTarget> unAuthenticatedNavigationTargets;
   final ThemeData darkMode;
@@ -226,7 +236,7 @@ class _AppState extends State<App> with RestorationMixin {
         debugPrint("No redirection, return Null");
         return null;
       },
-      errorBuilder: (context, state) => ErrorScreen(error: state.error!, initiallLocation: _initialLocation),
+      // errorBuilder: (context, state) => ErrorScreen(error: state.error!, initiallLocation: _initialLocation),
       navigatorBuilder: (context, state, child) {
         try {
           debugPrint(state.pageKey.toString());
@@ -244,6 +254,7 @@ class _AppState extends State<App> with RestorationMixin {
               appTitle: widget.title,
               child: child,
               state: state,
+              issuePageLink: widget.issuePageLink,
               navigationTargets: _navigationTargets(userState),
               lightMode: widget.lightMode,
               darkMode: widget.darkMode,
@@ -288,7 +299,23 @@ class _AppState extends State<App> with RestorationMixin {
             if (widget is Scaffold || widget is Navigator) {
               error = Scaffold(body: Center(child: error));
             }
-            ErrorWidget.builder = (FlutterErrorDetails errorDetails) => error;
+            ErrorWidget.builder = (FlutterErrorDetails details) {
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: ListTile(
+                    leading: const Icon(
+                      Icons.warning,
+                      color: Colors.yellowAccent,
+                    ),
+                    title: Text(
+                      details.exception.toString(),
+                      // style: TextStyle(overflow: TextOverflow.ellipsis),
+                    ),
+                  ),
+                ),
+              );
+            };
             return widget!;
           },
         );
