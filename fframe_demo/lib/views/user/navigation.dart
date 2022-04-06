@@ -21,5 +21,5 @@ final usersNavigationTargets = NavigationTarget(
     icon: Icon(Icons.person),
     label: Text('Users'),
   ),
-  roles: ['user'],
+  roles: ['UserAdmin', 'SuperAdmin'],
 );

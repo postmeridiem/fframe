@@ -121,6 +121,26 @@ class _AppState extends State<App> with RestorationMixin {
       } catch (_) {
         throw ("The unAuthenticated NavigationTargets do not contain a target configured as initial Navigation target!");
       }
+    } else {
+      debugPrint("Signed in user, filter on roles");
+      UserStateSignedIn _userState = userState as UserStateSignedIn;
+
+      if (_userState.appUser.roles == null) {
+        //Remove all paths wich require a role
+        _navigationTargets.removeWhere((navigationTarget) => navigationTarget.roles != null);
+      } else {
+        List<String> userRoles = _userState.appUser.roles!.map((userRole) => userRole.toLowerCase()).toList();
+
+        _navigationTargets.removeWhere((navigationTarget) {
+          if (navigationTarget.roles == null) {
+            return true;
+          }
+          List<String> targetRoles = navigationTarget.roles!.map((targetRole) => targetRole.toLowerCase()).toList();
+          return !targetRoles.any(
+            (targetRole) => userRoles.contains(targetRole),
+          );
+        });
+      }
     }
 
     //Determine the first navigatablepath for this user

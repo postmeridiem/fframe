@@ -11,5 +11,5 @@ final suggestionNavigationTargets = NavigationTarget(
     icon: Icon(Icons.pest_control),
     label: Text('Suggestions'),
   ),
-  roles: ['user'],
+  roles: ['User'],
 );
