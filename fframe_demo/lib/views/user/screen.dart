@@ -1,7 +1,9 @@
-import 'package:fframe_demo/models/user.dart';
-import 'package:fframe/fframe.dart';
-import 'package:fframe_demo/views/user/user.dart';
 import 'package:flutter/material.dart';
+import 'package:fframe/fframe.dart';
+
+import 'package:fframe_demo/models/user.dart';
+import 'package:fframe_demo/views/user/user.dart';
+import 'package:fframe_demo/views/user/tabs/tabs.dart';
 
 class UsersScreen extends StatelessWidget {
   const UsersScreen({
@@ -40,14 +42,44 @@ class UsersScreen extends StatelessWidget {
         DocumentTab<User>(
           tabBuilder: () {
             return const Tab(
-              text: "User",
+              text: "Profile",
               icon: Icon(
                 Icons.person,
               ),
             );
           },
           childBuilder: (user) {
-            return UserDocument(
+            return ProfileTab(
+              user: user,
+            );
+          },
+        ),
+        DocumentTab<User>(
+          tabBuilder: () {
+            return const Tab(
+              text: "Settings",
+              icon: Icon(
+                Icons.settings,
+              ),
+            );
+          },
+          childBuilder: (user) {
+            return SettingsTab(
+              user: user,
+            );
+          },
+        ),
+        DocumentTab<User>(
+          tabBuilder: () {
+            return const Tab(
+              text: "Roles",
+              icon: Icon(
+                Icons.lock_open,
+              ),
+            );
+          },
+          childBuilder: (user) {
+            return RolesTab(
               user: user,
             );
           },
