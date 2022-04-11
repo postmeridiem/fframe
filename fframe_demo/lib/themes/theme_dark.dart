@@ -1,64 +1,66 @@
 import 'package:flutter/material.dart';
-import 'package:fframe_demo/themes/fonts.dart';
-import 'package:fframe_demo/themes/colors.dart';
+import 'package:fframe_demo/themes/config.dart';
+
+final darkModeConfig = DarkModeThemeConfig();
 
 final ThemeData appDarkTheme = ThemeData(
-  fontFamily: mainFontFamily,
-  scaffoldBackgroundColor: constBackgroundColorDark,
-  indicatorColor: constPrimaryAccentColorDark,
+  fontFamily: darkModeConfig.fonts.mainFontFamily,
+  scaffoldBackgroundColor: darkModeConfig.constBackgroundColor,
+  indicatorColor: darkModeConfig.constPrimaryAccentColor,
+  dividerColor: darkModeConfig.constDividerColor,
   colorScheme: ColorScheme(
-    brightness: Brightness.dark,
-    primary: constOnPrimaryColorDark,
-    onPrimary: constPrimaryColorDark,
-    secondary: constSecondaryColorDark,
-    onSecondary: constOnSecondaryColorDark,
-    tertiary: constTertiaryColorDark,
-    onTertiary: constOnTertiaryColorDark,
-    surface: constPrimaryColorDark,
-    onSurface: constOnPrimaryColorDark,
-    primaryContainer: constPrimaryColorDark,
-    onPrimaryContainer: constOnPrimaryColorDark,
-    secondaryContainer: constSecondaryColorDark,
-    onSecondaryContainer: constOnSecondaryColorDark,
-    background: constBackgroundColorDark,
-    onBackground: constPrimaryAccentColorDark,
+    brightness: darkModeConfig.brightness,
+    primary: darkModeConfig.constOnPrimaryColor,
+    onPrimary: darkModeConfig.constPrimaryColor,
+    secondary: darkModeConfig.constSecondaryColor,
+    onSecondary: darkModeConfig.constOnSecondaryColor,
+    tertiary: darkModeConfig.constTertiaryColor,
+    onTertiary: darkModeConfig.constOnTertiaryColor,
+    surface: darkModeConfig.constPrimaryColor,
+    onSurface: darkModeConfig.constOnPrimaryColor,
+    primaryContainer: darkModeConfig.constPrimaryColor,
+    onPrimaryContainer: darkModeConfig.constOnPrimaryColor,
+    secondaryContainer: darkModeConfig.constSecondaryColor,
+    onSecondaryContainer: darkModeConfig.constOnSecondaryColor,
+    background: darkModeConfig.constBackgroundColor,
+    onBackground: darkModeConfig.constPrimaryAccentColor,
     surfaceVariant: const Color(0xFFFF00DD),
-    onSurfaceVariant: constOnBackgroundColorFadedDark,
+    onSurfaceVariant: darkModeConfig.constOnBackgroundColorFaded,
     error: const Color(0xffd32f2f),
     onError: const Color(0xff000000),
     outline: const Color(0xFFFF00C8),
   ),
+
   inputDecorationTheme: InputDecorationTheme(
     labelStyle: TextStyle(
-      backgroundColor: constTertiaryColorDark,
-      color: constOnTertiaryColorDark,
+      backgroundColor: darkModeConfig.constTertiaryColor,
+      color: darkModeConfig.constOnTertiaryColor,
     ),
     floatingLabelStyle: TextStyle(
-      backgroundColor: constTertiaryColorDark,
-      color: constOnTertiaryColorDark,
+      backgroundColor: darkModeConfig.constTertiaryColor,
+      color: darkModeConfig.constOnTertiaryColor,
     ),
     helperStyle: TextStyle(
-      backgroundColor: constTertiaryColorDark,
-      color: constOnTertiaryColorDark,
+      backgroundColor: darkModeConfig.constTertiaryColor,
+      color: darkModeConfig.constOnTertiaryColor,
     ),
     hintStyle: TextStyle(
-      backgroundColor: constTertiaryColorDark,
-      color: constOnTertiaryColorDark,
+      backgroundColor: darkModeConfig.constTertiaryColor,
+      color: darkModeConfig.constOnTertiaryColor,
     ),
     errorStyle: TextStyle(
-      backgroundColor: constTertiaryColorDark,
-      color: constOnTertiaryColorDark,
+      backgroundColor: darkModeConfig.constTertiaryColor,
+      color: darkModeConfig.constOnTertiaryColor,
     ),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    foregroundColor: constPrimaryAccentColorDark,
-    focusColor: constOnPrimaryColorDark,
-    backgroundColor: constPrimaryColorDark,
+    foregroundColor: darkModeConfig.constPrimaryAccentColor,
+    focusColor: darkModeConfig.constOnPrimaryColor,
+    backgroundColor: darkModeConfig.constPrimaryColor,
   ),
   cardTheme: CardTheme(
-    color: constSecondaryColorDark,
+    color: darkModeConfig.constSecondaryColor,
   ),
-  dividerColor: constDividerColorDark,
   buttonTheme: const ButtonThemeData(
     textTheme: ButtonTextTheme.normal,
     minWidth: 88,
@@ -128,8 +130,8 @@ final ThemeData appDarkTheme = ThemeData(
   ),
   tabBarTheme: TabBarTheme(
     indicatorSize: TabBarIndicatorSize.tab,
-    labelColor: constPrimaryAccentColorDark,
-    unselectedLabelColor: constUnselectedColorDark,
+    labelColor: darkModeConfig.constPrimaryAccentColor,
+    unselectedLabelColor: darkModeConfig.constUnselectedColor,
   ),
   chipTheme: const ChipThemeData(
     backgroundColor: Color(0x1fffffff),
