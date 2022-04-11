@@ -1,6 +1,5 @@
 import 'package:fframe_demo/firebase_config.dart';
-import 'package:fframe_demo/themes/theme_dark.dart';
-import 'package:fframe_demo/themes/theme_light.dart';
+import 'package:fframe_demo/themes/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
