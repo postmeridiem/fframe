@@ -1,7 +1,7 @@
 import 'package:fframe/controllers/navigation_state_controller.dart';
 import 'package:fframe/fframe.dart';
 import 'package:fframe/providers/global_providers.dart';
-import 'package:fframe/screens/errorscreen.dart';
+import 'package:fframe/screens/screens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -30,35 +30,35 @@ class MainScreen extends StatelessWidget {
   }) : super(key: key);
 
   ActiveTarget getActiveTarget() {
-    List<String> subloc = state.subloc.split('/');
-    subloc.removeWhere((String element) => element == ''); //Clean out any empty strings
-    List<NavigationTarget> _navigationTargets = List<NavigationTarget>.from(navigationTargets);
+    try {
+      //This is the only applicable target
+      if (navigationTargets.length == 1) return ActiveTarget(currentTarget: navigationTargets.first);
 
-    //Remove any targets which are not currently loaded....
-    _navigationTargets.removeWhere((NavigationTarget navigationTarget) => navigationTarget.path != subloc.first);
-    if (_navigationTargets.isEmpty) {
-      debugPrint("_navigationTargets should not be empty.");
-      for (var navigationTarget in _navigationTargets) {
-        debugPrint(" ${navigationTarget.path != subloc.first} => ${navigationTarget.path}");
+      //Get the first applicable target
+      List<String> subloc = state.subloc.split('/');
+      subloc.removeWhere((String element) => element == ''); //Clean out any empty strings
+      List<NavigationTarget> _navigationTargets = List<NavigationTarget>.from(navigationTargets);
+
+      NavigationTarget? activeTarget = _navigationTargets.firstWhere((navigationTarget) => navigationTarget.path == subloc.first);
+      if (subloc.length == 1) {
+        return ActiveTarget(currentTarget: activeTarget, parentTarget: null);
+      } else {
+        activeTarget = activeTarget.navigationTabs!.firstWhere((navigationTarget) => navigationTarget.path == subloc.last);
+
+        // activeTarget = _navigationTargets.firstWhere((navigationTarget) => navigationTarget.path == subloc.join('/'));
+        return ActiveTarget(currentTarget: activeTarget, parentTarget: null);
       }
-      return ActiveTarget(
-        currentTarget: NavigationTarget(
-          title: "Error",
-          path: "/error",
-          contentPane: ErrorScreen(
-            error: Exception("Navigation target could not be located or is not accesible for your account."),
-          ),
-        ),
-      );
+
+      // //Research the tabs
+      // if (_navigationTargets.first.navigationTabs != null) {
+      //   List<NavigationTarget> _parentNavigationTargets = List<NavigationTarget>.from(_navigationTargets.first.navigationTabs!);
+      //   _parentNavigationTargets.removeWhere((NavigationTarget navigationTarget) => navigationTarget.path != subloc.last);
+      //   return ActiveTarget(currentTarget: _parentNavigationTargets.first, parentTarget: _navigationTargets.first);
+      // }
+    } catch (e) {
+      debugPrint("Exception on getActiveTarget. could not determine selected target: ${e.toString()}");
+      return ActiveTarget(currentTarget: navigationTargets.first);
     }
-
-    if (_navigationTargets.length == 1 && subloc.length == 1) return ActiveTarget(currentTarget: _navigationTargets.first);
-    //This is the only applicable target
-
-    //Research the tabs
-    List<NavigationTarget> _parentNavigationTargets = List<NavigationTarget>.from(_navigationTargets.first.navigationTabs!);
-    _parentNavigationTargets.removeWhere((NavigationTarget navigationTarget) => navigationTarget.path != subloc.last);
-    return ActiveTarget(currentTarget: _parentNavigationTargets.first, parentTarget: _navigationTargets.first);
   }
 
   String _pageTitle(ActiveTarget activeTarget) {
@@ -68,10 +68,15 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     debugPrint("Build mainScreen ${state.location} ${state.queryParams.toString()}");
-    ActiveTarget _activeTargets = getActiveTarget();
+
+    if (navigationTargets.isEmpty) {
+      return const EmptyScreen();
+    }
+
+    ActiveTarget? _activeTarget = getActiveTarget();
     final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
-    String pageTitle = _pageTitle(_activeTargets);
+    String pageTitle = _pageTitle(_activeTarget);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
@@ -98,7 +103,7 @@ class MainScreen extends StatelessWidget {
         ),
         body: MainBody(
           key: key,
-          activeTarget: _activeTargets.currentTarget,
+          activeTarget: _activeTarget.currentTarget,
           navigationTargets: navigationTargets,
           state: state,
           child: child,
@@ -119,11 +124,11 @@ class MainBody extends ConsumerWidget {
   final Widget? child;
   final GoRouterState state;
   final List<NavigationTarget> navigationTargets;
-  final NavigationTarget activeTarget;
+  final NavigationTarget? activeTarget;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    debugPrint("Build MainBody => ${state.queryParams.toString()} ${activeTarget.contentPane.toString()}");
+    // debugPrint("Build MainBody => ${state.queryParams.toString()} ${activeTarget?.contentPane.toString()}");
 
     NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
 

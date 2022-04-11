@@ -69,7 +69,6 @@ class _FframeState extends State<Fframe> {
               ),
             );
         }
-        // return const Center(child: CircularProgressIndicator());
       },
     );
   }
@@ -126,31 +125,49 @@ class _AppState extends State<App> with RestorationMixin {
       UserStateSignedIn _userState = userState as UserStateSignedIn;
 
       if (_userState.appUser.roles == null) {
-        //Remove all paths wich require a role
+        // debugPrint("Remove all paths wich require a role");
         _navigationTargets.removeWhere((navigationTarget) => navigationTarget.roles != null);
       } else {
-        List<String> userRoles = _userState.appUser.roles!.map((userRole) => userRole.toLowerCase()).toList();
+        List<String> userRoles = _userState.appUser.roles!;
+        debugPrint("Current user roles: ${userRoles.join(",")}");
 
         _navigationTargets.removeWhere((navigationTarget) {
           if (navigationTarget.roles == null) {
+            // debugPrint("Allow ${navigationTarget.title}");
             return true;
           }
           List<String> targetRoles = navigationTarget.roles!.map((targetRole) => targetRole.toLowerCase()).toList();
-          return !targetRoles.any(
-            (targetRole) => userRoles.contains(targetRole),
+          bool allow = targetRoles.any(
+            (targetRole) => !userRoles.contains(targetRole),
           );
+          // debugPrint("Allowed roles for ${navigationTarget.title}: ${targetRoles.join(",")} => $allow");
+          return allow;
         });
       }
     }
 
-    //Determine the first navigatablepath for this user
-    _initialNavigationTarget = _navigationTargets.first;
-    if (_initialNavigationTarget.navigationTabs == null) {
-      _initialLocation = "/${_initialNavigationTarget.path}";
+    if (_navigationTargets.isNotEmpty) {
+      //Determine the first navigatablepath for this user
+      _initialNavigationTarget = _navigationTargets.first;
+      if (_initialNavigationTarget.navigationTabs == null) {
+        _initialLocation = "/${_initialNavigationTarget.path}";
+      } else {
+        _initialLocation = "/${_initialNavigationTarget.path}/${_initialNavigationTarget.navigationTabs!.first.path}";
+      }
     } else {
-      _initialLocation = "/${_initialNavigationTarget.path}/${_initialNavigationTarget.navigationTabs!.first.path}";
+      debugPrint("No routes available");
+      _navigationTargets.add(
+        NavigationTarget(
+          path: 'error',
+          title: "configuration error",
+          contentPane: ErrorScreen(
+            error: Exception("No routes left after evaluating user access."),
+          ),
+        ),
+      );
+      _initialNavigationTarget = _navigationTargets.first;
+      _initialLocation = "/${_initialNavigationTarget.path}";
     }
-
     return _navigationTargets;
   }
 
@@ -221,7 +238,9 @@ class _AppState extends State<App> with RestorationMixin {
           pageBuilder: (context, state) {
             return CustomTransitionPage<void>(
               key: state.pageKey,
-              child: const WaitScreen(),
+              child: const WaitScreen(
+                color: Colors.blueGrey,
+              ),
               transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
             );
           },
@@ -259,29 +278,29 @@ class _AppState extends State<App> with RestorationMixin {
       // errorBuilder: (context, state) => ErrorScreen(error: state.error!, initiallLocation: _initialLocation),
       navigatorBuilder: (context, state, child) {
         try {
-          debugPrint(state.pageKey.toString());
-          debugPrint(widget.title.toString());
-          debugPrint(child.toString());
-          debugPrint(state.toString());
-          debugPrint(_navigationTargets(userState).toString());
-          debugPrint(state.pageKey.toString());
+          // debugPrint(state.pageKey.toString());
+          // debugPrint(widget.title.toString());
+          // debugPrint(child.toString());
+          // debugPrint(state.toString());
+          // debugPrint(_navigationTargets(userState).toString());
+          // debugPrint(state.pageKey.toString());
 
           List<NavigationTarget> navigationTargets = _navigationTargets(userState);
 
-          if (navigationTargets.isNotEmpty) {
-            return MainScreen(
-              key: state.pageKey,
-              appTitle: widget.title,
-              child: child,
-              state: state,
-              issuePageLink: widget.issuePageLink,
-              navigationTargets: _navigationTargets(userState),
-              lightMode: widget.lightMode,
-              darkMode: widget.darkMode,
-            );
-          } else {
-            return ErrorScreen(error: Exception("Nowhere to route to."));
-          }
+          // if (navigationTargets.isNotEmpty) {
+          return MainScreen(
+            key: state.pageKey,
+            appTitle: widget.title,
+            child: child,
+            state: state,
+            issuePageLink: widget.issuePageLink,
+            navigationTargets: navigationTargets,
+            lightMode: widget.lightMode,
+            darkMode: widget.darkMode,
+          );
+          // } else {
+          //   return ErrorScreen(error: Exception("Nowhere to route to."));
+          // }
         } catch (e) {
           return ErrorScreen(
             error: Exception(e),
@@ -314,7 +333,7 @@ class _AppState extends State<App> with RestorationMixin {
           ),
           locale: const Locale('en'),
           builder: (BuildContext context, Widget? widget) {
-            debugPrint("builder");
+            // debugPrint("builder");
             Widget error = const Text('...rendering error...');
             if (widget is Scaffold || widget is Navigator) {
               error = Scaffold(body: Center(child: error));
@@ -349,6 +368,8 @@ class UnknownStateLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const WaitScreen();
+    return const WaitScreen(
+      color: Colors.blueAccent,
+    );
   }
 }

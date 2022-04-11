@@ -58,23 +58,23 @@ class _SettingScreenState extends State<SettingScreen> {
             switch (setting.id) {
               case "01-generalsettings":
                 {
-                  return SettingsGeneralForm();
+                  return const SettingsGeneralForm();
                 }
               case "70-managelists":
                 {
-                  return SettingsListsForm();
+                  return const SettingsListsForm();
                 }
               case "80-managepages":
                 {
-                  return SettingsPagesForm();
+                  return const SettingsPagesForm();
                 }
               case "99-advancedsettings":
                 {
-                  return SettingsAdvancedForm();
+                  return const SettingsAdvancedForm();
                 }
               default:
                 {
-                  return Text("unconfigured");
+                  return const Text("unconfigured");
                 }
             }
           },

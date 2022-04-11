@@ -12,7 +12,7 @@ class _SettingsPagesFormState extends State<SettingsPagesForm> {
 
   @override
   Widget build(BuildContext context) {
-    print("presenting SettingsPagesForm");
+    debugPrint("presenting SettingsPagesForm");
     return Form(
       key: _formKey,
       child: Padding(
@@ -21,8 +21,7 @@ class _SettingsPagesFormState extends State<SettingsPagesForm> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: const [
             Text('SettingsPagesForm'),
-            Text(
-                'Manage any navigation entity that needs to exist as a static page'),
+            Text('Manage any navigation entity that needs to exist as a static page'),
             Text('Manage what happens on the home page'),
             Text('Manage any pages that need to be public'),
           ],

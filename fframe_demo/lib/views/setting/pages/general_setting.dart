@@ -12,7 +12,7 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
 
   @override
   Widget build(BuildContext context) {
-    print("presenting SettingsGeneralForm");
+    debugPrint("presenting SettingsGeneralForm");
     return Form(
       key: _formKey,
       child: Padding(

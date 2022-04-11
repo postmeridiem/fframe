@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
 class WaitScreen extends StatelessWidget {
-  const WaitScreen({Key? key}) : super(key: key);
-
+  const WaitScreen({Key? key, this.color}) : super(key: key);
+  final Color? color;
   @override
-  Widget build(BuildContext context) => const Center(child: CircularProgressIndicator());
+  Widget build(BuildContext context) => Center(
+        child: CircularProgressIndicator(
+          color: color,
+        ),
+      );
 }
