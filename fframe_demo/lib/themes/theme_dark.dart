@@ -4,7 +4,7 @@ import 'package:fframe_demo/themes/config.dart';
 final darkModeConfig = DarkModeThemeConfig();
 
 final ThemeData appDarkTheme = ThemeData(
-  fontFamily: darkModeConfig.fonts.mainFontFamily,
+  fontFamily: darkModeConfig.fonts.mainFont,
   scaffoldBackgroundColor: darkModeConfig.constBackgroundColor,
   indicatorColor: darkModeConfig.constPrimaryAccentColor,
   dividerColor: darkModeConfig.constDividerColor,

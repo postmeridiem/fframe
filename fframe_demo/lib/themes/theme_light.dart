@@ -4,7 +4,7 @@ import 'package:fframe_demo/themes/config.dart';
 final lightModeConfig = LightModeThemeConfig();
 
 final ThemeData appLightTheme = ThemeData(
-  fontFamily: lightModeConfig.fonts.mainFontFamily,
+  fontFamily: lightModeConfig.fonts.mainFont,
   scaffoldBackgroundColor: lightModeConfig.constBackgroundColor,
   indicatorColor: lightModeConfig.constPrimaryAccentColor,
   dividerColor: lightModeConfig.constDividerColor,

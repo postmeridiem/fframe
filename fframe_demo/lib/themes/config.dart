@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class Fonts {
-  // Main font (changing this needs the font assets to be added to the project)
-  String mainFontFamily = 'OpenSans';
-  // Monospace font (changing this needs the font assets to be added to the project)
-  String monoFontFamily = 'RobotoMono';
+  // Main font (changing this needs the new font assets to be included in the project!)
+  String mainFont = 'OpenSans';
+  // Monospace font (changing this needs the new font assets to be included in the project!)
+  String monoFont = 'RobotoMono';
 }
 
 class SignalColors {
