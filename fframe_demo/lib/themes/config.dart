@@ -17,7 +17,7 @@ class DarkModeThemeConfig {
   // DARK MODE =======
   final brightness = Brightness.dark;
   // color that sets the primary accent color
-  Color constPrimaryAccentColor = const Color(0xFF008381);
+  Color constPrimaryAccentColor = Color.fromARGB(255, 5, 202, 198);
 
   // color that sets the appbar, navrail, contextwidgets and FAB
   Color constPrimaryColor = const Color(0xFF1B020B);
@@ -28,7 +28,7 @@ class DarkModeThemeConfig {
   Color constSecondaryColor = const Color(0xFF310414);
   Color constOnSecondaryColor = const Color(0xFFEEEEEE);
 
-  // color that sets 'secondary' level control widgets
+  // color that sets 'tertiary' level control widgets
   // (the background of fields and the text that goes in there)
   Color constTertiaryColor = const Color(0xFF160209);
   Color constOnTertiaryColor = const Color(0xFFEEEEEE);
@@ -55,7 +55,7 @@ class LightModeThemeConfig {
   // LIGHT MODE =======
   final brightness = Brightness.light;
   // color that sets the primary accent color
-  Color constPrimaryAccentColor = const Color(0xFF00B8B5);
+  Color constPrimaryAccentColor = Color.fromARGB(255, 0, 139, 137);
 
   // color that sets the appbar, navrail, contextwidgets and FAB
   Color constPrimaryColor = const Color(0xFF610525);
@@ -67,7 +67,7 @@ class LightModeThemeConfig {
   Color constSecondaryColor = const Color(0xFFFFF8FB);
   Color constOnSecondaryColor = const Color(0xB21D1D1D);
 
-  // color that sets 'secondary' level control widgets
+  // color that sets 'tertiary' level control widgets
   // (the background of fields and the text that goes in there)
   Color constTertiaryColor = const Color(0xFFFFFFFF);
   Color constOnTertiaryColor = const Color(0xB247138B);
