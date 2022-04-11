@@ -1,7 +1,7 @@
 import 'package:fframe_demo/models/setting.dart';
 import 'package:flutter/material.dart';
 
-import 'package:fframe_demo/themes/icons.dart';
+import 'package:fframe_demo/helpers/icons.dart';
 
 class SettingListItem extends StatelessWidget {
   const SettingListItem({
