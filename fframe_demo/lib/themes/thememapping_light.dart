@@ -1,31 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:fframe_demo/themes/config.dart';
 
-final darkModeConfig = DarkModeThemeConfig();
+// this file is used to map the simplified configuration as set up in config.dart to
+// the myriad of different flutter components as to be sane in the context of FlutFrame
 
-final ThemeData appDarkTheme = ThemeData(
-  fontFamily: darkModeConfig.fonts.mainFont,
-  scaffoldBackgroundColor: darkModeConfig.constBackgroundColor,
-  indicatorColor: darkModeConfig.constPrimaryAccentColor,
-  dividerColor: darkModeConfig.constDividerColor,
+// first try working with the config.dart in this directory before making changes here
+
+final lightModeConfig = LightModeThemeConfig();
+
+final ThemeData appLightTheme = ThemeData(
+  fontFamily: lightModeConfig.fonts.mainFont,
+  scaffoldBackgroundColor: lightModeConfig.constBackgroundColor,
+  indicatorColor: lightModeConfig.constPrimaryAccentColor,
+  dividerColor: lightModeConfig.constDividerColor,
   colorScheme: ColorScheme(
-    brightness: darkModeConfig.brightness,
-    primary: darkModeConfig.constOnPrimaryColor,
-    onPrimary: darkModeConfig.constPrimaryColor,
-    secondary: darkModeConfig.constSecondaryColor,
-    onSecondary: darkModeConfig.constOnSecondaryColor,
-    tertiary: darkModeConfig.constTertiaryColor,
-    onTertiary: darkModeConfig.constOnTertiaryColor,
-    surface: darkModeConfig.constPrimaryColor,
-    onSurface: darkModeConfig.constOnPrimaryColor,
-    primaryContainer: darkModeConfig.constPrimaryColor,
-    onPrimaryContainer: darkModeConfig.constOnPrimaryColor,
-    secondaryContainer: darkModeConfig.constSecondaryColor,
-    onSecondaryContainer: darkModeConfig.constOnSecondaryColor,
-    background: darkModeConfig.constBackgroundColor,
-    onBackground: darkModeConfig.constPrimaryAccentColor,
+    brightness: lightModeConfig.brightness,
+    primary: lightModeConfig.constOnPrimaryColor,
+    onPrimary: lightModeConfig.constPrimaryColor,
+    secondary: lightModeConfig.constSecondaryColor,
+    onSecondary: lightModeConfig.constOnSecondaryColor,
+    tertiary: lightModeConfig.constTertiaryColor,
+    onTertiary: lightModeConfig.constOnTertiaryColor,
+    surface: lightModeConfig.constPrimaryColor,
+    onSurface: lightModeConfig.constOnPrimaryColor,
+    primaryContainer: lightModeConfig.constPrimaryColor,
+    onPrimaryContainer: lightModeConfig.constOnPrimaryColor,
+    secondaryContainer: lightModeConfig.constSecondaryColor,
+    onSecondaryContainer: lightModeConfig.constOnSecondaryColor,
+    background: lightModeConfig.constBackgroundColor,
+    onBackground: lightModeConfig.constPrimaryAccentColor,
     surfaceVariant: const Color(0xFFFF00DD),
-    onSurfaceVariant: darkModeConfig.constOnBackgroundColorFaded,
+    onSurfaceVariant: lightModeConfig.constOnBackgroundColorFaded,
     error: const Color(0xffd32f2f),
     onError: const Color(0xff000000),
     outline: const Color(0xFFFF00C8),
@@ -33,33 +38,33 @@ final ThemeData appDarkTheme = ThemeData(
 
   inputDecorationTheme: InputDecorationTheme(
     labelStyle: TextStyle(
-      backgroundColor: darkModeConfig.constTertiaryColor,
-      color: darkModeConfig.constOnTertiaryColor,
+      backgroundColor: lightModeConfig.constTertiaryColor,
+      color: lightModeConfig.constOnTertiaryColor,
     ),
     floatingLabelStyle: TextStyle(
-      backgroundColor: darkModeConfig.constTertiaryColor,
-      color: darkModeConfig.constOnTertiaryColor,
+      backgroundColor: lightModeConfig.constTertiaryColor,
+      color: lightModeConfig.constOnTertiaryColor,
     ),
     helperStyle: TextStyle(
-      backgroundColor: darkModeConfig.constTertiaryColor,
-      color: darkModeConfig.constOnTertiaryColor,
+      backgroundColor: lightModeConfig.constTertiaryColor,
+      color: lightModeConfig.constOnTertiaryColor,
     ),
     hintStyle: TextStyle(
-      backgroundColor: darkModeConfig.constTertiaryColor,
-      color: darkModeConfig.constOnTertiaryColor,
+      backgroundColor: lightModeConfig.constTertiaryColor,
+      color: lightModeConfig.constOnTertiaryColor,
     ),
     errorStyle: TextStyle(
-      backgroundColor: darkModeConfig.constTertiaryColor,
-      color: darkModeConfig.constOnTertiaryColor,
+      backgroundColor: lightModeConfig.constTertiaryColor,
+      color: lightModeConfig.constOnTertiaryColor,
     ),
   ),
   floatingActionButtonTheme: FloatingActionButtonThemeData(
-    foregroundColor: darkModeConfig.constPrimaryAccentColor,
-    focusColor: darkModeConfig.constOnPrimaryColor,
-    backgroundColor: darkModeConfig.constPrimaryColor,
+    foregroundColor: lightModeConfig.constPrimaryAccentColor,
+    focusColor: lightModeConfig.constOnPrimaryColor,
+    backgroundColor: lightModeConfig.constPrimaryColor,
   ),
   cardTheme: CardTheme(
-    color: darkModeConfig.constSecondaryColor,
+    color: lightModeConfig.constSecondaryColor,
   ),
   buttonTheme: const ButtonThemeData(
     textTheme: ButtonTextTheme.normal,
@@ -130,8 +135,8 @@ final ThemeData appDarkTheme = ThemeData(
   ),
   tabBarTheme: TabBarTheme(
     indicatorSize: TabBarIndicatorSize.tab,
-    labelColor: darkModeConfig.constPrimaryAccentColor,
-    unselectedLabelColor: darkModeConfig.constUnselectedColor,
+    labelColor: lightModeConfig.constPrimaryAccentColor,
+    unselectedLabelColor: lightModeConfig.constUnselectedColor,
   ),
   chipTheme: const ChipThemeData(
     backgroundColor: Color(0x1fffffff),

@@ -1,2 +1,2 @@
-export 'theme_light.dart';
-export 'theme_dark.dart';
+export 'thememapping_light.dart';
+export 'thememapping_dark.dart';
