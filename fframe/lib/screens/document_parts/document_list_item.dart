@@ -8,5 +8,5 @@ class DocumentList<T> {
     this.queryBuilder,
   });
   final DocumentListItemBuilder<T> builder;
-  final Query<T> Function(Query query)? queryBuilder;
+  final Query<T> Function(Query<T> query)? queryBuilder;
 }

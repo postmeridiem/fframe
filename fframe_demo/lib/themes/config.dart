@@ -17,7 +17,7 @@ class DarkModeThemeConfig {
   // DARK MODE =======
   final brightness = Brightness.dark;
   // color that sets the primary accent color
-  Color constPrimaryAccentColor = Color.fromARGB(255, 5, 202, 198);
+  Color constPrimaryAccentColor = const Color.fromARGB(255, 5, 202, 198);
 
   // color that sets the appbar, navrail, contextwidgets and FAB
   Color constPrimaryColor = const Color(0xFF1B020B);
@@ -55,7 +55,7 @@ class LightModeThemeConfig {
   // LIGHT MODE =======
   final brightness = Brightness.light;
   // color that sets the primary accent color
-  Color constPrimaryAccentColor = Color.fromARGB(255, 0, 139, 137);
+  Color constPrimaryAccentColor = const Color.fromARGB(255, 0, 139, 137);
 
   // color that sets the appbar, navrail, contextwidgets and FAB
   Color constPrimaryColor = const Color(0xFF610525);

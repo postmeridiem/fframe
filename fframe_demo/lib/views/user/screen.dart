@@ -8,7 +8,9 @@ import 'package:fframe_demo/views/user/tabs/tabs.dart';
 class UsersScreen extends StatelessWidget {
   const UsersScreen({
     Key? key,
+    required this.isActive,
   }) : super(key: key);
+  final bool isActive;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,7 @@ class UsersScreen extends StatelessWidget {
       },
       document: _document(),
       documentList: DocumentList(
+        queryBuilder: (query) => query.where("active", isEqualTo: isActive),
         builder: (context, selected, data) {
           return UserListItem(
             user: data,

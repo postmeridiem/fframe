@@ -125,7 +125,7 @@ class _AppState extends State<App> with RestorationMixin {
       UserStateSignedIn _userState = userState as UserStateSignedIn;
 
       if (_userState.appUser.roles == null) {
-        // debugPrint("Remove all paths wich require a role");
+        debugPrint("Remove all paths wich require a role");
         _navigationTargets.removeWhere((navigationTarget) => navigationTarget.roles != null);
       } else {
         List<String> userRoles = _userState.appUser.roles!;
@@ -133,14 +133,15 @@ class _AppState extends State<App> with RestorationMixin {
 
         _navigationTargets.removeWhere((navigationTarget) {
           if (navigationTarget.roles == null) {
-            // debugPrint("Allow ${navigationTarget.title}");
+            debugPrint("Allow ${navigationTarget.title}");
             return true;
           }
           List<String> targetRoles = navigationTarget.roles!.map((targetRole) => targetRole.toLowerCase()).toList();
-          bool allow = targetRoles.any(
-            (targetRole) => !userRoles.contains(targetRole),
+          debugPrint("Roles for ${navigationTarget.title}: ${targetRoles.join(",")}");
+          bool allow = !targetRoles.any(
+            (targetRole) => userRoles.contains(targetRole),
           );
-          // debugPrint("Allowed roles for ${navigationTarget.title}: ${targetRoles.join(",")} => $allow");
+          debugPrint("Allowed roles for ${navigationTarget.title}: ${targetRoles.join(",")} => $allow");
           return allow;
         });
       }
@@ -268,7 +269,7 @@ class _AppState extends State<App> with RestorationMixin {
 
         if (goRouterState.queryParams.isNotEmpty) {
           debugPrint("Process redirect");
-          SelectionState selectionState = SelectionState(queryDocumentSnapshot: null, queryParams: goRouterState.queryParams);
+          SelectionState selectionState = SelectionState(data: null, queryParams: goRouterState.queryParams, docId: null);
           ref.read(navigationStateProvider.notifier).selectionState = selectionState;
           return null;
         }
@@ -278,13 +279,6 @@ class _AppState extends State<App> with RestorationMixin {
       // errorBuilder: (context, state) => ErrorScreen(error: state.error!, initiallLocation: _initialLocation),
       navigatorBuilder: (context, state, child) {
         try {
-          // debugPrint(state.pageKey.toString());
-          // debugPrint(widget.title.toString());
-          // debugPrint(child.toString());
-          // debugPrint(state.toString());
-          // debugPrint(_navigationTargets(userState).toString());
-          // debugPrint(state.pageKey.toString());
-
           List<NavigationTarget> navigationTargets = _navigationTargets(userState);
 
           // if (navigationTargets.isNotEmpty) {

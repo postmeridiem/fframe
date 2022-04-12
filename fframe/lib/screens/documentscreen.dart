@@ -1,16 +1,11 @@
 part of fframe;
 
-class DocumentScreen<T> extends StatefulWidget {
-  /// Creates a 1, 2 3 pane layout for easy access and layout for  Firestore data .
-  ///
-  /// The [length] argument is typically greater than one. The [length] must
-  /// match [TabBar.tabs]'s and [TabBarView.children]'s length.
-  ///
-  /// The [initialIndex] argument must not be null.
+class DocumentScreen<T> extends ConsumerStatefulWidget {
   const DocumentScreen({
     Key? key,
     required this.collection,
     required this.createNew,
+    this.createDocumentId,
     required this.fromFirestore,
     required this.toFirestore,
     this.documentList,
@@ -18,8 +13,8 @@ class DocumentScreen<T> extends StatefulWidget {
     this.titleBuilder,
     required this.document,
     this.extraActionButtons,
+    this.contextCardBuilders,
   }) : super(key: key);
-  // final Query<T> query;
 
   /// this is a fFrame Document Screen
   /// we have not documented this yet
@@ -33,267 +28,264 @@ class DocumentScreen<T> extends StatefulWidget {
   final DocumentBuilder<T>? documentBuilder;
   final TitleBuilder<T>? titleBuilder;
   final Document document;
-  final List<ActionButton>? extraActionButtons;
+  final List<IconButton>? extraActionButtons;
 
-  final String collection;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
-  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
-  final T Function() createNew;
-
-  @override
-  State<DocumentScreen<T>> createState() => _DocumentScreenState<T>();
-}
-
-class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
-  @override
-  Widget build(BuildContext context) {
-    _DocumentBody<T> documentBody = _DocumentBody(
-      collection: widget.collection,
-      fromFirestore: widget.fromFirestore,
-      toFirestore: widget.toFirestore,
-      createNew: widget.createNew,
-      extraActionButtons: widget.extraActionButtons,
-      titleBuilder: widget.titleBuilder,
-      document: widget.document,
-    );
-
-    //Check if a documentList is to be loaded
-    if (widget.documentList != null) {
-      return Row(
-        children: [
-          SizedBox(
-            width: 250,
-            child: Padding(
-              padding: const EdgeInsets.all(0.0),
-              child: _DocumentList<T>(
-                collection: widget.collection,
-                fromFirestore: widget.fromFirestore,
-                toFirestore: widget.toFirestore,
-                documentList: widget.documentList!,
-              ),
-            ),
-          ),
-          const VerticalDivider(thickness: 1, width: 1),
-          // This is the main content.
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: documentBody,
-            ),
-          ),
-        ],
-      );
-    } else {
-      return Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: documentBody,
-      );
-    }
-  }
-}
-
-class _DocumentBody<T> extends ConsumerWidget {
-  const _DocumentBody({
-    Key? key,
-    required this.collection,
-    required this.fromFirestore,
-    required this.toFirestore,
-    this.titleBuilder,
-    this.extraActionButtons,
-    required this.document,
-    this.contextCardBuilders,
-    required this.createNew,
-    this.createDocumentId,
-  }) : super(key: key);
   final String collection;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final T Function() createNew;
   final String? Function(T)? createDocumentId;
-  final TitleBuilder<T>? titleBuilder;
-  final List<ActionButton>? extraActionButtons;
-  final Document document;
   final List<ContextCardBuilder>? contextCardBuilders;
-
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    try {
-      NavigationStateNotifier navigationState = ref.watch(navigationStateProvider);
-      UserState userState = ref.watch(userStateNotifierProvider);
-
-      _callClose() {
-        navigationState.selectionState = SelectionState(
-          data: null,
-          queryParams: null,
-          queryDocumentSnapshot: null,
-        );
-      }
-
-      _callCreateNew() {
-        navigationState.selectionState = SelectionState(
-          data: createNew(),
-          queryParams: null,
-          queryDocumentSnapshot: null,
-        );
-      }
-
-      Future<bool> _callSave(String? documentId, T data) async {
-        try {
-          if (createDocumentId != null) {
-            debugPrint("Request a new documentId");
-            documentId = createDocumentId!(data);
-          }
-          documentId = documentId ?? const Uuid().v4();
-
-          if (await DatabaseService<T>().updateData(
-            collection: collection,
-            documentId: documentId,
-            data: data,
-            fromFirestore: fromFirestore,
-            toFirestore: toFirestore,
-          )) {
-            //Success
-            debugPrint("Save was successfull ");
-            return true;
-          } else {
-            debugPrint("Save failed");
-            return false;
-          } // Failed
-
-        } catch (error) {
-          debugPrint(error.toString());
-        }
-        return false;
-      }
-
-      Map<String, String>? queryParams = navigationState.selectionState.queryParams;
-      T? data = navigationState.selectionState.data;
-      if (data != null) {
-        //Return injected type
-
-        return Scaffold(
-          primary: false,
-          body: DocumentCanvas<T>(
-            key: ObjectKey(data),
-            titleBuilder: titleBuilder,
-            data: data,
-            userState: userState,
-            collection: collection,
-            // documentSnapshot: null,
-            document: document,
-            extraActionButtons: extraActionButtons,
-            toFirestore: toFirestore,
-            fromFirestore: fromFirestore,
-            callCreateNew: _callCreateNew,
-            callClose: _callClose,
-            callSave: _callSave,
-          ),
-        );
-      } else if ((queryParams != null && queryParams.containsKey("id"))) {
-        return StreamBuilder<DocumentSnapshot<T>>(
-          stream: DatabaseService<T>().documentStream(
-            collection: collection,
-            documentId: queryParams['id']!,
-            fromFirestore: fromFirestore,
-            toFirestore: toFirestore,
-          ),
-          builder: (context, AsyncSnapshot<DocumentSnapshot<T>> asyncSnapshot) {
-            switch (asyncSnapshot.connectionState) {
-              case ConnectionState.none:
-                return const EmptyScreen();
-              case ConnectionState.waiting:
-                return const WaitScreen();
-              case ConnectionState.active:
-              case ConnectionState.done:
-                if (asyncSnapshot.hasError) return ErrorScreen(error: Exception(asyncSnapshot.error));
-                if (!asyncSnapshot.hasData) return const WaitScreen();
-                debugPrint("Load DocumentCanvas");
-
-                try {
-                  // T? snapshotData = asyncSnapshot.data!.data();
-                  DocumentSnapshot<T>? snapshotData = asyncSnapshot.data;
-
-                  if (snapshotData != null) {
-                    return Scaffold(
-                      primary: false,
-                      body: DocumentCanvas<T>(
-                        key: ObjectKey(data),
-                        titleBuilder: titleBuilder,
-                        data: snapshotData.data()!,
-                        userState: userState,
-                        collection: collection,
-                        documentId: queryParams['id']!,
-                        document: document,
-                        extraActionButtons: extraActionButtons,
-                        toFirestore: toFirestore,
-                        fromFirestore: fromFirestore,
-                        callCreateNew: _callCreateNew,
-                        callClose: _callClose,
-                        callSave: _callSave,
-                      ),
-                    );
-                  } else {
-                    return ErrorScreen(
-                      error: Exception("Unable to convert documentdata to modeldata."),
-                    );
-                  }
-                } catch (e) {
-                  return ErrorScreen(
-                    error: Exception("${e.toString()} in ${asyncSnapshot.data?.reference.path ?? 'unknowmn path'} ${{asyncSnapshot.data?.reference}}"),
-                    // externalLocation: "https://console.firebase.google.com/project/${asyncSnapshot.data?.reference.firestore.app.name}/firestore/data/~2Fusers~2F1U1O47tW48W5K5PpEXWc1QRRWxt1",
-                  );
-                }
-            }
-          },
-        );
-      }
-      return const EmptyScreen();
-    } catch (e) {
-      return ErrorScreen(
-        error: Exception(e.toString()),
-      );
-    }
-  }
+  ConsumerState<DocumentScreen<T>> createState() => _DocumentScreenState<T>();
 }
 
-class DocumentCanvas<T> extends StatelessWidget {
-  DocumentCanvas({
-    Key? key,
-    this.titleBuilder,
-    required this.data,
-    required this.userState,
-    this.documentId,
-    required this.document,
-    required this.collection,
-    required this.fromFirestore,
-    required this.toFirestore,
-    this.extraActionButtons,
-    required this.callCreateNew,
-    required this.callClose,
-    required this.callSave,
-  }) : super(key: key);
+class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
+  @override
+  void initState() {
+    super.initState();
+    // "ref" can be used in all life-cycles of a StatefulWidget.
+    //
+    // UserState userState = ref.read(userStateNotifierProvider);
+  }
 
-  final GlobalKey<ScaffoldState> _key = GlobalKey();
-  final String? documentId;
-  final T data;
-  final String collection;
-  final UserState userState;
-  final TitleBuilder<T>? titleBuilder;
-  final List<ActionButton>? extraActionButtons;
-  final Document document;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
-  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
-  final Function() callCreateNew;
-  final Function() callClose;
-  final Future<bool> Function(String?, T) callSave;
+  final GlobalKey<_DocumentScreenState> _documentScreenState = GlobalKey<_DocumentScreenState>();
 
   @override
   Widget build(BuildContext context) {
-    if (userState.runtimeType == UserStateSignedIn) {
-      UserStateSignedIn _userState = userState as UserStateSignedIn;
-      // _userState.appUser
+    debugPrint("Rebuild DocumentScreen");
+    NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
+
+    // ignore: unused_element
+    _callEditToggle() {}
+
+    // ignore: unused_element
+    _callDelete() {}
+
+    _callClose() {
+      navigationState.selectionState = SelectionState(
+        docId: null,
+        data: null,
+        queryParams: null,
+      );
     }
-    // DocumentSnapshot<T>? _documentSnapshot = documentSnapshot;
+
+    // ignore: unused_element
+    _callCopy() {}
+
+    _callCreateNew() {
+      navigationState.selectionState = SelectionState(
+        docId: null,
+        data: widget.createNew(),
+        queryParams: null,
+      );
+    }
+
+    Future<bool> _callSave() async {
+      try {
+        SelectionState selectionState = navigationState.selectionState;
+        String? documentId = selectionState.docId;
+        debugPrint("Save item $documentId in collection ${widget.collection}");
+        if (widget.createDocumentId != null && selectionState.docId == null) {
+          debugPrint("Request a new documentId");
+          documentId = widget.createDocumentId!(selectionState.data);
+        }
+        documentId = documentId ?? const Uuid().v4();
+
+        if (await DatabaseService<T>().updateData(
+          collection: widget.collection,
+          documentId: documentId,
+          data: selectionState.data,
+          fromFirestore: widget.fromFirestore,
+          toFirestore: widget.toFirestore,
+        )) {
+          //Success
+          debugPrint("Save was successfull ");
+          return true;
+        } else {
+          debugPrint("Save failed");
+          return false;
+        } // Failed
+
+      } catch (error) {
+        debugPrint(error.toString());
+      }
+      return false;
+    }
+
+    _callValidate() async {
+      debugPrint("callValidate");
+      _DocumentCanvas<T>? _documentCanvas = _documentScreenState.currentWidget as _DocumentCanvas<T>?;
+      if (_documentCanvas != null) {
+        if (_documentCanvas.validateDocument() == true) {
+          //Save this document
+          if ((await _callSave()) == true) {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: Text('Saved succesfully'),
+            ));
+            // callClose();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              behavior: SnackBarBehavior.floating,
+              content: ListTile(
+                leading: Icon(
+                  Icons.warning,
+                  color: Colors.amberAccent,
+                ),
+                title: Text(
+                  "Save failed succesfully",
+                ),
+                tileColor: Colors.redAccent,
+              ),
+            ));
+          }
+        }
+      } else {
+        debugPrint(_documentScreenState.currentWidget.toString());
+      }
+    }
+
+    List<IconButton>? iconButtons = [
+      IconButton(
+        icon: Icon(
+          Icons.close,
+          color: Colors.grey.shade400,
+        ),
+        onPressed: _callClose,
+      ),
+      // IconButton(
+      //   icon: Icon(
+      //     Icons.edit,
+      //     color: Colors.grey.shade400,
+      //   ),
+      //   onPressed: _callEditToggle,
+      // ),
+      // IconButton(
+      //   icon: Icon(
+      //     Icons.delete,
+      //     color: Colors.grey.shade400,
+      //   ),
+      //   onPressed: _callDelete,
+      // ),
+      // IconButton(
+      //   icon: Icon(
+      //     Icons.copy_outlined,
+      //     color: Colors.grey.shade400,
+      //   ),
+      //   onPressed: _callCopy,
+      // ),
+      IconButton(
+        icon: Icon(
+          Icons.save,
+          color: Colors.grey.shade400,
+        ),
+        onPressed: _callValidate,
+      ),
+    ];
+
+    //Add any extra configured buttons to the list
+    if (widget.extraActionButtons != null) {
+      iconButtons.addAll(widget.extraActionButtons!);
+    }
+
+    return CurvedBottomBar(
+      floatingActionButton: FloatingActionButton(child: const Icon(Icons.add), elevation: 0.1, onPressed: _callCreateNew),
+      iconButtons: iconButtons,
+      child: Row(
+        children: [
+          if (widget.documentList != null)
+            SizedBox(
+              width: 250,
+              child: Padding(
+                padding: const EdgeInsets.all(0.0),
+                child: _DocumentList<T>(
+                  key: ValueKey(widget.collection),
+                  collection: widget.collection,
+                  fromFirestore: widget.fromFirestore,
+                  documentList: widget.documentList!,
+                ),
+              ),
+            ),
+          if (widget.documentList != null) const VerticalDivider(thickness: 1, width: 1),
+          Expanded(
+            child: _DocumentBody<T>(
+              key: _documentScreenState,
+              titleBuilder: widget.titleBuilder,
+              document: widget.document,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+class _DocumentBody<T> extends ConsumerWidget {
+  const _DocumentBody({
+    Key? key,
+    required this.document,
+    this.titleBuilder,
+  }) : super(key: key);
+  final Document document;
+  final TitleBuilder<T>? titleBuilder;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    SelectionState selectionState = ref.watch(navigationStateProvider).selectionState;
+    debugPrint("Rebuild documentBody");
+    return Scaffold(
+      primary: false,
+      body: (selectionState.data == null)
+          ? const EmptyScreen()
+          : _DocumentCanvas<T>(
+              key: key,
+              document: document,
+              selectionState: selectionState,
+              titleBuilder: titleBuilder,
+            ),
+    );
+  }
+}
+
+class _DocumentCanvas<T> extends StatelessWidget {
+  _DocumentCanvas({
+    Key? key,
+    this.titleBuilder,
+    required this.selectionState,
+    required this.document,
+    // required this.callValidate,
+  }) : super(key: key);
+
+  final GlobalKey<ScaffoldState> _key = GlobalKey();
+  final SelectionState selectionState;
+  final TitleBuilder<T>? titleBuilder;
+  final Document document;
+
+  late PreloadPageController preloadPageController;
+
+  bool validateDocument() {
+    List<bool> validationResults = document.tabs.map((documentTab) {
+      bool isValid = documentTab.formKey.currentState!.validate();
+      return isValid;
+    }).toList();
+
+    if (validationResults.contains(false)) {
+      //Validation has failed
+      int failedTab = validationResults.indexWhere((validationResult) => validationResult == false);
+      preloadPageController.animateToPage(failedTab, duration: const Duration(microseconds: 100), curve: Curves.easeOutCirc);
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (selectionState.data == null) {
+      return const EmptyScreen();
+    }
 
     return DefaultTabController(
       length: document.tabs.length,
@@ -302,63 +294,7 @@ class DocumentCanvas<T> extends StatelessWidget {
       child: Builder(
         builder: (BuildContext context) {
           final TabController tabController = DefaultTabController.of(context)!;
-          PreloadPageController preloadPageController = PreloadPageController(initialPage: 0);
-
-          List<ActionButton> actionButtons = [
-            ...?extraActionButtons,
-            ActionButton(
-              onPressed: callClose,
-              icon: const Icon(
-                Icons.close,
-              ),
-            ),
-            ActionButton(
-              onPressed: () async {
-                List<bool> validationResults = document.tabs.map((documentTab) {
-                  bool isValid = documentTab.formKey.currentState!.validate();
-                  return isValid;
-                }).toList();
-
-                if (validationResults.contains(false)) {
-                  //Validation has failed
-                  int failedTab = validationResults.indexWhere((validationResult) => validationResult == false);
-                  preloadPageController.animateToPage(failedTab, duration: const Duration(microseconds: 100), curve: Curves.easeOutCirc);
-                } else {
-                  //Save this document
-                  if ((await callSave(documentId, data)) == true) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: Text('Saved succesfully'),
-                    ));
-                    callClose();
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      behavior: SnackBarBehavior.floating,
-                      content: ListTile(
-                        leading: Icon(
-                          Icons.warning,
-                          color: Colors.amberAccent,
-                        ),
-                        title: Text(
-                          "Save failed succesfully",
-                        ),
-                        tileColor: Colors.redAccent,
-                      ),
-                    ));
-                  }
-                }
-              },
-              icon: const Icon(
-                Icons.save,
-              ),
-            ),
-            ActionButton(
-              onPressed: callCreateNew,
-              icon: const Icon(
-                Icons.add,
-              ),
-            ),
-          ];
+          preloadPageController = PreloadPageController(initialPage: 0);
 
           tabController.addListener(() {
             if (!tabController.indexIsChanging) {
@@ -383,7 +319,7 @@ class DocumentCanvas<T> extends StatelessWidget {
                             ? ContextCanvas(
                                 contextWidgets: document.contextCards!
                                     .map(
-                                      (contextCardBuilder) => contextCardBuilder(data),
+                                      (contextCardBuilder) => contextCardBuilder(selectionState.data),
                                     )
                                     .toList(),
                               )
@@ -396,7 +332,7 @@ class DocumentCanvas<T> extends StatelessWidget {
                               SliverAppBar(
                                 actions: const [IgnorePointer()], //To surpess the hamburger
                                 primary: false,
-                                title: titleBuilder != null ? titleBuilder!(context, data) : null,
+                                title: titleBuilder != null ? titleBuilder!(context, selectionState.data) : null,
                                 floating: true,
                                 pinned: false,
                                 snap: true,
@@ -424,8 +360,8 @@ class DocumentCanvas<T> extends StatelessWidget {
                               return Form(
                                 key: document.tabs[position].formKey,
                                 child: Container(
-                                  key: ObjectKey(data),
-                                  child: document.tabs[position].childBuilder(data),
+                                  key: ObjectKey(selectionState.data),
+                                  child: document.tabs[position].childBuilder(selectionState.data),
                                 ),
                               );
                             },
@@ -434,10 +370,6 @@ class DocumentCanvas<T> extends StatelessWidget {
                               debugPrint('page changed. current: $position');
                             },
                           ),
-                        ),
-                        floatingActionButton: ExpandableFab(
-                          distance: 112.0,
-                          children: actionButtons,
                         ),
                       ),
                     ),
@@ -449,7 +381,7 @@ class DocumentCanvas<T> extends StatelessWidget {
                             child: ContextCanvas(
                               contextWidgets: document.contextCards!
                                   .map(
-                                    (contextCardBuilder) => contextCardBuilder(data),
+                                    (contextCardBuilder) => contextCardBuilder(selectionState.data),
                                   )
                                   .toList(),
                             ),
@@ -562,26 +494,28 @@ class _DocumentList<T> extends StatelessWidget {
     Key? key,
     required this.collection,
     required this.fromFirestore,
-    required this.toFirestore,
     required this.documentList,
   }) : super(key: key);
   final DocumentList<T> documentList;
   final String collection;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
-  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
 
   @override
   Widget build(BuildContext context) {
     debugPrint("Build DocumentList $runtimeType ${key.toString()}");
 
-    Query<T> q = DatabaseService<T>().query(
+    Query<T> query = DatabaseService<T>().query(
       collection: collection,
       fromFirestore: fromFirestore,
-      toFirestore: toFirestore, //List does not support updates
     );
 
+    if (documentList.queryBuilder != null) {
+      debugPrint("Apply query builder");
+      query = documentList.queryBuilder!(query);
+    }
+
     return FirestoreListView<T>(
-      query: q,
+      query: query,
       itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
         // return documentListBuilder(context, queryDocumentSnapshot);
         return _CardList(
@@ -617,16 +551,14 @@ class _CardList<T> extends ConsumerWidget {
             String documentPath = GoRouter.of(context).location;
             debugPrint("Update document to ${document.reference.path}");
             NavigationStateNotifier navigationState = ref.read(navigationStateProvider.notifier);
-            SelectionState<T> selectionState = SelectionState<T>(queryDocumentSnapshot: document, queryParams: {"id": document.id}, cardId: document.id);
-            navigationState.selectionState = selectionState;
+            navigationState.selectionState = SelectionState<T>(data: document.data(), queryParams: {"id": document.id}, docId: document.id);
             documentPath = documentPath.split("?")[0];
             // GoRouter.of(context).go('$documentPath?id=${document.id}', extra: selectionState); //Disables until we figure out how to prevent a full rebuild when changing the query-string
           },
           child: Consumer(builder: (context, ref, child) {
-            String activeCard = ref.watch(navigationStateProvider).selectionState.cardId;
-            // debugPrint("Draw card ${document.id} active card: $activeCard");
+            String docId = ref.watch(navigationStateProvider).selectionState.docId ?? '';
             try {
-              return documentListItemBuilder(context, activeCard == document.id, document.data());
+              return documentListItemBuilder(context, docId == document.id, document.data());
             } catch (e) {
               return Card(
                 child: ListTile(

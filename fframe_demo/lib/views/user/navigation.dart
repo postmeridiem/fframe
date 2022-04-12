@@ -7,12 +7,16 @@ final usersNavigationTargets = NavigationTarget(
   title: "Users",
   navigationTabs: <NavigationTab>[
     NavigationTab(
-      contentPane: const UsersScreen(),
+      contentPane: const UsersScreen(
+        isActive: true,
+      ),
       title: "Active",
       path: "active",
     ),
     NavigationTab(
-      contentPane: const UsersScreen(),
+      contentPane: const UsersScreen(
+        isActive: false,
+      ),
       title: "Inactive",
       path: "inactive",
     )
@@ -21,5 +25,5 @@ final usersNavigationTargets = NavigationTarget(
     icon: Icon(Icons.person),
     label: Text('Users'),
   ),
-  roles: ['UserAdmin', 'SuperAdmin'],
+  roles: ["User", 'UserAdmin', 'SuperAdmin'],
 );

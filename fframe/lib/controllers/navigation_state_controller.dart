@@ -1,15 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/foundation.dart';
 
 class SelectionState<T> {
-  final QueryDocumentSnapshot<T>? queryDocumentSnapshot;
+  // final QueryDocumentSnapshot<T>? queryDocumentSnapshot;
   final Map<String, String>? queryParams;
   final T? data;
-  final String cardId;
+  final String? docId;
   SelectionState({
-    this.queryDocumentSnapshot,
-    this.cardId = "",
+    // this.queryDocumentSnapshot,
+    required this.docId,
     this.data,
     this.queryParams,
   });
@@ -19,7 +19,7 @@ class NavigationStateNotifier with ChangeNotifier {
   late String? _redirectState;
   late List<NavigationTarget> _navigationTargets = [];
   late List<String> _roles = [];
-  late SelectionState _selectionState = SelectionState();
+  late SelectionState _selectionState = SelectionState(docId: null);
 
   int _currentIndex = 0;
   NavigationTarget? _currentTarget;
@@ -101,7 +101,7 @@ class NavigationStateNotifier with ChangeNotifier {
   int get currentIndex => _currentIndex;
   set currentIndex(int index) {
     _currentIndex = index;
-    _selectionState = SelectionState();
+    _selectionState = SelectionState(docId: null);
   }
 
   NavigationTarget? get currentTarget => _currentTarget;

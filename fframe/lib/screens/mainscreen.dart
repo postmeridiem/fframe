@@ -175,21 +175,14 @@ class MainBody extends ConsumerWidget {
                 Expanded(
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: child,
-                      // child: activeTarget == null ? EmptyScreen() : activeTarget.contentPane,
-                    ),
+                    child: child,
                   ),
                 )
               ],
             )
           : AnimatedSwitcher(
               duration: const Duration(milliseconds: 300),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: child,
-              ),
+              child: child,
             ),
     );
   }
