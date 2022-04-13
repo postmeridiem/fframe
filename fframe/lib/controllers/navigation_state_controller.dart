@@ -1,18 +1,18 @@
 // import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fframe/fframe.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class SelectionState<T> {
   // final QueryDocumentSnapshot<T>? queryDocumentSnapshot;
   final Map<String, String>? queryParams;
   final T? data;
   final String? docId;
+  final GlobalKey globalKey;
   SelectionState({
-    // this.queryDocumentSnapshot,
     required this.docId,
     this.data,
     this.queryParams,
-  });
+  }) : globalKey = GlobalKey();
 }
 
 class NavigationStateNotifier with ChangeNotifier {

@@ -49,12 +49,32 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
     // UserState userState = ref.read(userStateNotifierProvider);
   }
 
-  final GlobalKey<_DocumentScreenState> _documentScreenState = GlobalKey<_DocumentScreenState>();
+  Future<void> lazyLoad(SelectionState selectionState) async {
+    NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
+    DocumentSnapshot<T>? documentSnapshot = await DatabaseService<T>().documentSnapshot(collection: widget.collection, documentId: selectionState.queryParams!["id"]!, fromFirestore: widget.fromFirestore, toFirestore: widget.toFirestore);
+
+    if (documentSnapshot != null) {
+      navigationState.selectionState = SelectionState(
+        docId: selectionState.queryParams!["id"],
+        data: documentSnapshot.data(),
+        queryParams: navigationState.selectionState.queryParams,
+      );
+    } else {
+      debugPrint("Unable to lazy load document ${selectionState.docId} from ${widget.collection}");
+    }
+
+    // if (!(await documentStream?.isEmpty ?? true)) {
+    //   Future<DocumentSnapshot<T>> docFirst = documentStream!.first;
+    //   docFirst.
+    // }
+    //  DocumentSnapshot<T> document =  .first();
+  }
 
   @override
   Widget build(BuildContext context) {
     debugPrint("Rebuild DocumentScreen");
     NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
+    SelectionState selectionState = navigationState.selectionState;
 
     // ignore: unused_element
     _callEditToggle() {}
@@ -115,7 +135,8 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
 
     _callValidate() async {
       debugPrint("callValidate");
-      _DocumentCanvas<T>? _documentCanvas = _documentScreenState.currentWidget as _DocumentCanvas<T>?;
+      SelectionState selectionState = navigationState.selectionState;
+      _DocumentCanvas<T>? _documentCanvas = selectionState.globalKey.currentWidget as _DocumentCanvas<T>?;
       if (_documentCanvas != null) {
         if (_documentCanvas.validateDocument() == true) {
           //Save this document
@@ -142,7 +163,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
           }
         }
       } else {
-        debugPrint(_documentScreenState.currentWidget.toString());
+        debugPrint(selectionState.globalKey.currentWidget.toString());
       }
     }
 
@@ -189,6 +210,12 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
       iconButtons.addAll(widget.extraActionButtons!);
     }
 
+    //Handle a case where a deeplink to a document comes in
+    if (selectionState.data == null && selectionState.queryParams?["id"] != null && selectionState.docId != selectionState.queryParams!["id"]) {
+      debugPrint("Lazy load the deeplinked document");
+      lazyLoad(selectionState);
+    }
+
     return CurvedBottomBar(
       floatingActionButton: FloatingActionButton(child: const Icon(Icons.add), elevation: 0.1, onPressed: _callCreateNew),
       iconButtons: iconButtons,
@@ -210,7 +237,6 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
           if (widget.documentList != null) const VerticalDivider(thickness: 1, width: 1),
           Expanded(
             child: _DocumentBody<T>(
-              key: _documentScreenState,
               titleBuilder: widget.titleBuilder,
               document: widget.document,
             ),
@@ -220,7 +246,6 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
     );
   }
 }
-
 
 class _DocumentBody<T> extends ConsumerWidget {
   const _DocumentBody({
@@ -235,20 +260,23 @@ class _DocumentBody<T> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     SelectionState selectionState = ref.watch(navigationStateProvider).selectionState;
     debugPrint("Rebuild documentBody");
+
     return Scaffold(
       primary: false,
-      body: (selectionState.data == null)
-          ? const EmptyScreen()
-          : _DocumentCanvas<T>(
-              key: key,
-              document: document,
-              selectionState: selectionState,
-              titleBuilder: titleBuilder,
-            ),
+      body: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 500),
+        child: _DocumentCanvas<T>(
+          key: selectionState.globalKey,
+          document: document,
+          selectionState: selectionState,
+          titleBuilder: titleBuilder,
+        ),
+      ),
     );
   }
 }
 
+// ignore: must_be_immutable
 class _DocumentCanvas<T> extends StatelessWidget {
   _DocumentCanvas({
     Key? key,
@@ -284,10 +312,14 @@ class _DocumentCanvas<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (selectionState.data == null) {
+      if (selectionState.docId != selectionState.queryParams?["id"]) {
+        return const WaitScreen();
+      }
       return const EmptyScreen();
     }
 
     return DefaultTabController(
+      animationDuration: Duration.zero,
       length: document.tabs.length,
       // The Builder widget is used to have a different BuildContext to access
       // closest DefaultTabController.
@@ -357,6 +389,8 @@ class _DocumentCanvas<T> extends StatelessWidget {
                             preloadPagesCount: document.tabs.length,
                             itemBuilder: (BuildContext context, int position) {
                               debugPrint("Build tab $position");
+                              //                       AnimatedSwitcher(
+                              // duration: const Duration(milliseconds: 500),
                               return Form(
                                 key: document.tabs[position].formKey,
                                 child: Container(
@@ -367,7 +401,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
                             },
                             controller: preloadPageController,
                             onPageChanged: (int position) {
-                              debugPrint('page changed. current: $position');
+                              debugPrint('page changed to: $position');
                             },
                           ),
                         ),
@@ -553,7 +587,7 @@ class _CardList<T> extends ConsumerWidget {
             NavigationStateNotifier navigationState = ref.read(navigationStateProvider.notifier);
             navigationState.selectionState = SelectionState<T>(data: document.data(), queryParams: {"id": document.id}, docId: document.id);
             documentPath = documentPath.split("?")[0];
-            // GoRouter.of(context).go('$documentPath?id=${document.id}', extra: selectionState); //Disables until we figure out how to prevent a full rebuild when changing the query-string
+            // GoRouter.of(context).go('$documentPath?id=${document.id}', extra: navigationState.selectionState); //Disables until we figure out how to prevent a full rebuild when changing the query-string
           },
           child: Consumer(builder: (context, ref, child) {
             String docId = ref.watch(navigationStateProvider).selectionState.docId ?? '';
