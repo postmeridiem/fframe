@@ -1,4 +1,5 @@
 import 'package:fframe/controllers/navigation_state_controller.dart';
+import 'package:fframe/controllers/selection_state_controller.dart';
 import 'package:fframe/fframe.dart';
 import 'package:fframe/providers/global_providers.dart';
 import 'package:fframe/screens/screens.dart';
@@ -14,7 +15,7 @@ class MainScreen extends StatelessWidget {
   final String appTitle;
   final String? issuePageLink;
   final Widget child;
-  final GoRouterState state;
+  // final NavigationState navigationState;
   final List<NavigationTarget> navigationTargets;
   final ThemeData darkMode;
   final ThemeData lightMode;
@@ -22,7 +23,7 @@ class MainScreen extends StatelessWidget {
     Key? key,
     required this.appTitle,
     required this.child,
-    required this.state,
+    // required this.navigationState,
     required this.navigationTargets,
     required this.darkMode,
     required this.lightMode,
@@ -35,7 +36,9 @@ class MainScreen extends StatelessWidget {
       if (navigationTargets.length == 1) return ActiveTarget(currentTarget: navigationTargets.first);
 
       //Get the first applicable target
-      List<String> subloc = state.subloc.split('/');
+      // navigationState.
+      // List<String> subloc = state.subloc.split('/');
+      List<String> subloc = ["suggestions"];
       subloc.removeWhere((String element) => element == ''); //Clean out any empty strings
       List<NavigationTarget> _navigationTargets = List<NavigationTarget>.from(navigationTargets);
 
@@ -67,7 +70,7 @@ class MainScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Build mainScreen ${state.location} ${state.queryParams.toString()}");
+    // debugPrint("Build mainScreen ${state.location} ${state.queryParams.toString()}");
 
     if (navigationTargets.isEmpty) {
       return const EmptyScreen();
@@ -90,7 +93,7 @@ class MainScreen extends StatelessWidget {
           centerTitle: true,
           title: Consumer(
             builder: (context, ref, _) {
-              String subTitle = ref.watch(navigationStateProvider).currentTarget?.title != null ? ":: ${ref.watch(navigationStateProvider).currentTarget!.title}" : "";
+              String subTitle = ref.watch(navigationStateProvider).state.currentTarget?.title != null ? ":: ${ref.watch(navigationStateProvider).state.currentTarget!.title}" : "";
               return (subTitle.isEmpty) ? Text(pageTitle) : Text("$pageTitle - $subTitle");
             },
           ),
@@ -105,7 +108,7 @@ class MainScreen extends StatelessWidget {
           key: key,
           activeTarget: _activeTarget.currentTarget,
           navigationTargets: navigationTargets,
-          state: state,
+          // state: state,
           child: child,
         ),
       ),
@@ -116,13 +119,13 @@ class MainScreen extends StatelessWidget {
 class MainBody extends ConsumerWidget {
   const MainBody({
     required this.activeTarget,
-    required this.state,
+    // required this.state,
     required this.navigationTargets,
     Key? key,
     this.child,
   }) : super(key: key);
   final Widget? child;
-  final GoRouterState state;
+  // final GoRouterState state;
   final List<NavigationTarget> navigationTargets;
   final NavigationTarget? activeTarget;
 
@@ -200,8 +203,8 @@ class BarButtonShare extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    NavigationStateNotifier navigationState = ref.watch(navigationStateProvider);
-    Map<String, String>? queryParams = navigationState.selectionState.queryParams;
+    SelectionState selectionState = ref.watch(selectionStateProvider).state;
+    Map<String, String>? queryParams = selectionState.queryParams;
     String? queryString;
     if (queryParams != null) {
       queryString = "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
@@ -224,8 +227,8 @@ class BarButtonDuplicate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    NavigationStateNotifier navigationState = ref.watch(navigationStateProvider);
-    Map<String, String>? queryParams = navigationState.selectionState.queryParams;
+    SelectionState selectionState = ref.watch(selectionStateProvider).state;
+    Map<String, String>? queryParams = selectionState.queryParams;
     String? queryString;
     if (queryParams != null) {
       queryString = "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";

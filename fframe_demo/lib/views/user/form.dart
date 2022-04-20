@@ -2,6 +2,7 @@ import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe_demo/models/user.dart';
 
+
 // //Shows the selected customer in the right hand pane
 class UserForm extends StatelessWidget {
   const UserForm({required this.user, Key? key}) : super(key: key);

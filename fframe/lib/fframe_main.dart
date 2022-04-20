@@ -251,7 +251,7 @@ class _AppState extends State<App> with RestorationMixin {
       redirect: (goRouterState) {
         if (!isSignedIn && goRouterState.subloc != '/' && goRouterState.subloc != _initialLocation) {
           debugPrint("<a> Redirect to $_initialLocation with deeplink to ${goRouterState.subloc}");
-          ref.read(navigationStateProvider).redirectState = goRouterState.subloc;
+          ref.read(navigationStateProvider).state.redirectState = goRouterState.subloc;
         }
 
         if (isSignedIn && goRouterState.queryParams.containsKey('redirectTo')) {
@@ -270,15 +270,19 @@ class _AppState extends State<App> with RestorationMixin {
         if (goRouterState.queryParams.isNotEmpty) {
           debugPrint("Process redirect");
           SelectionState selectionState = SelectionState(data: null, queryParams: goRouterState.queryParams, docId: null);
-          ref.read(navigationStateProvider.notifier).selectionState = selectionState;
+          ref.read(selectionStateProvider.notifier).state = selectionState;
           return null;
         }
+
+        // NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
+
         debugPrint("No redirection, return Null");
         return null;
       },
       // errorBuilder: (context, state) => ErrorScreen(error: state.error!, initiallLocation: _initialLocation),
       navigatorBuilder: (context, state, child) {
         try {
+          debugPrint("-=-=-=-=-=-=-navigatorBuilder rebuild=-=-=-=-=-=-=-=-=-");
           List<NavigationTarget> navigationTargets = _navigationTargets(userState);
 
           // if (navigationTargets.isNotEmpty) {
@@ -286,7 +290,6 @@ class _AppState extends State<App> with RestorationMixin {
             key: state.pageKey,
             appTitle: widget.title,
             child: child,
-            state: state,
             issuePageLink: widget.issuePageLink,
             navigationTargets: navigationTargets,
             lightMode: widget.lightMode,

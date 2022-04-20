@@ -1,30 +1,14 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
-class SelectionState<T> {
-  // final QueryDocumentSnapshot<T>? queryDocumentSnapshot;
-  final Map<String, String>? queryParams;
-  final T? data;
-  final String? docId;
-  final GlobalKey globalKey;
-  SelectionState({
-    required this.docId,
-    this.data,
-    this.queryParams,
-  }) : globalKey = GlobalKey();
-}
-
-class NavigationStateNotifier with ChangeNotifier {
+class NavigationState {
   late String? _redirectState;
   late List<NavigationTarget> _navigationTargets = [];
   late List<String> _roles = [];
-  late SelectionState _selectionState = SelectionState(docId: null);
 
   int _currentIndex = 0;
   NavigationTarget? _currentTarget;
-  Map<String, String>? _queryParams;
-  ValueKey<String>? _pageKey;
+  ValueKey<String>? pageKey;
 
   //Setters and getters to preserve toe initial state (before signing amd apply it after initial load)
   set redirectState(String? redirectState) {
@@ -86,30 +70,31 @@ class NavigationStateNotifier with ChangeNotifier {
     return navigationTargets;
   }
 
-  Map<String, String>? get queryParams => _queryParams;
-  updateQueryParams(Map<String, String>? queryParams) async {
-    _queryParams = queryParams;
+  NavigationTarget? get currentTarget => _currentTarget;
+}
+
+class NavigationStateNotifier with ChangeNotifier {
+  late NavigationState _navigationState = NavigationState();
+  // ValueKey<String>? pageKey;
+
+  // // ignore: unnecessary_getters_setters
+  ValueKey<String>? get pageKey => _navigationState.pageKey;
+  set pageKey(ValueKey<String>? pageKey) {
+    _navigationState.pageKey = pageKey;
     notifyListeners();
   }
 
   // ignore: unnecessary_getters_setters
-  ValueKey<String>? get pageKey => _pageKey;
-  set pageKey(ValueKey<String>? pageKey) {
-    _pageKey = pageKey;
-  }
-
-  int get currentIndex => _currentIndex;
+  int get currentIndex => _navigationState._currentIndex;
   set currentIndex(int index) {
-    _currentIndex = index;
-    _selectionState = SelectionState(docId: null);
+    _navigationState._currentIndex = index;
+    notifyListeners();
   }
 
-  NavigationTarget? get currentTarget => _currentTarget;
-
-  SelectionState get selectionState => _selectionState;
-  set selectionState(SelectionState selectionState) {
-    debugPrint("NavigationStateNotifier: new selectionState: ${selectionState.queryParams}");
-    _selectionState = selectionState;
+  NavigationState get state => _navigationState;
+  set state(NavigationState navigationState) {
+    debugPrint("NavigationStateNotifier: new navigationState: ${navigationState.pageKey}");
+    _navigationState = navigationState;
     notifyListeners();
   }
 }

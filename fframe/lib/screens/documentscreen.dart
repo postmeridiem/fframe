@@ -50,14 +50,14 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
   }
 
   Future<void> lazyLoad(SelectionState selectionState) async {
-    NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
+    SelectionState selectionState = ref.read(selectionStateProvider).state;
     DocumentSnapshot<T>? documentSnapshot = await DatabaseService<T>().documentSnapshot(collection: widget.collection, documentId: selectionState.queryParams!["id"]!, fromFirestore: widget.fromFirestore, toFirestore: widget.toFirestore);
 
     if (documentSnapshot != null) {
-      navigationState.selectionState = SelectionState(
+      selectionState = SelectionState(
         docId: selectionState.queryParams!["id"],
         data: documentSnapshot.data(),
-        queryParams: navigationState.selectionState.queryParams,
+        queryParams: selectionState.queryParams,
       );
     } else {
       debugPrint("Unable to lazy load document ${selectionState.docId} from ${widget.collection}");
@@ -73,8 +73,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
   @override
   Widget build(BuildContext context) {
     debugPrint("Rebuild DocumentScreen");
-    NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
-    SelectionState selectionState = navigationState.selectionState;
+    SelectionState selectionState = ref.read(selectionStateProvider).state;
 
     // ignore: unused_element
     _callEditToggle() {}
@@ -83,7 +82,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
     _callDelete() {}
 
     _callClose() {
-      navigationState.selectionState = SelectionState(
+      ref.read(selectionStateProvider).state = SelectionState(
         docId: null,
         data: null,
         queryParams: null,
@@ -94,7 +93,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
     _callCopy() {}
 
     _callCreateNew() {
-      navigationState.selectionState = SelectionState(
+      ref.read(selectionStateProvider).state = SelectionState(
         docId: null,
         data: widget.createNew(),
         queryParams: null,
@@ -103,7 +102,6 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
 
     Future<bool> _callSave() async {
       try {
-        SelectionState selectionState = navigationState.selectionState;
         String? documentId = selectionState.docId;
         debugPrint("Save item $documentId in collection ${widget.collection}");
         if (widget.createDocumentId != null && selectionState.docId == null) {
@@ -135,7 +133,6 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
 
     _callValidate() async {
       debugPrint("callValidate");
-      SelectionState selectionState = navigationState.selectionState;
       _DocumentCanvas<T>? _documentCanvas = selectionState.globalKey.currentWidget as _DocumentCanvas<T>?;
       if (_documentCanvas != null) {
         if (_documentCanvas.validateDocument() == true) {
@@ -258,7 +255,7 @@ class _DocumentBody<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SelectionState selectionState = ref.watch(navigationStateProvider).selectionState;
+    SelectionState selectionState = ref.watch(selectionStateProvider).state;
     debugPrint("Rebuild documentBody");
 
     return Scaffold(
@@ -286,7 +283,6 @@ class _DocumentCanvas<T> extends StatelessWidget {
     // required this.callValidate,
   }) : super(key: key);
 
-  final GlobalKey<ScaffoldState> _key = GlobalKey();
   final SelectionState selectionState;
   final TitleBuilder<T>? titleBuilder;
   final Document document;
@@ -295,7 +291,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
 
   bool validateDocument() {
     List<bool> validationResults = document.tabs.map((documentTab) {
-      bool isValid = documentTab.formKey.currentState!.validate();
+      bool isValid = documentTab._formState.currentState!.validate();
       return isValid;
     }).toList();
 
@@ -346,7 +342,6 @@ class _DocumentCanvas<T> extends StatelessWidget {
                     child: DefaultTabController(
                       length: document.tabs.length,
                       child: Scaffold(
-                        key: _key,
                         endDrawer: (document.contextCards != null && document.contextCards!.isNotEmpty)
                             ? ContextCanvas(
                                 contextWidgets: document.contextCards!
@@ -392,7 +387,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
                               //                       AnimatedSwitcher(
                               // duration: const Duration(milliseconds: 500),
                               return Form(
-                                key: document.tabs[position].formKey,
+                                key: document.tabs[position]._formState,
                                 child: Container(
                                   key: ObjectKey(selectionState.data),
                                   child: document.tabs[position].childBuilder(selectionState.data),
@@ -420,7 +415,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
                                   .toList(),
                             ),
                           )
-                        : DrawerButton(scaffoldKey: _key),
+                        : DrawerButton(scaffoldKey: GlobalKey<ScaffoldState>()),
                 ],
               );
             },
@@ -584,13 +579,13 @@ class _CardList<T> extends ConsumerWidget {
           onTap: () {
             String documentPath = GoRouter.of(context).location;
             debugPrint("Update document to ${document.reference.path}");
-            NavigationStateNotifier navigationState = ref.read(navigationStateProvider.notifier);
-            navigationState.selectionState = SelectionState<T>(data: document.data(), queryParams: {"id": document.id}, docId: document.id);
+            // SelectionState selectionState = ref.read(selectionStateProvider.notifier).state;
+            ref.read(selectionStateProvider.notifier).state = SelectionState<T>(data: document.data(), queryParams: {"id": document.id}, docId: document.id);
             documentPath = documentPath.split("?")[0];
-            // GoRouter.of(context).go('$documentPath?id=${document.id}', extra: navigationState.selectionState); //Disables until we figure out how to prevent a full rebuild when changing the query-string
+            // GoRouter.of(context).go('$documentPath?id=${document.id}', extra: ref.read(selectionStateProvider.notifier).state); //Disables until we figure out how to prevent a full rebuild when changing the query-string
           },
           child: Consumer(builder: (context, ref, child) {
-            String docId = ref.watch(navigationStateProvider).selectionState.docId ?? '';
+            String docId = ref.watch(selectionStateProvider).state.docId ?? '';
             try {
               return documentListItemBuilder(context, docId == document.id, document.data());
             } catch (e) {
@@ -649,7 +644,7 @@ class DocumentTab<T> {
   ///
   final DocumentTabBuilder<T> tabBuilder;
   final DocumentTabChildBuilder childBuilder;
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formState = GlobalKey<FormState>();
 
   DocumentTab({
     required this.tabBuilder,

@@ -1,4 +1,4 @@
-import 'package:fframe/controllers/navigation_state_controller.dart';
+import 'package:fframe/controllers/selection_state_controller.dart';
 import 'package:fframe/providers/global_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -21,8 +21,7 @@ class CurvedBottomBar extends ConsumerStatefulWidget {
 class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
   @override
   Widget build(BuildContext context) {
-    SelectionState selectionState = ref.watch(navigationStateProvider).selectionState;
-    // SelectionState selectionState = navigationState.selectionState;
+    SelectionState selectionState = ref.watch(selectionStateProvider).state;
 
     final Size size = MediaQuery.of(context).size;
 

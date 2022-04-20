@@ -1,4 +1,3 @@
-
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {default as config} from "./config";
@@ -23,7 +22,7 @@ exports.processSignUp = functions.region("europe-west1").auth.user().onCreate(as
   ) {
     try {
       // Check if we already have users
-      const customClaims = (await auth.listUsers(2)).users.length==1?config.initialUserRoles :config.defaultUserRoles;
+      const customClaims = (await auth.listUsers(2)).users.length == 1 ? config.initialUserRoles : config.defaultUserRoles;
 
       // Set custom user claims on this newly created user.
       await auth.setCustomUserClaims(user.uid, customClaims);
@@ -41,24 +40,181 @@ exports.processSignUp = functions.region("europe-west1").auth.user().onCreate(as
 });
 
 
-// exports.callLambda = functions.region("europe-west1").https.onCall(async (payLoad: JSON, context: functions.https.CallableContext) => {
-//   // Authentication / user information is automatically added to the request.
-//   if (!context.auth) {
-//     throw new functions.https.HttpsError(
-//       "failed-precondition",
-//       "Authentication failed",
-//     );
-//   }
+exports.getUserRoles = functions.region("europe-west1").https.onCall(async (payLoad, context: functions.https.CallableContext) => {
+  // Authentication / user information is automatically added to the request.
+  console.log(context.auth);
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Authentication failed",
+    );
+  }
+  try {
+    const uid = payLoad["uid"] || context.auth.uid;
 
-//     getAuth(context.auth.uid)
+
+    console.log("Request accepted");
+    const customClaims = (await auth.getUser(uid)).customClaims;
+    if (customClaims && customClaims["roles"]) {
+      return customClaims["roles"];
+    }
+
+    return [];
+  } catch (e) {
+    throw new functions.https.HttpsError("invalid-argument", `${e}`);
+  }
+});
 
 
-//   // return admin.auth().setCustomUserClaims(
-//   //   context.params.docId,
-//   //   claims
-//   // );
+exports.addUserRole = functions.region("europe-west1").https.onCall(async (payLoad, context: functions.https.CallableContext) => {
+  // Authentication / user information is automatically added to the request.
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Authentication failed",
+    );
+  }
+  try {
+    console.log("Check caller roles");
 
-// });
+    // Get the payload
+    const uid = payLoad["uid"];
+    const role = payLoad["role"];
+
+    const callerClaims = (await auth.getUser(context.auth.uid)).customClaims;
+    if (callerClaims && callerClaims["roles"]) {
+      const callerRoles: string[] = callerClaims["roles"].map((role: string) => role.toLowerCase());
+      if (!(callerRoles.includes("superadmin") || callerRoles.includes("useradmin"))) {
+        throw new functions.https.HttpsError(
+          "permission-denied",
+          `Calling user has insufficient role assignments: ${callerRoles.join(", ")}`,
+        );
+      }
+    } else {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Calling user has insufficient role assignments",
+      );
+    }
+
+    if (uid == context.auth.uid) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "User cannot change their own roles.",
+      );
+    }
+    console.log("Request accepted", payLoad);
+    // Process the request
+
+    if (!uid || !role) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        `uid and role are mandatory. received: uid= ${uid} role=${role}`,
+      );
+    }
+
+    // Get the current roles and add the new role to the current listed roles
+    let customClaims = (await auth.getUser(uid)).customClaims;
+    if (customClaims) {
+      if (customClaims["roles"]) {
+        customClaims["roles"].push(role);
+      }
+    } else {
+      customClaims = {roles: [role]};
+    }
+
+    // Update the user auth in Firestore auth
+    customClaims["roles"] = customClaims["roles"].filter((value: string, index: number, self: string[]) => {
+      return self.indexOf(value) === index;
+    });
+    await auth.setCustomUserClaims(uid, customClaims);
+
+    db.doc(`users/${uid}`).set({customClaims: customClaims}, {merge: true});
+
+    // Echo the current settings
+    return customClaims["roles"];
+  } catch (e) {
+    throw new functions.https.HttpsError("invalid-argument", `${e}`);
+  }
+});
+
+
+exports.removeUserRole = functions.region("europe-west1").https.onCall(async (payLoad, context: functions.https.CallableContext) => {
+  // Authentication / user information is automatically added to the request.
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Authentication failed",
+    );
+  }
+  try {
+    console.log("Check caller roles");
+
+    // Get the payload
+    const uid = payLoad["uid"];
+    const role = payLoad["role"];
+
+    const callerClaims = (await auth.getUser(context.auth.uid)).customClaims;
+    if (callerClaims && callerClaims["roles"]) {
+      const callerRoles: string[] = callerClaims["roles"].map((role: string) => role.toLowerCase());
+      if (!(callerRoles.includes("superadmin") || callerRoles.includes("useradmin"))) {
+        throw new functions.https.HttpsError(
+          "permission-denied",
+          `Calling user has insufficient role assignments: ${callerRoles.join(", ")}`,
+        );
+      }
+    } else {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Calling user has insufficient role assignments",
+      );
+    }
+
+    if (uid == context.auth.uid) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "User cannot change their own roles.",
+      );
+    }
+    console.log("Request accepted", payLoad);
+    // Process the request
+
+    if (!uid || !role) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        `uid and role are mandatory. received: uid= ${uid} role=${role}`,
+      );
+    }
+
+
+    // Get the current roles and add the new role to the current listed roles
+    let customClaims = (await auth.getUser(uid)).customClaims;
+    if (customClaims) {
+      if (customClaims["roles"]) {
+        customClaims["roles"];
+        const index = customClaims["roles"].indexOf(role, 0);
+        if (index > -1) {
+          customClaims["roles"].splice(index, 1);
+        }
+      }
+    } else {
+      customClaims = {roles: []};
+    }
+
+    // Update the user auth in Firestore auth
+    customClaims["roles"] = customClaims["roles"].filter((value: string, index: number, self: string[]) => {
+      return self.indexOf(value) === index;
+    });
+    await auth.setCustomUserClaims(uid, customClaims);
+
+    db.doc(`users/${uid}`).set({customClaims: customClaims}, {merge: true});
+
+    // Echo the current settings
+    return customClaims["roles"];
+  } catch (e) {
+    throw new functions.https.HttpsError("invalid-argument", `${e}`);
+  }
+});
 
 // /**
 //  * Adds two numbers together.

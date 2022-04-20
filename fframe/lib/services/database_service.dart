@@ -1,10 +1,23 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
+
+Map<Function, dynamic> firestore = {
+// getCustomer(): async (documentId: string) =>
+//         await getSingle<customerDataModel>(firestore()
+//             .collection(`${collectionIds.customersCollectionId}`)
+//             .doc(documentId)
+//             .withConverter(customerConverter))
+};
 
 class DatabaseService<T> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Query<SampleModel> getSuggestion() {
+  //   return query<SampleModel>(collection: "", SampleModel.fromFirestore, ))
+  // }
 
   Query<T> query({
     required String collection,
@@ -12,7 +25,7 @@ class DatabaseService<T> {
     Query<T> Function(Query query)? queryBuilder,
     int? limit,
   }) {
-    Query<T> query = FirebaseFirestore.instance.collection(collection).withConverter<T>(
+    Query<T> query = FirebaseFirestore.instance.collection(collection).withConverter(
           fromFirestore: fromFirestore,
           toFirestore: (T, _) => {},
         );
