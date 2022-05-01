@@ -13,6 +13,7 @@ match /databases/{database}/documents {
     function isDomainUser() {
         return request["auth"]["token"]["email"].matches(".*@zwaag.net")||
         request["auth"]["token"]["email"].matches(".*@postmeridiem.net")||
+        request["auth"]["token"]["email"].matches("dehlak@gmail.com")||
         request["auth"]["token"]["email"].matches(".*@imagin.studio")||
         request["auth"]["token"]["email"].matches(".*@churned.nl")
 		}
