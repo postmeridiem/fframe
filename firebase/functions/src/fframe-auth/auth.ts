@@ -1,18 +1,18 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import {default as config} from "./config";
+import { default as config } from "./config";
 
 if (!admin.apps.length) {
   admin.initializeApp();
 }
-admin.firestore().settings({ignoreUndefinedProperties: true});
+admin.firestore().settings({ ignoreUndefinedProperties: true });
 const db = admin.firestore();
 const auth = admin.auth();
 
 
 
 // On sign up.
-
+// TODO: get the function region into a config file
 exports.processSignUp = functions.region("europe-west1").auth.user().onCreate(async (user) => {
   // Check if user meets role criteria.
   if (
@@ -82,9 +82,14 @@ exports.addUserRole = functions.region("europe-west1").https.onCall(async (payLo
     const role = payLoad["role"];
 
     const callerClaims = (await auth.getUser(context.auth.uid)).customClaims;
+    var callerRoles: string[];
     if (callerClaims && callerClaims["roles"]) {
-      const callerRoles: string[] = callerClaims["roles"].map((role: string) => role.toLowerCase());
-      if (!(callerRoles.includes("superadmin") || callerRoles.includes("useradmin"))) {
+      callerRoles = callerClaims["roles"].map((role: string) => role.toLowerCase());
+      if (!(
+        callerRoles.includes("superadmin") ||
+        callerRoles.includes("useradmin") ||
+        callerRoles.includes("rolemanager"
+        ))) {
         throw new functions.https.HttpsError(
           "permission-denied",
           `Calling user has insufficient role assignments: ${callerRoles.join(", ")}`,
@@ -97,7 +102,7 @@ exports.addUserRole = functions.region("europe-west1").https.onCall(async (payLo
       );
     }
 
-    if (uid == context.auth.uid) {
+    if (uid == context.auth.uid && !(callerRoles.includes("superadmin"))) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "User cannot change their own roles.",
@@ -120,7 +125,7 @@ exports.addUserRole = functions.region("europe-west1").https.onCall(async (payLo
         customClaims["roles"].push(role);
       }
     } else {
-      customClaims = {roles: [role]};
+      customClaims = { roles: [role] };
     }
 
     // Update the user auth in Firestore auth
@@ -129,7 +134,7 @@ exports.addUserRole = functions.region("europe-west1").https.onCall(async (payLo
     });
     await auth.setCustomUserClaims(uid, customClaims);
 
-    db.doc(`users/${uid}`).set({customClaims: customClaims}, {merge: true});
+    db.doc(`users/${uid}`).set({ customClaims: customClaims }, { merge: true });
 
     // Echo the current settings
     return customClaims["roles"];
@@ -155,9 +160,14 @@ exports.removeUserRole = functions.region("europe-west1").https.onCall(async (pa
     const role = payLoad["role"];
 
     const callerClaims = (await auth.getUser(context.auth.uid)).customClaims;
+    var callerRoles: string[];
     if (callerClaims && callerClaims["roles"]) {
-      const callerRoles: string[] = callerClaims["roles"].map((role: string) => role.toLowerCase());
-      if (!(callerRoles.includes("superadmin") || callerRoles.includes("useradmin"))) {
+      callerRoles = callerClaims["roles"].map((role: string) => role.toLowerCase());
+      if (!(
+        callerRoles.includes("superadmin") ||
+        callerRoles.includes("useradmin") ||
+        callerRoles.includes("rolemanager"
+        ))) {
         throw new functions.https.HttpsError(
           "permission-denied",
           `Calling user has insufficient role assignments: ${callerRoles.join(", ")}`,
@@ -170,7 +180,7 @@ exports.removeUserRole = functions.region("europe-west1").https.onCall(async (pa
       );
     }
 
-    if (uid == context.auth.uid) {
+    if (uid == context.auth.uid && !(callerRoles.includes("superadmin"))) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "User cannot change their own roles.",
@@ -198,7 +208,7 @@ exports.removeUserRole = functions.region("europe-west1").https.onCall(async (pa
         }
       }
     } else {
-      customClaims = {roles: []};
+      customClaims = { roles: [] };
     }
 
     // Update the user auth in Firestore auth
@@ -207,7 +217,7 @@ exports.removeUserRole = functions.region("europe-west1").https.onCall(async (pa
     });
     await auth.setCustomUserClaims(uid, customClaims);
 
-    db.doc(`users/${uid}`).set({customClaims: customClaims}, {merge: true});
+    db.doc(`users/${uid}`).set({ customClaims: customClaims }, { merge: true });
 
     // Echo the current settings
     return customClaims["roles"];
