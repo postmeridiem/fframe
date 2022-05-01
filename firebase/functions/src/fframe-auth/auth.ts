@@ -82,7 +82,7 @@ exports.addUserRole = functions.region("europe-west1").https.onCall(async (payLo
     const role = payLoad["role"];
 
     const callerClaims = (await auth.getUser(context.auth.uid)).customClaims;
-    var callerRoles: string[];
+    let callerRoles: string[];
     if (callerClaims && callerClaims["roles"]) {
       callerRoles = callerClaims["roles"].map((role: string) => role.toLowerCase());
       if (!(
@@ -160,7 +160,7 @@ exports.removeUserRole = functions.region("europe-west1").https.onCall(async (pa
     const role = payLoad["role"];
 
     const callerClaims = (await auth.getUser(context.auth.uid)).customClaims;
-    var callerRoles: string[];
+    let callerRoles: string[];
     if (callerClaims && callerClaims["roles"]) {
       callerRoles = callerClaims["roles"].map((role: string) => role.toLowerCase());
       if (!(
