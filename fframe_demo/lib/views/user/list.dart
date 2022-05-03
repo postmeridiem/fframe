@@ -12,7 +12,10 @@ class UserListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<String>? avatarText = user.displayName?.split(' ').map((part) => part.trim().substring(0, 1)).toList();
+    List<String>? avatarText = user.displayName
+        ?.split(' ')
+        .map((part) => part.trim().substring(0, 1))
+        .toList();
     return ListTile(
       selected: selected,
       leading: (avatarText != null || user.photoURL != null)
@@ -24,10 +27,14 @@ class UserListItem extends StatelessWidget {
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     )
                   : null,
-              backgroundImage: (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
-              backgroundColor: (user.photoURL == null) ? Colors.amber : Colors.transparent,
+              backgroundImage:
+                  (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
+              backgroundColor:
+                  (user.photoURL == null) ? Colors.amber : Colors.transparent,
             )
           : null,
+      selectedColor: Theme.of(context).colorScheme.onTertiary,
+      selectedTileColor: Theme.of(context).colorScheme.tertiary,
       title: Text(user.displayName ?? "?"),
     );
   }
