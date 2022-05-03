@@ -70,7 +70,7 @@ class LightModeThemeConfig {
   // color that sets 'tertiary' level control widgets
   // (the background of fields and the text that goes in there)
   Color constTertiaryColor = const Color(0xFFFFFFFF);
-  Color constOnTertiaryColor = const Color(0xB247138B);
+  Color constOnTertiaryColor = const Color(0xFF610525);
 
   // color for unselected elements
   Color constUnselectedColor = const Color(0xB2474747);
