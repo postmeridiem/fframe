@@ -258,7 +258,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
                           TextField(
                             autofocus: true,
                             onChanged: (String query) {
-                              if (query?.substring((query.length - 1)
+                              if (query.substring((query.length - 1)
                                       .clamp(0, query.length)) ==
                                   ":") {
                                 ScaffoldMessenger.of(context).showSnackBar(
