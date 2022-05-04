@@ -1,5 +1,5 @@
+import 'package:fframe/helpers/l10n.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fframe/providers/global_providers.dart';
@@ -22,6 +22,7 @@ class MainScreen extends StatelessWidget {
   final List<NavigationTarget> navigationTargets;
   final ThemeData darkMode;
   final ThemeData lightMode;
+  final L10nConfig l10nConfig;
   const MainScreen({
     Key? key,
     required this.appTitle,
@@ -30,15 +31,16 @@ class MainScreen extends StatelessWidget {
     required this.navigationTargets,
     required this.darkMode,
     required this.lightMode,
+    required this.l10nConfig,
     this.issuePageLink,
   }) : super(key: key);
 
   ActiveTarget getActiveTarget() {
     try {
       //This is the only applicable target
-      if (navigationTargets.length == 1)
+      if (navigationTargets.length == 1) {
         return ActiveTarget(currentTarget: navigationTargets.first);
-
+      }
       //Get the first applicable target
       // navigationState.
       // List<String> subloc = state.subloc.split('/');
@@ -98,15 +100,11 @@ class MainScreen extends StatelessWidget {
       theme: lightMode,
       darkTheme: darkMode,
       themeMode: ThemeMode.system,
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('en', ''), // English, no country code
-        Locale('nl', ''), // Spanish, no country code
-      ],
+      localizationsDelegates:
+          l10nConfig.enabled ? l10nConfig.localizationsDelegates : null,
+      supportedLocales: l10nConfig.enabled
+          ? l10nConfig.supportedLocales
+          : [const Locale('en', '')],
       home: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(

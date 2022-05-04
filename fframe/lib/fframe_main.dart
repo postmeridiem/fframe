@@ -9,6 +9,7 @@ class Fframe extends StatefulWidget {
     required this.unAuthenticatedNavigationTargets,
     required this.darkMode,
     required this.lightMode,
+    required this.l10nConfig,
     this.issuePageLink,
   }) : super(key: key);
   final String title;
@@ -18,6 +19,7 @@ class Fframe extends StatefulWidget {
   final List<NavigationTarget> unAuthenticatedNavigationTargets;
   final ThemeData darkMode;
   final ThemeData lightMode;
+  final L10nConfig l10nConfig;
 
   @override
   State<Fframe> createState() => _FframeState();
@@ -52,17 +54,21 @@ class _FframeState extends State<Fframe> {
                   builder: (context, ref, child) {
                     UserState userState = ref.watch(userStateNotifierProvider);
 
-                    if (userState.runtimeType != UserStateSignedIn && userState.runtimeType != UserStateSignedOut) {
+                    if (userState.runtimeType != UserStateSignedIn &&
+                        userState.runtimeType != UserStateSignedOut) {
                       return const UnknownStateLoader();
                     }
 
                     return App(
                       title: widget.title,
                       issuePageLink: widget.issuePageLink,
-                      authenticatedNavigationTargets: widget.authenticatedNavigationTargets,
-                      unAuthenticatedNavigationTargets: widget.unAuthenticatedNavigationTargets,
+                      authenticatedNavigationTargets:
+                          widget.authenticatedNavigationTargets,
+                      unAuthenticatedNavigationTargets:
+                          widget.unAuthenticatedNavigationTargets,
                       lightMode: widget.lightMode,
                       darkMode: widget.darkMode,
+                      l10nConfig: widget.l10nConfig,
                     );
                   },
                 ),
@@ -82,6 +88,7 @@ class App extends StatefulWidget {
     required this.unAuthenticatedNavigationTargets,
     required this.darkMode,
     required this.lightMode,
+    required this.l10nConfig,
     this.issuePageLink,
   }) : super(key: key);
 
@@ -91,6 +98,12 @@ class App extends StatefulWidget {
   final List<NavigationTarget> unAuthenticatedNavigationTargets;
   final ThemeData darkMode;
   final ThemeData lightMode;
+  final L10nConfig l10nConfig;
+
+  // create the key to access global (ya, probably doing this wrong, but it's working great!)
+  static GlobalKey<NavigatorState> global = GlobalKey<NavigatorState>();
+  static BuildContext context = global.currentContext as BuildContext;
+
   @override
   State<App> createState() => _AppState();
 }
@@ -108,13 +121,16 @@ class _AppState extends State<App> with RestorationMixin {
   List<NavigationTarget> _navigationTargets(UserState userState) {
     //Get the current auth state
     bool isSignedIn = userState.runtimeType == UserStateSignedIn;
-    List<NavigationTarget> _navigationTargets = isSignedIn ? List<NavigationTarget>.from(widget.authenticatedNavigationTargets) : List<NavigationTarget>.from(widget.unAuthenticatedNavigationTargets);
+    List<NavigationTarget> _navigationTargets = isSignedIn
+        ? List<NavigationTarget>.from(widget.authenticatedNavigationTargets)
+        : List<NavigationTarget>.from(widget.unAuthenticatedNavigationTargets);
     NavigationTarget _initialNavigationTarget;
     //Return if unauthed
 
     if (!isSignedIn) {
       try {
-        _initialNavigationTarget = _navigationTargets.singleWhere((navigationTarget) => navigationTarget.signInPage == true);
+        _initialNavigationTarget = _navigationTargets.singleWhere(
+            (navigationTarget) => navigationTarget.signInPage == true);
         _initialLocation = "/${_initialNavigationTarget.path}";
         return _navigationTargets;
       } catch (_) {
@@ -126,7 +142,8 @@ class _AppState extends State<App> with RestorationMixin {
 
       if (_userState.appUser.roles == null) {
         debugPrint("Remove all paths wich require a role");
-        _navigationTargets.removeWhere((navigationTarget) => navigationTarget.roles != null);
+        _navigationTargets
+            .removeWhere((navigationTarget) => navigationTarget.roles != null);
       } else {
         List<String> userRoles = _userState.appUser.roles!;
         debugPrint("Current user roles: ${userRoles.join(",")}");
@@ -136,12 +153,16 @@ class _AppState extends State<App> with RestorationMixin {
             debugPrint("Allow ${navigationTarget.title}");
             return true;
           }
-          List<String> targetRoles = navigationTarget.roles!.map((targetRole) => targetRole.toLowerCase()).toList();
-          debugPrint("Roles for ${navigationTarget.title}: ${targetRoles.join(",")}");
+          List<String> targetRoles = navigationTarget.roles!
+              .map((targetRole) => targetRole.toLowerCase())
+              .toList();
+          debugPrint(
+              "Roles for ${navigationTarget.title}: ${targetRoles.join(",")}");
           bool allow = !targetRoles.any(
             (targetRole) => userRoles.contains(targetRole),
           );
-          debugPrint("Allowed roles for ${navigationTarget.title}: ${targetRoles.join(",")} => $allow");
+          debugPrint(
+              "Allowed roles for ${navigationTarget.title}: ${targetRoles.join(",")} => $allow");
           return allow;
         });
       }
@@ -153,7 +174,8 @@ class _AppState extends State<App> with RestorationMixin {
       if (_initialNavigationTarget.navigationTabs == null) {
         _initialLocation = "/${_initialNavigationTarget.path}";
       } else {
-        _initialLocation = "/${_initialNavigationTarget.path}/${_initialNavigationTarget.navigationTabs!.first.path}";
+        _initialLocation =
+            "/${_initialNavigationTarget.path}/${_initialNavigationTarget.navigationTabs!.first.path}";
       }
     } else {
       debugPrint("No routes available");
@@ -188,7 +210,9 @@ class _AppState extends State<App> with RestorationMixin {
                   navigationTarget: navigationTarget,
                   goRouterState: state,
                 ),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) =>
+                        FadeTransition(opacity: animation, child: child),
               );
             },
           );
@@ -213,7 +237,9 @@ class _AppState extends State<App> with RestorationMixin {
               navigationTarget: navigationTarget,
               goRouterState: state,
             ),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) =>
+                    FadeTransition(
               opacity: animation,
               child: child,
             ),
@@ -242,34 +268,43 @@ class _AppState extends State<App> with RestorationMixin {
               child: const WaitScreen(
                 color: Colors.blueGrey,
               ),
-              transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) =>
+                      FadeTransition(opacity: animation, child: child),
             );
           },
           routes: _goRouteTargets(_navigationTargets(userState)).toList(),
         ),
       ],
       redirect: (goRouterState) {
-        if (!isSignedIn && goRouterState.subloc != '/' && goRouterState.subloc != _initialLocation) {
-          debugPrint("<a> Redirect to $_initialLocation with deeplink to ${goRouterState.subloc}");
-          ref.read(navigationStateProvider).state.redirectState = goRouterState.subloc;
+        if (!isSignedIn &&
+            goRouterState.subloc != '/' &&
+            goRouterState.subloc != _initialLocation) {
+          debugPrint(
+              "<a> Redirect to $_initialLocation with deeplink to ${goRouterState.subloc}");
+          ref.read(navigationStateProvider).state.redirectState =
+              goRouterState.subloc;
         }
 
         if (isSignedIn && goRouterState.queryParams.containsKey('redirectTo')) {
-          debugPrint("<b> Redirect to queryParam instuction ${goRouterState.queryParams["redirectTo"]}");
+          debugPrint(
+              "<b> Redirect to queryParam instuction ${goRouterState.queryParams["redirectTo"]}");
           return goRouterState.queryParams["redirectTo"];
         }
         // String _deepLink =  ? '?redirectTo=${goRouterState.subloc}' : '';
 
         // debugPrint("RedirectRequest to ${goRouterState.subloc} _initialLocation: $_initialLocation deepLink: $_deepLink");
 
-        if (goRouterState.subloc == "/" && goRouterState.subloc != _initialLocation) {
+        if (goRouterState.subloc == "/" &&
+            goRouterState.subloc != _initialLocation) {
           debugPrint("<c> Redirect to $_initialLocation");
           return _initialLocation;
         }
 
         if (goRouterState.queryParams.isNotEmpty) {
           debugPrint("Process redirect");
-          SelectionState selectionState = SelectionState(data: null, queryParams: goRouterState.queryParams, docId: null);
+          SelectionState selectionState = SelectionState(
+              data: null, queryParams: goRouterState.queryParams, docId: null);
           ref.read(selectionStateProvider.notifier).state = selectionState;
           return null;
         }
@@ -283,7 +318,8 @@ class _AppState extends State<App> with RestorationMixin {
       navigatorBuilder: (context, state, child) {
         try {
           debugPrint("-=-=-=-=-=-=-navigatorBuilder rebuild=-=-=-=-=-=-=-=-=-");
-          List<NavigationTarget> navigationTargets = _navigationTargets(userState);
+          List<NavigationTarget> navigationTargets =
+              _navigationTargets(userState);
 
           // if (navigationTargets.isNotEmpty) {
           return MainScreen(
@@ -294,6 +330,7 @@ class _AppState extends State<App> with RestorationMixin {
             navigationTargets: navigationTargets,
             lightMode: widget.lightMode,
             darkMode: widget.darkMode,
+            l10nConfig: widget.l10nConfig,
           );
           // } else {
           //   return ErrorScreen(error: Exception("Nowhere to route to."));
@@ -328,6 +365,7 @@ class _AppState extends State<App> with RestorationMixin {
               border: OutlineInputBorder(),
             ),
           ),
+          //TODO hook this up to the l10n config?
           locale: const Locale('en'),
           builder: (BuildContext context, Widget? widget) {
             // debugPrint("builder");

@@ -4,6 +4,7 @@ import 'package:fframe/fframe.dart';
 
 import 'package:fframe_demo/firebase_config.dart';
 import 'package:fframe_demo/themes/themes.dart';
+import 'package:fframe_demo/l10n/l10n.dart';
 
 import 'package:fframe_demo/views/signInPage/signin_page.dart';
 import 'package:fframe_demo/views/suggestion/suggestion.dart';
@@ -32,12 +33,13 @@ class MainApp extends StatelessWidget {
     ];
 
     return Fframe(
-      title: "FFrame Demo",
+      title: "FlutFrame Demo",
       firebaseOptions: DefaultFirebaseConfig.platformOptions,
       authenticatedNavigationTargets: authenticatedNavigationTargets,
       unAuthenticatedNavigationTargets: unAuthenticatedNavigationTargets,
       lightMode: appLightTheme,
       darkMode: appDarkTheme,
+      l10nConfig: l10nConfig,
       issuePageLink: "https://github.com/postmeridiem/fframe/issues",
     );
   }

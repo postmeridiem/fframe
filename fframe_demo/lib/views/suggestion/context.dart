@@ -1,5 +1,8 @@
-import 'package:fframe_demo/models/suggestion.dart';
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
+import 'package:fframe_demo/l10n/l10n.dart';
+
+import 'package:fframe_demo/models/suggestion.dart';
 
 class ContextCard extends StatelessWidget {
   const ContextCard({Key? key, required this.suggestion}) : super(key: key);
@@ -7,14 +10,16 @@ class ContextCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String contextHeader = AppLocalizations.of(context)!.contextHeader;
     return Card(
       color: Theme.of(context).colorScheme.primaryContainer,
       child: SizedBox(
         width: double.infinity,
         child: Padding(
-          padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+          padding:
+              const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
           child: Column(children: [
-            Text("Unnamed",
+            Text(contextHeader,
                 style: TextStyle(
                   // fontFamily: mainFontFamily,
                   fontSize: 12,

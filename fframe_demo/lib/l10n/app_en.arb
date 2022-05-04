@@ -1,6 +1,22 @@
 {
-    "appTitle": "FlutFrame Demo",
-    "@appTitle": {
-      "appTitle": "The app name"
-    }
+  "navAppTitle": "FlutFrame Demo",
+  "@navAppTitle": {
+    "navAppTitle": "The app name"
+  },
+  "navSuggestions": "Suggestions",
+  "@navSuggestions": {
+    "navSuggestions": "Suggestions Navigator Label"
+  },
+  "navSettingssNav": "Settings",
+  "@navSettingssNav": {
+    "navSettingssNav": "Settings Navigator Label"
+  },
+  "navUsersNav": "Users",
+  "@navUsersNav": {
+    "navUsersNav": "Users Navigator Label"
+  },
+  "contextHeader": "Context Header",
+  "@contextHeader": {
+    "contextHeader": "a header test in the suggestion context bar"
+  }
 }
