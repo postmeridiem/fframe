@@ -1,5 +1,5 @@
 name: fframe
-description: The FlutterFrame package .
+description: The FlutFrame package.
 version: 0.0.1
 homepage: fframe.app
 
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_localizations:
-    sdk: flutter        
+    sdk: flutter
   intl: ^0.17.0
   firebase_core:
   firebase_auth:
