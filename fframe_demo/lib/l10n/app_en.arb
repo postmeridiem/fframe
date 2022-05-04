@@ -15,7 +15,7 @@
   "@navUsersNav": {
     "navUsersNav": "Users Navigator Label"
   },
-  "contextHeader": "Context Header",
+  "contextHeader": "l10n ENGLISH!!!",
   "@contextHeader": {
     "contextHeader": "a header test in the suggestion context bar"
   }
