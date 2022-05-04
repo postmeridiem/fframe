@@ -100,9 +100,9 @@ class App extends StatefulWidget {
   final ThemeData lightMode;
   final L10nConfig l10nConfig;
 
-  // create the key to access global (ya, probably doing this wrong, but it's working great!)
-  static GlobalKey<NavigatorState> global = GlobalKey<NavigatorState>();
-  static BuildContext context = global.currentContext as BuildContext;
+  // global access to a buildcontext, so I can access the translation from anywhere.
+  static BuildContext context =
+      GlobalKey<NavigatorState>().currentContext as BuildContext;
 
   @override
   State<App> createState() => _AppState();
