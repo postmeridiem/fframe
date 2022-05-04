@@ -42,3 +42,4 @@ doc/api/
 
 # Firebase components
 .firebase
+firebase/.firebaserc

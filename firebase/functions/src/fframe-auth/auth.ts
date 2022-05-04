@@ -10,14 +10,13 @@ const db = admin.firestore();
 const auth = admin.auth();
 
 
-
 // On sign up.
 // TODO: get the function region into a config file
 exports.processSignUp = functions.region("europe-west1").auth.user().onCreate(async (user) => {
   // Check if user meets role criteria.
   if (
     user.email &&
-    config.authorizedDomains.map((authorizedDomain) => user.email?.endsWith(authorizedDomain)).includes(true) &&
+    config.authorizedEmailMasks.map((authorizedEmailMask) => user.email?.endsWith(authorizedEmailMask)).includes(true) &&
     user.emailVerified
   ) {
     try {
