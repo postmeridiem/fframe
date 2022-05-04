@@ -1,7 +1,6 @@
-import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:fframe_demo/l10n/l10n.dart';
 
+import 'package:fframe_demo/l10n/l10n.dart';
 import 'package:fframe_demo/models/suggestion.dart';
 
 class ContextCard extends StatelessWidget {

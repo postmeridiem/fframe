@@ -105,6 +105,7 @@ class MainScreen extends StatelessWidget {
       supportedLocales: l10nConfig.enabled
           ? l10nConfig.supportedLocales
           : [const Locale('en', '')],
+      locale: l10nConfig.locale,
       home: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(

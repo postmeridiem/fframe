@@ -365,8 +365,7 @@ class _AppState extends State<App> with RestorationMixin {
               border: OutlineInputBorder(),
             ),
           ),
-          //TODO hook this up to the l10n config?
-          locale: const Locale('en'),
+          locale: widget.l10nConfig.locale,
           builder: (BuildContext context, Widget? widget) {
             // debugPrint("builder");
             Widget error = const Text('...rendering error...');
