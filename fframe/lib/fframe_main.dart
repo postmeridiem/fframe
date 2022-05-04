@@ -134,7 +134,7 @@ class _AppState extends State<App> with RestorationMixin {
         _initialLocation = "/${_initialNavigationTarget.path}";
         return _navigationTargets;
       } catch (_) {
-        throw ("The unAuthenticated NavigationTargets do not contain a target configured as initial Navigation target!");
+        throw ("The Unauthenticated NavigationTargets do not contain a target configured as initial Navigation target!");
       }
     } else {
       debugPrint("Signed in user, filter on roles");
