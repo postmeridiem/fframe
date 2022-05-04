@@ -1,0 +1,6 @@
+{
+    "appTitle": "FlutFrame Demo",
+    "@appTitle": {
+      "appTitle": "The app name"
+    }
+}

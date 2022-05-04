@@ -1,15 +1,18 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fframe/providers/global_providers.dart';
+import 'package:go_router/go_router.dart';
 import 'package:fframe/controllers/navigation_state_controller.dart';
 import 'package:fframe/controllers/selection_state_controller.dart';
-import 'package:fframe/fframe.dart';
-import 'package:fframe/providers/global_providers.dart';
-import 'package:fframe/screens/screens.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:clipboard/clipboard.dart';
 
+import 'package:clipboard/clipboard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'package:fframe/screens/screens.dart';
+import 'package:fframe/fframe.dart';
 
 class MainScreen extends StatelessWidget {
   final String appTitle;
@@ -33,20 +36,25 @@ class MainScreen extends StatelessWidget {
   ActiveTarget getActiveTarget() {
     try {
       //This is the only applicable target
-      if (navigationTargets.length == 1) return ActiveTarget(currentTarget: navigationTargets.first);
+      if (navigationTargets.length == 1)
+        return ActiveTarget(currentTarget: navigationTargets.first);
 
       //Get the first applicable target
       // navigationState.
       // List<String> subloc = state.subloc.split('/');
       List<String> subloc = ["suggestions"];
-      subloc.removeWhere((String element) => element == ''); //Clean out any empty strings
-      List<NavigationTarget> _navigationTargets = List<NavigationTarget>.from(navigationTargets);
+      subloc.removeWhere(
+          (String element) => element == ''); //Clean out any empty strings
+      List<NavigationTarget> _navigationTargets =
+          List<NavigationTarget>.from(navigationTargets);
 
-      NavigationTarget? activeTarget = _navigationTargets.firstWhere((navigationTarget) => navigationTarget.path == subloc.first);
+      NavigationTarget? activeTarget = _navigationTargets.firstWhere(
+          (navigationTarget) => navigationTarget.path == subloc.first);
       if (subloc.length == 1) {
         return ActiveTarget(currentTarget: activeTarget, parentTarget: null);
       } else {
-        activeTarget = activeTarget.navigationTabs!.firstWhere((navigationTarget) => navigationTarget.path == subloc.last);
+        activeTarget = activeTarget.navigationTabs!.firstWhere(
+            (navigationTarget) => navigationTarget.path == subloc.last);
 
         // activeTarget = _navigationTargets.firstWhere((navigationTarget) => navigationTarget.path == subloc.join('/'));
         return ActiveTarget(currentTarget: activeTarget, parentTarget: null);
@@ -59,13 +67,16 @@ class MainScreen extends StatelessWidget {
       //   return ActiveTarget(currentTarget: _parentNavigationTargets.first, parentTarget: _navigationTargets.first);
       // }
     } catch (e) {
-      debugPrint("Exception on getActiveTarget. could not determine selected target: ${e.toString()}");
+      debugPrint(
+          "Exception on getActiveTarget. could not determine selected target: ${e.toString()}");
       return ActiveTarget(currentTarget: navigationTargets.first);
     }
   }
 
   String _pageTitle(ActiveTarget activeTarget) {
-    return (activeTarget.parentTarget == null) ? activeTarget.currentTarget.title : "${activeTarget.parentTarget!.title} - ${activeTarget.currentTarget.title}";
+    return (activeTarget.parentTarget == null)
+        ? activeTarget.currentTarget.title
+        : "${activeTarget.parentTarget!.title} - ${activeTarget.currentTarget.title}";
   }
 
   @override
@@ -87,21 +98,40 @@ class MainScreen extends StatelessWidget {
       theme: lightMode,
       darkTheme: darkMode,
       themeMode: ThemeMode.system,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', ''), // English, no country code
+        Locale('nl', ''), // Spanish, no country code
+      ],
       home: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
           centerTitle: true,
           title: Consumer(
             builder: (context, ref, _) {
-              String subTitle = ref.watch(navigationStateProvider).state.currentTarget?.title != null ? ":: ${ref.watch(navigationStateProvider).state.currentTarget!.title}" : "";
-              return (subTitle.isEmpty) ? Text(pageTitle) : Text("$pageTitle - $subTitle");
+              String subTitle = ref
+                          .watch(navigationStateProvider)
+                          .state
+                          .currentTarget
+                          ?.title !=
+                      null
+                  ? ":: ${ref.watch(navigationStateProvider).state.currentTarget!.title}"
+                  : "";
+              return (subTitle.isEmpty)
+                  ? Text(pageTitle)
+                  : Text("$pageTitle - $subTitle");
             },
           ),
           actions: [
             const BarButtonShare(),
             const BarButtonDuplicate(),
             BarButtonFeedback(issuePageLink: issuePageLink),
-            if (FirebaseAuth.instance.currentUser != null) const BarButtonProfile(),
+            if (FirebaseAuth.instance.currentUser != null)
+              const BarButtonProfile(),
           ],
         ),
         body: MainBody(
@@ -135,8 +165,10 @@ class MainBody extends ConsumerWidget {
 
     NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
 
-    List<NavigationTarget>? _navigationTargets = List<NavigationTarget>.from(navigationTargets);
-    _navigationTargets.retainWhere((navigationTarget) => navigationTarget.navigationRailDestination != null);
+    List<NavigationTarget>? _navigationTargets =
+        List<NavigationTarget>.from(navigationTargets);
+    _navigationTargets.retainWhere((navigationTarget) =>
+        navigationTarget.navigationRailDestination != null);
     return Scaffold(
       body: _navigationTargets.length > 1
           ? Row(
@@ -145,25 +177,31 @@ class MainBody extends ConsumerWidget {
                   builder: (context, constraint) {
                     return SingleChildScrollView(
                       child: ConstrainedBox(
-                        constraints: BoxConstraints(minHeight: constraint.maxHeight),
+                        constraints:
+                            BoxConstraints(minHeight: constraint.maxHeight),
                         child: IntrinsicHeight(
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 500),
                             child: NavigationRail(
-                              selectedIndex: ref.read(navigationStateProvider).currentIndex,
+                              selectedIndex: ref
+                                  .read(navigationStateProvider)
+                                  .currentIndex,
                               onDestinationSelected: (int index) {
                                 navigationState.currentIndex = index;
-                                NavigationTarget navigationTarget = _navigationTargets[index];
+                                NavigationTarget navigationTarget =
+                                    _navigationTargets[index];
                                 if (navigationTarget.navigationTabs == null) {
                                   context.go("/${navigationTarget.path}");
                                 } else {
-                                  context.go("/${navigationTarget.path}/${navigationTarget.navigationTabs!.first.path}");
+                                  context.go(
+                                      "/${navigationTarget.path}/${navigationTarget.navigationTabs!.first.path}");
                                 }
                               },
                               labelType: NavigationRailLabelType.all,
                               destinations: <NavigationRailDestination>[
                                 ..._navigationTargets.map((navigationTarget) {
-                                  return navigationTarget.navigationRailDestination!;
+                                  return navigationTarget
+                                      .navigationRailDestination!;
                                 })
                               ],
                             ),
@@ -207,13 +245,17 @@ class BarButtonShare extends ConsumerWidget {
     Map<String, String>? queryParams = selectionState.queryParams;
     String? queryString;
     if (queryParams != null) {
-      queryString = "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
+      queryString =
+          "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
     }
     return IconButton(
       onPressed: () {
-        String url = "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
+        String url =
+            "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
         FlutterClipboard.copy(url).then((_) {
-          return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Copied current location ($url) to clipboard."), behavior: SnackBarBehavior.floating));
+          return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("Copied current location ($url) to clipboard."),
+              behavior: SnackBarBehavior.floating));
         });
       },
       icon: const Icon(Icons.share),
@@ -231,13 +273,17 @@ class BarButtonDuplicate extends ConsumerWidget {
     Map<String, String>? queryParams = selectionState.queryParams;
     String? queryString;
     if (queryParams != null) {
-      queryString = "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
+      queryString =
+          "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
     }
     return IconButton(
       onPressed: () {
-        String url = "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
+        String url =
+            "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
         launch(url).then((_) {
-          return ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Opened current location ($url) in new tab."), behavior: SnackBarBehavior.floating));
+          return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("Opened current location ($url) in new tab."),
+              behavior: SnackBarBehavior.floating));
         });
       },
       icon: const Icon(Icons.open_in_new),
@@ -260,7 +306,9 @@ class BarButtonFeedback extends StatelessWidget {
         return IconButton(
           onPressed: () {
             launch(issuePageLink!).then((_) {
-              return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Opened GitHub issue tracker in a new tab."), behavior: SnackBarBehavior.floating));
+              return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Opened GitHub issue tracker in a new tab."),
+                  behavior: SnackBarBehavior.floating));
             });
           },
           icon: const Icon(Icons.pest_control),
