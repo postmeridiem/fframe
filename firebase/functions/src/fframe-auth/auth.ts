@@ -30,6 +30,7 @@ exports.processSignUp = functions.region("europe-west1").auth.user().onCreate(as
       await db.collection("users").doc(user.uid).set((await auth.getUser(user.uid)).toJSON()).catch((reason) => {
         throw new Error(reason);
       });
+      console.log(`Processed ${user.email}`);
     } catch (error) {
       throw new Error(`${error}`);
     }
