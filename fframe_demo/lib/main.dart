@@ -1,7 +1,9 @@
+import 'package:flutter/material.dart';
+
+import 'package:fframe/fframe.dart';
+
 import 'package:fframe_demo/firebase_config.dart';
 import 'package:fframe_demo/themes/themes.dart';
-import 'package:flutter/material.dart';
-import 'package:fframe/fframe.dart';
 
 import 'package:fframe_demo/views/signInPage/signin_page.dart';
 import 'package:fframe_demo/views/suggestion/suggestion.dart';
@@ -9,11 +11,11 @@ import 'package:fframe_demo/views/setting/setting.dart';
 import 'package:fframe_demo/views/user/user.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MainApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MainApp extends StatelessWidget {
+  const MainApp({Key? key}) : super(key: key);
 
   // This widget is the root of your FlutFrame application.
   @override
