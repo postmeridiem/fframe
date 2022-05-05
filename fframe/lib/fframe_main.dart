@@ -69,6 +69,7 @@ class _FframeState extends State<Fframe> {
                       lightMode: widget.lightMode,
                       darkMode: widget.darkMode,
                       l10nConfig: widget.l10nConfig,
+                      locale: widget.l10nConfig.locale,
                     );
                   },
                 ),
@@ -89,6 +90,7 @@ class App extends StatefulWidget {
     required this.darkMode,
     required this.lightMode,
     required this.l10nConfig,
+    required this.locale,
     this.issuePageLink,
   }) : super(key: key);
 
@@ -99,6 +101,7 @@ class App extends StatefulWidget {
   final ThemeData darkMode;
   final ThemeData lightMode;
   final L10nConfig l10nConfig;
+  final Locale locale;
 
   // global access to a buildcontext, so I can access the translation from anywhere.
   static BuildContext context =
@@ -365,7 +368,7 @@ class _AppState extends State<App> with RestorationMixin {
               border: OutlineInputBorder(),
             ),
           ),
-          locale: widget.l10nConfig.locale,
+          locale: widget.locale,
           builder: (BuildContext context, Widget? widget) {
             // debugPrint("builder");
             Widget error = const Text('...rendering error...');
