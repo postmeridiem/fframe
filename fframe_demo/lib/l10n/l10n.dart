@@ -13,12 +13,14 @@ final L10nConfig l10nConfig = L10nConfig(
   enabled: true,
 
   // the default locale your App starts with
-  locale: _applyLocale(const Locale('en', '')),
+  // passed through url string reader here to enable url
+  // control of l10n
+  locale: l10nUrlReader(const Locale('en', 'US')),
 
   // the list of locales that are supported by your app
   supportedLocales: [
-    const Locale('en', ''), // English, no country code
-    const Locale('nl', ''), // Dutch, no country code
+    const Locale('en', 'US'), // English, US country code
+    const Locale('nl', 'NL'), // Dutch, Netherlands country code
   ],
 
   // the localizations you make available to the
@@ -30,19 +32,3 @@ final L10nConfig l10nConfig = L10nConfig(
     AppLocalizations.delegate,
   ],
 );
-
-// apply a url parameter (?loc=en) to the default language
-_applyLocale(Locale defaultLoc) {
-  Locale _output;
-  List<String> rawuri = Uri.base.toString().split("#");
-  Uri actual = Uri.parse(rawuri[1]);
-
-  if (actual.queryParameters["loc"] != null) {
-    String _locationquery = actual.queryParameters["loc"] as String;
-    _output = Locale(_locationquery, '');
-  } else {
-    _output = defaultLoc;
-  }
-  debugPrint("Locale set to [$_output]");
-  return _output;
-}
