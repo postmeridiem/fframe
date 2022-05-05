@@ -22,7 +22,10 @@ class _SettingScreenState extends State<SettingScreen> {
       createNew: () => Setting(),
       //Optional title widget
       titleBuilder: (context, data) {
-        return Text(data.name ?? "New Setting");
+        return Text(
+          data.name ?? "New Setting",
+          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+        );
       },
 
       // Optional Left hand (navigation/document selection pane)

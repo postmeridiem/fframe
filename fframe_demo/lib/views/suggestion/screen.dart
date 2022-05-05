@@ -31,7 +31,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       ),
       //Optional title widget
       titleBuilder: (context, data) {
-        return Text(data.name ?? "New Suggestion");
+        return Text(
+          data.name ?? "New Suggestion",
+          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+        );
       },
 
       // Optional Left hand (navigation/document selection pane)

@@ -23,7 +23,10 @@ class UsersScreen extends StatelessWidget {
       // createDocumentId: (User user) => {},
       //Optional title widget
       titleBuilder: (context, data) {
-        return Text(data.displayName ?? "New User");
+        return Text(
+          data.displayName ?? "New User",
+          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+        );
       },
       document: _document(),
       documentList: DocumentList(
