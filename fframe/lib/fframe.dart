@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:fframe/controllers/app_user_state_controller.dart';
 import 'package:fframe/controllers/selection_state_controller.dart';
 import 'package:fframe/helpers/curved_bottom_navbar.dart';
+import 'package:fframe/helpers/documentlist_search.dart';
 import 'package:fframe/helpers/roles.dart';
 import 'package:fframe/helpers/l10n.dart';
 
