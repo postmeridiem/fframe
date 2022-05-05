@@ -26,6 +26,11 @@ class L10nConfig {
 // apply a url parameter (e.g. ?locale=en_US) to the default language
 l10nUrlReader(Locale defaultLoc, {String urlparam = "locale"}) {
   Locale _output;
+  String baseurl = Uri.base.toString();
+  if (!baseurl.contains('#')) {
+    // url is not a deeplink, no locale specified
+    return defaultLoc;
+  }
   List<String> rawuri = Uri.base.toString().split("#");
   Uri actual = Uri.parse(rawuri[1]);
 
