@@ -17,7 +17,7 @@ dependencies:
   # fframe:
   #     git:
   #       url: https://github.com/postmeridiem/fframe.git
-  #       path: fframe/
+  #       path: /
   #       ref: main
   fframe:
     path: ../
