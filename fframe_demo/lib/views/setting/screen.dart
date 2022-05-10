@@ -57,7 +57,6 @@ class _SettingScreenState extends State<SettingScreen> {
             );
           },
           childBuilder: (setting) {
-            // leave these not constants, they won't be forever
             switch (setting.id) {
               case "01-generalsettings":
                 {
