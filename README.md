@@ -1,8 +1,8 @@
 # fframe
-FlutFrame
+##FlutFrame
 
-
- install flutter per normal instructions
+### installation
+- install flutter per normal instructions
 - pull repo
 - set up a firestore database (see other instructions out of scope)
 - get yourself a firebase_config.dart file in the lib dir (an empty one will be supplied firebase_config.dart.clean next to it)
@@ -10,7 +10,7 @@ FlutFrame
 - start server with flutter run -d chrome  --web-port 8000 in the fframe_demo dir
 
 
-## l10n support added
+### l10n support added
 to update for l10n support you need to do the following
 - copy l10n.yaml from fframe_demo dir to your project root
 - add generate: true to the flutter section of your pubspec.yaml
