@@ -22,10 +22,8 @@ workflows:
     scripts:
       - 
         # run pub get
-        cd fframe
         flutter packages pub get
-        cd ..
-        cd fframe_demo
+        cd example
         flutter packages pub get
       - flutter config --enable-web
       - |
