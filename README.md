@@ -19,7 +19,7 @@ To update for l10n support you need to do the following
 
 for examples check the example codebase. 
 
-NOTE: when everything is added at once the flutter_gen package may not yet be available. In that case, comment out the missing imports in lib/l10n/l10n.dart and the additional error in that same file. Then build the project, reload your IDE project and uncomment the temporary changes in l10n.dart
+NOTE: when everything is added at once the flutter_gen package may not yet be available. In that case, comment out the missing imports in lib/l10n/l10n.dart and the additional error in that same file. Run *flutter gen-l10n* and then reload your IDE project and uncomment the temporary changes in l10n.dart
 
 <!-- 
 This README describes the package. If you publish this package to pub.dev,
