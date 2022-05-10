@@ -11,7 +11,8 @@
 
 
 ### l10n support added
-to update for l10n support you need to do the following
+For a new clone, no action is needed.
+To update for l10n support you need to do the following
 - copy l10n.yaml from fframe_demo dir to your project root
 - add generate: true to the flutter section of your pubspec.yaml
 - copy the l10n folder from fframe_demo/lib into your lib dir
