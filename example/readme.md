@@ -1,4 +1,5 @@
-### a FlutFrame Starter App
+### A FlutFrame Starter App
+## Installation Instructions
 
 - set up a firestore database (INSTRUCTIONS NEEDED)
 - get yourself a firebase_config.dart file in the lib dir (an empty one is supplied (firebase_config.dart.clean) in your new lib dir)
