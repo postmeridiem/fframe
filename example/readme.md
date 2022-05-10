@@ -1,4 +1,4 @@
-### A FlutFrame Starter App
+# A FlutFrame Starter App
 ## Installation Instructions
 
 - set up a firestore database (INSTRUCTIONS NEEDED)
