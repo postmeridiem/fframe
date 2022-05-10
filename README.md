@@ -1,7 +1,7 @@
 # fframe
 ## FlutFrame
 
-### installation
+### Installation
 - install flutter per normal instructions
 - create a new flutter project
 - copy the example dir into the root of your project
