@@ -13,6 +13,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+# TODO: to use this example, replace the fframe dependency with
+  # fframe:
+  #     git:
+  #       url: https://github.com/postmeridiem/fframe.git
+  #       path: fframe/
+  #       ref: main
   fframe:
     path: ../fframe/
 
