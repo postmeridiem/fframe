@@ -1,5 +1,5 @@
 # fframe
-##FlutFrame
+## FlutFrame
 
 ### installation
 - install flutter per normal instructions
