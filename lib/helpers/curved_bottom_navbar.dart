@@ -46,21 +46,22 @@ class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
     return Scaffold(
       // backgroundColor: Colors.white.withAlpha(55),
       body: Stack(
-        fit: StackFit.loose,
         children: [
           if (widget.child != null) widget.child!,
           Positioned(
             bottom: 0,
             left: 0,
             child: SizedBox(
-              width: size.width,
+              width: 850,
+              // width: size.width,
               height: 60,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   if (_iconButtons != null)
                     CustomPaint(
-                      size: Size(size.width, 80),
+                      // size: Size(size.width, 80),
+                      size: const Size(850, 80),
                       painter: BNBCustomPainter(
                           context, widget.floatingActionButton != null),
                     ),
@@ -72,7 +73,8 @@ class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
                     ),
                   if (_iconButtons != null)
                     SizedBox(
-                      width: size.width,
+                      // width: size.width,
+                      width: 860,
                       height: 80,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
