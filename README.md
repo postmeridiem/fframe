@@ -10,7 +10,7 @@ FlutFrame
 - start server with flutter run -d chrome  --web-port 8000 in the fframe_demo dir
 
 
-# l10n support added
+## l10n support added
 to add l10n support you need to do the following
 - copy l10n.yaml from fframe_demo dir to your project root
 - add generate: true to the flutter section of your pubspec.yaml
