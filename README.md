@@ -5,7 +5,7 @@
 - install flutter per normal instructions
 - create a new flutter project
 - copy the example dir into the root of your project
-- continue following the instructions [here](https://github.com/postmeridiem/fframe/blob/main/example/readme.md)
+- continue following the instructions [here](https://github.com/postmeridiem/fframe/blob/main/example/installation.md)
 
 
 ### l10n support added
