@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-// import 'package:flutter_gen/gen_l10n/l10n.dart';
-// export 'package:flutter_gen/gen_l10n/l10n.dart';
+import 'package:flutter_gen/gen_l10n/l10n.dart';
+export 'package:flutter_gen/gen_l10n/l10n.dart';
 import 'package:fframe/helpers/l10n.dart';
 
 final L10nConfig l10nConfig = L10nConfig(
@@ -29,6 +29,6 @@ final L10nConfig l10nConfig = L10nConfig(
   localizationsDelegates: [
     GlobalWidgetsLocalizations.delegate,
     GlobalMaterialLocalizations.delegate,
-    // AppLocalizations.delegate,
+    AppLocalizations.delegate,
   ],
 );

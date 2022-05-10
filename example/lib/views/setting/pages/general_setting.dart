@@ -27,7 +27,7 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
               onPressed: () {
                 // App.l10nConfig.locale = const Locale('nl','');
               },
-              child: Text("AppLocalizations.of(context)!.contextHeader"),
+              child: Text(AppLocalizations.of(context)!.contextHeader),
             ),
             const Text(
                 'General settings - dunno probably will get culled in the end'),

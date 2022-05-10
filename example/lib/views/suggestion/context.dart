@@ -9,7 +9,7 @@ class ContextCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String contextHeader = "AppLocalizations.of(context)!.contextHeader";
+    String contextHeader = AppLocalizations.of(context)!.contextHeader;
     return Card(
       color: Theme.of(context).colorScheme.primaryContainer,
       child: SizedBox(
