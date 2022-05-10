@@ -176,7 +176,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
       IconButton(
         icon: Icon(
           Icons.close,
-          color: Colors.grey.shade400,
+          color: Theme.of(context).colorScheme.onBackground,
         ),
         onPressed: _callClose,
       ),
@@ -204,7 +204,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
       IconButton(
         icon: Icon(
           Icons.save,
-          color: Colors.grey.shade400,
+          color: Theme.of(context).colorScheme.onBackground,
         ),
         onPressed: _callValidate,
       ),
@@ -222,84 +222,52 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
       debugPrint("Lazy load the deeplinked document");
       lazyLoad(selectionState);
     }
+    FloatingActionButton mainFAB = FloatingActionButton(
+      backgroundColor: Theme.of(context).colorScheme.background,
+      child: const Icon(Icons.add),
+      elevation: 0.2,
+      onPressed: _callCreateNew,
+    );
+    Map<String, dynamic> fabConfig = {
+      "iconButtons": iconButtons,
+      "mainFAB": mainFAB,
+    };
 
-    // return Row(
-    //   children: [
-    //     if (widget.documentList != null)
-    //       SizedBox(
-    //         width: 250,
-    //         child: Column(
-    //           children: [
-    //             const Padding(
-    //               padding: EdgeInsets.only(bottom: 4.0),
-    //               child: DocSearch(),
-    //             ),
-    //             Expanded(
-    //               child: Padding(
-    //                 padding: const EdgeInsets.all(0.0),
-    //                 child: _DocumentList<T>(
-    //                   key: ValueKey(widget.collection),
-    //                   collection: widget.collection,
-    //                   fromFirestore: widget.fromFirestore,
-    //                   documentList: widget.documentList!,
-    //                 ),
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //     if (widget.documentList != null)
-    //       const VerticalDivider(thickness: 1, width: 1),
-    //     Expanded(
-    //       child: _DocumentBody<T>(
-    //         titleBuilder: widget.titleBuilder,
-    //         document: widget.document,
-    //       ),
-    //     ),
-    //   ],
-    // );
-
-    return CurvedBottomBar(
-      floatingActionButton: FloatingActionButton(
-          child: const Icon(Icons.add),
-          elevation: 0.1,
-          onPressed: _callCreateNew),
-      iconButtons: iconButtons,
-      child: Row(
-        children: [
-          if (widget.documentList != null)
-            SizedBox(
-              width: 250,
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 4.0),
-                    child: DocSearch(),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(0.0),
-                      child: _DocumentList<T>(
-                        key: ValueKey(widget.collection),
-                        collection: widget.collection,
-                        fromFirestore: widget.fromFirestore,
-                        documentList: widget.documentList!,
-                      ),
+    return Row(
+      children: [
+        if (widget.documentList != null)
+          SizedBox(
+            width: 250,
+            child: Column(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 4.0),
+                  child: DocSearch(),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(0.0),
+                    child: _DocumentList<T>(
+                      key: ValueKey(widget.collection),
+                      collection: widget.collection,
+                      fromFirestore: widget.fromFirestore,
+                      documentList: widget.documentList!,
                     ),
                   ),
-                ],
-              ),
-            ),
-          if (widget.documentList != null)
-            const VerticalDivider(thickness: 1, width: 1),
-          Expanded(
-            child: _DocumentBody<T>(
-              titleBuilder: widget.titleBuilder,
-              document: widget.document,
+                ),
+              ],
             ),
           ),
-        ],
-      ),
+        if (widget.documentList != null)
+          const VerticalDivider(thickness: 1, width: 1),
+        Expanded(
+          child: _DocumentBody<T>(
+            titleBuilder: widget.titleBuilder,
+            document: widget.document,
+            fabConfig: fabConfig,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -309,9 +277,11 @@ class _DocumentBody<T> extends ConsumerWidget {
     Key? key,
     required this.document,
     this.titleBuilder,
+    this.fabConfig,
   }) : super(key: key);
   final Document document;
   final TitleBuilder<T>? titleBuilder;
+  final Map<String, dynamic>? fabConfig;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -327,6 +297,8 @@ class _DocumentBody<T> extends ConsumerWidget {
           document: document,
           selectionState: selectionState,
           titleBuilder: titleBuilder,
+          fabConfig: fabConfig,
+          docBodyRef: ref,
         ),
       ),
     );
@@ -338,14 +310,18 @@ class _DocumentCanvas<T> extends StatelessWidget {
   _DocumentCanvas({
     Key? key,
     this.titleBuilder,
+    this.fabConfig,
     required this.selectionState,
     required this.document,
+    required this.docBodyRef,
     // required this.callValidate,
   }) : super(key: key);
 
   final SelectionState selectionState;
   final TitleBuilder<T>? titleBuilder;
   final Document document;
+  final Map<String, dynamic>? fabConfig;
+  final WidgetRef? docBodyRef;
 
   late PreloadPageController preloadPageController;
 
@@ -399,17 +375,97 @@ class _DocumentCanvas<T> extends StatelessWidget {
           return LayoutBuilder(
             builder: (context, constraints) {
               final bool collapsed = constraints.maxWidth > 1000;
-
-              return Row(
-                children: [
-                  Flexible(
-                    fit: FlexFit.tight,
-                    child: DefaultTabController(
-                      length: document.tabs.length,
-                      child: Scaffold(
-                        endDrawer: (document.contextCards != null &&
-                                document.contextCards!.isNotEmpty)
-                            ? ContextCanvas(
+              return CurvedBottomBar(
+                floatingActionButton: fabConfig!["mainFAB"],
+                iconButtons: fabConfig!["iconButtons"],
+                child: Row(
+                  children: [
+                    Flexible(
+                      fit: FlexFit.tight,
+                      child: DefaultTabController(
+                        length: document.tabs.length,
+                        child: Scaffold(
+                          endDrawer: (document.contextCards != null &&
+                                  document.contextCards!.isNotEmpty)
+                              ? ContextCanvas(
+                                  contextWidgets: document.contextCards!
+                                      .map(
+                                        (contextCardBuilder) =>
+                                            contextCardBuilder(
+                                                selectionState.data),
+                                      )
+                                      .toList(),
+                                )
+                              : null,
+                          primary: false,
+                          backgroundColor:
+                              Theme.of(context).colorScheme.secondary,
+                          body: NestedScrollView(
+                            headerSliverBuilder: (BuildContext context,
+                                bool innerBoxIsScrolled) {
+                              return <Widget>[
+                                SliverAppBar(
+                                  actions: const [
+                                    IgnorePointer()
+                                  ], //To surpess the hamburger
+                                  primary: false,
+                                  title: titleBuilder != null
+                                      ? titleBuilder!(
+                                          context, selectionState.data)
+                                      : null,
+                                  floating: true,
+                                  pinned: false,
+                                  snap: true,
+                                  centerTitle: true,
+                                  automaticallyImplyLeading: false,
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.secondary,
+                                  bottom: document.tabs.length != 1
+                                      ? TabBar(
+                                          controller: tabController,
+                                          tabs: document.tabs
+                                              .map(
+                                                (documentTab) =>
+                                                    documentTab.tabBuilder(),
+                                              )
+                                              .toList(),
+                                        )
+                                      : null,
+                                ),
+                              ];
+                            },
+                            body: PreloadPageView.builder(
+                              itemCount: document.tabs.length,
+                              preloadPagesCount: document.tabs.length,
+                              itemBuilder:
+                                  (BuildContext context, int position) {
+                                debugPrint("Build tab $position");
+                                //                       AnimatedSwitcher(
+                                // duration: const Duration(milliseconds: 500),
+                                return Form(
+                                  key: document.tabs[position]._formState,
+                                  child: Container(
+                                    key: ObjectKey(selectionState.data),
+                                    child: document.tabs[position]
+                                        .childBuilder(selectionState.data),
+                                  ),
+                                );
+                              },
+                              controller: preloadPageController,
+                              onPageChanged: (int position) {
+                                debugPrint('page changed to: $position');
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (document.contextCards != null &&
+                        document.contextCards!.isNotEmpty)
+                      collapsed
+                          ? SizedBox(
+                              width: 250,
+                              child: ContextCanvas(
                                 contextWidgets: document.contextCards!
                                     .map(
                                       (contextCardBuilder) =>
@@ -417,86 +473,12 @@ class _DocumentCanvas<T> extends StatelessWidget {
                                               selectionState.data),
                                     )
                                     .toList(),
-                              )
-                            : null,
-                        primary: false,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                        body: NestedScrollView(
-                          headerSliverBuilder:
-                              (BuildContext context, bool innerBoxIsScrolled) {
-                            return <Widget>[
-                              SliverAppBar(
-                                actions: const [
-                                  IgnorePointer()
-                                ], //To surpess the hamburger
-                                primary: false,
-                                title: titleBuilder != null
-                                    ? titleBuilder!(
-                                        context, selectionState.data)
-                                    : null,
-                                floating: true,
-                                pinned: false,
-                                snap: true,
-                                centerTitle: true,
-                                automaticallyImplyLeading: false,
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.secondary,
-                                bottom: document.tabs.length != 1
-                                    ? TabBar(
-                                        controller: tabController,
-                                        tabs: document.tabs
-                                            .map(
-                                              (documentTab) =>
-                                                  documentTab.tabBuilder(),
-                                            )
-                                            .toList(),
-                                      )
-                                    : null,
                               ),
-                            ];
-                          },
-                          body: PreloadPageView.builder(
-                            itemCount: document.tabs.length,
-                            preloadPagesCount: document.tabs.length,
-                            itemBuilder: (BuildContext context, int position) {
-                              debugPrint("Build tab $position");
-                              //                       AnimatedSwitcher(
-                              // duration: const Duration(milliseconds: 500),
-                              return Form(
-                                key: document.tabs[position]._formState,
-                                child: Container(
-                                  key: ObjectKey(selectionState.data),
-                                  child: document.tabs[position]
-                                      .childBuilder(selectionState.data),
-                                ),
-                              );
-                            },
-                            controller: preloadPageController,
-                            onPageChanged: (int position) {
-                              debugPrint('page changed to: $position');
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  if (document.contextCards != null &&
-                      document.contextCards!.isNotEmpty)
-                    collapsed
-                        ? SizedBox(
-                            width: 250,
-                            child: ContextCanvas(
-                              contextWidgets: document.contextCards!
-                                  .map(
-                                    (contextCardBuilder) =>
-                                        contextCardBuilder(selectionState.data),
-                                  )
-                                  .toList(),
-                            ),
-                          )
-                        : DrawerButton(scaffoldKey: GlobalKey<ScaffoldState>()),
-                ],
+                            )
+                          : DrawerButton(
+                              scaffoldKey: GlobalKey<ScaffoldState>()),
+                  ],
+                ),
               );
             },
           );

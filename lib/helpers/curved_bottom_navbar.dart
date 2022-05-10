@@ -46,6 +46,7 @@ class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
     return Scaffold(
       // backgroundColor: Colors.white.withAlpha(55),
       body: Stack(
+        fit: StackFit.loose,
         children: [
           if (widget.child != null) widget.child!,
           Positioned(
@@ -60,7 +61,8 @@ class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
                   if (_iconButtons != null)
                     CustomPaint(
                       size: Size(size.width, 80),
-                      painter: BNBCustomPainter(widget.floatingActionButton != null),
+                      painter: BNBCustomPainter(
+                          context, widget.floatingActionButton != null),
                     ),
                   if (widget.floatingActionButton != null)
                     Center(
@@ -88,13 +90,14 @@ class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
 }
 
 class BNBCustomPainter extends CustomPainter {
-  BNBCustomPainter(this.hasFAB);
+  BNBCustomPainter(this.context, this.hasFAB);
   final bool hasFAB;
+  final BuildContext context;
 
   @override
   void paint(Canvas canvas, Size size) {
     Paint paint = Paint()
-      ..color = Colors.white
+      ..color = Theme.of(context).colorScheme.background
       ..style = PaintingStyle.fill;
 
     Path path = Path();
@@ -102,7 +105,8 @@ class BNBCustomPainter extends CustomPainter {
     path.quadraticBezierTo(size.width * 0.20, 0, size.width * 0.35, 0);
     if (hasFAB) {
       path.quadraticBezierTo(size.width * 0.40, 0, size.width * 0.40, 20);
-      path.arcToPoint(Offset(size.width * 0.60, 20), radius: const Radius.circular(20.0), clockwise: false);
+      path.arcToPoint(Offset(size.width * 0.60, 20),
+          radius: const Radius.circular(20.0), clockwise: false);
       path.quadraticBezierTo(size.width * 0.60, 0, size.width * 0.65, 0);
     }
     path.quadraticBezierTo(size.width * 0.80, 0, size.width, 20);
