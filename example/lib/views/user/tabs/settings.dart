@@ -12,19 +12,100 @@ class SettingsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Card(
-        color: Theme.of(context).colorScheme.tertiary,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
+    return ListView(children: [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: const [
+            SizedBox(
+              width: 150,
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Text(
+                  "Theme Selection:",
+                  style: TextStyle(fontFamily: "OpenSans"),
+                ),
+              ),
+            ),
+            Expanded(
+              child: ThemeToggle(),
+            ),
+          ],
+        ),
+      ),
+    ]);
+  }
+}
+
+class ThemeToggle extends StatefulWidget {
+  const ThemeToggle({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<ThemeToggle> createState() => _ThemeToggleState();
+}
+
+class _ThemeToggleState extends State<ThemeToggle> {
+  @override
+  Widget build(BuildContext context) {
+    List<bool> isSelected = [true, false, false];
+    return ToggleButtons(
+      children: <Widget>[
+        SizedBox(
+          width: 200,
+          child: Row(
             children: const [
-              Text("change stuff like permanent dark mode"),
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.radio_button_checked),
+              ),
+              Text("auto"),
             ],
           ),
         ),
-      ),
+        SizedBox(
+          width: 200,
+          child: Row(
+            children: const [
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.radio_button_unchecked),
+              ),
+              Text("light"),
+            ],
+          ),
+        ),
+        SizedBox(
+          width: 200,
+          child: Row(
+            children: const [
+              Padding(
+                padding: EdgeInsets.all(8.0),
+                child: Icon(Icons.radio_button_unchecked),
+              ),
+              Text("dark"),
+            ],
+          ),
+        ),
+      ],
+      onPressed: (int index) {
+        setState(() {
+          for (int buttonIndex = 0;
+              buttonIndex < isSelected.length;
+              buttonIndex++) {
+            if (buttonIndex == index) {
+              isSelected[buttonIndex] = true;
+            } else {
+              isSelected[buttonIndex] = false;
+            }
+          }
+          //wut
+        });
+      },
+      isSelected: isSelected,
     );
   }
 }
