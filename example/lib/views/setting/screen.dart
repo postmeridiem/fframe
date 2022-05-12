@@ -70,6 +70,10 @@ class _SettingScreenState extends State<SettingScreen> {
                 {
                   return const SettingsPagesForm();
                 }
+              case "98-palette":
+                {
+                  return const PaletteForm();
+                }
               case "99-advancedsettings":
                 {
                   return const SettingsAdvancedForm();
