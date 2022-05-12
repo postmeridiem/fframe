@@ -33,7 +33,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       padding: EdgeInsets.only(top: 12, left: 8),
                       child: Text(
                         "Fonts",
-                        style: TextStyle(fontFamily: "Raleway"),
+                        style: TextStyle(fontFamily: "OpenSans"),
                       ),
                     ),
                     Card(
@@ -46,10 +46,10 @@ class _PaletteFormFormState extends State<PaletteForm> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: const [
                               Text(
-                                "Raleway",
+                                "OpenSans",
                                 style: TextStyle(
                                   fontSize: 20,
-                                  fontFamily: "Raleway",
+                                  fontFamily: "OpenSans",
                                 ),
                               ),
                               Text(
@@ -86,7 +86,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       child: Text(
                         "colorScheme.background\ncolorScheme.onBackground",
                         style: TextStyle(
-                          fontFamily: "Raleway",
+                          fontFamily: "OpenSans",
                         ),
                       ),
                     ),
@@ -101,7 +101,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onBackground,
                               fontSize: 20,
-                              fontFamily: "Raleway",
+                              fontFamily: "OpenSans",
                             ),
                           ),
                         ),
@@ -117,7 +117,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       child: Text(
                         "colorScheme.primary\ncolorScheme.onPrimary",
                         style: TextStyle(
-                          fontFamily: "Raleway",
+                          fontFamily: "OpenSans",
                         ),
                       ),
                     ),
@@ -132,7 +132,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onPrimary,
                               fontSize: 20,
-                              fontFamily: "Raleway",
+                              fontFamily: "OpenSans",
                             ),
                           ),
                         ),
@@ -148,7 +148,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       child: Text(
                         "colorScheme.secondary\ncolorScheme.onSecondary",
                         style: TextStyle(
-                          fontFamily: "Raleway",
+                          fontFamily: "OpenSans",
                         ),
                       ),
                     ),
@@ -163,7 +163,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSecondary,
                               fontSize: 20,
-                              fontFamily: "Raleway",
+                              fontFamily: "OpenSans",
                             ),
                           ),
                         ),
@@ -179,7 +179,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       child: Text(
                         "colorScheme.tertiary\ncolorScheme.onTertiary",
                         style: TextStyle(
-                          fontFamily: "Raleway",
+                          fontFamily: "OpenSans",
                         ),
                       ),
                     ),
@@ -194,7 +194,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onTertiary,
                               fontSize: 20,
-                              fontFamily: "Raleway",
+                              fontFamily: "OpenSans",
                             ),
                           ),
                         ),
@@ -210,7 +210,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       child: Text(
                         "colorScheme.surface\ncolorScheme.onSurface",
                         style: TextStyle(
-                          fontFamily: "Raleway",
+                          fontFamily: "OpenSans",
                         ),
                       ),
                     ),
@@ -225,7 +225,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 20,
-                              fontFamily: "Raleway",
+                              fontFamily: "OpenSans",
                             ),
                           ),
                         ),
@@ -241,7 +241,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       child: Text(
                         "colorScheme.surfaceVariant\ncolorScheme.onSurfaceVariant",
                         style: TextStyle(
-                          fontFamily: "Raleway",
+                          fontFamily: "OpenSans",
                         ),
                       ),
                     ),
@@ -258,7 +258,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                                   .colorScheme
                                   .onSurfaceVariant,
                               fontSize: 20,
-                              fontFamily: "Raleway",
+                              fontFamily: "OpenSans",
                             ),
                           ),
                         ),
@@ -274,7 +274,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       child: Text(
                         "colorScheme.primaryContainer\ncolorScheme.onPrimaryContainer",
                         style: TextStyle(
-                          fontFamily: "Raleway",
+                          fontFamily: "OpenSans",
                         ),
                       ),
                     ),
@@ -291,7 +291,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                                   .colorScheme
                                   .onPrimaryContainer,
                               fontSize: 20,
-                              fontFamily: "Raleway",
+                              fontFamily: "OpenSans",
                             ),
                           ),
                         ),
@@ -307,7 +307,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       child: Text(
                         "colorScheme.secondaryContainer\ncolorScheme.onSecondaryContainer",
                         style: TextStyle(
-                          fontFamily: "Raleway",
+                          fontFamily: "OpenSans",
                         ),
                       ),
                     ),
@@ -324,7 +324,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                                   .colorScheme
                                   .onPrimaryContainer,
                               fontSize: 20,
-                              fontFamily: "Raleway",
+                              fontFamily: "OpenSans",
                             ),
                           ),
                         ),
@@ -340,7 +340,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       child: Text(
                         "colorScheme.error\ncolorScheme.onError",
                         style: TextStyle(
-                          fontFamily: "Raleway",
+                          fontFamily: "OpenSans",
                         ),
                       ),
                     ),
@@ -355,7 +355,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onError,
                               fontSize: 20,
-                              fontFamily: "Raleway",
+                              fontFamily: "OpenSans",
                             ),
                           ),
                         ),
@@ -371,7 +371,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       child: Text(
                         "colorScheme.errorContainer\ncolorScheme.onErrorContainer",
                         style: TextStyle(
-                          fontFamily: "Raleway",
+                          fontFamily: "OpenSans",
                         ),
                       ),
                     ),
@@ -388,7 +388,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                                   .colorScheme
                                   .onErrorContainer,
                               fontSize: 20,
-                              fontFamily: "Raleway",
+                              fontFamily: "OpenSans",
                             ),
                           ),
                         ),
