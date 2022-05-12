@@ -245,13 +245,15 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
                   child: DocSearch(),
                 ),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(0.0),
-                    child: _DocumentList<T>(
-                      key: ValueKey(widget.collection),
-                      collection: widget.collection,
-                      fromFirestore: widget.fromFirestore,
-                      documentList: widget.documentList!,
+                  child: RepaintBoundary(
+                    child: Padding(
+                      padding: const EdgeInsets.all(0.0),
+                      child: _DocumentList<T>(
+                        key: ValueKey(widget.collection),
+                        collection: widget.collection,
+                        fromFirestore: widget.fromFirestore,
+                        documentList: widget.documentList!,
+                      ),
                     ),
                   ),
                 ),
