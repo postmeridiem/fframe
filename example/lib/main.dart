@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:flutter/rendering.dart';
 
 import 'package:fframe/fframe.dart';
 import 'package:example/firebase_config.dart';
@@ -13,16 +12,6 @@ import 'package:example/views/setting/setting.dart';
 import 'package:example/views/user/user.dart';
 
 void main() {
-  // debugPaintSizeEnabled = false;
-  // debugPaintBaselinesEnabled = false;
-  // debugPaintLayerBordersEnabled = false;
-  // debugPaintPointersEnabled = false;
-  // debugRepaintRainbowEnabled = false;
-  // debugRepaintTextRainbowEnabled = false;
-  // debugDisableClipLayers = false;
-  // debugDisablePhysicalShapeLayers = false;
-  // debugDisableOpacityLayers = false;
-
   runApp(const MainApp());
 }
 
