@@ -16,7 +16,13 @@ class SuggestionListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       selected: selected,
-      title: Text(suggestion.name!),
+      title: Text(
+        suggestion.name!,
+        style: TextStyle(
+          decoration: selected ? TextDecoration.underline : TextDecoration.none,
+          color: Theme.of(context).colorScheme.onSecondary,
+        ),
+      ),
       selectedColor: Theme.of(context).colorScheme.onTertiary,
       selectedTileColor: Theme.of(context).colorScheme.tertiary,
       leading: Icon(iconMap[suggestion.icon]),

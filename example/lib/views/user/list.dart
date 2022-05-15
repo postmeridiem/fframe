@@ -35,7 +35,13 @@ class UserListItem extends StatelessWidget {
           : null,
       selectedColor: Theme.of(context).colorScheme.onTertiary,
       selectedTileColor: Theme.of(context).colorScheme.tertiary,
-      title: Text(user.displayName ?? "?"),
+      title: Text(
+        user.displayName ?? "?",
+        style: TextStyle(
+          decoration: selected ? TextDecoration.underline : TextDecoration.none,
+          color: Theme.of(context).colorScheme.onSecondary,
+        ),
+      ),
     );
   }
 }

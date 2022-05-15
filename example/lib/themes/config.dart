@@ -9,40 +9,44 @@ class Fonts {
 
 class SignalColors {
   // Basic Signal Colors
-  Color constGreenSuccess = const Color(0xFF10743D);
-  Color constRedFailure = const Color(0xFF8B3737);
+  Color constAccentColor = const Color.fromARGB(255, 21, 206, 163);
+  Color constWaitingColor = const Color.fromARGB(255, 72, 72, 72);
+  Color constWarningColor = const Color.fromARGB(255, 241, 126, 32);
+  Color constRunningColor = const Color.fromARGB(255, 203, 134, 235);
+  Color constSuccessColor = const Color.fromARGB(255, 6, 178, 83);
+  Color constErrorColor = const Color.fromARGB(255, 192, 64, 61);
 }
 
 class DarkModeThemeConfig {
   // DARK MODE =======
   final brightness = Brightness.dark;
-  // color that sets the primary accent color
-  Color constPrimaryAccentColor = const Color.fromARGB(255, 5, 202, 198);
-
   // color that sets the appbar, navrail, contextwidgets and FAB
-  Color constPrimaryColor = const Color(0xFF1B020B);
-  Color constOnPrimaryColor = const Color(0xffffffff);
+  Color constPrimaryColor = const Color.fromARGB(255, 27, 2, 11);
+  Color constOnPrimaryColor = const Color.fromARGB(255, 255, 255, 255);
 
   // color that sets 'secondary' level control widgets
   // (application surfaces and things that are not navrail, contextwidgets, FAB or appbar...)
-  Color constSecondaryColor = const Color(0xFF310414);
-  Color constOnSecondaryColor = const Color(0xFFEEEEEE);
+  Color constSecondaryColor = const Color.fromARGB(255, 49, 4, 20);
+  Color constOnSecondaryColor = const Color.fromARGB(255, 238, 238, 238);
 
   // color that sets 'tertiary' level control widgets
   // (the background of fields and the text that goes in there)
-  Color constTertiaryColor = const Color(0xFF160209);
-  Color constOnTertiaryColor = const Color(0xFFEEEEEE);
+  Color constTertiaryColor = const Color.fromARGB(255, 36, 3, 15);
+  Color constOnTertiaryColor = const Color.fromARGB(255, 238, 238, 238);
+
+  // color that sets the primary accent color
+  Color constPrimaryAccentColor = const Color.fromARGB(255, 5, 202, 198);
 
   // color for unselected elements
-  Color constUnselectedColor = const Color(0xB2E7E7E7);
+  Color constUnselectedColor = const Color.fromARGB(177, 233, 233, 233);
 
   // color for dividers and lines
-  Color constDividerColor = const Color(0xB21B1B1B);
+  Color constDividerColor = const Color.fromARGB(177, 28, 28, 28);
 
   // color that sets the main background behind everything
-  Color constBackgroundColor = const Color(0xFF0E0D0D);
-  Color constOnBackgroundColor = const Color(0xFFEEEEEE);
-  Color constOnBackgroundColorFaded = const Color(0xFF330216);
+  Color constBackgroundColor = const Color.fromARGB(255, 14, 13, 13);
+  Color constOnBackgroundColor = const Color.fromARGB(255, 238, 238, 238);
+  Color constOnBackgroundColorFaded = const Color.fromARGB(255, 51, 2, 22);
 
   // signal color import
   SignalColors signalColors = SignalColors();
@@ -54,34 +58,34 @@ class DarkModeThemeConfig {
 class LightModeThemeConfig {
   // LIGHT MODE =======
   final brightness = Brightness.light;
-  // color that sets the primary accent color
-  Color constPrimaryAccentColor = const Color.fromARGB(255, 0, 139, 137);
 
   // color that sets the appbar, navrail, contextwidgets and FAB
-  Color constPrimaryColor = const Color(0xFF610525);
-  Color constOnPrimaryColor = const Color(0xFFFFFFFF);
+  Color constPrimaryColor = const Color.fromARGB(255, 97, 5, 37);
+  Color constOnPrimaryColor = const Color.fromARGB(255, 255, 255, 255);
 
   // color that sets 'secondary' level control widgets
   // (application surfaces and things that are not navrail, contextwidgets, FAB or appbar...)
-  // Color constSecondaryColor = const Color(0xFFEBB3CB);
-  Color constSecondaryColor = const Color(0xFFFFF8FB);
-  Color constOnSecondaryColor = const Color(0xB21D1D1D);
+  Color constSecondaryColor = const Color.fromARGB(255, 255, 247, 251);
+  Color constOnSecondaryColor = const Color.fromARGB(176, 28, 28, 28);
 
   // color that sets 'tertiary' level control widgets
   // (the background of fields and the text that goes in there)
-  Color constTertiaryColor = const Color(0xFFFFFFFF);
-  Color constOnTertiaryColor = const Color(0xFF610525);
+  Color constTertiaryColor = const Color.fromARGB(255, 255, 255, 255);
+  Color constOnTertiaryColor = const Color.fromARGB(255, 107, 6, 42);
+
+  // color that sets the primary accent color
+  Color constPrimaryAccentColor = const Color.fromARGB(255, 0, 138, 136);
 
   // color for unselected elements
-  Color constUnselectedColor = const Color(0xB2474747);
+  Color constUnselectedColor = const Color.fromARGB(177, 71, 71, 71);
 
   // color for dividers and lines
-  Color constDividerColor = const Color(0xB2B6B6B6);
+  Color constDividerColor = const Color.fromARGB(177, 182, 182, 182);
 
   // color that sets the main background behind everything
-  Color constBackgroundColor = const Color(0xFFECE2E2);
-  Color constOnBackgroundColor = const Color(0xFF1B020B);
-  Color constOnBackgroundColorFaded = const Color(0xFFDAC8CF);
+  Color constBackgroundColor = const Color.fromARGB(255, 236, 226, 226);
+  Color constOnBackgroundColor = const Color.fromARGB(255, 27, 2, 11);
+  Color constOnBackgroundColorFaded = const Color.fromARGB(255, 218, 200, 207);
 
   // signal color import
   SignalColors signalColors = SignalColors();
