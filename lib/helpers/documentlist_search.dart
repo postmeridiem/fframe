@@ -62,8 +62,13 @@ class _DocSearchState extends ConsumerState<DocSearch> {
                 // if user types a : here, it should auto chip
                 // put some trottling in: only one chip at a time
                 // so we don't overload the firestore index?
-
               }
+
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Search not implemented yet..."),
+                ),
+              );
               debugPrint("$doclistqueries");
             },
             decoration: const InputDecoration(
