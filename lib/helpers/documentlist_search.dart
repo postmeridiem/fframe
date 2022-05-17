@@ -66,6 +66,9 @@ class _DocSearchState extends ConsumerState<DocSearch> {
               }
               debugPrint("$doclistqueries");
             },
+            decoration: const InputDecoration(
+              suffixIcon: Icon(Icons.search),
+            ),
           ),
         ],
       ),
