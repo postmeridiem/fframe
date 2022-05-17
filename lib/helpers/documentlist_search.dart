@@ -67,6 +67,8 @@ class _DocSearchState extends ConsumerState<DocSearch> {
               debugPrint("$doclistqueries");
             },
             decoration: const InputDecoration(
+              contentPadding:
+                  EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
               prefixIcon: Icon(Icons.search),
             ),
           ),
