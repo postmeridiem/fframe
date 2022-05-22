@@ -439,6 +439,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
                             body: PreloadPageView.builder(
                               itemCount: document.tabs.length,
                               preloadPagesCount: document.tabs.length,
+                              physics: const NeverScrollableScrollPhysics(),
                               itemBuilder:
                                   (BuildContext context, int position) {
                                 debugPrint("Build tab $position");
