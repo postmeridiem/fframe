@@ -232,7 +232,6 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
       "iconButtons": iconButtons,
       "mainFAB": mainFAB,
     };
-
     return Row(
       children: [
         if (widget.documentList != null)
@@ -245,15 +244,13 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
                   child: DocSearch(),
                 ),
                 Expanded(
-                  child: RepaintBoundary(
-                    child: Padding(
-                      padding: const EdgeInsets.all(0.0),
-                      child: _DocumentList<T>(
-                        key: ValueKey(widget.collection),
-                        collection: widget.collection,
-                        fromFirestore: widget.fromFirestore,
-                        documentList: widget.documentList!,
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(0.0),
+                    child: _DocumentList<T>(
+                      key: ValueKey(widget.collection),
+                      collection: widget.collection,
+                      fromFirestore: widget.fromFirestore,
+                      documentList: widget.documentList!,
                     ),
                   ),
                 ),
@@ -377,10 +374,14 @@ class _DocumentCanvas<T> extends StatelessWidget {
           return LayoutBuilder(
             builder: (context, constraints) {
               final double docCanvasWidth = constraints.maxWidth;
-              final bool collapsed = docCanvasWidth > 1000;
-              // print(constraints.maxWidth);
+              final bool contextDrawerOpen = docCanvasWidth > 1000;
+
+              final double formCanvasWidth = contextDrawerOpen
+                  ? (constraints.maxWidth - 250)
+                  : constraints.maxWidth;
+
               return CurvedBottomBar(
-                parentContext: context,
+                formCanvasWidth: formCanvasWidth,
                 floatingActionButton: fabConfig!["mainFAB"],
                 iconButtons: fabConfig!["iconButtons"],
                 child: Row(
@@ -469,7 +470,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
                     ContextDrawer(
                       document: document,
                       selectionState: selectionState,
-                      collapsed: collapsed,
+                      contextDrawerOpen: contextDrawerOpen,
                     ),
                   ],
                 ),
@@ -487,16 +488,17 @@ class ContextDrawer extends StatelessWidget {
     Key? key,
     required this.document,
     required this.selectionState,
-    required this.collapsed,
+    required this.contextDrawerOpen,
   }) : super(key: key);
 
   final Document document;
   final SelectionState selectionState;
-  final bool collapsed;
+  final bool contextDrawerOpen;
 
   @override
   Widget build(BuildContext context) {
-    if (collapsed) {
+    if (contextDrawerOpen) {
+      // if the document canvas gets too small, render this
       if (document.contextCards != null && document.contextCards!.isNotEmpty) {
         return SizedBox(
           width: 250,

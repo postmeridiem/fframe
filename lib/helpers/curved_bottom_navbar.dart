@@ -6,12 +6,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class CurvedBottomBar extends ConsumerStatefulWidget {
   const CurvedBottomBar({
     Key? key,
-    this.parentContext,
+    this.formCanvasWidth,
     this.child,
     this.iconButtons,
     this.floatingActionButton,
   }) : super(key: key);
-  final BuildContext? parentContext;
+  final double? formCanvasWidth;
   final List<IconButton>? iconButtons;
   final FloatingActionButton? floatingActionButton;
   final Widget? child;
@@ -25,8 +25,7 @@ class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
   Widget build(BuildContext context) {
     SelectionState selectionState = ref.watch(selectionStateProvider).state;
 
-    final BuildContext _parentContext = widget.parentContext as BuildContext;
-    final Size size = MediaQuery.of(_parentContext).size;
+    final double formCanvasWidth = widget.formCanvasWidth as double;
 
     List<Widget>? _iconButtons;
     if (widget.iconButtons != null && selectionState.data != null) {
@@ -39,7 +38,7 @@ class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
         _iconButtons.insert(
             _iconButtons.length ~/ 2,
             SizedBox(
-              width: size.width * 0.20,
+              width: formCanvasWidth * 0.20,
             ));
       }
     } else {
@@ -56,14 +55,14 @@ class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
             left: 0,
             child: SizedBox(
               // width: 850,
-              width: size.width,
+              width: formCanvasWidth,
               height: 60,
               child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   if (_iconButtons != null)
                     CustomPaint(
-                      size: Size(size.width, 80),
+                      size: Size(formCanvasWidth, 80),
                       // size: const Size(850, 80),
                       painter: BNBCustomPainter(
                           context, widget.floatingActionButton != null),
@@ -76,7 +75,7 @@ class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
                     ),
                   if (_iconButtons != null)
                     SizedBox(
-                      width: size.width,
+                      width: formCanvasWidth,
                       // width: 860,
                       height: 80,
                       child: Row(
