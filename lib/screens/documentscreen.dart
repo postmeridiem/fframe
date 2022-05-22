@@ -376,8 +376,11 @@ class _DocumentCanvas<T> extends StatelessWidget {
           });
           return LayoutBuilder(
             builder: (context, constraints) {
-              final bool collapsed = constraints.maxWidth > 1000;
+              final double docCanvasWidth = constraints.maxWidth;
+              final bool collapsed = docCanvasWidth > 1000;
+              // print(constraints.maxWidth);
               return CurvedBottomBar(
+                parentContext: context,
                 floatingActionButton: fabConfig!["mainFAB"],
                 iconButtons: fabConfig!["iconButtons"],
                 child: Row(
@@ -463,23 +466,11 @@ class _DocumentCanvas<T> extends StatelessWidget {
                         ),
                       ),
                     ),
-                    if (document.contextCards != null &&
-                        document.contextCards!.isNotEmpty)
-                      collapsed
-                          ? SizedBox(
-                              width: 250,
-                              child: ContextCanvas(
-                                contextWidgets: document.contextCards!
-                                    .map(
-                                      (contextCardBuilder) =>
-                                          contextCardBuilder(
-                                              selectionState.data),
-                                    )
-                                    .toList(),
-                              ),
-                            )
-                          : DrawerButton(
-                              scaffoldKey: GlobalKey<ScaffoldState>()),
+                    ContextDrawer(
+                      document: document,
+                      selectionState: selectionState,
+                      collapsed: collapsed,
+                    ),
                   ],
                 ),
               );
@@ -488,6 +479,42 @@ class _DocumentCanvas<T> extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class ContextDrawer extends StatelessWidget {
+  const ContextDrawer({
+    Key? key,
+    required this.document,
+    required this.selectionState,
+    required this.collapsed,
+  }) : super(key: key);
+
+  final Document document;
+  final SelectionState selectionState;
+  final bool collapsed;
+
+  @override
+  Widget build(BuildContext context) {
+    if (collapsed) {
+      if (document.contextCards != null && document.contextCards!.isNotEmpty) {
+        return SizedBox(
+          width: 250,
+          child: ContextCanvas(
+            contextWidgets: document.contextCards!
+                .map(
+                  (contextCardBuilder) =>
+                      contextCardBuilder(selectionState.data),
+                )
+                .toList(),
+          ),
+        );
+      } else {
+        return const IgnorePointer();
+      }
+    } else {
+      return DrawerButton(scaffoldKey: GlobalKey<ScaffoldState>());
+    }
   }
 }
 
