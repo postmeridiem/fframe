@@ -1,3 +1,14 @@
+# Credential files
+lib/firebase_config.dart
+test_driver/instance_e2e.dart
+test_driver/firebase_config.dart
+test_driver/test_utils.dart
+test_driver/user_e2e.dart
+ios/GoogleService-Info.plist
+.firebase/
+.firebaserc
+firebase_config.dart
+
 # Miscellaneous
 *.class
 *.log
