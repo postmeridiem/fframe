@@ -179,28 +179,31 @@ class MainBody extends ConsumerWidget {
                         child: IntrinsicHeight(
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 500),
-                            child: NavigationRail(
-                              selectedIndex: ref
-                                  .read(navigationStateProvider)
-                                  .currentIndex,
-                              onDestinationSelected: (int index) {
-                                navigationState.currentIndex = index;
-                                NavigationTarget navigationTarget =
-                                    _navigationTargets[index];
-                                if (navigationTarget.navigationTabs == null) {
-                                  context.go("/${navigationTarget.path}");
-                                } else {
-                                  context.go(
-                                      "/${navigationTarget.path}/${navigationTarget.navigationTabs!.first.path}");
-                                }
-                              },
-                              labelType: NavigationRailLabelType.all,
-                              destinations: <NavigationRailDestination>[
-                                ..._navigationTargets.map((navigationTarget) {
-                                  return navigationTarget
-                                      .navigationRailDestination!;
-                                })
-                              ],
+                            child: IconTheme(
+                              data: const IconThemeData(color: null),
+                              child: NavigationRail(
+                                selectedIndex: ref
+                                    .read(navigationStateProvider)
+                                    .currentIndex,
+                                onDestinationSelected: (int index) {
+                                  navigationState.currentIndex = index;
+                                  NavigationTarget navigationTarget =
+                                      _navigationTargets[index];
+                                  if (navigationTarget.navigationTabs == null) {
+                                    context.go("/${navigationTarget.path}");
+                                  } else {
+                                    context.go(
+                                        "/${navigationTarget.path}/${navigationTarget.navigationTabs!.first.path}");
+                                  }
+                                },
+                                labelType: NavigationRailLabelType.all,
+                                destinations: <NavigationRailDestination>[
+                                  ..._navigationTargets.map((navigationTarget) {
+                                    return navigationTarget
+                                        .navigationRailDestination!;
+                                  })
+                                ],
+                              ),
                             ),
                           ),
                         ),
