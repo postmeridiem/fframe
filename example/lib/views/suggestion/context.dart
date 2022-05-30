@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-
-import 'package:example/l10n/l10n.dart';
 import 'package:example/models/suggestion.dart';
 
 class ContextCard extends StatelessWidget {
@@ -9,7 +7,7 @@ class ContextCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String contextHeader = AppLocalizations.of(context)!.contextHeader;
+    String contextHeader = "Header";
     return Card(
       color: Theme.of(context).colorScheme.primaryContainer,
       child: SizedBox(

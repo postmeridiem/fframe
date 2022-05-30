@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:example/l10n/l10n.dart';
-
 class SettingsGeneralForm extends StatefulWidget {
   const SettingsGeneralForm({Key? key}) : super(key: key);
 
@@ -27,7 +25,7 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
               onPressed: () {
                 // App.l10nConfig.locale = const Locale('nl','');
               },
-              child: Text(AppLocalizations.of(context)!.contextHeader),
+              child: const Text("header"),
             ),
             const Text(
                 'General settings - dunno probably will get culled in the end'),

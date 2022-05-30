@@ -10,8 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_localizations:
-    sdk: flutter
   intl: ^0.17.0
   firebase_core:
   firebase_auth:
