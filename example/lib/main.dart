@@ -4,7 +4,7 @@ import 'package:fframe/fframe.dart';
 import 'package:example/firebase_config.dart';
 
 import 'package:example/themes/themes.dart';
-import 'package:example/l10n/l10n.dart';
+import 'package:example/helpers/l10n.dart';
 
 import 'package:example/views/signInPage/signin_page.dart';
 import 'package:example/views/suggestion/suggestion.dart';

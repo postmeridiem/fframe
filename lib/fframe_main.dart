@@ -34,6 +34,7 @@ class _FframeState extends State<Fframe> {
   @override
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
+
     return FutureBuilder(
       future: Firebase.initializeApp(
         options: widget.firebaseOptions,
@@ -53,24 +54,53 @@ class _FframeState extends State<Fframe> {
                 child: Consumer(
                   builder: (context, ref, child) {
                     UserState userState = ref.watch(userStateNotifierProvider);
-
                     if (userState.runtimeType != UserStateSignedIn &&
                         userState.runtimeType != UserStateSignedOut) {
                       return const UnknownStateLoader();
                     }
-
-                    return App(
-                      title: widget.title,
-                      issuePageLink: widget.issuePageLink,
-                      authenticatedNavigationTargets:
-                          widget.authenticatedNavigationTargets,
-                      unAuthenticatedNavigationTargets:
-                          widget.unAuthenticatedNavigationTargets,
-                      lightMode: widget.lightMode,
-                      darkMode: widget.darkMode,
-                      l10nConfig: widget.l10nConfig,
-                      locale: widget.l10nConfig.locale,
-                    );
+                    // Initialize the language engine.
+                    return FutureBuilder(
+                        future: L10nReader.read(context, widget.l10nConfig),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<Map<String, dynamic>> localeSnap) {
+                          switch (localeSnap.connectionState) {
+                            case ConnectionState.none:
+                            case ConnectionState.active:
+                            case ConnectionState.waiting:
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            case ConnectionState.done:
+                              if (localeSnap.hasData) {
+                                Map<String, dynamic> _localeData =
+                                    localeSnap.data as Map<String, dynamic>;
+                                // create the language engine
+                                L10n(
+                                  l10nConfig: widget.l10nConfig,
+                                  localeData: _localeData,
+                                );
+                                debugPrint("L10N: Language engine loaded.");
+                              } else {
+                                // create the language engine
+                                L10n(
+                                  l10nConfig: widget.l10nConfig,
+                                  localeData: {},
+                                );
+                                debugPrint(
+                                    "L10N ERROR: Language engine failed to load.");
+                              }
+                              // start building the Fframe App
+                              return App(
+                                title: widget.title,
+                                issuePageLink: widget.issuePageLink,
+                                authenticatedNavigationTargets:
+                                    widget.authenticatedNavigationTargets,
+                                unAuthenticatedNavigationTargets:
+                                    widget.unAuthenticatedNavigationTargets,
+                                lightMode: widget.lightMode,
+                                darkMode: widget.darkMode,
+                              );
+                          }
+                        });
                   },
                 ),
               ),
@@ -89,8 +119,6 @@ class App extends StatefulWidget {
     required this.unAuthenticatedNavigationTargets,
     required this.darkMode,
     required this.lightMode,
-    required this.l10nConfig,
-    required this.locale,
     this.issuePageLink,
   }) : super(key: key);
 
@@ -100,8 +128,6 @@ class App extends StatefulWidget {
   final List<NavigationTarget> unAuthenticatedNavigationTargets;
   final ThemeData darkMode;
   final ThemeData lightMode;
-  final L10nConfig l10nConfig;
-  final Locale locale;
 
   // global access to a buildcontext, so I can access the translation from anywhere.
   static BuildContext context =
@@ -333,7 +359,7 @@ class _AppState extends State<App> with RestorationMixin {
             navigationTargets: navigationTargets,
             lightMode: widget.lightMode,
             darkMode: widget.darkMode,
-            l10nConfig: widget.l10nConfig,
+            // l10nConfig: widget.l10nConfig,
           );
           // } else {
           //   return ErrorScreen(error: Exception("Nowhere to route to."));
@@ -368,7 +394,7 @@ class _AppState extends State<App> with RestorationMixin {
               border: OutlineInputBorder(),
             ),
           ),
-          locale: widget.locale,
+          locale: L10n.getLocale(),
           builder: (BuildContext context, Widget? widget) {
             // debugPrint("builder");
             Widget error = const Text('...rendering error...');

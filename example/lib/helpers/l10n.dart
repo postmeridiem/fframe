@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:fframe/helpers/l10n.dart';
+export 'package:fframe/helpers/l10n.dart';
 
-final L10nConfig l10nConfig = L10nConfig(
-  // if you disable this, no Localizations
-  // will be made available. You also need
-  // to set generate to false on flutter in
-  // your pubspec.yaml and remove any usage
-  enabled: true,
+// to manage the translations and labels, update the
+// translation files your project's assets dir
 
+L10nConfig l10nConfig = L10nConfig(
   // the default locale your App starts with
   // passed through url string reader here to enable url
-  // control of l10n
-  locale: l10nUrlReader(const Locale('en', 'US')),
+  // deeplinking of an l10n locale. You can also just pass a Locale.
+  locale: L10nConfig.urlReader(const Locale('en', 'US')),
 
   // the list of locales that are supported by your app
   supportedLocales: [
@@ -21,11 +19,12 @@ final L10nConfig l10nConfig = L10nConfig(
     const Locale('nl', 'NL'), // Dutch, Netherlands country code
   ],
 
-  // the localizations you make available to the
-  // App. The top two are flutter and material level
-  // localizations. The bottom one is the l10n integration
+  // Pass the localizations for flutter and material level
+  // widget localizations. Stuff you can't reach otherwise, basically.
   localizationsDelegates: [
     GlobalWidgetsLocalizations.delegate,
     GlobalMaterialLocalizations.delegate,
   ],
+
+  source: L10nSource.assets,
 );

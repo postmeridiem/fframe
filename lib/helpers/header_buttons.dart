@@ -1,10 +1,10 @@
-import 'package:fframe/fframe.dart';
-import 'package:fframe/screens/mainscreen.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fframe/providers/global_providers.dart';
 import 'package:fframe/controllers/selection_state_controller.dart';
+
+import 'package:fframe/helpers/l10n.dart';
 
 import 'package:clipboard/clipboard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -23,18 +23,18 @@ class BarButtonShare extends ConsumerWidget {
           "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
     }
     return IconButton(
-      onPressed: () {
-        String url =
-            "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
-        FlutterClipboard.copy(url).then((_) {
-          return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Copied current location ($url) to clipboard."),
-              behavior: SnackBarBehavior.floating));
-        });
-      },
-      icon: const Icon(Icons.share),
-      tooltip: "Copy the current location to the paste buffer...",
-    );
+        onPressed: () {
+          String url =
+              "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
+          FlutterClipboard.copy(url).then((_) {
+            return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("Copied current location ($url) to clipboard."),
+                behavior: SnackBarBehavior.floating));
+          });
+        },
+        icon: const Icon(Icons.share),
+        tooltip: L10n.string('header_copydeeplink',
+            placeholder: 'Copy deeplink...', namespace: 'fframe'));
   }
 }
 
@@ -61,7 +61,8 @@ class BarButtonDuplicate extends ConsumerWidget {
         });
       },
       icon: const Icon(Icons.open_in_new),
-      tooltip: "Open the current page in a new tab...",
+      tooltip: L10n.string('header_opennewtab',
+          placeholder: 'Open in new tab...', namespace: 'fframe'),
     );
   }
 }
@@ -86,7 +87,8 @@ class BarButtonFeedback extends StatelessWidget {
             });
           },
           icon: const Icon(Icons.pest_control),
-          tooltip: 'translationkey',
+          tooltip: L10n.string('header_openfeedbacklink',
+              placeholder: 'Open feedback...', namespace: 'fframe'),
         );
       },
     );
@@ -97,10 +99,11 @@ class BarButtonProfile extends StatelessWidget {
   const BarButtonProfile({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return const IconButton(
+    return IconButton(
       onPressed: _signOut,
-      icon: Icon(Icons.logout_outlined),
-      tooltip: "Log out...",
+      icon: const Icon(Icons.logout_outlined),
+      tooltip: L10n.string('header_logout',
+          placeholder: 'Log out...', namespace: 'fframe'),
     );
   }
 }

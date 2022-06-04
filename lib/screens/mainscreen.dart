@@ -20,7 +20,7 @@ class MainScreen extends StatelessWidget {
   final List<NavigationTarget> navigationTargets;
   final ThemeData darkMode;
   final ThemeData lightMode;
-  final L10nConfig l10nConfig;
+  // final L10nConfig l10nConfig;
   const MainScreen({
     Key? key,
     required this.appTitle,
@@ -29,7 +29,7 @@ class MainScreen extends StatelessWidget {
     required this.navigationTargets,
     required this.darkMode,
     required this.lightMode,
-    required this.l10nConfig,
+    // required this.l10nConfig,
     this.issuePageLink,
   }) : super(key: key);
 
@@ -98,12 +98,9 @@ class MainScreen extends StatelessWidget {
       theme: lightMode,
       darkTheme: darkMode,
       themeMode: ThemeMode.system,
-      localizationsDelegates:
-          l10nConfig.enabled ? l10nConfig.localizationsDelegates : null,
-      supportedLocales: l10nConfig.enabled
-          ? l10nConfig.supportedLocales
-          : [const Locale('en', '')],
-      locale: l10nConfig.locale,
+      localizationsDelegates: L10n.getDelegates(),
+      supportedLocales: L10n.getLocales(),
+      locale: L10n.getLocale(),
       home: Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(

@@ -1,0 +1,5 @@
+{
+	"test": {
+		"translation": "Test label from the dynamically loaded {locale} file"
+	}
+}
