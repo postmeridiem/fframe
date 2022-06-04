@@ -16,6 +16,13 @@ class MyApp extends StatelessWidget {
     return FRouterLoader(
       mainScreen: const MainScreen(),
       navigationConfig: navigationConfig,
+      routerBuilder: (context) {
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          routeInformationParser: FNavigationRouteInformationParser(),
+          routerDelegate: FNavigationRouterDelegate(),
+        );
+      },
     );
   }
 }

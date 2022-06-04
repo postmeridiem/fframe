@@ -97,11 +97,5 @@ class _RouterScreenState extends State<RouterScreen> {
   }
 }
 
-class EmptyScreen extends StatelessWidget {
-  const EmptyScreen({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text("MT"));
-  }
-}
+
