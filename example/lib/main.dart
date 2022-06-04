@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:fframe/fframe.dart';
-import 'package:example/firebase_config.dart';
+import 'package:example/firebase_options.dart';
 
 import 'package:example/themes/themes.dart';
 import 'package:example/helpers/l10n.dart';
@@ -34,7 +34,7 @@ class MainApp extends StatelessWidget {
 
     return Fframe(
       title: "FlutFrame Demo",
-      firebaseOptions: DefaultFirebaseConfig.platformOptions,
+      firebaseOptions: DefaultFirebaseOptions.currentPlatform,
       authenticatedNavigationTargets: authenticatedNavigationTargets,
       unAuthenticatedNavigationTargets: unAuthenticatedNavigationTargets,
       lightMode: appLightTheme,
