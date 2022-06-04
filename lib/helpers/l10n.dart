@@ -30,7 +30,6 @@ class L10n {
       var _namespace = L10n.instance.map[namespace];
       if (_namespace.containsKey(key)) {
         _output = _namespace[key]!['translation'];
-        debugPrint("L10N: Key found: <$key>.");
       } else {
         debugPrint(
             "L10N MISSING KEY: Inserted placeholder. Key not found: <$key>.");
