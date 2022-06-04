@@ -45,3 +45,5 @@ doc/api/
 # Firebase components
 .firebase
 firebase/.firebaserc
+example/android/app/google-services.json
+example/ios/firebase_app_id_file.json
