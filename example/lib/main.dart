@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:fframe/fframe.dart';
+import 'package:fframe/helpers/l10n.dart';
 import 'package:example/firebase_options.dart';
 
 import 'package:example/themes/themes.dart';
-import 'package:example/helpers/l10n.dart';
 
 import 'package:example/views/signInPage/signin_page.dart';
 import 'package:example/views/suggestion/suggestion.dart';
@@ -31,6 +31,28 @@ class MainApp extends StatelessWidget {
     final List<NavigationTarget> unAuthenticatedNavigationTargets = [
       signInPageNavigationTargets,
     ];
+    final L10nConfig l10nConfig = L10nConfig(
+      // the default locale your App starts with
+      // passed through url string reader here to enable url
+      // deeplinking of an l10n locale. You can also just pass a Locale.
+      locale: L10nConfig.urlReader(const Locale('en', 'US')),
+
+      // the list of locales that are supported by your app
+      supportedLocales: [
+        const Locale('en', 'US'), // English, US country code
+        const Locale('nl', 'NL'), // Dutch, Netherlands country code
+      ],
+
+      // Pass the localizations for flutter and material level
+      // widget localizations. Stuff you can't reach otherwise, basically.
+      localizationsDelegates: [],
+
+      // set the source configuration
+      source: L10nSource.assets,
+
+      // define the namespaces that need to be loaded
+      namespaces: ['fframe', 'global'],
+    );
 
     return Fframe(
       title: "FlutFrame Demo",
