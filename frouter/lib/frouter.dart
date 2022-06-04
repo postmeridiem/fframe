@@ -41,7 +41,7 @@ class FRouterLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    InitialConfig(
+    RouterConfig(
       navigationConfig: navigationConfig,
       routerBuilder: routerBuilder,
       mainScreen: mainScreen,
@@ -58,24 +58,6 @@ class FRouterLoader extends StatelessWidget {
     );
   }
 }
-
-// class _FRouterBuilder extends StatefulWidget {
-//   const _FRouterBuilder({Key? key}) : super(key: key);
-
-//   @override
-//   State<_FRouterBuilder> createState() => __FRouterBuilderState();
-// }
-
-// class __FRouterBuilderState extends State<_FRouterBuilder> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp.router(
-//       debugShowCheckedModeBanner: false,
-//       routeInformationParser: FNavigationRouteInformationParser(),
-//       routerDelegate: FNavigationRouterDelegate(),
-//     );
-//   }
-// }
 
 typedef RouterBuilder = MaterialApp Function(
   BuildContext context,

@@ -15,6 +15,7 @@ final NavigationConfig navigationConfig = NavigationConfig(
         label: Text('Item 1'),
       ),
       public: false,
+      landingPage: true,
     ),
     NavigationTarget(
         path: "path2",
@@ -64,6 +65,7 @@ final NavigationConfig navigationConfig = NavigationConfig(
         label: Text('Item 4'),
       ),
       public: true,
+      private: false,
       landingPage: true,
     ),
   ],

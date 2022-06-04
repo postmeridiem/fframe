@@ -10,6 +10,7 @@ class NavigationTarget {
   final List<String>? roles;
   final List<NavigationTab>? navigationTabs;
   final bool public;
+  final bool private;
   final bool landingPage;
 
   NavigationTarget({
@@ -20,6 +21,7 @@ class NavigationTarget {
     this.navigationTabs,
     this.roles,
     this.public = false,
+    this.private = true,
     this.landingPage = false,
   }); //: assert(contentPane == null && navigationTabs == null, "NavigationTarget: '/${path}' Either contentPane or navigationTabs must not be null");
 }

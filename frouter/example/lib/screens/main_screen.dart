@@ -18,20 +18,14 @@ class _MainScreenState extends State<MainScreen> {
         automaticallyImplyLeading: false,
         title: const Text("FRouter Example"),
         actions: [
-          Consumer(
-            builder: (context, ref, child) {
-              NavigationNotifier navigationNotifier = ref.watch(navigationProvider);
-              if (navigationNotifier.isSignedIn) {
-                return IconButton(
+          FRouter.of(context).isSignedIn
+              ? IconButton(
                   icon: const Icon(Icons.logout),
                   onPressed: () {
-                    navigationNotifier.isSignedIn = false;
+                    FRouter.of(context).logout();
                   },
-                );
-              }
-              return const IgnorePointer();
-            },
-          ),
+                )
+              : const IgnorePointer(),
         ],
       ),
       body: Center(
@@ -46,7 +40,11 @@ class _MainScreenState extends State<MainScreen> {
                   return Column(
                     children: [
                       Text("Last build: ${DateFormat('HH:mm:ss').format(DateTime.now())}"),
-                      ...navigationConfig.navigationTargets
+                      ...FRouter.of(context)
+                          .navigationConfig
+                          .navigationTargets
+
+                          // ...navigationConfig.navigationTargets
                           .map(
                             (NavigationTarget navigationTarget) => Padding(
                               padding: const EdgeInsets.all(8.0),
@@ -82,7 +80,7 @@ class _MainScreenState extends State<MainScreen> {
                               padding: const EdgeInsets.all(4.0),
                               child: ElevatedButton.icon(
                                   onPressed: () {
-                                    navigationNotifier.uri = Uri.parse("/${navigationConfig.signInConfig.signInTarget.path}".replaceAll("//", "/"));
+                                    FRouter.of(context).navigateTo(navigationTarget: navigationConfig.signInConfig.signInTarget);
                                   },
                                   icon: navigationConfig.signInConfig.signInTarget.destination!.icon,
                                   label: Text(navigationConfig.signInConfig.signInTarget.title)),

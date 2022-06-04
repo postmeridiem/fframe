@@ -9,4 +9,12 @@ class NavigationConfig {
     required this.navigationTargets,
     required this.errorPage,
   });
+
+  factory NavigationConfig.clone(NavigationConfig navigationConfig) {
+    return NavigationConfig(
+      errorPage: navigationConfig.errorPage,
+      navigationTargets: List<NavigationTarget>.from(navigationConfig.navigationTargets),
+      signInConfig: navigationConfig.signInConfig,
+    );
+  }
 }

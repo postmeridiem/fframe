@@ -37,19 +37,29 @@ class TargetState {
     if (uri.pathSegments.isEmpty) {
       //This either routes to a / route or to the default route.
       return TargetState(
-        navigationTarget: InitialConfig.instance.navigationConfig.navigationTargets.firstWhere(
+        navigationTarget: navigationNotifier.navigationConfig.navigationTargets.firstWhere(
           (NavigationTarget navigationTarget) => navigationTarget.path == "/",
           orElse: () => TargetState.defaultRoute().navigationTarget,
         ),
       );
     }
 
+    //Check if this is a login path
+    if (navigationNotifier.navigationConfig.signInConfig.signInTarget.path == uri.pathSegments.first) {
+      return TargetState(navigationTarget: navigationNotifier.navigationConfig.signInConfig.signInTarget);
+    }
+    //Check if this is an invite path
+    if (navigationNotifier.navigationConfig.signInConfig.invitionTarget?.path == uri.pathSegments.first) {
+      return TargetState(navigationTarget: navigationNotifier.navigationConfig.signInConfig.invitionTarget!);
+    }
+
+    //Check if this is part of the config
     TargetState targetState = TargetState(
-      navigationTarget: InitialConfig.instance.navigationConfig.navigationTargets.firstWhere(
+      navigationTarget: navigationNotifier.navigationConfig.navigationTargets.firstWhere(
         (NavigationTarget navigationTarget) => navigationTarget.path == uri.pathSegments.first,
         orElse: () {
           debugPrint("No route found to ${uri.pathSegments.first}. Please update the navigation config.");
-          return InitialConfig.instance.navigationConfig.errorPage;
+          return navigationNotifier.navigationConfig.errorPage;
         },
       ),
     );
@@ -57,14 +67,14 @@ class TargetState {
     if (uri.pathSegments.length > 1) {
       debugPrint("Search for subroutes. If not found..... error page");
       if (targetState.navigationTarget.navigationTabs == null || targetState.navigationTarget.navigationTabs!.isEmpty) {
-        return TargetState(navigationTarget: InitialConfig.instance.navigationConfig.errorPage);
+        return TargetState(navigationTarget: navigationNotifier.navigationConfig.errorPage);
       }
 
       try {
         NavigationTab navigationTab = targetState.navigationTarget.navigationTabs!.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == uri.pathSegments.last);
         targetState = TargetState(navigationTarget: navigationTab);
       } catch (e) {
-        TargetState(navigationTarget: InitialConfig.instance.navigationConfig.errorPage);
+        TargetState(navigationTarget: navigationNotifier.navigationConfig.errorPage);
       }
     } else if (targetState.navigationTarget.navigationTabs != null) {
       //Cannot route to a path which has tabs. Mandatory apply the first tab
@@ -76,9 +86,9 @@ class TargetState {
 
   factory TargetState.defaultRoute() {
     TargetState targetState = TargetState(
-      navigationTarget: InitialConfig.instance.navigationConfig.navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.landingPage, orElse: () {
+      navigationTarget: navigationNotifier.navigationConfig.navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.landingPage, orElse: () {
         debugPrint("No default route has been configured. Please update the navigation config.");
-        return InitialConfig.instance.navigationConfig.errorPage;
+        return navigationNotifier.navigationConfig.errorPage;
       }),
     );
     debugPrint("DefaultRoute to ${targetState.navigationTarget.title} at ${targetState.navigationTarget.path}");
@@ -132,15 +142,48 @@ class NavigationNotifier extends ChangeNotifier {
   bool _buildPending = false;
 
   bool _isSignedIn = false;
+  List<String>? _roles;
 
-  NavigationNotifier({required this.ref});
+  late NavigationConfig navigationConfig = RouterConfig.instance.navigationConfig;
+
+  NavigationNotifier({required this.ref}) {
+    _filterRoutes();
+  }
 
   bool get isSignedIn => _isSignedIn;
-  set isSignedIn(bool isSignedIn) {
-    debugPrint("New sign in state: $isSignedIn");
-    _isSignedIn = isSignedIn;
-    updateProviders();
-    notifyListeners();
+
+  signIn({List<String>? roles}) {
+    _roles = roles;
+    _isSignedIn = true;
+    _filterRoutes();
+    TargetState? targetState = TargetState.defaultRoute();
+    QueryState? queryState = QueryState(queryParameters: null);
+    processRouteInformation(targetState: targetState, queryState: queryState);
+  }
+
+  signOut() {
+    _roles = null;
+    _isSignedIn = false;
+
+    _filterRoutes();
+    TargetState? targetState = TargetState.defaultRoute();
+    QueryState? queryState = QueryState(queryParameters: null);
+    processRouteInformation(targetState: targetState, queryState: queryState);
+  }
+
+  _filterRoutes() {
+    navigationConfig = NavigationConfig.clone(RouterConfig.instance.navigationConfig);
+    if (_isSignedIn) {
+      //Not signed in. Keep private routes
+      navigationConfig.navigationTargets.removeWhere(
+        (NavigationTarget navigationTarget) => navigationTarget.private == false,
+      );
+    } else {
+      //Not signed in. Keep public routes
+      navigationConfig.navigationTargets.removeWhere(
+        (NavigationTarget navigationTarget) => navigationTarget.public == false,
+      );
+    }
   }
 
   parseRouteInformation({required Uri uri}) {

@@ -64,6 +64,24 @@ class FRouter extends InheritedWidget {
     // navigationNotifier.uri = Uri.parse("${navigationNotifier.uri!.path}?${queryParameters.entries.map((queryStringEntry) => "${queryStringEntry.key}=${queryStringEntry.value}").join("&")}");
   }
 
+  ///Notify a logout
+  logout() {
+    navigationNotifier.signOut();
+  }
+
+  ///Notify a login, optionally parse a list of current user roles
+  login({List<String>? roles}) {
+    navigationNotifier.signIn(roles: roles);
+  }
+
+  bool get isSignedIn {
+    return navigationNotifier.isSignedIn;
+  }
+
+  NavigationConfig get navigationConfig {
+    return navigationNotifier.navigationConfig;
+  }
+
   static FRouter of(BuildContext context) {
     final FRouter? fRouter = context.dependOnInheritedWidgetOfExactType<FRouter>();
     assert(fRouter != null, 'No FRouter found in context');
@@ -92,10 +110,7 @@ class _RouterScreenState extends State<RouterScreen> {
     debugPrint("Build RouterScreen");
     return Consumer(builder: (context, ref, child) {
       // NavigationNotifier navigationNotifier = ref.read(navigationProvider);
-      return InitialConfig.instance.mainScreen;
+      return RouterConfig.instance.mainScreen;
     });
   }
 }
-
-
-
