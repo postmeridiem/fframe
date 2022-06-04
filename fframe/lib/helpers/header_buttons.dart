@@ -56,7 +56,7 @@ class BarButtonDuplicate extends ConsumerWidget {
             "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
         launch(url).then((_) {
           return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Opened CURRENT location ($url) in new tab."),
+              content: Text("Opened current location ($url) in new tab."),
               behavior: SnackBarBehavior.floating));
         });
       },
