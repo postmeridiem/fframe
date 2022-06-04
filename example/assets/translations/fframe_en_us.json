@@ -31,5 +31,11 @@
 	},
 	"errors_dataissue": {
 		"translation": "Data Issue: {error} in {path}"
+	},
+	"errors_homelink": {
+		"translation": "Home"
+	},
+	"errors_externalreference": {
+		"translation": "Launch external reference"
 	}
 }

@@ -1,3 +1,4 @@
+import 'package:fframe/helpers/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,7 +18,12 @@ class NoAccessScreen extends StatelessWidget {
             ),
             TextButton(
               onPressed: () => context.go(initialRoute),
-              child: const Text('Home'),
+              child: Text(
+                L10n.string(
+                  'errors_homelink',
+                  placeholder: "Home",
+                ),
+              ),
             ),
           ],
         ),

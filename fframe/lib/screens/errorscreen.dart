@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:fframe/helpers/l10n.dart';
 
 class ErrorScreen extends StatelessWidget {
   const ErrorScreen({
@@ -27,14 +28,24 @@ class ErrorScreen extends StatelessWidget {
             initiallLocation != null
                 ? TextButton(
                     onPressed: () => context.go(initiallLocation!),
-                    child: const Text('Home'),
+                    child: Text(
+                      L10n.string(
+                        'errors_homelink',
+                        placeholder: "Home",
+                      ),
+                    ),
                   )
                 : const IgnorePointer(),
             externalLocation != null
                 ? TextButton(
                     onPressed: () =>
                         launchUrl(Uri.dataFromString(externalLocation!)),
-                    child: const Text('Launch external reference'),
+                    child: Text(
+                      L10n.string(
+                        "errors_externalreference",
+                        placeholder: "Launch external reference",
+                      ),
+                    ),
                   )
                 : const IgnorePointer(),
           ],
