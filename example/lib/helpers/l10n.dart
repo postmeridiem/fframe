@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:fframe/helpers/l10n.dart';
 export 'package:fframe/helpers/l10n.dart';
@@ -21,10 +20,7 @@ L10nConfig l10nConfig = L10nConfig(
 
   // Pass the localizations for flutter and material level
   // widget localizations. Stuff you can't reach otherwise, basically.
-  localizationsDelegates: [
-    GlobalWidgetsLocalizations.delegate,
-    GlobalMaterialLocalizations.delegate,
-  ],
+  localizationsDelegates: [],
 
   source: L10nSource.assets,
 );
