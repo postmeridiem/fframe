@@ -52,11 +52,12 @@ class BarButtonDuplicate extends ConsumerWidget {
     }
     return IconButton(
       onPressed: () {
-        String url =
+        String _url =
             "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
-        launch(url).then((_) {
+        Uri _uri = Uri.dataFromString(_url);
+        launchUrl(_uri).then((_) {
           return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Opened current location ($url) in new tab."),
+              content: Text("Opened current location ($_url) in new tab."),
               behavior: SnackBarBehavior.floating));
         });
       },
@@ -80,7 +81,8 @@ class BarButtonFeedback extends StatelessWidget {
       builder: (BuildContext context) {
         return IconButton(
           onPressed: () {
-            launch(issuePageLink!).then((_) {
+            Uri _uri = Uri.dataFromString(issuePageLink!);
+            launchUrl(_uri).then((_) {
               return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                   content: Text("Opened issue tracker in a new tab."),
                   behavior: SnackBarBehavior.floating));

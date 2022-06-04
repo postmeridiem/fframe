@@ -32,7 +32,8 @@ class ErrorScreen extends StatelessWidget {
                 : const IgnorePointer(),
             externalLocation != null
                 ? TextButton(
-                    onPressed: () => launch(externalLocation!),
+                    onPressed: () =>
+                        launchUrl(Uri.dataFromString(externalLocation!)),
                     child: const Text('Launch external reference'),
                   )
                 : const IgnorePointer(),
