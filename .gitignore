@@ -47,3 +47,4 @@ doc/api/
 firebase/.firebaserc
 example/android/app/google-services.json
 example/ios/firebase_app_id_file.json
+example/macos/Podfile.lock
