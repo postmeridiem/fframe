@@ -20,7 +20,7 @@ dependencies:
   #       path: /
   #       ref: main
   fframe:
-    path: ../
+    path: ../fframe
 
 
   # The following adds the Cupertino Icons font to your application.
