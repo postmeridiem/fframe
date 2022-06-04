@@ -7,11 +7,25 @@ class FakeLogin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ElevatedButton(
-        child: const Text("Fake Login"),
-        onPressed: () {
-          FRouter.of(context).login();
-        },
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+            child: const Text("Fake Login (without roles)"),
+            onPressed: () {
+              FRouter.of(context).login();
+            },
+          ),
+          const SizedBox(
+            height: 16,
+          ),
+          ElevatedButton(
+            child: const Text("Fake Login (with role: user)"),
+            onPressed: () {
+              FRouter.of(context).login(roles: ["user"]);
+            },
+          ),
+        ],
       ),
     );
   }
