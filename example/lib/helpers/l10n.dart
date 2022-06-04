@@ -22,5 +22,9 @@ L10nConfig l10nConfig = L10nConfig(
   // widget localizations. Stuff you can't reach otherwise, basically.
   localizationsDelegates: [],
 
+  // set the source configuration
   source: L10nSource.assets,
+
+  // define the namespaces that need to be loaded
+  namespaces: ['fframe', 'global'],
 );
