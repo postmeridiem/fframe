@@ -45,6 +45,7 @@ class MainApp extends StatelessWidget {
 
       // Pass the localizations for flutter and material level
       // widget localizations. Stuff you can't reach otherwise, basically.
+      // TODO: @JS needs to be provided. need to figure out a clean way
       localizationsDelegates: [],
 
       // set the source configuration
