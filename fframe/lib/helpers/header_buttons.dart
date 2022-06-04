@@ -28,7 +28,7 @@ class BarButtonShare extends ConsumerWidget {
               "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
           FlutterClipboard.copy(url).then((_) {
             return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Copied CURRENT location ($url) to clipboard."),
+                content: Text("Copied current location ($url) to clipboard."),
                 behavior: SnackBarBehavior.floating));
           });
         },
