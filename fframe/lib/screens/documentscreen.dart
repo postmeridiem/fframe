@@ -146,21 +146,29 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
         if (_documentCanvas.validateDocument() == true) {
           //Save this document
           if ((await _callSave()) == true) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               behavior: SnackBarBehavior.floating,
-              content: Text('Saved succesfully'),
+              content: Text(
+                L10n.string(
+                  'validator_savesuccess',
+                  placeholder: "Saved succesfully",
+                ),
+              ),
             ));
             // callClose();
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               behavior: SnackBarBehavior.floating,
               content: ListTile(
-                leading: Icon(
+                leading: const Icon(
                   Icons.warning,
                   color: Colors.amberAccent,
                 ),
                 title: Text(
-                  "Save failed succesfully",
+                  L10n.string(
+                    'validator_savefail',
+                    placeholder: "Save failed succesfully.",
+                  ),
                 ),
                 tileColor: Colors.redAccent,
               ),
@@ -692,11 +700,27 @@ class _CardList<T> extends ConsumerWidget {
               return documentListItemBuilder(
                   context, docId == document.id, document.data());
             } catch (e) {
+              String _error = e.toString();
+              String _path = document.reference.path;
               return Card(
                 child: ListTile(
                   leading: const Icon(Icons.warning, color: Colors.amberAccent),
                   subtitle: Text(
-                      "Data Issue: ${e.toString()} in ${document.reference.path}"),
+                    L10n.interpolated(
+                      'errors_dataissue',
+                      placeholder: "Data Issue: $_error in $_path",
+                      replacers: [
+                        L10nReplacer(
+                          from: "{error}",
+                          replace: _error,
+                        ),
+                        L10nReplacer(
+                          from: "{path}",
+                          replace: _path,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             }

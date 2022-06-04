@@ -11,7 +11,25 @@
 	"header_opennewtab": {
 		"translation": "Open page in new tab..."
 	},
+	"header_opennewtab_message": {
+		"translation": "Duplicated current page in new tab."
+	},
 	"header_copydeeplink": {
 		"translation": "Copy the current location to the clipboard..."
+	},
+	"header_copydeeplink_message": {
+		"translation": "Copied current location to clipboard."
+	},
+	"doclistsearch_filterchiptip": {
+		"translation": "TIP: Hit enter after typing ':' to create a filter chip...."
+	},
+	"validator_savesuccess": {
+		"translation": "Saved succesfully"
+	},
+	"validator_savefail": {
+		"translation": "Save failed succesfully."
+	},
+	"errors_dataissue": {
+		"translation": "Data Issue: {error} in {path}"
 	}
 }

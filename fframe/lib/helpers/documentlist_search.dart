@@ -1,3 +1,4 @@
+import 'package:fframe/helpers/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,9 +39,14 @@ class _DocSearchState extends ConsumerState<DocSearch> {
               if (query.substring((query.length - 1).clamp(0, query.length)) ==
                   ":") {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
+                  SnackBar(
                     content: Text(
-                        "TIP: Hit enter after typing ':' to create a filter chip... "),
+                      L10n.string(
+                        'doclistsearch_filterchiptip',
+                        placeholder:
+                            "TIP: Hit enter after typing ':' to create a filter chip...",
+                      ),
+                    ),
                   ),
                 );
               }

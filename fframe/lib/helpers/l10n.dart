@@ -76,6 +76,7 @@ class L10nConfig {
     required this.supportedLocales,
     required this.localizationsDelegates,
     required this.source,
+    this.namespaces,
   });
   // this class configured what language
   // settings are provided to the MaterialApp

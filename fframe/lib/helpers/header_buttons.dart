@@ -23,18 +23,28 @@ class BarButtonShare extends ConsumerWidget {
           "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
     }
     return IconButton(
-        onPressed: () {
-          String url =
-              "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
-          FlutterClipboard.copy(url).then((_) {
-            return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Copied current location ($url) to clipboard."),
-                behavior: SnackBarBehavior.floating));
-          });
-        },
-        icon: const Icon(Icons.share),
-        tooltip: L10n.string('header_copydeeplink',
-            placeholder: 'Copy deeplink...', namespace: 'fframe'));
+      onPressed: () {
+        String url =
+            "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
+        FlutterClipboard.copy(url).then((_) {
+          return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                L10n.string(
+                  "header_copydeeplink_message",
+                  placeholder: "Copied current location to clipboard.",
+                  namespace: 'fframe',
+                ),
+              ),
+              behavior: SnackBarBehavior.floating));
+        });
+      },
+      icon: const Icon(Icons.share),
+      tooltip: L10n.string(
+        'header_copydeeplink',
+        placeholder: 'Copy deeplink...',
+        namespace: 'fframe',
+      ),
+    );
   }
 }
 
@@ -56,13 +66,23 @@ class BarButtonDuplicate extends ConsumerWidget {
             "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
         launchUrl(Uri.dataFromString(_url)).then((_) {
           return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Opened current location ($_url) in new tab."),
+              // content: Text("Opened current location ($_url) in new tab."),
+              content: Text(
+                L10n.string(
+                  "header_opennewtab_message",
+                  placeholder: "Duplicated current page in new tab.",
+                  namespace: 'fframe',
+                ),
+              ),
               behavior: SnackBarBehavior.floating));
         });
       },
       icon: const Icon(Icons.open_in_new),
-      tooltip: L10n.string('header_opennewtab',
-          placeholder: 'Open in new tab...', namespace: 'fframe'),
+      tooltip: L10n.string(
+        'header_opennewtab',
+        placeholder: 'Open in new tab...',
+        namespace: 'fframe',
+      ),
     );
   }
 }
@@ -87,8 +107,7 @@ class BarButtonFeedback extends StatelessWidget {
             });
           },
           icon: const Icon(Icons.pest_control),
-          tooltip: L10n.string('header_openfeedbacklink',
-              placeholder: 'Open feedback...', namespace: 'fframe'),
+          tooltip: "Open issue tracker...",
         );
       },
     );
