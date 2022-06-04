@@ -178,6 +178,30 @@ class NavigationNotifier extends ChangeNotifier {
       navigationConfig.navigationTargets.removeWhere(
         (NavigationTarget navigationTarget) => navigationTarget.private == false,
       );
+
+      //Check routes for roles (TODO:)
+      navigationConfig.navigationTargets.removeWhere(
+        (NavigationTarget navigationTarget) {
+          //If the target does not require roles. Return false
+          if (navigationTarget.roles == null) {
+            return false;
+          }
+
+          //If the user does not have roles. return true
+          if (_roles == null) {
+            return true;
+          }
+
+          //Check if the intersection contains a value. If so return false
+          Set<String> userRoles = _roles!.toSet();
+          Set<String> targetRoles = navigationTarget.roles!.toSet();
+
+          Set<String> interSection = userRoles.intersection(targetRoles);
+          return interSection.isNotEmpty;
+        },
+      );
+      //Check tabs for roles (TODO:)
+
     } else {
       //Not signed in. Keep public routes
       navigationConfig.navigationTargets.removeWhere(
