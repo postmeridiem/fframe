@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "fframe-dev"
+  },
+  "targets": {
+    "fframe-dev": {
+      "hosting": {
+        "frouter": [
+          "frouter"
+        ]
+      }
+    }
+  }
+}
