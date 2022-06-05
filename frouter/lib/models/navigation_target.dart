@@ -23,5 +23,6 @@ class NavigationTarget {
     this.public = false,
     this.private = true,
     this.landingPage = false,
-  }); //: assert(contentPane == null && navigationTabs == null, "NavigationTarget: '/${path}' Either contentPane or navigationTabs must not be null");
+  }); // : assert(contentPane == null && navigationTabs == null, "NavigationTarget: '$path' Either contentPane or navigationTabs must be null: ${contentPane == null} ${navigationTabs == null}"),
+  //    assert(navigationTabs != null && roles != null, "NavigationTarget: '$path' Do not assign roles when tabs are determined. The roles are derived from the tabs");
 }

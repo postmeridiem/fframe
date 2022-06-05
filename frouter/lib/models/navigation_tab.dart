@@ -7,6 +7,8 @@ class NavigationTab extends NavigationTarget {
     required String path,
     required Widget contentPane,
     List<String>? roles,
+    public = false,
+    private = true,
   }) :
         // assert(contentPane == null, "NavigationTab: '/${path}' contentPane must not be null"),
         super(
@@ -14,6 +16,8 @@ class NavigationTab extends NavigationTarget {
           path: path,
           contentPane: contentPane,
           roles: roles,
+          public: public,
+          private: private,
         );
 
   late NavigationTarget parentTarget;

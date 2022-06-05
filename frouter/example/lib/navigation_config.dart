@@ -25,23 +25,24 @@ final NavigationConfig navigationConfig = NavigationConfig(
           icon: Icon(Icons.lock),
           label: Text('Item 2'),
         ),
-        roles: [
-          'User'
-        ],
         navigationTabs: [
           NavigationTab(
             title: "Tab 1",
             path: "tab1",
             contentPane: const DocumentScreen(),
+            roles: ['user'],
           ),
           NavigationTab(
             title: "Tab 2",
             path: "tab2",
             contentPane: const DocumentScreen(),
+            public: true,
+            private: false,
           ),
           NavigationTab(
             title: "Tab 3",
             path: "tab3",
+            private: true,
             contentPane: const DocumentScreen(),
           )
         ]),

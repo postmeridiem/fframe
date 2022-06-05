@@ -147,7 +147,7 @@ class NavigationNotifier extends ChangeNotifier {
   late NavigationConfig navigationConfig = RouterConfig.instance.navigationConfig;
 
   NavigationNotifier({required this.ref}) {
-    _filterRoutes();
+    _filterNavigationRoutes();
   }
 
   bool get isSignedIn => _isSignedIn;
@@ -155,7 +155,7 @@ class NavigationNotifier extends ChangeNotifier {
   signIn({List<String>? roles}) {
     _roles = roles;
     _isSignedIn = true;
-    _filterRoutes();
+    _filterNavigationRoutes();
     TargetState? targetState = TargetState.defaultRoute();
     QueryState? queryState = QueryState(queryParameters: null);
     processRouteInformation(targetState: targetState, queryState: queryState);
@@ -165,23 +165,29 @@ class NavigationNotifier extends ChangeNotifier {
     _roles = null;
     _isSignedIn = false;
 
-    _filterRoutes();
+    _filterNavigationRoutes();
     TargetState? targetState = TargetState.defaultRoute();
     QueryState? queryState = QueryState(queryParameters: null);
     processRouteInformation(targetState: targetState, queryState: queryState);
   }
 
-  _filterRoutes() {
+  _filterNavigationRoutes() {
     navigationConfig = NavigationConfig.clone(RouterConfig.instance.navigationConfig);
     if (_isSignedIn) {
-      //Not signed in. Keep private routes
-      navigationConfig.navigationTargets.removeWhere(
-        (NavigationTarget navigationTarget) => navigationTarget.private == false,
-      );
-
-      //Check routes for roles (TODO:)
+      //Check routes for roles
       navigationConfig.navigationTargets.removeWhere(
         (NavigationTarget navigationTarget) {
+          //Check tabs first(if any)
+          if (navigationTarget.navigationTabs != null) {
+            List<NavigationTab> navigationTabs = _filterTabRoutes(navigationTarget.navigationTabs!);
+            return navigationTabs.isEmpty;
+          }
+
+          //Remove all routes which are not private
+          if (navigationTarget.private == false) {
+            return true;
+          }
+
           //If the target does not require roles. Return false
           if (navigationTarget.roles == null) {
             return false;
@@ -197,17 +203,55 @@ class NavigationNotifier extends ChangeNotifier {
           Set<String> targetRoles = navigationTarget.roles!.toSet();
 
           Set<String> interSection = userRoles.intersection(targetRoles);
-          return interSection.isNotEmpty;
+          return interSection.isEmpty;
         },
       );
-      //Check tabs for roles (TODO:)
-
     } else {
       //Not signed in. Keep public routes
-      navigationConfig.navigationTargets.removeWhere(
-        (NavigationTarget navigationTarget) => navigationTarget.public == false,
+      navigationConfig.navigationTargets.removeWhere((NavigationTarget navigationTarget) {
+        if (navigationTarget.navigationTabs != null) {
+          List<NavigationTab> navigationTabs = _filterTabRoutes(navigationTarget.navigationTabs!);
+          return navigationTabs.isEmpty;
+        }
+
+        return navigationTarget.public == false;
+      });
+    }
+  }
+
+  List<NavigationTab> _filterTabRoutes(List<NavigationTab> navigationTabs) {
+    if (_isSignedIn) {
+      navigationTabs.removeWhere((NavigationTab navigationTab) {
+        //Signed in. Keep private routes
+        if (navigationTab.private == false) {
+          return true;
+        }
+
+        //If the target does not require roles. Return false
+        if (navigationTab.roles == null) {
+          return false;
+        }
+
+        //If the user does not have roles. return true
+        if (_roles == null) {
+          return true;
+        }
+
+        //Check if the intersection contains a value. If so return false
+        Set<String> userRoles = _roles!.toSet();
+        Set<String> targetRoles = navigationTab.roles!.toSet();
+
+        Set<String> interSection = userRoles.intersection(targetRoles);
+        return interSection.isEmpty;
+      });
+    } else {
+      //Not signed in. Keep public routes
+      navigationTabs.removeWhere(
+        (NavigationTab navigationTab) => navigationTab.public == false,
       );
     }
+
+    return navigationTabs;
   }
 
   parseRouteInformation({required Uri uri}) {
