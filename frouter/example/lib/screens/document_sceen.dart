@@ -59,9 +59,6 @@ class DocumentScreen extends StatelessWidget {
             },
           ),
         ),
-        const VerticalDivider(
-          color: Colors.blueGrey,
-        ),
       ],
     );
   }

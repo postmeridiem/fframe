@@ -82,6 +82,147 @@ class FRouter extends InheritedWidget {
     return navigationNotifier.navigationConfig;
   }
 
+  Drawer drawer({
+    required BuildContext context,
+    DrawerHeader? drawerHeader,
+    Destination? signOutDestination,
+  }) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          drawerHeader ?? const IgnorePointer(),
+          ...navigationNotifier.navigationConfig.navigationTargets
+              .where(
+                ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
+              )
+              .map(
+                (NavigationTarget navigationTarget) => Column(
+                  children: [
+                    ListTile(
+                      leading: navigationTarget.destination?.icon,
+                      title: navigationTarget.destination?.label,
+                      onTap: () {
+                        navigateTo(navigationTarget: navigationTarget);
+                        Navigator.pop(context);
+                      },
+                    ),
+                    // Text("${navigationTarget.navigationTabs?.length}"),
+                    ...?navigationTarget.navigationTabs
+                        ?.where(
+                          ((NavigationTab navigationTab) => navigationTab.destination != null),
+                        )
+                        .map(
+                          (NavigationTab navigationTab) => Padding(
+                            padding: navigationTab.destination?.padding ??
+                                const EdgeInsets.only(
+                                  left: 24,
+                                ),
+                            child: ListTile(
+                              leading: navigationTab.destination?.icon,
+                              title: navigationTab.destination?.label,
+                              onTap: () {
+                                navigateTo(navigationTarget: navigationTab);
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ],
+                ),
+              ),
+          if (!navigationNotifier.isSignedIn && navigationNotifier.navigationConfig.signInConfig.signInTarget.destination != null)
+            ListTile(
+              leading: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination?.icon,
+              title: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.label,
+              onTap: () {
+                navigateTo(navigationTarget: navigationNotifier.navigationConfig.signInConfig.signInTarget);
+                Navigator.pop(context);
+              },
+            ),
+          if (signOutDestination != null && navigationNotifier.isSignedIn)
+            ListTile(
+              leading: signOutDestination.icon,
+              title: signOutDestination.label,
+              onTap: () {
+                logout();
+                Navigator.pop(context);
+              },
+            ),
+        ],
+      ),
+    );
+  }
+
+  NavigationRail navigationRail({NavigationRailDestination? signOutDestination}) {
+    return NavigationRail(
+      selectedIndex: navigationNotifier.selectedNavRailIndex,
+      onDestinationSelected: (int index) {
+        if (index < navigationNotifier.navigationConfig.navigationTargets.length) {
+          navigationNotifier.selectedNavRailIndex = index;
+          NavigationTarget navigationTarget = navigationNotifier.navigationConfig.navigationTargets[index];
+          navigateTo(navigationTarget: navigationTarget);
+        } else {
+          debugPrint("Sign in/out action");
+          if (isSignedIn) {
+            logout();
+          } else {
+            NavigationTarget navigationTarget = navigationNotifier.navigationConfig.signInConfig.signInTarget;
+            navigateTo(navigationTarget: navigationTarget);
+          }
+        }
+      },
+      labelType: NavigationRailLabelType.all,
+      destinations: [
+        ...navigationNotifier.navigationConfig.navigationTargets
+            .where(
+              ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
+            )
+            .map(
+              (NavigationTarget navigationTarget) => NavigationRailDestination(
+                icon: navigationTarget.destination!.icon,
+                selectedIcon: navigationTarget.destination!.selectedIcon,
+                label: navigationTarget.destination!.label,
+                padding: navigationTarget.destination!.padding,
+              ),
+            ),
+        if (!navigationNotifier.isSignedIn && navigationNotifier.navigationConfig.signInConfig.signInTarget.destination != null)
+          NavigationRailDestination(
+            icon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.icon,
+            selectedIcon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
+            label: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.label,
+            padding: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.padding,
+          ),
+        if (signOutDestination != null && navigationNotifier.isSignedIn) signOutDestination,
+      ],
+    );
+  }
+
+  // Consumer contentBuilder({required DocumentBuilder documentBody, required EmptyPageBuilder emptyPage}) {
+  //   // return const Text("xx");
+  //   return Consumer(
+  //     builder: (context, ref, child) {
+  //       TargetState targetState = ref.watch(targetStateProvider);
+  //       QueryState queryState = ref.watch(queryStateProvider);
+  //       debugPrint("ReSpawn DocumentBody for ${targetState.navigationTarget.title} ${queryState.queryString} ");
+  //       Widget returnWidget = queryState.queryString.isEmpty
+  //           ? documentBody(
+  //               context,
+  //               ValueKey(queryState.queryString),
+  //               queryState,
+  //             )
+  //           : emptyPage(context);
+  //       // return returnWidget;
+  //       return AnimatedSwitcher(
+  //         key: ValueKey("query_${key.toString()}"),
+  //         duration: const Duration(milliseconds: 250),
+  //         child: returnWidget,
+  //       );
+  //     },
+  //   );
+  // }
+
   static FRouter of(BuildContext context) {
     final FRouter? fRouter = context.dependOnInheritedWidgetOfExactType<FRouter>();
     assert(fRouter != null, 'No FRouter found in context');
@@ -108,9 +249,9 @@ class _RouterScreenState extends State<RouterScreen> {
       navigationNotifier.isBuilding = false;
     });
     debugPrint("Build RouterScreen");
-    return Consumer(builder: (context, ref, child) {
-      // NavigationNotifier navigationNotifier = ref.read(navigationProvider);
-      return RouterConfig.instance.mainScreen;
-    });
+    return RouterConfig.instance.mainScreen;
   }
 }
+
+typedef DocumentBuilder = Widget Function(BuildContext context, Key key, QueryState queryState);
+typedef EmptyPageBuilder = Widget Function(BuildContext context);

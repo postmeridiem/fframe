@@ -31,6 +31,10 @@ final NavigationConfig navigationConfig = NavigationConfig(
             path: "tab1",
             contentPane: const DocumentScreen(),
             roles: ['user'],
+            destination: const Destination(
+              icon: Icon(Icons.onetwothree),
+              label: Text('Tab 1'),
+            ),
           ),
           NavigationTab(
             title: "Tab 2",
@@ -38,12 +42,20 @@ final NavigationConfig navigationConfig = NavigationConfig(
             contentPane: const DocumentScreen(),
             public: true,
             private: false,
+            destination: const Destination(
+              icon: Icon(Icons.onetwothree),
+              label: Text('Tab 3'),
+            ),
           ),
           NavigationTab(
             title: "Tab 3",
             path: "tab3",
             private: true,
             contentPane: const DocumentScreen(),
+            destination: const Destination(
+              icon: Icon(Icons.onetwothree),
+              label: Text('Tab 3'),
+            ),
           )
         ]),
     NavigationTarget(

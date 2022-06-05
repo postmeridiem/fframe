@@ -1,7 +1,5 @@
-import 'package:example/navigation_config.dart';
 import 'package:flutter/material.dart';
 import 'package:frouter/frouter.dart';
-import 'package:intl/intl.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -11,95 +9,72 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: const Text("FRouter Example"),
+        leading: IconButton(
+            onPressed: () {
+              if (_scaffoldKey.currentState!.isDrawerOpen) {
+                _scaffoldKey.currentState!.closeDrawer();
+              } else {
+                _scaffoldKey.currentState!.openDrawer();
+              }
+            },
+            icon: const Icon(Icons.menu)),
         actions: [
-          FRouter.of(context).isSignedIn
-              ? IconButton(
-                  icon: const Icon(Icons.logout),
-                  onPressed: () {
-                    FRouter.of(context).logout();
-                  },
-                )
-              : const IgnorePointer(),
+          if (FRouter.of(context).isSignedIn)
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () {
+                FRouter.of(context).logout();
+              },
+            ),
+          IconButton(
+              onPressed: () {
+                if (_scaffoldKey.currentState!.isEndDrawerOpen) {
+                  _scaffoldKey.currentState!.closeEndDrawer();
+                } else {
+                  _scaffoldKey.currentState!.openEndDrawer();
+                }
+              },
+              icon: const Icon(Icons.menu)),
         ],
+      ),
+      drawer: FRouter.of(context).drawer(
+        context: context,
+        drawerHeader: const DrawerHeader(
+          decoration: BoxDecoration(
+            color: Colors.blue,
+          ),
+          child: Text("FRouter Example"),
+        ),
+        signOutDestination: const Destination(
+          icon: Icon(Icons.logout),
+          label: Text("Sign out"),
+        ),
+      ),
+      endDrawer: FRouter.of(context).drawer(
+        context: context,
       ),
       body: Center(
         child: Row(
           children: [
-            Flexible(
-              flex: 2,
-              fit: FlexFit.tight,
-              child: Consumer(
-                builder: (context, ref, child) {
-                  // NavigationNotifier navigationNotifier = ref.read(navigationProvider);
-                  return Column(
-                    children: [
-                      Text("Last build: ${DateFormat('HH:mm:ss').format(DateTime.now())}"),
-                      ...FRouter.of(context)
-                          .navigationConfig
-                          .navigationTargets
-
-                          // ...navigationConfig.navigationTargets
-                          .map(
-                            (NavigationTarget navigationTarget) => Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Column(
-                                children: [
-                                  ElevatedButton.icon(
-                                    onPressed: () {
-                                      FRouter.of(context).navigateTo(navigationTarget: navigationTarget);
-                                    },
-                                    icon: navigationTarget.destination!.icon,
-                                    label: navigationTarget.destination!.label,
-                                  ),
-                                  ...?navigationTarget.navigationTabs
-                                      ?.map((NavigationTab navigationTab) => Padding(
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: ElevatedButton(
-                                                onPressed: () {
-                                                  FRouter.of(context).navigateTo(navigationTarget: navigationTab);
-                                                },
-                                                child: Text(navigationTab.title)),
-                                          ))
-                                      .toList()
-                                ],
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      Consumer(
-                        builder: (context, ref, child) {
-                          NavigationNotifier navigationNotifier = ref.watch(navigationProvider);
-                          if (!navigationNotifier.isSignedIn) {
-                            return Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: ElevatedButton.icon(
-                                  onPressed: () {
-                                    FRouter.of(context).navigateTo(navigationTarget: navigationConfig.signInConfig.signInTarget);
-                                  },
-                                  icon: navigationConfig.signInConfig.signInTarget.destination!.icon,
-                                  label: Text(navigationConfig.signInConfig.signInTarget.title)),
-                            );
-                          }
-                          return const IgnorePointer();
-                        },
-                      ),
-                    ],
-                  );
-                },
+            FRouter.of(context).navigationRail(
+              signOutDestination: const NavigationRailDestination(
+                icon: Icon(Icons.logout),
+                label: Text("Sign out"),
               ),
             ),
             const VerticalDivider(
               color: Colors.blueGrey,
             ),
-            Flexible(
-              flex: 4,
-              fit: FlexFit.tight,
+            Expanded(
               child: Consumer(
                 builder: (context, ref, child) {
                   TargetState targetState = ref.watch(targetStateProvider);
@@ -112,7 +87,7 @@ class _MainScreenState extends State<MainScreen> {
                   );
                 },
               ),
-            )
+            ),
           ],
         ),
       ),

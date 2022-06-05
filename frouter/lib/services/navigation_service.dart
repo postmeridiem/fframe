@@ -150,6 +150,7 @@ class NavigationNotifier extends ChangeNotifier {
     _filterNavigationRoutes();
   }
 
+  int selectedNavRailIndex = 0;
   bool get isSignedIn => _isSignedIn;
 
   signIn({List<String>? roles}) {
