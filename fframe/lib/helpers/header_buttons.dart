@@ -225,7 +225,7 @@ class _ThemeDropdownState extends State<ThemeDropdown> {
   Widget build(BuildContext context) {
     return Theme(
       data: Theme.of(context).copyWith(
-        canvasColor: Theme.of(context).colorScheme.secondary,
+        canvasColor: Theme.of(context).colorScheme.tertiary,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -273,7 +273,7 @@ class _LocaleDropdownState extends State<LocaleDropdown> {
   Widget build(BuildContext context) {
     return Theme(
       data: Theme.of(context).copyWith(
-        canvasColor: Theme.of(context).colorScheme.secondary,
+        canvasColor: Theme.of(context).colorScheme.tertiary,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
