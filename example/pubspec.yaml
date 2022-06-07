@@ -18,10 +18,10 @@ dependencies:
   #       url: https://github.com/postmeridiem/fframe.git
   #       path: fframe/
   #       ref: main
-  # froute:
+  # frouter:
   #     git:
   #       url: https://github.com/postmeridiem/fframe.git
-  #       path: froute/
+  #       path: frouter/
   #       ref: main
   fframe:
     path: ../fframe
