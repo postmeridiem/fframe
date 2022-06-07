@@ -118,15 +118,201 @@ class BarButtonProfile extends StatelessWidget {
   const BarButtonProfile({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: _signOut,
-      icon: const Icon(Icons.logout_outlined),
-      tooltip: L10n.string('header_logout',
-          placeholder: 'Log out...', namespace: 'fframe'),
+    String? _photoUrl = FirebaseAuth.instance.currentUser!.photoURL;
+    String _profileName =
+        FirebaseAuth.instance.currentUser!.displayName as String;
+    List<String>? _avatarText = _profileName
+        .split(' ')
+        .map((part) => part.trim().substring(0, 1))
+        .toList();
+    CircleAvatar? _circleAvatar = CircleAvatar(
+      radius: 16.0,
+      child: (_photoUrl == null)
+          ? Text(
+              "${_avatarText.first}${_avatarText.last}",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            )
+          : null,
+      backgroundImage: (_photoUrl == null) ? null : NetworkImage(_photoUrl),
+      backgroundColor: (_photoUrl == null) ? Colors.amber : Colors.transparent,
     );
+
+    return PopupMenuButton(
+      color: Theme.of(context).colorScheme.tertiary,
+      offset: Offset.fromDirection(100.0),
+      icon: _circleAvatar,
+      onSelected: (item) => _onSelected(context, item),
+      itemBuilder: (context) => [
+        PopupMenuItem<String>(
+          value: "profile",
+          child: Card(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: ListTile(
+              mouseCursor: SystemMouseCursors.click,
+              leading: _circleAvatar,
+              title: Text(
+                _profileName,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer),
+              ),
+              subtitle: Text(
+                L10n.string("header_profilelabel",
+                    placeholder: "Click to open profile...",
+                    namespace: "fframe"),
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                    fontSize: 12),
+              ),
+            ),
+          ),
+        ),
+        // PopupMenuDivider(),
+        const PopupMenuItem<String>(
+          child: ThemeDropdown(),
+        ),
+        const PopupMenuItem<String>(
+          child: LocaleDropdown(),
+        ),
+        // PopupMenuDivider(),
+        PopupMenuItem<String>(
+          value: "logout",
+          child: ListTile(
+            leading: Icon(Icons.logout_outlined,
+                color: Theme.of(context).colorScheme.onTertiary),
+            title: Text(
+              L10n.string("header_signout",
+                  placeholder: "Sign out...", namespace: "fframe"),
+              style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+            ),
+          ),
+        ),
+      ],
+    );
+    // return IconButton(
+    //   onPressed: _signOut,
+    //   icon: const Icon(Icons.logout_outlined),
+    //   tooltip: L10n.string('header_logout',
+    //       placeholder: 'Log out...', namespace: 'fframe'),
+    // );
+    //   icon: (avatarText != null || _photoUrl != null)
+    //       ? CircleAvatar(
+    //           radius: 18.0,
+    //           child: (_photoUrl == null && avatarText != null)
+    //               ? Text(
+    //                   "${avatarText.first}${avatarText.last}",
+    //                   style: const TextStyle(fontWeight: FontWeight.bold),
+    //                 )
+    //               : null,
+    //           backgroundImage:
+    //               (_photoUrl == null) ? null : NetworkImage(_photoUrl!),
+    //           backgroundColor:
+    //               (_photoUrl == null) ? Colors.amber : Colors.transparent,
+    //         )
+    //       : null,
+    //   tooltip: L10n.string('header_logout',
+    //       placeholder: 'Log out...', namespace: 'fframe'),
+    // );
+  }
+
+  void _onSelected(BuildContext context, item) {
+    switch (item) {
+      case 'logout':
+        _signOut();
+        break;
+      case 'void':
+        break;
+      default:
+        break;
+    }
   }
 }
 
 Future<void> _signOut() async {
   await FirebaseAuth.instance.signOut();
+}
+
+class ThemeDropdown extends StatefulWidget {
+  const ThemeDropdown({Key? key}) : super(key: key);
+
+  @override
+  State<ThemeDropdown> createState() => _ThemeDropdownState();
+}
+
+class _ThemeDropdownState extends State<ThemeDropdown> {
+  String dropdownValue = 'Theme: auto';
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        DropdownButton<String>(
+          value: dropdownValue,
+          elevation: 16,
+          underline: Container(
+            height: 2,
+          ),
+          onChanged: (String? newValue) {
+            setState(() {
+              dropdownValue = newValue!;
+            });
+          },
+          items: <String>['Theme: auto', 'Theme: light', 'Theme: dark']
+              .map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+}
+
+class LocaleDropdown extends StatefulWidget {
+  const LocaleDropdown({Key? key}) : super(key: key);
+
+  @override
+  State<LocaleDropdown> createState() => _LocaleDropdownState();
+}
+
+class _LocaleDropdownState extends State<LocaleDropdown> {
+  String dropdownValue = 'Locale: en-US';
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        DropdownButton<String>(
+          value: dropdownValue,
+          elevation: 16,
+          underline: Container(
+            height: 2,
+          ),
+          onChanged: (String? newValue) {
+            setState(() {
+              dropdownValue = newValue!;
+            });
+          },
+          items: <String>['Locale: en-US', 'Locale: nl-NL']
+              .map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(
+                value,
+                style:
+                    TextStyle(color: Theme.of(context).colorScheme.onTertiary),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
 }

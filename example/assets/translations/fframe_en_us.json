@@ -3,7 +3,10 @@
 		"translation": "FlutFrame Demo"
 	},
 	"header_logout": {
-		"translation": "Log out..."
+		"translation": "Sign out..."
+	},
+	"header_profilelabel": {
+		"translation": "Click to open profile..."
 	},
 	"header_translation": {
 		"translation": "Open issue tracker..."
