@@ -15,6 +15,7 @@ class SettingListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      mouseCursor: SystemMouseCursors.click,
       selected: selected,
       title: Text(
         setting.name!,
