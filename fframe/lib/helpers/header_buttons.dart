@@ -189,30 +189,6 @@ class BarButtonProfile extends StatelessWidget {
         ),
       ],
     );
-    // return IconButton(
-    //   onPressed: _signOut,
-    //   icon: const Icon(Icons.logout_outlined),
-    //   tooltip: L10n.string('header_logout',
-    //       placeholder: 'Log out...', namespace: 'fframe'),
-    // );
-    //   icon: (avatarText != null || _photoUrl != null)
-    //       ? CircleAvatar(
-    //           radius: 18.0,
-    //           child: (_photoUrl == null && avatarText != null)
-    //               ? Text(
-    //                   "${avatarText.first}${avatarText.last}",
-    //                   style: const TextStyle(fontWeight: FontWeight.bold),
-    //                 )
-    //               : null,
-    //           backgroundImage:
-    //               (_photoUrl == null) ? null : NetworkImage(_photoUrl!),
-    //           backgroundColor:
-    //               (_photoUrl == null) ? Colors.amber : Colors.transparent,
-    //         )
-    //       : null,
-    //   tooltip: L10n.string('header_logout',
-    //       placeholder: 'Log out...', namespace: 'fframe'),
-    // );
   }
 
   void _onSelected(BuildContext context, item) {
@@ -247,33 +223,38 @@ class _ThemeDropdownState extends State<ThemeDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        DropdownButton<String>(
-          value: dropdownValue,
-          elevation: 16,
-          underline: Container(
-            height: 2,
+    return Theme(
+      data: Theme.of(context).copyWith(
+        canvasColor: Theme.of(context).colorScheme.secondary,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          DropdownButton<String>(
+            value: dropdownValue,
+            elevation: 16,
+            underline: Container(
+              height: 2,
+            ),
+            onChanged: (String? newValue) {
+              setState(() {
+                dropdownValue = newValue!;
+              });
+            },
+            items: <String>['Theme: auto', 'Theme: light', 'Theme: dark']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(
+                  value,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onTertiary),
+                ),
+              );
+            }).toList(),
           ),
-          onChanged: (String? newValue) {
-            setState(() {
-              dropdownValue = newValue!;
-            });
-          },
-          items: <String>['Theme: auto', 'Theme: light', 'Theme: dark']
-              .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(
-                value,
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.onTertiary),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -290,33 +271,38 @@ class _LocaleDropdownState extends State<LocaleDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        DropdownButton<String>(
-          value: dropdownValue,
-          elevation: 16,
-          underline: Container(
-            height: 2,
+    return Theme(
+      data: Theme.of(context).copyWith(
+        canvasColor: Theme.of(context).colorScheme.secondary,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          DropdownButton<String>(
+            value: dropdownValue,
+            elevation: 16,
+            underline: Container(
+              height: 2,
+            ),
+            onChanged: (String? newValue) {
+              setState(() {
+                dropdownValue = newValue!;
+              });
+            },
+            items: <String>['Locale: en-US', 'Locale: nl-NL']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(
+                  value,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onTertiary),
+                ),
+              );
+            }).toList(),
           ),
-          onChanged: (String? newValue) {
-            setState(() {
-              dropdownValue = newValue!;
-            });
-          },
-          items: <String>['Locale: en-US', 'Locale: nl-NL']
-              .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(
-                value,
-                style:
-                    TextStyle(color: Theme.of(context).colorScheme.onTertiary),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
