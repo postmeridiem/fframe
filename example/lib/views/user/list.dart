@@ -14,6 +14,7 @@ class UserListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     List<String>? avatarText = user.displayName?.split(' ').map((part) => part.trim().substring(0, 1)).toList();
     return ListTile(
+      mouseCursor: SystemMouseCursors.click,
       selected: selected,
       leading: (avatarText != null || user.photoURL != null)
           ? CircleAvatar(
