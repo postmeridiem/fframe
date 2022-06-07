@@ -119,6 +119,7 @@ class BarButtonProfile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String? _photoUrl = FirebaseAuth.instance.currentUser!.photoURL;
+    print(_photoUrl);
     String _profileName =
         FirebaseAuth.instance.currentUser!.displayName as String;
     List<String>? _avatarText = _profileName
@@ -134,7 +135,7 @@ class BarButtonProfile extends StatelessWidget {
             )
           : null,
       backgroundImage: (_photoUrl == null) ? null : NetworkImage(_photoUrl),
-      backgroundColor: (_photoUrl == null) ? Colors.amber : Colors.transparent,
+      backgroundColor: (_photoUrl == null) ? Colors.amber : Colors.white,
     );
 
     return PopupMenuButton(
@@ -218,6 +219,9 @@ class BarButtonProfile extends StatelessWidget {
     switch (item) {
       case 'logout':
         _signOut();
+        break;
+      case 'profile':
+        debugPrint('Open profile');
         break;
       case 'void':
         break;
