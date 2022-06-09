@@ -60,15 +60,10 @@ class _FframeState extends State<Fframe> {
                   // routeInformationProvider:
                   routeInformationParser: FNavigationRouteInformationParser(),
                   routerDelegate: FNavigationRouterDelegate(),
-                  themeMode: ThemeMode.system,
                   debugShowCheckedModeBanner: false,
-                  theme: ThemeData(
-                    brightness: Brightness.dark,
-                    visualDensity: VisualDensity.adaptivePlatformDensity,
-                    inputDecorationTheme: const InputDecorationTheme(
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
+                  theme: widget.lightMode,
+                  darkTheme: widget.darkMode,
+                  themeMode: ThemeMode.system,
                   locale: L10n.getLocale(),
                 );
               }),
