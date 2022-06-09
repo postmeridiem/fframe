@@ -281,23 +281,42 @@ class _DocumentBody<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SelectionState selectionState = ref.watch(selectionStateProvider).state;
-    debugPrint("Rebuild documentBody");
-
-    return Scaffold(
-      primary: false,
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 500),
-        child: _DocumentCanvas<T>(
-          key: selectionState.globalKey,
-          document: document,
-          selectionState: selectionState,
-          titleBuilder: titleBuilder,
-          fabConfig: fabConfig,
-          docBodyRef: ref,
-        ),
-      ),
+    TargetState targetState = ref.watch(targetStateProvider);
+    QueryState queryState = ref.watch(queryStateProvider);
+    debugPrint("ReSpawn DocumentBody for ${targetState.navigationTarget.title} ${queryState.queryString} preloaded: ${queryState.context != null}");
+    Widget returnWidget = queryState.queryString.isEmpty
+        ? FRouter.of(context).emptyPage
+        : _DocumentCanvas(
+            key: ValueKey(queryState.queryString),
+            queryState: queryState,
+            document: document,
+            docBodyRef: null,
+            fabConfig: fabConfig,
+          );
+    // return returnWidget;
+    return AnimatedSwitcher(
+      key: ValueKey("query_${key.toString()}"),
+      duration: const Duration(milliseconds: 250),
+      child: returnWidget,
     );
+
+    // SelectionState selectionState = ref.watch(selectionStateProvider).state;
+    // debugPrint("Rebuild documentBody");
+
+    // return Scaffold(
+    //   primary: false,
+    //   body: AnimatedSwitcher(
+    //     duration: const Duration(milliseconds: 500),
+    //     child: _DocumentCanvas<T>(
+    //       key: selectionState.globalKey,
+    //       document: document,
+    //       selectionState: selectionState,
+    //       titleBuilder: titleBuilder,
+    //       fabConfig: fabConfig,
+    //       docBodyRef: ref,
+    //     ),
+    //   ),
+    // );
   }
 }
 
@@ -307,15 +326,15 @@ class _DocumentCanvas<T> extends StatelessWidget {
     Key? key,
     this.titleBuilder,
     this.fabConfig,
-    required this.selectionState,
+    required this.queryState,
     required this.document,
     required this.docBodyRef,
     // required this.callValidate,
   }) : super(key: key);
 
-  final SelectionState selectionState;
+  final QueryState<T> queryState;
   final TitleBuilder<T>? titleBuilder;
-  final Document document;
+  final Document<T> document;
   final Map<String, dynamic>? fabConfig;
   final WidgetRef? docBodyRef;
 
@@ -339,11 +358,15 @@ class _DocumentCanvas<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (selectionState.data == null) {
-      if (selectionState.docId != selectionState.queryParams?["id"]) {
-        return const WaitScreen();
+    if (queryState.context == null && queryState.queryParameters != null) {
+      debugPrint("Resolve query parameters: ${queryState.queryParameters}");
+      if (queryState.queryParameters?['id']?.isNotEmpty ?? false) {
+        return FRouter.of(context).waitPage;
       }
-      return const EmptyScreen();
+      // if (selectionState.docId != selectionState.queryParams?["id"]) {
+      //   return const WaitScreen();
+      // }
+      return FRouter.of(context).errorPage;
     }
 
     return DefaultTabController(
@@ -385,7 +408,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
                               ? ContextCanvas(
                                   contextWidgets: document.contextCards!
                                       .map(
-                                        (contextCardBuilder) => contextCardBuilder(selectionState.data),
+                                        (contextCardBuilder) => contextCardBuilder(queryState.context),
                                       )
                                       .toList(),
                                 )
@@ -398,7 +421,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
                                 SliverAppBar(
                                   actions: const [IgnorePointer()], //To surpess the hamburger
                                   primary: false,
-                                  title: titleBuilder != null ? titleBuilder!(context, selectionState.data) : null,
+                                  title: titleBuilder != null ? titleBuilder!(context, queryState.context!) : null,
                                   floating: true,
                                   pinned: false,
                                   snap: true,
@@ -429,8 +452,8 @@ class _DocumentCanvas<T> extends StatelessWidget {
                                 return Form(
                                   key: document.tabs[position]._formState,
                                   child: Container(
-                                    key: ObjectKey(selectionState.data),
-                                    child: document.tabs[position].childBuilder(selectionState.data),
+                                    key: ObjectKey(queryState.context),
+                                    child: document.tabs[position].childBuilder(queryState.context!),
                                   ),
                                 );
                               },
@@ -443,9 +466,9 @@ class _DocumentCanvas<T> extends StatelessWidget {
                         ),
                       ),
                     ),
-                    ContextDrawer(
+                    ContextDrawer<T>(
                       document: document,
-                      selectionState: selectionState,
+                      queryState: queryState,
                       contextDrawerOpen: contextDrawerOpen,
                     ),
                   ],
@@ -459,16 +482,16 @@ class _DocumentCanvas<T> extends StatelessWidget {
   }
 }
 
-class ContextDrawer extends StatelessWidget {
+class ContextDrawer<T> extends StatelessWidget {
   const ContextDrawer({
     Key? key,
     required this.document,
-    required this.selectionState,
+    required this.queryState,
     required this.contextDrawerOpen,
   }) : super(key: key);
 
-  final Document document;
-  final SelectionState selectionState;
+  final Document<T> document;
+  final QueryState<T> queryState;
   final bool contextDrawerOpen;
 
   @override
@@ -481,7 +504,7 @@ class ContextDrawer extends StatelessWidget {
           child: ContextCanvas(
             contextWidgets: document.contextCards!
                 .map(
-                  (contextCardBuilder) => contextCardBuilder(selectionState.data),
+                  (contextCardBuilder) => contextCardBuilder(queryState.context),
                 )
                 .toList(),
           ),
@@ -646,7 +669,8 @@ class _CardList<T> extends ConsumerWidget {
       return Card(
         child: GestureDetector(
           onTap: () {
-            FRouter.of(context).updateQueryString(queryParameters: {"id": document.id}, resetQueryString: true);
+            // FRouter.of(context)
+            FRouter.of(context).updateQueryString<T>(queryParameters: {"id": document.id}, resetQueryString: true, context: document.data());
             //TODO: Fix this detector
             // // String documentPath = GoRouter.of(context).location;
             // debugPrint("Update document to ${document.reference.path}");

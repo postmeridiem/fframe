@@ -63,7 +63,7 @@ class _FframeState extends State<Fframe> {
                   themeMode: ThemeMode.system,
                   debugShowCheckedModeBanner: false,
                   theme: ThemeData(
-                    brightness: Brightness.light,
+                    brightness: Brightness.dark,
                     visualDensity: VisualDensity.adaptivePlatformDensity,
                     inputDecorationTheme: const InputDecorationTheme(
                       border: OutlineInputBorder(),

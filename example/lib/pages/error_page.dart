@@ -5,8 +5,20 @@ class ErrorPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("ErrorPage"),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: const [
+          Icon(
+            Icons.error,
+            size: 48.0,
+          ),
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text("Something failed succesfully"),
+          ),
+        ],
+      ),
     );
   }
 }

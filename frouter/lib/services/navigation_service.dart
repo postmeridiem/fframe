@@ -107,23 +107,22 @@ class TargetState {
   }
 }
 
-class QueryState {
-  QueryState({
-    this.queryParameters,
-  });
+class QueryState<T> {
+  QueryState({this.queryParameters, this.context});
 
+  final T? context;
   final Map<String, String>? queryParameters;
 
   factory QueryState.fromUri(Uri uri) {
     return QueryState(queryParameters: uri.queryParameters);
   }
 
-  factory QueryState.mergeComponents(QueryState queryState, Map<String, String>? queryParameters) {
+  factory QueryState.mergeComponents(QueryState queryState, Map<String, String>? queryParameters, T? context) {
     Map<String, String> newQueryParameters = {};
     newQueryParameters.addAll(queryState.queryParameters ?? {});
     newQueryParameters.addAll(queryParameters ?? {});
     debugPrint("Merged parameters: ${newQueryParameters.toString()}");
-    return QueryState(queryParameters: newQueryParameters);
+    return QueryState(queryParameters: newQueryParameters, context: context);
   }
 
   String get queryString {

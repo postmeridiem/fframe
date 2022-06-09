@@ -38,11 +38,11 @@ class FRouter extends InheritedWidget {
   ///FRouter.of(context).navigateTo(navigationTarget: widget.navigationTarget, queryString: {"id": "cow"});
   ///Path and replace QS
   ///FRouter.of(context).navigateTo(navigationTarget: widget.navigationTarget, queryString: {"id": "cow"}, resetQueryString: true);
-  navigateTo({required NavigationTarget navigationTarget, Map<String, String>? queryParameters, bool? resetQueryString = true}) {
+  navigateTo<T>({required NavigationTarget navigationTarget, Map<String, String>? queryParameters, bool? resetQueryString = true, T? context}) {
     debugPrint("FRouter: navigate to ${navigationTarget.path} ${queryParameters == null ? "without" : "with"} queryString ${queryParameters?.toString() ?? ""}. Reset queryString: $resetQueryString");
     QueryState queryState = ref.read(queryStateProvider);
 
-    QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
+    QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters, context: context) : QueryState.mergeComponents(queryState, queryParameters, context);
     debugPrint(newQueryState.toString());
 
     TargetState targetState = TargetState.processRouteRequest(navigationTarget: navigationTarget);
@@ -53,18 +53,18 @@ class FRouter extends InheritedWidget {
   ///FRouter.of(context).updateQueryString(queryString: {"id": "cow"});
   ///Only QS (replace path and existing QS values)
   ///FRouter.of(context).updateQueryString(queryString: {"id": "cow"}, resetQueryString: true);
-  updateQueryString({required Map<String, String> queryParameters, bool? resetQueryString = false}) {
-    debugPrint("FRouter: update QueryString to ${queryParameters.toString()}");
+  updateQueryString<T>({required Map<String, String> queryParameters, bool? resetQueryString = false, T? context}) {
+    debugPrint("FRouter: update QueryString to ${queryParameters.toString()} context: ${context ?? "none"}");
     QueryState queryState = ref.read(queryStateProvider);
 
-    QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
+    QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters, context: context) : QueryState.mergeComponents(queryState, queryParameters, context);
     debugPrint(newQueryState.toString());
 
     navigationNotifier.processRouteInformation(queryState: newQueryState);
     // navigationNotifier.uri = Uri.parse("${navigationNotifier.uri!.path}?${queryParameters.entries.map((queryStringEntry) => "${queryStringEntry.key}=${queryStringEntry.value}").join("&")}");
   }
 
-  ///Notify a logout
+  ///Request a logout
   logout() {
     navigationNotifier.signOut();
   }
@@ -74,6 +74,7 @@ class FRouter extends InheritedWidget {
     navigationNotifier.signIn(roles: roles);
   }
 
+  //Current auth state
   bool get isSignedIn {
     return navigationNotifier.isSignedIn;
   }
@@ -82,6 +83,11 @@ class FRouter extends InheritedWidget {
     return navigationNotifier.navigationConfig;
   }
 
+  Widget get waitPage => RouterConfig.instance.navigationConfig.waitPage.contentPane ?? const Center(child: CircularProgressIndicator());
+  Widget get errorPage => RouterConfig.instance.navigationConfig.errorPage.contentPane ?? const Center(child: Icon((Icons.error)));
+  Widget get emptyPage => RouterConfig.instance.navigationConfig.emptyPage.contentPane ?? const Center(child: Text("Much empty"));
+
+  ///Get a drawer for the current context
   Drawer drawer({
     required BuildContext context,
     DrawerHeader? drawerHeader,
