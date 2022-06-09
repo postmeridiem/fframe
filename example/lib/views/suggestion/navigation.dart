@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 
 import 'package:example/views/suggestion/suggestion.dart';
 
-final suggestionNavigationTargets = NavigationTarget(
+final suggestionNavigationTarget = NavigationTarget(
   path: "suggestions",
   title: "Suggestions",
   contentPane: const SuggestionScreen(),
-  navigationRailDestination: const NavigationRailDestination(
+  destination: const Destination(
     icon: Icon(Icons.pest_control),
     label: Text('Suggestions'),
   ),
-  roles: ['User'],
+  roles: ['user'],
+  private: true,
+  landingPage: true,
 );

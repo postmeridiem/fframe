@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -46,9 +48,7 @@ class Setting extends ChangeNotifier {
       name: json['name']! as String,
       active: json['active'] == null ? true : json['active'] as bool,
       icon: json['icon'] == null ? 'question_mark' : json['icon'] as String,
-      creationDate: json['creationDate'] != null
-          ? json['creationDate'] as Timestamp
-          : null,
+      creationDate: json['creationDate'] != null ? json['creationDate'] as Timestamp : null,
       createdBy: json['createdBy'] != null ? json['createdBy'] as String : null,
     );
 
@@ -63,8 +63,7 @@ class Setting extends ChangeNotifier {
   String? createdBy;
 
   Map<String, Object?> toFirestore() {
-    String updatedBy =
-        FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous";
+    String updatedBy = FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous";
 
     final Map<String, Timestamp> changeHistory = {updatedBy: Timestamp.now()};
 
@@ -74,9 +73,7 @@ class Setting extends ChangeNotifier {
       "name": name,
       "icon": icon,
       "creationDate": creationDate ?? Timestamp.now(),
-      "createdBy": createdBy ??
-          FirebaseAuth.instance.currentUser?.displayName ??
-          "Anonymous",
+      "createdBy": createdBy ?? FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous",
       "changeHistory": FieldValue.arrayUnion([changeHistory]),
     };
   }

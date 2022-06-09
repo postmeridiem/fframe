@@ -3,6 +3,8 @@ description: The FlutFrame package.
 version: 0.0.1
 homepage: fframe.app
 
+publish_to: none
+
 environment:
   sdk: ">=2.16.1 <3.0.0"
   flutter: ">=1.17.0"
@@ -10,6 +12,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  frouter:
+    path: ../frouter
   intl: ^0.17.0
   firebase_core:
   firebase_auth:

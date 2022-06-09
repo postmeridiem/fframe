@@ -64,8 +64,7 @@ class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
                     CustomPaint(
                       size: Size(formCanvasWidth, 80),
                       // size: const Size(850, 80),
-                      painter: BNBCustomPainter(
-                          context, widget.floatingActionButton != null),
+                      painter: BNBCustomPainter(context, widget.floatingActionButton != null),
                     ),
                   if (widget.floatingActionButton != null)
                     Center(
@@ -109,8 +108,7 @@ class BNBCustomPainter extends CustomPainter {
     path.quadraticBezierTo(size.width * 0.20, 0, size.width * 0.35, 0);
     if (hasFAB) {
       path.quadraticBezierTo(size.width * 0.40, 0, size.width * 0.40, 20);
-      path.arcToPoint(Offset(size.width * 0.60, 20),
-          radius: const Radius.circular(20.0), clockwise: false);
+      path.arcToPoint(Offset(size.width * 0.60, 20), radius: const Radius.circular(20.0), clockwise: false);
       path.quadraticBezierTo(size.width * 0.60, 0, size.width * 0.65, 0);
     }
     path.quadraticBezierTo(size.width * 0.80, 0, size.width, 20);

@@ -52,14 +52,13 @@ class FRouterLoader extends StatelessWidget {
           navigationNotifier = ref.read(navigationProvider);
           routerDelegate = FNavigationRouterDelegate();
           return routerBuilder(context);
-          // return const _FRouterBuilder();
         },
       ),
     );
   }
 }
 
-typedef RouterBuilder = MaterialApp Function(
+typedef RouterBuilder = Widget Function(
   BuildContext context,
   // Material data,
 );

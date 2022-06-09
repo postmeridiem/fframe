@@ -4,10 +4,14 @@ class NavigationConfig {
   final List<NavigationTarget> navigationTargets;
   final SignInConfig signInConfig;
   final NavigationTarget errorPage;
+  final NavigationTarget emptyPage;
+  final NavigationTarget waitPage;
   NavigationConfig({
     required this.signInConfig,
     required this.navigationTargets,
     required this.errorPage,
+    required this.emptyPage,
+    required this.waitPage,
   });
 
   factory NavigationConfig.clone(NavigationConfig navigationConfig) {
@@ -26,9 +30,11 @@ class NavigationConfig {
         .toList();
 
     return NavigationConfig(
+      emptyPage: navigationConfig.emptyPage,
       errorPage: navigationConfig.errorPage,
       navigationTargets: navigationTargets,
       signInConfig: navigationConfig.signInConfig,
+      waitPage: navigationConfig.waitPage,
     );
   }
 }

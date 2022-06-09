@@ -1,5 +1,7 @@
+import 'package:example/pages/empty_page.dart';
 import 'package:example/pages/error_page.dart';
 import 'package:example/pages/fake_login.dart';
+import 'package:example/pages/wait_page.dart';
 import 'package:example/screens/document_sceen.dart';
 import 'package:flutter/material.dart';
 import 'package:frouter/frouter.dart';
@@ -97,6 +99,18 @@ final NavigationConfig navigationConfig = NavigationConfig(
     path: "404",
     title: "Error",
     contentPane: const ErrorPage(),
+    public: true,
+  ),
+  emptyPage: NavigationTarget(
+    path: "",
+    title: "",
+    contentPane: const EmptyPage(),
+    public: true,
+  ),
+  waitPage: NavigationTarget(
+    path: "",
+    title: "",
+    contentPane: const WaitPage(),
     public: true,
   ),
 );

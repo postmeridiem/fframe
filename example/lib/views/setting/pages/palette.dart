@@ -37,6 +37,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.tertiary,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -69,7 +70,6 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.tertiary,
                     ),
                   ],
                 ),
@@ -91,6 +91,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.background,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -106,7 +107,6 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.background,
                     ),
                   ],
                 ),
@@ -122,6 +122,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.primary,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -137,7 +138,6 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.primary,
                     )
                   ],
                 ),
@@ -153,6 +153,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.secondary,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -168,7 +169,6 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.secondary,
                     ),
                   ],
                 ),
@@ -184,6 +184,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.tertiary,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -199,7 +200,6 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.tertiary,
                     ),
                   ],
                 ),
@@ -215,6 +215,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.surface,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -230,7 +231,6 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.surface,
                     ),
                   ],
                 ),
@@ -246,6 +246,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.surfaceVariant,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -254,16 +255,13 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.surfaceVariant,
                     ),
                   ],
                 ),
@@ -279,6 +277,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.primaryContainer,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -287,16 +286,13 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.primaryContainer,
                     ),
                   ],
                 ),
@@ -312,6 +308,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.primaryContainer,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -320,16 +317,13 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.primaryContainer,
                     ),
                   ],
                 ),
@@ -345,6 +339,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.error,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -360,7 +355,6 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.error,
                     ),
                   ],
                 ),
@@ -376,6 +370,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
+                      color: Theme.of(context).colorScheme.errorContainer,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -384,16 +379,13 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onErrorContainer,
+                              color: Theme.of(context).colorScheme.onErrorContainer,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
                           ),
                         ),
                       ),
-                      color: Theme.of(context).colorScheme.errorContainer,
                     ),
                   ],
                 ),

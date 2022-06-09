@@ -155,73 +155,52 @@ class FRouter extends InheritedWidget {
     );
   }
 
-  NavigationRail navigationRail({NavigationRailDestination? signOutDestination}) {
-    return NavigationRail(
-      selectedIndex: navigationNotifier.selectedNavRailIndex,
-      onDestinationSelected: (int index) {
-        if (index < navigationNotifier.navigationConfig.navigationTargets.length) {
-          navigationNotifier.selectedNavRailIndex = index;
-          NavigationTarget navigationTarget = navigationNotifier.navigationConfig.navigationTargets[index];
-          navigateTo(navigationTarget: navigationTarget);
-        } else {
-          debugPrint("Sign in/out action");
-          if (isSignedIn) {
-            logout();
-          } else {
-            NavigationTarget navigationTarget = navigationNotifier.navigationConfig.signInConfig.signInTarget;
+  Widget navigationRail({NavigationRailDestination? signOutDestination}) {
+    if (navigationNotifier.navigationConfig.navigationTargets.length >= 2) {
+      return NavigationRail(
+        selectedIndex: navigationNotifier.selectedNavRailIndex,
+        onDestinationSelected: (int index) {
+          if (index < navigationNotifier.navigationConfig.navigationTargets.length) {
+            navigationNotifier.selectedNavRailIndex = index;
+            NavigationTarget navigationTarget = navigationNotifier.navigationConfig.navigationTargets[index];
             navigateTo(navigationTarget: navigationTarget);
+          } else {
+            debugPrint("Sign in/out action");
+            if (isSignedIn) {
+              logout();
+            } else {
+              NavigationTarget navigationTarget = navigationNotifier.navigationConfig.signInConfig.signInTarget;
+              navigateTo(navigationTarget: navigationTarget);
+            }
           }
-        }
-      },
-      labelType: NavigationRailLabelType.all,
-      destinations: [
-        ...navigationNotifier.navigationConfig.navigationTargets
-            .where(
-              ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
-            )
-            .map(
-              (NavigationTarget navigationTarget) => NavigationRailDestination(
-                icon: navigationTarget.destination!.icon,
-                selectedIcon: navigationTarget.destination!.selectedIcon,
-                label: navigationTarget.destination!.label,
-                padding: navigationTarget.destination!.padding,
+        },
+        labelType: NavigationRailLabelType.all,
+        destinations: [
+          ...navigationNotifier.navigationConfig.navigationTargets
+              .where(
+                ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
+              )
+              .map(
+                (NavigationTarget navigationTarget) => NavigationRailDestination(
+                  icon: navigationTarget.destination!.icon,
+                  selectedIcon: navigationTarget.destination!.selectedIcon,
+                  label: navigationTarget.destination!.label,
+                  padding: navigationTarget.destination!.padding,
+                ),
               ),
+          if (!navigationNotifier.isSignedIn && navigationNotifier.navigationConfig.signInConfig.signInTarget.destination != null)
+            NavigationRailDestination(
+              icon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.icon,
+              selectedIcon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
+              label: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.label,
+              padding: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.padding,
             ),
-        if (!navigationNotifier.isSignedIn && navigationNotifier.navigationConfig.signInConfig.signInTarget.destination != null)
-          NavigationRailDestination(
-            icon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.icon,
-            selectedIcon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
-            label: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.label,
-            padding: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.padding,
-          ),
-        if (signOutDestination != null && navigationNotifier.isSignedIn) signOutDestination,
-      ],
-    );
+          if (signOutDestination != null && navigationNotifier.isSignedIn) signOutDestination,
+        ],
+      );
+    }
+    return const IgnorePointer();
   }
-
-  // Consumer contentBuilder({required DocumentBuilder documentBody, required EmptyPageBuilder emptyPage}) {
-  //   // return const Text("xx");
-  //   return Consumer(
-  //     builder: (context, ref, child) {
-  //       TargetState targetState = ref.watch(targetStateProvider);
-  //       QueryState queryState = ref.watch(queryStateProvider);
-  //       debugPrint("ReSpawn DocumentBody for ${targetState.navigationTarget.title} ${queryState.queryString} ");
-  //       Widget returnWidget = queryState.queryString.isEmpty
-  //           ? documentBody(
-  //               context,
-  //               ValueKey(queryState.queryString),
-  //               queryState,
-  //             )
-  //           : emptyPage(context);
-  //       // return returnWidget;
-  //       return AnimatedSwitcher(
-  //         key: ValueKey("query_${key.toString()}"),
-  //         duration: const Duration(milliseconds: 250),
-  //         child: returnWidget,
-  //       );
-  //     },
-  //   );
-  // }
 
   static FRouter of(BuildContext context) {
     final FRouter? fRouter = context.dependOnInheritedWidgetOfExactType<FRouter>();

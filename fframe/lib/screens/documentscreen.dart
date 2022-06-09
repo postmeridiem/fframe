@@ -31,8 +31,7 @@ class DocumentScreen<T> extends ConsumerStatefulWidget {
   final List<IconButton>? extraActionButtons;
 
   final String collection;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final T Function() createNew;
   final String? Function(T)? createDocumentId;
@@ -52,12 +51,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
 
   Future<void> lazyLoad(SelectionState selectionState) async {
     SelectionState selectionState = ref.read(selectionStateProvider).state;
-    DocumentSnapshot<T>? documentSnapshot = await DatabaseService<T>()
-        .documentSnapshot(
-            collection: widget.collection,
-            documentId: selectionState.queryParams!["id"]!,
-            fromFirestore: widget.fromFirestore,
-            toFirestore: widget.toFirestore);
+    DocumentSnapshot<T>? documentSnapshot = await DatabaseService<T>().documentSnapshot(collection: widget.collection, documentId: selectionState.queryParams!["id"]!, fromFirestore: widget.fromFirestore, toFirestore: widget.toFirestore);
 
     if (documentSnapshot != null) {
       selectionState = SelectionState(
@@ -66,8 +60,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
         queryParams: selectionState.queryParams,
       );
     } else {
-      debugPrint(
-          "Unable to lazy load document ${selectionState.docId} from ${widget.collection}");
+      debugPrint("Unable to lazy load document ${selectionState.docId} from ${widget.collection}");
     }
 
     // if (!(await documentStream?.isEmpty ?? true)) {
@@ -140,8 +133,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
 
     _callValidate() async {
       debugPrint("callValidate");
-      _DocumentCanvas<T>? _documentCanvas =
-          selectionState.globalKey.currentWidget as _DocumentCanvas<T>?;
+      _DocumentCanvas<T>? _documentCanvas = selectionState.globalKey.currentWidget as _DocumentCanvas<T>?;
       if (_documentCanvas != null) {
         if (_documentCanvas.validateDocument() == true) {
           //Save this document
@@ -224,9 +216,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
     }
 
     //Handle a case where a deeplink to a document comes in
-    if (selectionState.data == null &&
-        selectionState.queryParams?["id"] != null &&
-        selectionState.docId != selectionState.queryParams!["id"]) {
+    if (selectionState.data == null && selectionState.queryParams?["id"] != null && selectionState.docId != selectionState.queryParams!["id"]) {
       debugPrint("Lazy load the deeplinked document");
       lazyLoad(selectionState);
     }
@@ -265,8 +255,7 @@ class _DocumentScreenState<T> extends ConsumerState<DocumentScreen<T>> {
               ],
             ),
           ),
-        if (widget.documentList != null)
-          const VerticalDivider(thickness: 1, width: 1),
+        if (widget.documentList != null) const VerticalDivider(thickness: 1, width: 1),
         Expanded(
           child: _DocumentBody<T>(
             titleBuilder: widget.titleBuilder,
@@ -340,11 +329,8 @@ class _DocumentCanvas<T> extends StatelessWidget {
 
     if (validationResults.contains(false)) {
       //Validation has failed
-      int failedTab = validationResults
-          .indexWhere((validationResult) => validationResult == false);
-      preloadPageController.animateToPage(failedTab,
-          duration: const Duration(microseconds: 100),
-          curve: Curves.easeOutCirc);
+      int failedTab = validationResults.indexWhere((validationResult) => validationResult == false);
+      preloadPageController.animateToPage(failedTab, duration: const Duration(microseconds: 100), curve: Curves.easeOutCirc);
       return false;
     } else {
       return true;
@@ -373,9 +359,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
           tabController.addListener(() {
             if (!tabController.indexIsChanging) {
               debugPrint("Navigate to tab ${tabController.index}");
-              preloadPageController.animateToPage(tabController.index,
-                  duration: const Duration(microseconds: 100),
-                  curve: Curves.easeOutCirc);
+              preloadPageController.animateToPage(tabController.index, duration: const Duration(microseconds: 100), curve: Curves.easeOutCirc);
               // changePage(index: tabController.index, tabController: tabController, page: true);
             }
           });
@@ -384,9 +368,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
               final double docCanvasWidth = constraints.maxWidth;
               final bool contextDrawerOpen = docCanvasWidth > 1000;
 
-              final double formCanvasWidth = contextDrawerOpen
-                  ? (constraints.maxWidth - 250)
-                  : constraints.maxWidth;
+              final double formCanvasWidth = contextDrawerOpen ? (constraints.maxWidth - 250) : constraints.maxWidth;
 
               return CurvedBottomBar(
                 formCanvasWidth: formCanvasWidth,
@@ -399,48 +381,36 @@ class _DocumentCanvas<T> extends StatelessWidget {
                       child: DefaultTabController(
                         length: document.tabs.length,
                         child: Scaffold(
-                          endDrawer: (document.contextCards != null &&
-                                  document.contextCards!.isNotEmpty)
+                          endDrawer: (document.contextCards != null && document.contextCards!.isNotEmpty)
                               ? ContextCanvas(
                                   contextWidgets: document.contextCards!
                                       .map(
-                                        (contextCardBuilder) =>
-                                            contextCardBuilder(
-                                                selectionState.data),
+                                        (contextCardBuilder) => contextCardBuilder(selectionState.data),
                                       )
                                       .toList(),
                                 )
                               : null,
                           primary: false,
-                          backgroundColor:
-                              Theme.of(context).colorScheme.secondary,
+                          backgroundColor: Theme.of(context).colorScheme.secondary,
                           body: NestedScrollView(
-                            headerSliverBuilder: (BuildContext context,
-                                bool innerBoxIsScrolled) {
+                            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                               return <Widget>[
                                 SliverAppBar(
-                                  actions: const [
-                                    IgnorePointer()
-                                  ], //To surpess the hamburger
+                                  actions: const [IgnorePointer()], //To surpess the hamburger
                                   primary: false,
-                                  title: titleBuilder != null
-                                      ? titleBuilder!(
-                                          context, selectionState.data)
-                                      : null,
+                                  title: titleBuilder != null ? titleBuilder!(context, selectionState.data) : null,
                                   floating: true,
                                   pinned: false,
                                   snap: true,
                                   centerTitle: true,
                                   automaticallyImplyLeading: false,
-                                  backgroundColor:
-                                      Theme.of(context).colorScheme.secondary,
+                                  backgroundColor: Theme.of(context).colorScheme.secondary,
                                   bottom: document.tabs.length != 1
                                       ? TabBar(
                                           controller: tabController,
                                           tabs: document.tabs
                                               .map(
-                                                (documentTab) =>
-                                                    documentTab.tabBuilder(),
+                                                (documentTab) => documentTab.tabBuilder(),
                                               )
                                               .toList(),
                                         )
@@ -452,8 +422,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
                               itemCount: document.tabs.length,
                               preloadPagesCount: document.tabs.length,
                               physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder:
-                                  (BuildContext context, int position) {
+                              itemBuilder: (BuildContext context, int position) {
                                 debugPrint("Build tab $position");
                                 //                       AnimatedSwitcher(
                                 // duration: const Duration(milliseconds: 500),
@@ -461,8 +430,7 @@ class _DocumentCanvas<T> extends StatelessWidget {
                                   key: document.tabs[position]._formState,
                                   child: Container(
                                     key: ObjectKey(selectionState.data),
-                                    child: document.tabs[position]
-                                        .childBuilder(selectionState.data),
+                                    child: document.tabs[position].childBuilder(selectionState.data),
                                   ),
                                 );
                               },
@@ -513,8 +481,7 @@ class ContextDrawer extends StatelessWidget {
           child: ContextCanvas(
             contextWidgets: document.contextCards!
                 .map(
-                  (contextCardBuilder) =>
-                      contextCardBuilder(selectionState.data),
+                  (contextCardBuilder) => contextCardBuilder(selectionState.data),
                 )
                 .toList(),
           ),
@@ -538,8 +505,7 @@ class DrawerButton extends StatefulWidget {
 class _DrawerButtonState extends State<DrawerButton> {
   @override
   Widget build(BuildContext context) {
-    if (widget.scaffoldKey.currentState != null &&
-        widget.scaffoldKey.currentState!.hasEndDrawer) {
+    if (widget.scaffoldKey.currentState != null && widget.scaffoldKey.currentState!.hasEndDrawer) {
       return LimitedBox(
         maxWidth: 12,
         child: Center(
@@ -575,8 +541,7 @@ class _DrawerButtonState extends State<DrawerButton> {
 }
 
 class ContextCanvas extends StatelessWidget {
-  const ContextCanvas({Key? key, required this.contextWidgets})
-      : super(key: key);
+  const ContextCanvas({Key? key, required this.contextWidgets}) : super(key: key);
   final List<Widget> contextWidgets;
 
   @override
@@ -600,8 +565,7 @@ class ContextCanvas extends StatelessWidget {
 }
 
 class DocumentTitle extends StatelessWidget {
-  const DocumentTitle({Key? key, required, required this.title})
-      : super(key: key);
+  const DocumentTitle({Key? key, required, required this.title}) : super(key: key);
   final String title;
 
   @override
@@ -632,8 +596,7 @@ class _DocumentList<T> extends StatelessWidget {
   }) : super(key: key);
   final DocumentList<T> documentList;
   final String collection;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
 
   @override
   Widget build(BuildContext context) {
@@ -660,8 +623,7 @@ class _DocumentList<T> extends StatelessWidget {
         );
       },
       loadingBuilder: (context) => const WaitScreen(),
-      errorBuilder: (context, error, stackTrace) =>
-          ErrorScreen(error: Exception(error)),
+      errorBuilder: (context, error, stackTrace) => ErrorScreen(error: Exception(error)),
     );
     // return Container(child: Text("_DocumentList: ${location}"));
   }
@@ -684,21 +646,22 @@ class _CardList<T> extends ConsumerWidget {
       return Card(
         child: GestureDetector(
           onTap: () {
-            String documentPath = GoRouter.of(context).location;
-            debugPrint("Update document to ${document.reference.path}");
-            // SelectionState selectionState = ref.read(selectionStateProvider.notifier).state;
-            ref.read(selectionStateProvider.notifier).state = SelectionState<T>(
-                data: document.data(),
-                queryParams: {"id": document.id},
-                docId: document.id);
-            documentPath = documentPath.split("?")[0];
+            FRouter.of(context).updateQueryString(queryParameters: {"id": document.id}, resetQueryString: true);
+            //TODO: Fix this detector
+            // // String documentPath = GoRouter.of(context).location;
+            // debugPrint("Update document to ${document.reference.path}");
+            // // SelectionState selectionState = ref.read(selectionStateProvider.notifier).state;
+            // ref.read(selectionStateProvider.notifier).state = SelectionState<T>(
+            //     data: document.data(),
+            //     queryParams: {"id": document.id},
+            //     docId: document.id);
+            // documentPath = documentPath.split("?")[0];
             // GoRouter.of(context).go('$documentPath?id=${document.id}', extra: ref.read(selectionStateProvider.notifier).state); //Disables until we figure out how to prevent a full rebuild when changing the query-string
           },
           child: Consumer(builder: (context, ref, child) {
             String docId = ref.watch(selectionStateProvider).state.docId ?? '';
             try {
-              return documentListItemBuilder(
-                  context, docId == document.id, document.data());
+              return documentListItemBuilder(context, docId == document.id, document.data());
             } catch (e) {
               String _error = e.toString();
               String _path = document.reference.path;
@@ -760,8 +723,7 @@ typedef ContextCardBuilder<T> = Widget Function(
 
 typedef DocumentTabBuilder<T> = Widget Function();
 
-typedef DocumentTabChildBuilder<T> = Widget Function(
-    T data); //, AppUser appUser);
+typedef DocumentTabChildBuilder<T> = Widget Function(T data); //, AppUser appUser);
 
 typedef DocumentStream<T> = Stream<DocumentSnapshot> Function(
   String? documentId,

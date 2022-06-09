@@ -1,3 +1,6 @@
+import 'package:example/pages/empty_page.dart';
+import 'package:example/pages/error_page.dart';
+import 'package:example/pages/wait_page.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fframe/fframe.dart';
@@ -21,16 +24,33 @@ class MainApp extends StatelessWidget {
   // This widget is the root of your FlutFrame application.
   @override
   Widget build(BuildContext context) {
-    final List<NavigationTarget> authenticatedNavigationTargets = [
-      // homeNavigationTargets,
-      suggestionNavigationTargets,
-      settingNavigationTargets,
-      usersNavigationTargets,
-    ];
+    final NavigationConfig navigationConfig = NavigationConfig(
+      navigationTargets: [
+        suggestionNavigationTarget,
+        settingNavigationTarget,
+        usersNavigationTarget,
+      ],
+      signInConfig: SignInConfig(signInTarget: signInPageNavigationTarget),
+      errorPage: NavigationTarget(
+        path: "",
+        title: "",
+        contentPane: const ErrorPage(),
+        public: true,
+      ),
+      emptyPage: NavigationTarget(
+        path: "",
+        title: "",
+        contentPane: const EmptyPage(),
+        public: true,
+      ),
+      waitPage: NavigationTarget(
+        path: "",
+        title: "",
+        contentPane: const WaitPage(),
+        public: true,
+      ),
+    );
 
-    final List<NavigationTarget> unAuthenticatedNavigationTargets = [
-      signInPageNavigationTargets,
-    ];
     final L10nConfig l10nConfig = L10nConfig(
       // the default locale your App starts with
       // passed through url string reader here to enable url
@@ -58,8 +78,7 @@ class MainApp extends StatelessWidget {
     return Fframe(
       title: "FlutFrame Demo",
       firebaseOptions: DefaultFirebaseOptions.currentPlatform,
-      authenticatedNavigationTargets: authenticatedNavigationTargets,
-      unAuthenticatedNavigationTargets: unAuthenticatedNavigationTargets,
+      navigationConfig: navigationConfig,
       lightMode: appLightTheme,
       darkMode: appDarkTheme,
       l10nConfig: l10nConfig,

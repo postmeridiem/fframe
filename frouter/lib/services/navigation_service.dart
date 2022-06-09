@@ -85,9 +85,15 @@ class TargetState {
   }
 
   factory TargetState.defaultRoute() {
+    if (navigationNotifier.navigationConfig.navigationTargets.isEmpty && RouterConfig.instance.navigationConfig.navigationTargets.isNotEmpty && navigationNotifier.isSignedIn == false) {
+      //Assume there are no applicable routes within the access control. Route to the signin page
+      return TargetState(
+        navigationTarget: navigationNotifier.navigationConfig.signInConfig.signInTarget,
+      );
+    }
     TargetState targetState = TargetState(
       navigationTarget: navigationNotifier.navigationConfig.navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.landingPage, orElse: () {
-        debugPrint("No default route has been configured. Please update the navigation config.");
+        debugPrint("***** No default route has been configured. Please update the navigation config. *****");
         return navigationNotifier.navigationConfig.errorPage;
       }),
     );
@@ -136,7 +142,6 @@ class NavigationNotifier extends ChangeNotifier {
 
   TargetState? _targetState;
   QueryState? _queryState;
-  // TODO: Route sign in via the sign in path, instead of just loading the widget;
   // NavigationTarget? _postSignInTarget;
   bool _isbuilding = false;
   bool _buildPending = false;

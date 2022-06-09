@@ -6,6 +6,7 @@ class SignInPage extends StatelessWidget {
   final String title;
   @override
   Widget build(BuildContext context) {
+    debugPrint("Load the sign in page");
     return AuthenticationComponents(context, title).signInScreen();
   }
 }

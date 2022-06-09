@@ -53,6 +53,19 @@ class _ThemeToggleState extends State<ThemeToggle> {
   Widget build(BuildContext context) {
     List<bool> isSelected = [true, false, false];
     return ToggleButtons(
+      onPressed: (int index) {
+        setState(() {
+          for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
+            if (buttonIndex == index) {
+              isSelected[buttonIndex] = true;
+            } else {
+              isSelected[buttonIndex] = false;
+            }
+          }
+          //wut
+        });
+      },
+      isSelected: isSelected,
       children: <Widget>[
         SizedBox(
           width: 200,
@@ -91,21 +104,6 @@ class _ThemeToggleState extends State<ThemeToggle> {
           ),
         ),
       ],
-      onPressed: (int index) {
-        setState(() {
-          for (int buttonIndex = 0;
-              buttonIndex < isSelected.length;
-              buttonIndex++) {
-            if (buttonIndex == index) {
-              isSelected[buttonIndex] = true;
-            } else {
-              isSelected[buttonIndex] = false;
-            }
-          }
-          //wut
-        });
-      },
-      isSelected: isSelected,
     );
   }
 }
