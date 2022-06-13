@@ -238,5 +238,5 @@ class _RouterScreenState extends State<RouterScreen> {
   }
 }
 
-typedef DocumentBuilder = Widget Function(BuildContext context, Key key, QueryState queryState);
+// typedef DocumentBuilder = Widget Function(BuildContext context, Key key, QueryState queryState);
 typedef EmptyPageBuilder = Widget Function(BuildContext context);

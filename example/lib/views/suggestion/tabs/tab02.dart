@@ -3,15 +3,17 @@ import 'package:example/models/suggestion.dart';
 import 'package:flutter/material.dart';
 
 class Tab02 extends StatelessWidget {
-  const Tab02({
+  Tab02({
     Key? key,
     required this.suggestion,
   }) : super(key: key);
   final Suggestion suggestion;
+  final ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: scrollController,
       child: Column(
         children: [
           Padding(
