@@ -16,16 +16,16 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
   Widget build(BuildContext context) {
     debugPrint("presenting SettingsGeneralForm");
 
-    List<L10nReplacer> _replacers = [
+    List<L10nReplacer> replacers = [
       L10nReplacer(from: "{locale}", replace: 'replaceworks'),
       L10nReplacer(from: "global", replace: 'KAZAN'),
     ];
 
-    String _label = L10n.interpolated(
+    String label = L10n.interpolated(
       'test',
       placeholder: 'isniedaarnie',
       namespace: 'fframe',
-      replacers: _replacers,
+      replacers: replacers,
     );
 
     return Form(
@@ -38,13 +38,12 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
             const Text('SettingsGeneralForm'),
             OutlinedButton(
               onPressed: () {
-                promptOK(context, "testing l108 pull", _label);
+                promptOK(context, "testing l108 pull", label);
                 // App.l10nConfig.locale = const Locale('nl','');
               },
               child: const Text("This is the placeholder and text at dev time"),
             ),
-            const Text(
-                'General settings - dunno probably will get culled in the end'),
+            const Text('General settings - dunno probably will get culled in the end'),
           ],
         ),
       ),

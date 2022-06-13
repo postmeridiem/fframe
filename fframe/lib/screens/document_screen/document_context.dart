@@ -36,6 +36,7 @@ class ContextDrawer<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
     if (contextDrawerOpen) {
       // if the document canvas gets too small, render this
@@ -45,7 +46,7 @@ class ContextDrawer<T> extends StatelessWidget {
           child: ContextCanvas(
             contextWidgets: documentConfig.document.contextCards!
                 .map(
-                  (contextCardBuilder) => contextCardBuilder(queryState.context),
+                  (contextCardBuilder) => contextCardBuilder(inheritedDocument.selectionState.data),
                 )
                 .toList(),
           ),

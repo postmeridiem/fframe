@@ -30,13 +30,13 @@ class DocumentBody<T> extends StatelessWidget {
     InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
 
-    if (queryState.context == null && queryState.queryParameters != null) {
-      debugPrint("Resolve query parameters: ${queryState.queryParameters}");
-      if (queryState.queryParameters?['id']?.isNotEmpty ?? false) {
-        return FRouter.of(context).waitPage;
-      }
-      return FRouter.of(context).errorPage;
-    }
+    // if (queryState.context == null && queryState.queryParameters != null) {
+    //   debugPrint("Resolve query parameters: ${queryState.queryParameters}");
+    //   if (queryState.queryParameters?['id']?.isNotEmpty ?? false) {
+    //     return FRouter.of(context).waitPage;
+    //   }
+    //   return FRouter.of(context).errorPage;
+    // }
 
     return DefaultTabController(
       animationDuration: Duration.zero,
@@ -77,7 +77,7 @@ class DocumentBody<T> extends StatelessWidget {
                               ? ContextCanvas(
                                   contextWidgets: documentConfig.document.contextCards!
                                       .map(
-                                        (contextCardBuilder) => contextCardBuilder(queryState.context),
+                                        (contextCardBuilder) => contextCardBuilder(inheritedDocument.selectionState.data),
                                       )
                                       .toList(),
                                 )
@@ -90,7 +90,7 @@ class DocumentBody<T> extends StatelessWidget {
                                 SliverAppBar(
                                   actions: const [IgnorePointer()], //To surpess the hamburger
                                   primary: false,
-                                  title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, queryState.context!) : null,
+                                  title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : null,
                                   floating: true,
                                   pinned: false,
                                   snap: true,
@@ -123,8 +123,8 @@ class DocumentBody<T> extends StatelessWidget {
                                   child: Form(
                                     key: documentConfig.document.tabs[position].formState,
                                     child: Container(
-                                      key: ObjectKey(queryState.context),
-                                      child: documentConfig.document.tabs[position].childBuilder(queryState.context!),
+                                      key: ObjectKey(inheritedDocument.selectionState.data),
+                                      child: documentConfig.document.tabs[position].childBuilder(inheritedDocument.selectionState.data),
                                     ),
                                   ),
                                 );

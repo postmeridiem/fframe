@@ -1,10 +1,10 @@
 part of fframe;
 
 class InheritedDocument extends InheritedWidget {
-  const InheritedDocument({Key? key, required this.documentConfig, required child}) : super(key: key, child: child);
+  InheritedDocument({Key? key, required this.documentConfig, required child}) : super(key: key, child: child);
 
   final DocumentConfig documentConfig;
-
+  final SelectionState selectionState = SelectionState();
   static InheritedDocument? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<InheritedDocument>();
   }
@@ -180,13 +180,13 @@ class DocumentScreen<T> extends ConsumerWidget {
     debugPrint("(re)build DocumentScreen");
     // InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
-    SelectionState selectionState = ref.read(selectionStateProvider).state;
+    // SelectionState selectionState = ref.read(selectionStateProvider).state;
 
-    //Handle a case where a deeplink to a document comes in
-    if (selectionState.data == null && selectionState.queryParams?[documentConfig.queryStringIdParam] != null && selectionState.docId != selectionState.queryParams![documentConfig.queryStringIdParam]) {
-      debugPrint("Lazy load the deeplinked document");
-      // lazyLoad(selectionState);
-    }
+    // //Handle a case where a deeplink to a document comes in
+    // if (selectionState.data == null && selectionState.queryParams?[documentConfig.queryStringIdParam] != null && selectionState.docId != selectionState.queryParams![documentConfig.queryStringIdParam]) {
+    //   debugPrint("Lazy load the deeplinked document");
+    //   // lazyLoad(selectionState);
+    // }
 
     return Row(
       children: [
@@ -232,7 +232,7 @@ class ScreenBody<T> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     TargetState targetState = ref.watch(targetStateProvider);
     QueryState queryState = ref.watch(queryStateProvider);
-    debugPrint("ReSpawn DocumentBody for ${targetState.navigationTarget.title} ${queryState.queryString} preloaded: ${queryState.context != null}");
+    debugPrint("ReSpawn DocumentBody for ${targetState.navigationTarget.title} ${queryState.queryString}");
     Widget returnWidget = queryState.queryString.isEmpty ? FRouter.of(context).emptyPage : DocumentBody(key: ValueKey(queryState.queryString), queryState: queryState);
     // return returnWidget;
     return AnimatedSwitcher(

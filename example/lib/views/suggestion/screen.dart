@@ -39,7 +39,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         },
 
         // Optional, override on the query string param which holds the document id
-        queryStringIdParam: "fsadjfhjsad",
+        queryStringIdParam: "config_per_route",
 
         // Optional Left hand (navigation/document selection pane)
         documentList: DocumentList(

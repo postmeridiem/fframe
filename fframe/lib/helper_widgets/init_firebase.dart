@@ -2,7 +2,6 @@ import 'package:fframe/fframe.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:frouter/models/navigation_config.dart';
 
 class InitializeFirebase extends StatelessWidget {
   const InitializeFirebase({Key? key, required this.firebaseOptions, required this.child, required this.navigationConfig}) : super(key: key);

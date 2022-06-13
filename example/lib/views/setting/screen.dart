@@ -15,7 +15,7 @@ class SettingScreen<Setting> extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
-    return EmptyPage();
+    return const EmptyPage();
 
     //   return DocumentScreen<Setting>(
     //     //Indicate where the documents are located and how to convert them to and fromt their models.

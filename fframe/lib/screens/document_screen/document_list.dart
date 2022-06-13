@@ -10,12 +10,15 @@ class DocumentListItem<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
+    InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
+    DocumentConfig<T> documentConfig = inheritedDocument.documentConfig as DocumentConfig<T>;
     DocumentListItemBuilder<T> documentListItemBuilder = documentConfig.documentList!.builder;
     try {
       return Card(
         child: GestureDetector(
           onTap: () {
+            inheritedDocument.selectionState.data = queryDocumentSnapshot.data();
+            inheritedDocument.selectionState.docId = queryDocumentSnapshot.id;
             FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: true, context: queryDocumentSnapshot.data());
           },
           child: Consumer(builder: (context, ref, child) {
@@ -61,10 +64,10 @@ class DocumentListItem<T> extends ConsumerWidget {
 }
 
 class DocumentListBuilder<T> extends StatelessWidget {
-  const DocumentListBuilder({
+  DocumentListBuilder({
     Key? key,
   }) : super(key: key);
-
+  final ScrollController scrollController = ScrollController();
   @override
   Widget build(BuildContext context) {
     debugPrint("Build DocumentList $runtimeType ${key.toString()}");
@@ -82,6 +85,7 @@ class DocumentListBuilder<T> extends StatelessWidget {
     }
 
     return FirestoreListView<T>(
+      controller: scrollController,
       query: query,
       itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
         // return documentListBuilder(context, queryDocumentSnapshot);

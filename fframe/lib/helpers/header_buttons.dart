@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fframe/providers/global_providers.dart';
-import 'package:fframe/controllers/selection_state_controller.dart';
 
 import 'package:fframe/helpers/l10n.dart';
 
@@ -15,17 +13,9 @@ class BarButtonShare extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SelectionState selectionState = ref.watch(selectionStateProvider).state;
-    Map<String, String>? queryParams = selectionState.queryParams;
-    String? queryString;
-    if (queryParams != null) {
-      queryString =
-          "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
-    }
     return IconButton(
       onPressed: () {
-        String url =
-            "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
+        String url = "${Uri.base}";
         FlutterClipboard.copy(url).then((_) {
           return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(
@@ -53,17 +43,9 @@ class BarButtonDuplicate extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    SelectionState selectionState = ref.watch(selectionStateProvider).state;
-    Map<String, String>? queryParams = selectionState.queryParams;
-    String? queryString;
-    if (queryParams != null) {
-      queryString =
-          "/?${queryParams.entries.map((e) => "${e.key}=${e.value}").join("&")}";
-    }
     return IconButton(
       onPressed: () {
-        String _url =
-            "${Uri.base.replace(query: null).toString()}${queryString ?? ""}";
+        String _url = "${Uri.base}";
         launchUrl(Uri.dataFromString(_url)).then((_) {
           return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               // content: Text("Opened current location ($_url) in new tab."),
@@ -101,9 +83,7 @@ class BarButtonFeedback extends StatelessWidget {
         return IconButton(
           onPressed: () {
             launchUrl(Uri.dataFromString(issuePageLink!)).then((_) {
-              return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  content: Text("Opened issue tracker in a new tab."),
-                  behavior: SnackBarBehavior.floating));
+              return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Opened issue tracker in a new tab."), behavior: SnackBarBehavior.floating));
             });
           },
           icon: const Icon(Icons.pest_control),
@@ -121,8 +101,7 @@ class BarButtonProfile extends StatelessWidget {
     return IconButton(
       onPressed: _signOut,
       icon: const Icon(Icons.logout_outlined),
-      tooltip: L10n.string('header_logout',
-          placeholder: 'Log out...', namespace: 'fframe'),
+      tooltip: L10n.string('header_logout', placeholder: 'Log out...', namespace: 'fframe'),
     );
   }
 }
