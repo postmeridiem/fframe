@@ -8,40 +8,11 @@ class DocumentBody<T> extends StatelessWidget {
 
   final QueryState queryState;
 
-  // bool validateDocument() {
-  //   List<bool> validationResults = document.tabs.map((documentTab) {
-  //     bool isValid = documentTab._formState.currentState!.validate();
-  //     return isValid;
-  //   }).toList();
-
-  //   if (validationResults.contains(false)) {
-  //     //Validation has failed
-  //     int failedTab = validationResults.indexWhere((validationResult) => validationResult == false);
-  //     preloadPageController.animateToPage(failedTab, duration: const Duration(microseconds: 100), curve: Curves.easeOutCirc);
-  //     return false;
-  //   } else {
-  //     return true;
-  //   }
-  // }
-
   @override
   Widget build(BuildContext context) {
     PreloadPageController preloadPageController;
     InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
-
-    if (inheritedDocument.selectionState.data == null && queryState.queryParameters != null) {
-      debugPrint("Resolve query parameters: ${queryState.queryParameters}");
-      return FRouter.of(context).errorPage;
-    }
-
-    // if (queryState.context == null && queryState.queryParameters != null) {
-    //   debugPrint("Resolve query parameters: ${queryState.queryParameters}");
-    //   if (queryState.queryParameters?['id']?.isNotEmpty ?? false) {
-    //     return FRouter.of(context).waitPage;
-    //   }
-    //   return FRouter.of(context).errorPage;
-    // }
 
     return DefaultTabController(
       animationDuration: Duration.zero,
@@ -56,8 +27,8 @@ class DocumentBody<T> extends StatelessWidget {
           tabController.addListener(() {
             if (!tabController.indexIsChanging) {
               debugPrint("Navigate to tab ${tabController.index}");
-              preloadPageController.animateToPage(tabController.index, duration: const Duration(microseconds: 100), curve: Curves.easeOutCirc);
-              // changePage(index: tabController.index, tabController: tabController, page: true);
+              FRouter.of(context).updateQueryString(queryParameters: {"tabIndex": "${tabController.index}"});
+              preloadPageController.animateToPage(tabController.index, duration: const Duration(microseconds: 250), curve: Curves.easeOutCirc);
             }
           });
 
@@ -92,17 +63,6 @@ class DocumentBody<T> extends StatelessWidget {
                           backgroundColor: Theme.of(context).colorScheme.secondary,
                           body: NestedScrollView(
                             headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                              Text? title = Text("Title here");
-                              try {
-                                if (documentConfig.titleBuilder != null) {
-                                  title = documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data);
-                                }
-                                // title = documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : null;
-                              } catch (e) {
-                                debugPrint(e.toString());
-                              }
-                              // Widget? title = documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : null;
-
                               return <Widget>[
                                 SliverAppBar(
                                   actions: const [IgnorePointer()], //To surpess the hamburger

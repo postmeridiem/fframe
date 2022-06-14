@@ -38,7 +38,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         },
 
         // Optional, override on the query string param which holds the document id
-        queryStringIdParam: "fsadjfhjsad",
+        queryStringIdParam: "id",
 
         // Optional Left hand (navigation/document selection pane)
         documentList: DocumentList(
@@ -46,10 +46,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             return SuggestionListItem(
               suggestion: data,
               selected: selected,
+              
             );
           },
         ),
-
 
         // Center part, shows a firestore doc. Tabs possible
         document: _document(),
@@ -149,17 +149,65 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             );
           },
         ),
-      ],
-      contextCards: [
-        (suggestion) => ContextCard<Suggestion>(
-              suggestion: suggestion,
+        DocumentTab<Suggestion>(tabBuilder: () {
+          return const Tab(
+            text: "FormCeption?",
+            icon: Icon(
+              Icons.settings_overscan,
             ),
-        (suggestion) => ContextCard<Suggestion>(
-              suggestion: suggestion,
+          );
+        }, childBuilder: (suggestion) {
+          return DocumentScreen<Suggestion>(
+            //Indicate where the documents are located and how to convert them to and fromt their models.
+            collection: "suggestions",
+            fromFirestore: Suggestion.fromFirestore,
+            toFirestore: (suggestion, options) {
+              return suggestion.toFirestore();
+            },
+            createDocumentId: (suggestion) {
+              return "${suggestion.name}";
+            },
+            createNew: () => Suggestion(),
+
+            //Optional title widget
+            titleBuilder: (BuildContext context, Suggestion data) {
+              return Text(
+                data.name ?? "New Suggestion",
+                style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+              );
+            },
+
+            // Optional, override on the query string param which holds the document id
+            queryStringIdParam: "formception",
+
+            // Optional Left hand (navigation/document selection pane)
+            documentList: DocumentList(
+              builder: (context, selected, data) {
+                return SuggestionListItem(
+                  suggestion: data,
+                  selected: selected,
+                );
+              },
             ),
-        (suggestion) => ContextCard<Suggestion>(
-              suggestion: suggestion,
+
+            // Center part, shows a firestore doc. Tabs possible
+            document: Document<Suggestion>(
+              autoSave: false,
+              tabs: [
+                DocumentTab<Suggestion>(tabBuilder: () {
+                  return const Tab(
+                    text: "Suggestion",
+                    icon: Icon(
+                      Icons.pest_control,
+                    ),
+                  );
+                }, childBuilder: (suggestion) {
+                  return const Text("FormCeption");
+                })
+              ],
             ),
+          );
+        }),
       ],
     );
   }

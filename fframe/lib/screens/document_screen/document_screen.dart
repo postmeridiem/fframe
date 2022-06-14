@@ -89,6 +89,21 @@ class InheritedDocument extends InheritedWidget {
     // );
   }
 
+  load<T>({required String docId}) async {
+    DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
+
+    DocumentSnapshot<T>? documentSnapshot = await DatabaseService<T>().documentSnapshot(
+      collection: _documentConfig.collection,
+      documentId: docId,
+      fromFirestore: _documentConfig.fromFirestore,
+      toFirestore: _documentConfig.toFirestore,
+    );
+
+    if (documentSnapshot?.exists ?? false) {
+      selectionState.state = SelectionState(data: documentSnapshot!.data(), docId: docId);
+    }
+  }
+
   Future<bool> save() async {
     try {
       // String? documentId = selectionState.docId;
@@ -228,16 +243,7 @@ class DocumentLoader<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    debugPrint("(re)build DocumentLoader");
-    // InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
-    // SelectionState selectionState = ref.read(selectionStateProvider).state;
-
-    // //Handle a case where a deeplink to a document comes in
-    // if (selectionState.data == null && selectionState.queryParams?[documentConfig.queryStringIdParam] != null && selectionState.docId != selectionState.queryParams![documentConfig.queryStringIdParam]) {
-    //   debugPrint("Lazy load the deeplinked document");
-    //   // lazyLoad(selectionState);
-    // }
 
     return Row(
       children: [
@@ -256,9 +262,6 @@ class DocumentLoader<T> extends ConsumerWidget {
                     padding: const EdgeInsets.all(0.0),
                     child: DocumentListBuilder<T>(
                       key: ValueKey(documentConfig.collection),
-                      // collection: documentConfig.collection,
-                      // fromFirestore: documentConfig.fromFirestore,
-                      // documentList: documentConfig.documentList!,
                     ),
                   ),
                 ),
@@ -274,20 +277,38 @@ class DocumentLoader<T> extends ConsumerWidget {
   }
 }
 
-class ScreenBody<T> extends ConsumerWidget {
-  const ScreenBody({
-    Key? key,
-  }) : super(key: key);
+class ScreenBody<T> extends ConsumerStatefulWidget {
+  const ScreenBody({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    TargetState targetState = ref.watch(targetStateProvider);
+  ConsumerState<ConsumerStatefulWidget> createState() => _ScreenBodyState<T>();
+}
+
+class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
+  @override
+  Widget build(BuildContext context) {
     QueryState queryState = ref.watch(queryStateProvider);
-    debugPrint("ReSpawn DocumentBody for ${targetState.navigationTarget.title} ${queryState.queryString}");
     Widget returnWidget = queryState.queryString.isEmpty ? FRouter.of(context).emptyPage : DocumentBody<T>(key: ValueKey(queryState.queryString), queryState: queryState);
+
+    InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
+    if (queryState.queryParameters == null) {
+      //Cannot contain a form
+      return FRouter.of(context).emptyPage;
+    } else if (!queryState.queryParameters!.containsKey(inheritedDocument.documentConfig.queryStringIdParam)) {
+      return FRouter.of(context).emptyPage;
+    } else if (((inheritedDocument.selectionState.docId != queryState.queryParameters?[inheritedDocument.documentConfig.queryStringIdParam]) || (inheritedDocument.selectionState.data == null && queryState.queryParameters != null))) {
+      inheritedDocument.selectionState.addListener(() {
+        debugPrint("Our document has arrived");
+        inheritedDocument.selectionState.removeListener(() {});
+        setState(() {});
+      });
+      inheritedDocument.load<T>(docId: queryState.queryParameters![inheritedDocument.documentConfig.queryStringIdParam]!);
+      return FRouter.of(context).waitPage;
+    }
+
     // return returnWidget;
     return AnimatedSwitcher(
-      key: ValueKey("query_${key.toString()}"),
+      key: ValueKey("query_${widget.key.toString()}"),
       duration: const Duration(milliseconds: 250),
       child: returnWidget,
     );

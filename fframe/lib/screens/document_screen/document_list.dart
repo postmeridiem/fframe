@@ -17,34 +17,38 @@ class DocumentListItem<T> extends ConsumerWidget {
       return Card(
         child: GestureDetector(
           onTap: () {
-            inheritedDocument.selectionState.data = queryDocumentSnapshot.data();
-            inheritedDocument.selectionState.docId = queryDocumentSnapshot.id;
-            FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: true, context: queryDocumentSnapshot.data());
+            inheritedDocument.selectionState.state = SelectionState(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data());
+            // inheritedDocument.selectionState.data = queryDocumentSnapshot.data();
+            // inheritedDocument.selectionState.docId = queryDocumentSnapshot.id;
+            FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: false); //TODO: depends on
           },
           child: Consumer(builder: (context, ref, child) {
-            String docId = ref.watch(selectionStateProvider).state.docId ?? '';
+            String docId = inheritedDocument.selectionState.docId ?? '';
             try {
               return documentListItemBuilder(context, docId == queryDocumentSnapshot.id, queryDocumentSnapshot.data());
             } catch (e) {
               String _error = e.toString();
               String _path = queryDocumentSnapshot.reference.path;
-              return Card(
-                child: ListTile(
-                  leading: const Icon(Icons.warning, color: Colors.amberAccent),
-                  subtitle: Text(
-                    L10n.interpolated(
-                      'errors_dataissue',
-                      placeholder: "Data Issue: $_error in $_path",
-                      replacers: [
-                        L10nReplacer(
-                          from: "{error}",
-                          replace: _error,
-                        ),
-                        L10nReplacer(
-                          from: "{path}",
-                          replace: _path,
-                        ),
-                      ],
+              return MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.warning, color: Colors.amberAccent),
+                    subtitle: Text(
+                      L10n.interpolated(
+                        'errors_dataissue',
+                        placeholder: "Data Issue: $_error in $_path",
+                        replacers: [
+                          L10nReplacer(
+                            from: "{error}",
+                            replace: _error,
+                          ),
+                          L10nReplacer(
+                            from: "{path}",
+                            replace: _path,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -88,13 +92,12 @@ class DocumentListBuilder<T> extends StatelessWidget {
       controller: scrollController,
       query: query,
       itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
-        // return documentListBuilder(context, queryDocumentSnapshot);
         return DocumentListItem<T>(
           queryDocumentSnapshot: queryDocumentSnapshot,
         );
       },
-      loadingBuilder: (context) => const WaitScreen(),
-      errorBuilder: (context, error, stackTrace) => ErrorScreen(error: Exception(error)),
+      loadingBuilder: (context) => FRouter.of(context).waitPage,
+      errorBuilder: (context, error, stackTrace) => FRouter.of(context).errorPage,
     );
   }
 }

@@ -175,6 +175,23 @@ class NavigationNotifier extends ChangeNotifier {
     processRouteInformation(targetState: targetState, queryState: queryState);
   }
 
+  TargetState get currentTarget {
+    return _targetState!;
+  }
+
+  bool get hasTabs {
+    return _targetState!.navigationTarget is NavigationTab;
+  }
+
+  List<NavigationTab> get navigationTabs {
+    if (_targetState!.navigationTarget is NavigationTab) {
+      NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
+      NavigationTarget parentTarget = currentTab.parentTarget;
+      return parentTarget.navigationTabs!;
+    }
+    return [];
+  }
+
   _filterNavigationRoutes() {
     navigationConfig = NavigationConfig.clone(RouterConfig.instance.navigationConfig);
     if (_isSignedIn) {

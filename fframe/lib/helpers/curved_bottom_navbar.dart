@@ -1,5 +1,4 @@
-import 'package:fframe/controllers/selection_state_controller.dart';
-import 'package:fframe/providers/global_providers.dart';
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,12 +22,13 @@ class CurvedBottomBar extends ConsumerStatefulWidget {
 class _BottomNavBarV2State extends ConsumerState<CurvedBottomBar> {
   @override
   Widget build(BuildContext context) {
-    SelectionState selectionState = ref.watch(selectionStateProvider).state;
+    InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
+    // SelectionState selectionState = ref.watch(selectionStateProvider).state;
 
     final double formCanvasWidth = widget.formCanvasWidth as double;
 
     List<Widget>? _iconButtons;
-    if (widget.iconButtons != null && selectionState.data != null) {
+    if (widget.iconButtons != null && inheritedDocument.selectionState.data != null) {
       _iconButtons = List<Widget>.from(widget.iconButtons!);
       if (widget.floatingActionButton != null) {
         if (_iconButtons.length % 2 != 0) {

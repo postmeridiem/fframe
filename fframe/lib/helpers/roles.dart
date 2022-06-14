@@ -1,4 +1,4 @@
-import 'package:fframe/screens/waitscreen.dart';
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
@@ -107,11 +107,11 @@ class _RolesManagerState extends State<RolesManager> {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
-              return const WaitScreen();
+              return FRouter.of(context).waitPage;
             case ConnectionState.waiting:
-              return const WaitScreen();
+              return FRouter.of(context).waitPage;
             case ConnectionState.active:
-              return const WaitScreen();
+              return FRouter.of(context).waitPage;
             case ConnectionState.done:
               if (snapshot.hasData) {
                 userRoles = snapshot.data!;

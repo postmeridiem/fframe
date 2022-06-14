@@ -53,8 +53,8 @@ class FRouter extends InheritedWidget {
   ///FRouter.of(context).updateQueryString(queryString: {"id": "cow"});
   ///Only QS (replace path and existing QS values)
   ///FRouter.of(context).updateQueryString(queryString: {"id": "cow"}, resetQueryString: true);
-  updateQueryString<T>({required Map<String, String> queryParameters, bool? resetQueryString = false, T? context}) {
-    debugPrint("FRouter: update QueryString to ${queryParameters.toString()} context: ${context ?? "none"}");
+  updateQueryString<T>({required Map<String, String> queryParameters, bool? resetQueryString = false}) {
+    debugPrint("FRouter: update QueryString to ${queryParameters.toString()}}");
     QueryState queryState = ref.read(queryStateProvider);
 
     QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
@@ -77,6 +77,18 @@ class FRouter extends InheritedWidget {
   //Current auth state
   bool get isSignedIn {
     return navigationNotifier.isSignedIn;
+  }
+
+  NavigationTarget get currentTarget {
+    return navigationNotifier.currentTarget.navigationTarget;
+  }
+
+  bool get hasTabs {
+    return navigationNotifier.hasTabs;
+  }
+
+  List<NavigationTab> get navigationTabs {
+    return navigationNotifier.navigationTabs;
   }
 
   NavigationConfig get navigationConfig {

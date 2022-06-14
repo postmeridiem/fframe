@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class SelectionState<T> {
+class SelectionState<T> with ChangeNotifier {
   late T? data;
   late String? docId;
 
@@ -8,14 +8,10 @@ class SelectionState<T> {
     this.docId,
     this.data,
   });
-}
 
-class SelectionStateNotifier with ChangeNotifier {
-  late SelectionState _selectionState = SelectionState(docId: null);
-
-  SelectionState get state => _selectionState;
   set state(SelectionState selectionState) {
-    _selectionState = selectionState;
+    data = selectionState.data;
+    docId = selectionState.docId;
     notifyListeners();
   }
 }
