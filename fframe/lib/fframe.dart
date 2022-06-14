@@ -28,7 +28,6 @@ part 'screens/document_screen/typedefs.dart';
 part 'screens/document_screen/document_screen.dart';
 part 'screens/document_screen/document_body.dart';
 part 'screens/document_screen/document_context.dart';
-part 'screens/document_screen/document_title.dart';
 part 'screens/document_screen/document_list.dart';
 part 'helpers/validator.dart';
 part 'models/app_user.dart';

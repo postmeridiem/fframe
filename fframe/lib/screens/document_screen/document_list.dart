@@ -89,7 +89,7 @@ class DocumentListBuilder<T> extends StatelessWidget {
       query: query,
       itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
         // return documentListBuilder(context, queryDocumentSnapshot);
-        return DocumentListItem(
+        return DocumentListItem<T>(
           queryDocumentSnapshot: queryDocumentSnapshot,
         );
       },

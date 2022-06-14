@@ -8,7 +8,7 @@ class DocumentConfig<T> {
     required this.fromFirestore,
     required this.toFirestore,
     this.documentList,
-    this.documentBuilder,
+    // this.documentBuilder,
     this.titleBuilder,
     required this.document,
     this.extraActionButtons,
@@ -17,7 +17,7 @@ class DocumentConfig<T> {
   });
 
   final DocumentList<T>? documentList;
-  final DocumentBuilder<T>? documentBuilder;
+  // final DocumentBuilder<T>? documentBuilder;
   final TitleBuilder<T>? titleBuilder;
   final Document document;
   final List<IconButton>? extraActionButtons;

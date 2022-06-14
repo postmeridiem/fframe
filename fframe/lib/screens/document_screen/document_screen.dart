@@ -1,5 +1,56 @@
 part of fframe;
 
+class DocumentScreen<T> extends StatelessWidget {
+  const DocumentScreen({
+    Key? key,
+    required this.collection,
+    required this.createNew,
+    this.createDocumentId,
+    required this.fromFirestore,
+    required this.toFirestore,
+    this.documentList,
+    this.documentBuilder,
+    this.titleBuilder,
+    required this.document,
+    this.extraActionButtons,
+    this.contextCardBuilders,
+    this.queryStringIdParam = "id",
+  }) : super(key: key);
+
+  final DocumentList<T>? documentList;
+  final DocumentBuilder<T>? documentBuilder;
+  final TitleBuilder<T>? titleBuilder;
+  final Document<T> document;
+  final List<IconButton>? extraActionButtons;
+  final String queryStringIdParam;
+  final String collection;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
+  final T Function() createNew;
+  final String? Function(T)? createDocumentId;
+  final List<ContextCardBuilder>? contextCardBuilders;
+
+  @override
+  Widget build(BuildContext context) {
+    return InheritedDocument(
+      child: DocumentLoader<T>(),
+      documentConfig: DocumentConfig<T>(
+        collection: collection,
+        documentList: documentList,
+        queryStringIdParam: queryStringIdParam,
+        createNew: createNew,
+        createDocumentId: createDocumentId,
+        document: document,
+        toFirestore: toFirestore,
+        fromFirestore: fromFirestore,
+        extraActionButtons: extraActionButtons,
+        titleBuilder: titleBuilder as TitleBuilder<T>,
+        contextCardBuilders: contextCardBuilders,
+      ),
+    );
+  }
+}
+
 class InheritedDocument extends InheritedWidget {
   InheritedDocument({Key? key, required this.documentConfig, required child}) : super(key: key, child: child);
 
@@ -172,12 +223,12 @@ class InheritedDocument extends InheritedWidget {
   }
 }
 
-class DocumentScreen<T> extends ConsumerWidget {
-  const DocumentScreen({Key? key}) : super(key: key);
+class DocumentLoader<T> extends ConsumerWidget {
+  const DocumentLoader({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    debugPrint("(re)build DocumentScreen");
+    debugPrint("(re)build DocumentLoader");
     // InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
     // SelectionState selectionState = ref.read(selectionStateProvider).state;
@@ -233,7 +284,7 @@ class ScreenBody<T> extends ConsumerWidget {
     TargetState targetState = ref.watch(targetStateProvider);
     QueryState queryState = ref.watch(queryStateProvider);
     debugPrint("ReSpawn DocumentBody for ${targetState.navigationTarget.title} ${queryState.queryString}");
-    Widget returnWidget = queryState.queryString.isEmpty ? FRouter.of(context).emptyPage : DocumentBody(key: ValueKey(queryState.queryString), queryState: queryState);
+    Widget returnWidget = queryState.queryString.isEmpty ? FRouter.of(context).emptyPage : DocumentBody<T>(key: ValueKey(queryState.queryString), queryState: queryState);
     // return returnWidget;
     return AnimatedSwitcher(
       key: ValueKey("query_${key.toString()}"),

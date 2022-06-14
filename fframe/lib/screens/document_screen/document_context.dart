@@ -31,7 +31,7 @@ class ContextDrawer<T> extends StatelessWidget {
     required this.contextDrawerOpen,
   }) : super(key: key);
 
-  final QueryState<T> queryState;
+  final QueryState queryState;
   final bool contextDrawerOpen;
 
   @override

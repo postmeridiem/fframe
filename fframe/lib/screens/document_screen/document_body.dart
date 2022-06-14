@@ -6,7 +6,7 @@ class DocumentBody<T> extends StatelessWidget {
     required this.queryState,
   }) : super(key: key);
 
-  final QueryState<T> queryState;
+  final QueryState queryState;
 
   // bool validateDocument() {
   //   List<bool> validationResults = document.tabs.map((documentTab) {
@@ -29,6 +29,11 @@ class DocumentBody<T> extends StatelessWidget {
     PreloadPageController preloadPageController;
     InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
+
+    if (inheritedDocument.selectionState.data == null && queryState.queryParameters != null) {
+      debugPrint("Resolve query parameters: ${queryState.queryParameters}");
+      return FRouter.of(context).errorPage;
+    }
 
     // if (queryState.context == null && queryState.queryParameters != null) {
     //   debugPrint("Resolve query parameters: ${queryState.queryParameters}");
@@ -55,6 +60,7 @@ class DocumentBody<T> extends StatelessWidget {
               // changePage(index: tabController.index, tabController: tabController, page: true);
             }
           });
+
           return LayoutBuilder(
             builder: (context, constraints) {
               final double docCanvasWidth = constraints.maxWidth;
@@ -86,11 +92,22 @@ class DocumentBody<T> extends StatelessWidget {
                           backgroundColor: Theme.of(context).colorScheme.secondary,
                           body: NestedScrollView(
                             headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                              Text? title = Text("Title here");
+                              try {
+                                if (documentConfig.titleBuilder != null) {
+                                  title = documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data);
+                                }
+                                // title = documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : null;
+                              } catch (e) {
+                                debugPrint(e.toString());
+                              }
+                              // Widget? title = documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : null;
+
                               return <Widget>[
                                 SliverAppBar(
                                   actions: const [IgnorePointer()], //To surpess the hamburger
                                   primary: false,
-                                  title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : null,
+                                  title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : Text(inheritedDocument.selectionState.docId ?? ""),
                                   floating: true,
                                   pinned: false,
                                   snap: true,

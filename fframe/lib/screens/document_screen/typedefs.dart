@@ -6,7 +6,6 @@ typedef ContextCardBuilder<T> = Widget Function(
 
 typedef DocumentBuilder<T> = Widget Function(
   BuildContext context,
-  DocumentReference<T> documentReference,
   T data,
 );
 
@@ -24,7 +23,7 @@ typedef DocumentTabBuilder<T> = Widget Function();
 
 typedef DocumentTabChildBuilder<T> = Widget Function(T data);
 
-typedef TitleBuilder<T> = Widget Function(
+typedef TitleBuilder<T> = Text Function(
   BuildContext context,
   T data,
 );

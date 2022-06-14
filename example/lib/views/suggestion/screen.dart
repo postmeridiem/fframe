@@ -15,23 +15,22 @@ class SuggestionScreen<Suggestion> extends StatefulWidget {
 class _SuggestionScreenState extends State<SuggestionScreen> {
   @override
   Widget build(BuildContext context) {
-    return InheritedDocument(
-      documentConfig: DocumentConfig(
+    InheritedDocument inheritedDocument = InheritedDocument(
+      documentConfig: DocumentConfig<Suggestion>(
         //Indicate where the documents are located and how to convert them to and fromt their models.
         collection: "suggestions",
         fromFirestore: Suggestion.fromFirestore,
         toFirestore: (suggestion, options) {
-          return suggestion!.toFirestore();
+          return suggestion.toFirestore();
         },
         createDocumentId: (suggestion) {
           return "${suggestion.name}";
         },
 
-        createNew: () => Suggestion(
-            // name: "fietsbel",
-            ),
+        createNew: () => Suggestion(),
+
         //Optional title widget
-        titleBuilder: (context, data) {
+        titleBuilder: (BuildContext context, Suggestion data) {
           return Text(
             data.name ?? "New Suggestion",
             style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
@@ -39,7 +38,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         },
 
         // Optional, override on the query string param which holds the document id
-        queryStringIdParam: "config_per_route",
+        queryStringIdParam: "fsadjfhjsad",
 
         // Optional Left hand (navigation/document selection pane)
         documentList: DocumentList(
@@ -51,11 +50,53 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           },
         ),
 
-        // Center part, shows a fireatore doc. Tabs possible
+
+        // Center part, shows a firestore doc. Tabs possible
         document: _document(),
       ),
-      child: const DocumentScreen(),
+      child: const DocumentLoader<Suggestion>(),
     );
+
+    DocumentScreen<Suggestion> documentScreen = DocumentScreen<Suggestion>(
+      //Indicate where the documents are located and how to convert them to and fromt their models.
+      collection: "suggestions",
+      fromFirestore: Suggestion.fromFirestore,
+      toFirestore: (suggestion, options) {
+        return suggestion.toFirestore();
+      },
+      createDocumentId: (suggestion) {
+        return "${suggestion.name}";
+      },
+
+      createNew: () => Suggestion(),
+
+      //Optional title widget
+      titleBuilder: (BuildContext context, Suggestion data) {
+        return Text(
+          data.name ?? "New Suggestion",
+          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+        );
+      },
+
+      // Optional, override on the query string param which holds the document id
+      queryStringIdParam: "fsadjfhjsad",
+
+      // Optional Left hand (navigation/document selection pane)
+      documentList: DocumentList(
+        builder: (context, selected, data) {
+          return SuggestionListItem(
+            suggestion: data,
+            selected: selected,
+          );
+        },
+      ),
+
+      // Center part, shows a firestore doc. Tabs possible
+      document: _document(),
+      // document: _document(),
+    );
+
+    return inheritedDocument;
   }
 
   Document<Suggestion> _document() {
@@ -110,13 +151,13 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         ),
       ],
       contextCards: [
-        (suggestion) => ContextCard(
+        (suggestion) => ContextCard<Suggestion>(
               suggestion: suggestion,
             ),
-        (suggestion) => ContextCard(
+        (suggestion) => ContextCard<Suggestion>(
               suggestion: suggestion,
             ),
-        (suggestion) => ContextCard(
+        (suggestion) => ContextCard<Suggestion>(
               suggestion: suggestion,
             ),
       ],

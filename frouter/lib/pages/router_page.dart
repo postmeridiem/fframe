@@ -42,7 +42,7 @@ class FRouter extends InheritedWidget {
     debugPrint("FRouter: navigate to ${navigationTarget.path} ${queryParameters == null ? "without" : "with"} queryString ${queryParameters?.toString() ?? ""}. Reset queryString: $resetQueryString");
     QueryState queryState = ref.read(queryStateProvider);
 
-    QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters, context);
+    QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
     debugPrint(newQueryState.toString());
 
     TargetState targetState = TargetState.processRouteRequest(navigationTarget: navigationTarget);
@@ -57,7 +57,7 @@ class FRouter extends InheritedWidget {
     debugPrint("FRouter: update QueryString to ${queryParameters.toString()} context: ${context ?? "none"}");
     QueryState queryState = ref.read(queryStateProvider);
 
-    QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters, context);
+    QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
     debugPrint(newQueryState.toString());
 
     navigationNotifier.processRouteInformation(queryState: newQueryState);
