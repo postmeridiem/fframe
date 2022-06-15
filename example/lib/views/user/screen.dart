@@ -1,3 +1,4 @@
+// ignore: unused_import
 import 'package:example/pages/empty_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
@@ -15,33 +16,30 @@ class UsersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return EmptyPage();
-
-    // return ErrorScreen(error: Exception("Not implemented"));
-    // return DocumentScreen<User>(
-    //   collection: "users",
-    //   fromFirestore: User.fromFirestore,
-    //   toFirestore: (user, options) => user.toFirestore(),
-    //   createNew: () => User(),
-    //   // createDocumentId: (User user) => {},
-    //   //Optional title widget
-    //   titleBuilder: (context, data) {
-    //     return Text(
-    //       data.displayName ?? "New User",
-    //       style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
-    //     );
-    //   },
-    //   document: _document(),
-    //   documentList: DocumentList(
-    //     queryBuilder: (query) => query.where("active", isEqualTo: isActive),
-    //     builder: (context, selected, data) {
-    //       return UserListItem(
-    //         user: data,
-    //         selected: selected,
-    //       );
-    //     },
-    //   ),
-    // );
+    return DocumentScreen<User>(
+      collection: "users",
+      fromFirestore: User.fromFirestore,
+      toFirestore: (user, options) => user.toFirestore(),
+      createNew: () => User(),
+      // createDocumentId: (User user) => {},
+      //Optional title widget
+      titleBuilder: (context, data) {
+        return Text(
+          data.displayName ?? "New User",
+          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+        );
+      },
+      document: _document(),
+      documentList: DocumentList(
+        queryBuilder: (query) => query.where("active", isEqualTo: isActive),
+        builder: (context, selected, data) {
+          return UserListItem(
+            user: data,
+            selected: selected,
+          );
+        },
+      ),
+    );
   }
 
   Document<User> _document() {

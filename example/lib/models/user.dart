@@ -16,7 +16,6 @@ class User extends ChangeNotifier {
 
   factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot,
       SnapshotOptions? snapshotOptions) {
-    debugPrint("reading <User>");
 
     Map<String, dynamic> json = snapshot.data()!;
     return User(

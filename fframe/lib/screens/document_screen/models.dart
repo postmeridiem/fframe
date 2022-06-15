@@ -14,10 +14,10 @@ class DocumentConfig<T> {
     this.extraActionButtons,
     this.contextCardBuilders,
     this.queryStringIdParam = "id",
+    this.embeddedDocument = false,
   });
 
   final DocumentList<T>? documentList;
-  // final DocumentBuilder<T>? documentBuilder;
   final TitleBuilder<T>? titleBuilder;
   final Document document;
   final List<IconButton>? extraActionButtons;
@@ -29,6 +29,7 @@ class DocumentConfig<T> {
   final T Function() createNew;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
+  final bool embeddedDocument;
 }
 
 class Document<T> {
@@ -50,7 +51,6 @@ class DocumentTab<T> {
   ///
   final DocumentTabBuilder<T> tabBuilder;
   final DocumentTabChildBuilder childBuilder;
-  final GlobalKey<FormState> formState = GlobalKey<FormState>();
 
   DocumentTab({
     required this.tabBuilder,
@@ -66,3 +66,5 @@ class DocumentList<T> {
   final DocumentListItemBuilder<T> builder;
   final Query<T> Function(Query<T> query)? queryBuilder;
 }
+
+enum QueryStringStrategy { replace, append }

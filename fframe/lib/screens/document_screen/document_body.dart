@@ -13,6 +13,7 @@ class DocumentBody<T> extends StatelessWidget {
     PreloadPageController preloadPageController;
     InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
+    String tabIndexKey = inheritedDocument.documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
 
     return DefaultTabController(
       animationDuration: Duration.zero,
@@ -22,12 +23,14 @@ class DocumentBody<T> extends StatelessWidget {
       child: Builder(
         builder: (BuildContext context) {
           final TabController tabController = DefaultTabController.of(context)!;
-          preloadPageController = PreloadPageController(initialPage: 0);
+          debugPrint((FRouter.of(context).queryStringParam(tabIndexKey) ?? "0"));
+          tabController.index = int.parse(FRouter.of(context).queryStringParam(tabIndexKey) ?? "0");
+          preloadPageController = PreloadPageController(initialPage: tabController.index);
 
           tabController.addListener(() {
             if (!tabController.indexIsChanging) {
               debugPrint("Navigate to tab ${tabController.index}");
-              FRouter.of(context).updateQueryString(queryParameters: {"tabIndex": "${tabController.index}"});
+              FRouter.of(context).updateQueryString(queryParameters: {tabIndexKey: "${tabController.index}"});
               preloadPageController.animateToPage(tabController.index, duration: const Duration(microseconds: 250), curve: Curves.easeOutCirc);
             }
           });
@@ -93,23 +96,18 @@ class DocumentBody<T> extends StatelessWidget {
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (BuildContext context, int position) {
                                 debugPrint("Build tab $position");
-                                //                       AnimatedSwitcher(
-                                // duration: const Duration(milliseconds: 500),
                                 return Padding(
                                   padding: const EdgeInsets.all(8.0),
-                                  child: Form(
-                                    key: documentConfig.document.tabs[position].formState,
-                                    child: Container(
-                                      key: ObjectKey(inheritedDocument.selectionState.data),
-                                      child: documentConfig.document.tabs[position].childBuilder(inheritedDocument.selectionState.data),
-                                    ),
+                                  child: Container(
+                                    key: ValueKey("PreloadPageView_${inheritedDocument.selectionState.docId}_${tabController.index}"),
+                                    child: documentConfig.document.tabs[position].childBuilder(inheritedDocument.selectionState.data),
                                   ),
                                 );
                               },
                               controller: preloadPageController,
-                              onPageChanged: (int position) {
-                                debugPrint('page changed to: $position');
-                              },
+                              // onPageChanged: (int position) {
+                              //   debugPrint('page changed to: $position');
+                              // },
                             ),
                           ),
                         ),

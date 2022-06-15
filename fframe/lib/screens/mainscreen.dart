@@ -1,5 +1,4 @@
 import 'package:fframe/helpers/l10n.dart';
-import 'package:fframe/screens/contentscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
@@ -27,7 +26,7 @@ class _MainScreenState extends State<MainScreen> {
       key: _scaffoldKey,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text("fFrame Example"),
+        // title: const Text("fFrame Example"),
         leading: IconButton(
             onPressed: () {
               if (_scaffoldKey.currentState!.isDrawerOpen) {

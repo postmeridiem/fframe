@@ -9,13 +9,13 @@ import 'package:fframe/helpers/curved_bottom_navbar.dart';
 import 'package:fframe/helpers/documentlist_search.dart';
 import 'package:fframe/helper_widgets/init_firebase.dart';
 import 'package:fframe/helpers/l10n.dart';
+import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 
 import 'package:fframe/screens/screens.dart';
 import 'package:fframe/services/database_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:fframe/providers/global_providers.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutterfire_ui/firestore.dart';

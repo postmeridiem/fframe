@@ -17,10 +17,14 @@ class DocumentListItem<T> extends ConsumerWidget {
       return Card(
         child: GestureDetector(
           onTap: () {
+            bool embeddedDocument = inheritedDocument.documentConfig.embeddedDocument;
+            String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
             inheritedDocument.selectionState.state = SelectionState(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data());
-            // inheritedDocument.selectionState.data = queryDocumentSnapshot.data();
-            // inheritedDocument.selectionState.docId = queryDocumentSnapshot.id;
-            FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: false); //TODO: depends on
+            if (documentConfig.document.tabs.length == 1) {
+              FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: !embeddedDocument);
+            } else {
+              FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id, tabIndexKey: "0"}, resetQueryString: !embeddedDocument);
+            }
           },
           child: Consumer(builder: (context, ref, child) {
             String docId = inheritedDocument.selectionState.docId ?? '';

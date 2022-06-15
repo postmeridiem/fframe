@@ -15,35 +15,33 @@ class SettingScreen<Setting> extends StatefulWidget {
 class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
-    return const EmptyPage();
+    return DocumentScreen<Setting>(
+      //Indicate where the documents are located and how to convert them to and fromt their models.
+      collection: "/fframe/settings/collection",
+      fromFirestore: Setting.fromFirestore,
+      toFirestore: (setting, options) => setting.toFirestore(),
+      createNew: () => Setting(),
+      //Optional title widget
+      titleBuilder: (context, data) {
+        return Text(
+          data.name ?? "New Setting",
+          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+        );
+      },
 
-    //   return DocumentScreen<Setting>(
-    //     //Indicate where the documents are located and how to convert them to and fromt their models.
-    //     collection: "/fframe/settings/collection",
-    //     fromFirestore: Setting.fromFirestore,
-    //     toFirestore: (setting, options) => setting.toFirestore(),
-    //     createNew: () => Setting(),
-    //     //Optional title widget
-    //     titleBuilder: (context, data) {
-    //       return Text(
-    //         data.name ?? "New Setting",
-    //         style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
-    //       );
-    //     },
+      // Optional Left hand (navigation/document selection pane)
+      documentList: DocumentList(
+        builder: (context, selected, data) {
+          return SettingListItem(
+            setting: data,
+            selected: selected,
+          );
+        },
+      ),
 
-    //     // Optional Left hand (navigation/document selection pane)
-    //     documentList: DocumentList(
-    //       builder: (context, selected, data) {
-    //         return SettingListItem(
-    //           setting: data,
-    //           selected: selected,
-    //         );
-    //       },
-    //     ),
-
-    //     // Center part, shows a fireatore doc. Tabs possible
-    //     document: _document(),
-    // );
+      // Center part, shows a fireatore doc. Tabs possible
+      document: _document(),
+    );
   }
 
   Document<Setting> _document() {

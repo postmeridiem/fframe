@@ -30,7 +30,6 @@ class L10n {
         _output = _namespace[key]!['translation'];
       } else {
         debugPrint("L10N MISSING KEY: Inserted placeholder. Key not found: <$key>.");
-        //TODO: attach a reporting mechanism here; google analytics for app reporting?
       }
     } else {
       debugPrint("L10N ERROR: Unknown namespace: $namespace.");

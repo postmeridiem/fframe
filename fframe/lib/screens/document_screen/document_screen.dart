@@ -32,12 +32,30 @@ class DocumentScreen<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    InheritedDocument? parentInheritedDocument = InheritedDocument.of(context);
+    String? _queryStringIdParam;
+    bool? _embeddedDocument;
+    if (parentInheritedDocument != null) {
+      debugPrint("This is an embedded instance of the DocumentScreen initalize FormCeption");
+      if (queryStringIdParam == parentInheritedDocument.documentConfig.queryStringIdParam) {
+        debugPrint("Correct the colliding queryStringIdParam properties");
+        _queryStringIdParam = "child${toBeginningOfSentenceCase(parentInheritedDocument.documentConfig.queryStringIdParam)}";
+      }
+      _embeddedDocument = true;
+      debugPrint("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
+      debugPrint("*-* INIT EMBEDDED DOCUMENTSCREEN  *-*");
+      debugPrint("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
+    } else {
+      debugPrint("*-*-*-*-*-*-*-*-*-*-*-*-*-*");
+      debugPrint("*-* INIT DOCUMENTSCREEN *-*");
+      debugPrint("*-*-*-*-*-*-*-*-*-*-*-*-*-*");
+    }
     return InheritedDocument(
       child: DocumentLoader<T>(),
       documentConfig: DocumentConfig<T>(
         collection: collection,
         documentList: documentList,
-        queryStringIdParam: queryStringIdParam,
+        queryStringIdParam: _queryStringIdParam ?? queryStringIdParam,
         createNew: createNew,
         createDocumentId: createDocumentId,
         document: document,
@@ -46,6 +64,7 @@ class DocumentScreen<T> extends StatelessWidget {
         extraActionButtons: extraActionButtons,
         titleBuilder: titleBuilder as TitleBuilder<T>,
         contextCardBuilders: contextCardBuilders,
+        embeddedDocument: _embeddedDocument ?? false,
       ),
     );
   }

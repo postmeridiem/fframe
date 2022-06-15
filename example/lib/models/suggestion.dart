@@ -48,7 +48,6 @@ class Suggestion extends ChangeNotifier {
   factory Suggestion.fromFirestore(
       DocumentSnapshot<Map<String, dynamic>> snapshot,
       SnapshotOptions? snapshotOptions) {
-    debugPrint("reading <Suggestion>");
 
     Map<String, dynamic> json = snapshot.data()!;
     Suggestion suggestion = Suggestion(

@@ -64,6 +64,21 @@ class FRouter extends InheritedWidget {
     // navigationNotifier.uri = Uri.parse("${navigationNotifier.uri!.path}?${queryParameters.entries.map((queryStringEntry) => "${queryStringEntry.key}=${queryStringEntry.value}").join("&")}");
   }
 
+  //Get a value from the QueryString
+  bool hasQueryStringParam(String key) {
+    QueryState queryState = ref.read(queryStateProvider);
+    return queryState.queryParameters?.containsKey(key) ?? false;
+  }
+
+  //Get a value from the QueryString
+  String? queryStringParam(String key) {
+    QueryState queryState = ref.read(queryStateProvider);
+    if ((queryState.queryParameters?.containsKey(key) ?? false) == true) {
+      return queryState.queryParameters![key];
+    }
+    return null;
+  }
+
   ///Request a logout
   logout() {
     navigationNotifier.signOut();
