@@ -198,6 +198,7 @@ class InheritedDocument extends InheritedWidget {
   List<IconButton>? iconButtons(BuildContext context) {
     List<IconButton>? iconButtons = [
       IconButton(
+        tooltip: "Close this document",
         icon: Icon(
           Icons.close,
           color: Theme.of(context).colorScheme.onBackground,
@@ -228,6 +229,7 @@ class InheritedDocument extends InheritedWidget {
       //   onPressed: _callCopy,
       // ),
       IconButton(
+        tooltip: "Save this document",
         icon: Icon(
           Icons.save,
           color: Theme.of(context).colorScheme.onBackground,
@@ -325,6 +327,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
       return FRouter.of(context).waitPage;
     }
 
+   
     // return returnWidget;
     return AnimatedSwitcher(
       key: ValueKey("query_${widget.key.toString()}"),

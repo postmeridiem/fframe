@@ -1,11 +1,11 @@
+import 'package:example/models/user.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:example/models/user.dart';
 
 // //Shows the selected customer in the right hand pane
 class UserForm extends StatelessWidget {
   const UserForm({required this.user, Key? key}) : super(key: key);
-  final User user;
+  final AppUser user;
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +21,7 @@ class UserForm extends StatelessWidget {
             labelText: 'Name',
           ),
           readOnly: false,
-          controller: TextEditingController.fromValue(
-              TextEditingValue(text: user.displayName!)),
+          controller: TextEditingController.fromValue(TextEditingValue(text: user.displayName!)),
           validator: (curValue) {
             if (validator.validString(curValue)) {
               return null;
@@ -40,8 +39,7 @@ class UserForm extends StatelessWidget {
             labelText: 'User UID',
           ),
           readOnly: false,
-          controller: TextEditingController.fromValue(
-              TextEditingValue(text: user.uid ?? '')),
+          controller: TextEditingController.fromValue(TextEditingValue(text: user.uid ?? '')),
           validator: (curValue) {
             if (validator.validUUID(curValue)) {
               return null;
@@ -58,8 +56,7 @@ class UserForm extends StatelessWidget {
             border: OutlineInputBorder(),
             labelText: "Email",
           ),
-          controller: TextEditingController.fromValue(
-              TextEditingValue(text: user.creationDate!.toDate().toString())),
+          controller: TextEditingController.fromValue(TextEditingValue(text: user.creationDate!.toDate().toString())),
           validator: (curValue) {
             if (validator.validEmail(curValue)) {
               return null;

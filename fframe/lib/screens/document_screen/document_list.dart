@@ -33,26 +33,23 @@ class DocumentListItem<T> extends ConsumerWidget {
             } catch (e) {
               String _error = e.toString();
               String _path = queryDocumentSnapshot.reference.path;
-              return MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Card(
-                  child: ListTile(
-                    leading: const Icon(Icons.warning, color: Colors.amberAccent),
-                    subtitle: Text(
-                      L10n.interpolated(
-                        'errors_dataissue',
-                        placeholder: "Data Issue: $_error in $_path",
-                        replacers: [
-                          L10nReplacer(
-                            from: "{error}",
-                            replace: _error,
-                          ),
-                          L10nReplacer(
-                            from: "{path}",
-                            replace: _path,
-                          ),
-                        ],
-                      ),
+              return Card(
+                child: ListTile(
+                  leading: const Icon(Icons.warning, color: Colors.amberAccent),
+                  subtitle: Text(
+                    L10n.interpolated(
+                      'errors_dataissue',
+                      placeholder: "Data Issue: $_error in $_path",
+                      replacers: [
+                        L10nReplacer(
+                          from: "{error}",
+                          replace: _error,
+                        ),
+                        L10nReplacer(
+                          from: "{path}",
+                          replace: _path,
+                        ),
+                      ],
                     ),
                   ),
                 ),

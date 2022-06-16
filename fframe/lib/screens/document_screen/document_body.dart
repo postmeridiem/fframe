@@ -40,85 +40,94 @@ class DocumentBody<T> extends StatelessWidget {
               final double docCanvasWidth = constraints.maxWidth;
               final bool contextDrawerOpen = docCanvasWidth > 1000;
 
-              final double formCanvasWidth = contextDrawerOpen ? (constraints.maxWidth - 250) : constraints.maxWidth;
-
-              return CurvedBottomBar(
-                formCanvasWidth: formCanvasWidth,
-                floatingActionButton: inheritedDocument.fab(context),
-                iconButtons: inheritedDocument.iconButtons(context),
-                child: Row(
-                  children: [
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: DefaultTabController(
-                        length: documentConfig.document.tabs.length,
-                        child: Scaffold(
-                          endDrawer: (documentConfig.document.contextCards != null && documentConfig.document.contextCards!.isNotEmpty)
-                              ? ContextCanvas(
-                                  contextWidgets: documentConfig.document.contextCards!
-                                      .map(
-                                        (contextCardBuilder) => contextCardBuilder(inheritedDocument.selectionState.data),
+              // return CurvedBottomBar(
+              //   formCanvasWidth: formCanvasWidth,
+              //   floatingActionButton: inheritedDocument.fab(context),
+              //   iconButtons: inheritedDocument.iconButtons(context),
+              //   child:
+              return Row(
+                children: [
+                  Flexible(
+                    fit: FlexFit.tight,
+                    child: DefaultTabController(
+                      length: documentConfig.document.tabs.length,
+                      child: Scaffold(
+                        endDrawer: (documentConfig.document.contextCards != null && documentConfig.document.contextCards!.isNotEmpty)
+                            ? ContextCanvas(
+                                contextWidgets: documentConfig.document.contextCards!
+                                    .map(
+                                      (contextCardBuilder) => contextCardBuilder(inheritedDocument.selectionState.data),
+                                    )
+                                    .toList(),
+                              )
+                            : null,
+                        primary: false,
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
+                        body: NestedScrollView(
+                          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                            return <Widget>[
+                              SliverAppBar(
+                                actions: const [IgnorePointer()], //To surpess the hamburger
+                                primary: false,
+                                title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : Text(inheritedDocument.selectionState.docId ?? ""),
+                                floating: true,
+                                pinned: false,
+                                snap: true,
+                                centerTitle: true,
+                                automaticallyImplyLeading: false,
+                                backgroundColor: Theme.of(context).colorScheme.secondary,
+                                bottom: documentConfig.document.tabs.length != 1
+                                    ? TabBar(
+                                        controller: tabController,
+                                        tabs: documentConfig.document.tabs
+                                            .map(
+                                              (documentTab) => documentTab.tabBuilder(),
+                                            )
+                                            .toList(),
                                       )
-                                      .toList(),
-                                )
-                              : null,
-                          primary: false,
-                          backgroundColor: Theme.of(context).colorScheme.secondary,
-                          body: NestedScrollView(
-                            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                              return <Widget>[
-                                SliverAppBar(
-                                  actions: const [IgnorePointer()], //To surpess the hamburger
-                                  primary: false,
-                                  title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : Text(inheritedDocument.selectionState.docId ?? ""),
-                                  floating: true,
-                                  pinned: false,
-                                  snap: true,
-                                  centerTitle: true,
-                                  automaticallyImplyLeading: false,
-                                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                                  bottom: documentConfig.document.tabs.length != 1
-                                      ? TabBar(
-                                          controller: tabController,
-                                          tabs: documentConfig.document.tabs
-                                              .map(
-                                                (documentTab) => documentTab.tabBuilder(),
-                                              )
-                                              .toList(),
-                                        )
-                                      : null,
-                                ),
-                              ];
-                            },
-                            body: PreloadPageView.builder(
-                              itemCount: documentConfig.document.tabs.length,
-                              preloadPagesCount: documentConfig.document.tabs.length,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (BuildContext context, int position) {
-                                debugPrint("Build tab $position");
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    key: ValueKey("PreloadPageView_${inheritedDocument.selectionState.docId}_${tabController.index}"),
-                                    child: documentConfig.document.tabs[position].childBuilder(inheritedDocument.selectionState.data),
+                                    : null,
+                              ),
+                            ];
+                          },
+                          body: PreloadPageView.builder(
+                            itemCount: documentConfig.document.tabs.length,
+                            preloadPagesCount: documentConfig.document.tabs.length,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemBuilder: (BuildContext context, int position) {
+                              debugPrint("Build tab $position");
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                  key: ValueKey("PreloadPageView_${inheritedDocument.selectionState.docId}_${tabController.index}"),
+                                  child: Scaffold(
+                                    primary: false,
+                                    body: documentConfig.document.tabs[position].childBuilder(inheritedDocument.selectionState.data),
+                                    floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
+                                    bottomNavigationBar: BottomAppBar(
+                                      shape: const CircularNotchedRectangle(),
+                                      child: IconTheme(
+                                        data: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
+                                        child: Row(
+                                          children: inheritedDocument.iconButtons(context)!,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                );
-                              },
-                              controller: preloadPageController,
-                              // onPageChanged: (int position) {
-                              //   debugPrint('page changed to: $position');
-                              // },
-                            ),
+                                ),
+                              );
+                            },
+                            controller: preloadPageController,
                           ),
                         ),
                       ),
                     ),
-                    ContextDrawer<T>(
-                      queryState: queryState,
-                      contextDrawerOpen: contextDrawerOpen,
-                    ),
-                  ],
-                ),
+                  ),
+                  ContextDrawer<T>(
+                    queryState: queryState,
+                    contextDrawerOpen: contextDrawerOpen,
+                  ),
+                ],
+                // ),
               );
             },
           );

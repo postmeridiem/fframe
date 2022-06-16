@@ -1,4 +1,4 @@
-import 'package:fframe/components/auth/authentication.dart';
+import 'package:example/models/authentication.dart';
 import 'package:flutter/material.dart';
 
 class SignInPage extends StatelessWidget {

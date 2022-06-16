@@ -3,9 +3,10 @@ import 'package:example/pages/empty_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
-import 'package:example/models/user.dart';
 import 'package:example/views/user/user.dart';
 import 'package:example/views/user/tabs/tabs.dart';
+
+import '../../models/models.dart';
 
 class UsersScreen extends StatelessWidget {
   const UsersScreen({
@@ -16,11 +17,11 @@ class UsersScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DocumentScreen<User>(
+    return DocumentScreen<AppUser>(
       collection: "users",
-      fromFirestore: User.fromFirestore,
+      fromFirestore: AppUser.fromFirestore,
       toFirestore: (user, options) => user.toFirestore(),
-      createNew: () => User(),
+      createNew: () => AppUser(),
       // createDocumentId: (User user) => {},
       //Optional title widget
       titleBuilder: (context, data) {
@@ -42,11 +43,11 @@ class UsersScreen extends StatelessWidget {
     );
   }
 
-  Document<User> _document() {
-    return Document<User>(
+  Document<AppUser> _document() {
+    return Document<AppUser>(
       autoSave: false,
       tabs: [
-        DocumentTab<User>(
+        DocumentTab<AppUser>(
           tabBuilder: () {
             return const Tab(
               text: "Profile",
@@ -61,7 +62,7 @@ class UsersScreen extends StatelessWidget {
             );
           },
         ),
-        DocumentTab<User>(
+        DocumentTab<AppUser>(
           tabBuilder: () {
             return const Tab(
               text: "Settings",
@@ -76,7 +77,7 @@ class UsersScreen extends StatelessWidget {
             );
           },
         ),
-        DocumentTab<User>(
+        DocumentTab<AppUser>(
           tabBuilder: () {
             return const Tab(
               text: "Roles",

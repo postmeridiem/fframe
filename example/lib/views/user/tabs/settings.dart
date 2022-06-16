@@ -8,7 +8,7 @@ class SettingsTab extends StatelessWidget {
   }) : super(key: key);
 
   // Fields in a Widget subclass are always marked "final".
-  final User user;
+  final AppUser user;
 
   @override
   Widget build(BuildContext context) {

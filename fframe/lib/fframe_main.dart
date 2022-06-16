@@ -199,11 +199,11 @@ class _FframeState extends State<Fframe> {
 //   //     debugPrint("Signed in user, filter on roles");
 //   //     UserStateSignedIn _userState = userState as UserStateSignedIn;
 
-//   //     if (_userState.appUser.roles == null) {
+//   //     if (_userState.fFrameUser.roles == null) {
 //   //       debugPrint("Remove all paths wich require a role");
 //   //       _navigationTargets.removeWhere((navigationTarget) => navigationTarget.roles != null);
 //   //     } else {
-//   //       List<String> userRoles = _userState.appUser.roles!;
+//   //       List<String> userRoles = _userState.fFrameUser.roles!;
 //   //       debugPrint("Current user roles: ${userRoles.join(",")}");
 
 //   //       _navigationTargets.removeWhere((navigationTarget) {

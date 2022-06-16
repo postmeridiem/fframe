@@ -1,7 +1,7 @@
 part of fframe;
 
-class AppUser extends StateNotifier {
-  AppUser({
+class FFrameUser extends StateNotifier {
+  FFrameUser({
     required this.uid,
     this.displayName,
     this.email,
@@ -17,8 +17,8 @@ class AppUser extends StateNotifier {
   final UserMetadata metaData;
   final List<String>? roles;
 
-  factory AppUser.fromFirebaseUser({required User firebaseUser, List<String>? roles}) {
-    return AppUser(
+  factory FFrameUser.fromFirebaseUser({required User firebaseUser, List<String>? roles}) {
+    return FFrameUser(
       uid: firebaseUser.uid,
       displayName: firebaseUser.displayName,
       email: firebaseUser.email,

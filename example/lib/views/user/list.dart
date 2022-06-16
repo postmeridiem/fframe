@@ -7,7 +7,7 @@ class UserListItem extends StatelessWidget {
     required this.selected,
     Key? key,
   }) : super(key: key);
-  final User user;
+  final AppUser user;
   final bool selected;
 
   @override

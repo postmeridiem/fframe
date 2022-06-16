@@ -1,9 +1,13 @@
 import 'package:fframe/components/auth/decorations.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fframe/fframe.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_signin_button/button_view.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:flutterfire_ui/auth.dart';
+
 import 'package:google_sign_in/google_sign_in.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;

@@ -1,10 +1,8 @@
-// ignore_for_file: depend_on_referenced_packages
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-class User extends ChangeNotifier {
-  User({
+class AppUser extends ChangeNotifier {
+  AppUser({
     this.uid,
     this.displayName,
     this.active,
@@ -14,11 +12,9 @@ class User extends ChangeNotifier {
     this.creationDate,
   });
 
-  factory User.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot,
-      SnapshotOptions? snapshotOptions) {
-
+  factory AppUser.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? snapshotOptions) {
     Map<String, dynamic> json = snapshot.data()!;
-    return User(
+    return AppUser(
       uid: snapshot.id,
       displayName: json['displayName'] as String?,
       active: json['active'] == null ? true : json['active'] as bool,
@@ -39,7 +35,7 @@ class User extends ChangeNotifier {
   Timestamp? creationDate;
 
   Map<String, Object?> toFirestore() {
-    debugPrint("writing <User>");
+    debugPrint("writing <AppUser>");
     return {
       // 'name': displayName,
       // 'creationDate': creationDate,

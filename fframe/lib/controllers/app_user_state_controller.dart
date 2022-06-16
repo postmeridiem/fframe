@@ -2,7 +2,6 @@ import 'package:fframe/fframe.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 //Possible states
 abstract class UserState {
   const UserState();
@@ -17,8 +16,8 @@ class UserStateSignedOut extends UserState {
 }
 
 class UserStateSignedIn extends UserState {
-  final AppUser appUser;
-  const UserStateSignedIn(this.appUser);
+  final FFrameUser fFrameUser;
+  const UserStateSignedIn(this.fFrameUser);
 
   //Public method to sign out
   signOut() {
@@ -30,16 +29,16 @@ class UserStateSignedIn extends UserState {
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
 
-    return o is UserStateSignedIn && o.appUser == appUser;
+    return o is UserStateSignedIn && o.fFrameUser == fFrameUser;
   }
 
   @override
-  int get hashCode => appUser.hashCode;
+  int get hashCode => fFrameUser.hashCode;
 }
 
 //Notifier class
 class UserStateNotifier extends StateNotifier<UserState> {
-  // AppUser? appUser;
+  // FFrameUser? fFrameUser;
 
   UserStateNotifier() : super(const UserStateUnknown()) {
     FirebaseAuth.instance.authStateChanges().listen((User? user) async {
@@ -68,10 +67,10 @@ class UserStateNotifier extends StateNotifier<UserState> {
           }
           roles = roles.map((role) => role.toLowerCase()).toList();
           debugPrint("User is signed in as ${user.uid} ${user.displayName} with roles: ${roles.join(", ")}");
-          state = UserStateSignedIn(AppUser.fromFirebaseUser(firebaseUser: user, roles: roles));
+          state = UserStateSignedIn(FFrameUser.fromFirebaseUser(firebaseUser: user, roles: roles));
         } catch (e) {
           debugPrint("Unable to interpret claims ${e.toString()}");
-          state = UserStateSignedIn(AppUser.fromFirebaseUser(firebaseUser: user, roles: []));
+          state = UserStateSignedIn(FFrameUser.fromFirebaseUser(firebaseUser: user, roles: []));
         }
       }
     });
