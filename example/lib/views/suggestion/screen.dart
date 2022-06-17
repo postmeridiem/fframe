@@ -17,6 +17,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
   Widget build(BuildContext context) {
     return DocumentScreen<Suggestion>(
       //Indicate where the documents are located and how to convert them to and fromt their models.
+      // formKey: GlobalKey<FormState>(),
       collection: "suggestions",
       fromFirestore: Suggestion.fromFirestore,
       toFirestore: (suggestion, options) {
@@ -58,6 +59,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
   Document<Suggestion> _document() {
     return Document<Suggestion>(
       autoSave: false,
+      showEditToggleButton: true,
       tabs: [
         DocumentTab<Suggestion>(
           tabBuilder: () {
@@ -68,9 +70,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
               ),
             );
           },
-          childBuilder: (suggestion) {
+          childBuilder: (suggestion, readOnly) {
             return Tab01(
               suggestion: suggestion,
+              readOnly: readOnly,
               // user: user,
             );
           },
@@ -84,9 +87,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
               ),
             );
           },
-          childBuilder: (suggestion) {
+          childBuilder: (suggestion, readOnly) {
             return Tab02(
               suggestion: suggestion,
+              readOnly: readOnly,
             );
           },
         ),
@@ -99,9 +103,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
               ),
             );
           },
-          childBuilder: (suggestion) {
+          childBuilder: (suggestion, readOnly) {
             return Tab03(
               suggestion: suggestion,
+              readOnly: readOnly,
             );
           },
         ),
@@ -112,9 +117,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
               Icons.settings_overscan,
             ),
           );
-        }, childBuilder: (suggestion) {
+        }, childBuilder: (suggestion, readOnly) {
           return DocumentScreen<Suggestion>(
             //Indicate where the documents are located and how to convert them to and fromt their models.
+            // formKey: GlobalKey<FormState>(),
             collection: "suggestions",
             fromFirestore: Suggestion.fromFirestore,
             toFirestore: (suggestion, options) {
@@ -157,7 +163,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
                       Icons.pest_control,
                     ),
                   );
-                }, childBuilder: (suggestion) {
+                }, childBuilder: (suggestion, readOnly) {
                   return const Text("FormCeption");
                 })
               ],

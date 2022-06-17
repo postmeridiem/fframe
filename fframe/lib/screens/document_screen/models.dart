@@ -2,13 +2,13 @@ part of fframe;
 
 class DocumentConfig<T> {
   DocumentConfig({
+    required this.formKey,
     required this.collection,
     required this.createNew,
     this.createDocumentId,
     required this.fromFirestore,
     required this.toFirestore,
     this.documentList,
-    // this.documentBuilder,
     this.titleBuilder,
     required this.document,
     this.extraActionButtons,
@@ -17,11 +17,11 @@ class DocumentConfig<T> {
     this.embeddedDocument = false,
   });
 
+  final GlobalKey<FormState> formKey;
   final DocumentList<T>? documentList;
   final TitleBuilder<T>? titleBuilder;
   final Document document;
   final List<IconButton>? extraActionButtons;
-
   final String queryStringIdParam;
   final String collection;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
@@ -38,11 +38,23 @@ class Document<T> {
     required this.tabs,
     this.contextCards,
     this.autoSave = false,
+    this.readOnly = false,
+    this.showCopyButton = false,
+    this.showEditToggleButton = false,
+    this.showValidateButton = false,
+    this.showSaveButton = true,
+    this.showDeleteButton = false,
   });
   final Key? key;
   final List<DocumentTab> tabs;
   final List<ContextCardBuilder>? contextCards;
   bool autoSave;
+  bool readOnly;
+  bool showEditToggleButton;
+  bool showDeleteButton;
+  bool showCopyButton;
+  bool showValidateButton;
+  bool showSaveButton;
 }
 
 class DocumentTab<T> {

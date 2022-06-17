@@ -7,8 +7,10 @@ class Tab01 extends StatelessWidget {
   const Tab01({
     Key? key,
     required this.suggestion,
+    required this.readOnly,
   }) : super(key: key);
   final Suggestion suggestion;
+  final bool readOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +39,7 @@ class Tab01 extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  readOnly: readOnly,
                   decoration: const InputDecoration(
                     // hoverColor: Color(0xFFFF00C8),
                     // hoverColor: Theme.of(context).indicatorColor,
@@ -57,6 +60,7 @@ class Tab01 extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  readOnly: readOnly,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: "tab1 value",

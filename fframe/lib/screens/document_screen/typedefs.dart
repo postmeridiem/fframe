@@ -4,10 +4,11 @@ typedef ContextCardBuilder<T> = Widget Function(
   T data,
 );
 
-typedef DocumentBuilder<T> = Widget Function(
-  BuildContext context,
-  T data,
-);
+// typedef DocumentBuilder<T> = Widget Function(
+//   BuildContext context,
+//   T data,
+//   bool readOnly,
+// );
 
 typedef DocumentListItemBuilder<T> = Widget Function(
   BuildContext context,
@@ -21,7 +22,10 @@ typedef DocumentStream<T> = Stream<DocumentSnapshot> Function(
 
 typedef DocumentTabBuilder<T> = Widget Function();
 
-typedef DocumentTabChildBuilder<T> = Widget Function(T data);
+typedef DocumentTabChildBuilder<T> = Widget Function(
+  T data,
+  bool readOnly,
+);
 
 typedef TitleBuilder<T> = Text Function(
   BuildContext context,

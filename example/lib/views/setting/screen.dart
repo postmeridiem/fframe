@@ -15,6 +15,7 @@ class _SettingScreenState extends State<SettingScreen> {
   @override
   Widget build(BuildContext context) {
     return DocumentScreen<Setting>(
+      // formKey: GlobalKey<FormState>(),
       //Indicate where the documents are located and how to convert them to and fromt their models.
       collection: "/fframe/settings/collection",
       fromFirestore: Setting.fromFirestore,
@@ -56,7 +57,7 @@ class _SettingScreenState extends State<SettingScreen> {
               ),
             );
           },
-          childBuilder: (setting) {
+          childBuilder: (setting, readOnly) {
             switch (setting.id) {
               case "01-generalsettings":
                 {

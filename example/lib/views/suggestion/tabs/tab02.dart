@@ -6,8 +6,10 @@ class Tab02 extends StatelessWidget {
   Tab02({
     Key? key,
     required this.suggestion,
+    required this.readOnly,
   }) : super(key: key);
   final Suggestion suggestion;
+  final bool readOnly;
   final ScrollController scrollController = ScrollController();
 
   @override
@@ -23,6 +25,7 @@ class Tab02 extends StatelessWidget {
                 border: OutlineInputBorder(),
                 labelText: "tab2 value",
               ),
+              readOnly: readOnly,
               initialValue: suggestion.fieldTab2 ?? '',
               validator: (value) {
                 if (!Validator().validString(value)) {

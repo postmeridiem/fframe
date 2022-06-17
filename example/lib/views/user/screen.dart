@@ -18,6 +18,7 @@ class UsersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DocumentScreen<AppUser>(
+      // formKey: GlobalKey<FormState>(),
       collection: "users",
       fromFirestore: AppUser.fromFirestore,
       toFirestore: (user, options) => user.toFirestore(),
@@ -56,7 +57,7 @@ class UsersScreen extends StatelessWidget {
               ),
             );
           },
-          childBuilder: (user) {
+          childBuilder: (user, readOnly) {
             return ProfileTab(
               user: user,
             );
@@ -71,7 +72,7 @@ class UsersScreen extends StatelessWidget {
               ),
             );
           },
-          childBuilder: (user) {
+          childBuilder: (user, readOnly) {
             return SettingsTab(
               user: user,
             );
@@ -86,7 +87,7 @@ class UsersScreen extends StatelessWidget {
               ),
             );
           },
-          childBuilder: (user) {
+          childBuilder: (user, readOnly) {
             return RolesTab(
               user: user,
             );

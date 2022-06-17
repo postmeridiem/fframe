@@ -5,6 +5,7 @@ export 'package:firebase_core/firebase_core.dart';
 export 'package:firebase_auth/firebase_auth.dart';
 export 'package:flutterfire_ui/firestore.dart';
 import 'dart:async';
+import 'package:fframe/helper_widgets/confirmation_dialog.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fframe/controllers/selection_state_controller.dart';
@@ -25,6 +26,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:frouter/frouter.dart';
+import 'package:uuid/uuid.dart';
 
 part 'fframe_main.dart';
 part 'screens/document_screen/models.dart';

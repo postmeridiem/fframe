@@ -6,8 +6,10 @@ class Tab03 extends StatelessWidget {
   const Tab03({
     Key? key,
     required this.suggestion,
+    required this.readOnly,
   }) : super(key: key);
   final Suggestion suggestion;
+  final bool readOnly;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -17,7 +19,8 @@ class Tab03 extends StatelessWidget {
           border: OutlineInputBorder(),
           labelText: "tab3 value",
         ),
-        initialValue: suggestion.fieldTab2 ?? '',
+        readOnly: readOnly,
+        initialValue: suggestion.fieldTab3 ?? '',
         validator: (value) {
           if (!Validator().validString(value)) {
             return 'Enter a valid value';
