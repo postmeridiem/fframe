@@ -19,7 +19,7 @@ class DocumentListItem<T> extends ConsumerWidget {
           onTap: () {
             bool embeddedDocument = inheritedDocument.documentConfig.embeddedDocument;
             String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
-            inheritedDocument.selectionState.state = SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data());
+            inheritedDocument.selectionState.setState(SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
             if (documentConfig.document.tabs.length == 1) {
               FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: !embeddedDocument);
             } else {
@@ -68,22 +68,22 @@ class DocumentListItem<T> extends ConsumerWidget {
   }
 }
 
-class DocumentListBuilder<T> extends StatefulWidget {
-  const DocumentListBuilder({
+class DocumentListLoader<T> extends StatefulWidget {
+  const DocumentListLoader({
     Key? key,
   }) : super(key: key);
 
   @override
-  State<DocumentListBuilder<T>> createState() => _DocumentListBuilderState<T>();
+  State<DocumentListLoader<T>> createState() => _DocumentListLoaderState<T>();
 }
 
-class _DocumentListBuilderState<T> extends State<DocumentListBuilder<T>> {
+class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
   final ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Build DocumentList $runtimeType ${widget.key.toString()}");
-    // InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
+    debugPrint("Build DocumentList with key ${widget.key.toString()}");
+    InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
 
     Query<T> query = DatabaseService<T>().query(
@@ -96,46 +96,56 @@ class _DocumentListBuilderState<T> extends State<DocumentListBuilder<T>> {
       query = documentConfig.documentList!.queryBuilder!(query);
     }
 
-    return DocumentListLoader(
-      query: query,
+    return DocumentListBody<T>(
+      key: ValueKey("documentListBody_${widget.key.toString()}"),
       scrollController: scrollController,
-      key: ValueKey("DocumentListLoader_${widget.key.toString()}"),
+      inheritedDocument: inheritedDocument,
+      documentConfig: documentConfig,
+      query: query,
     );
   }
 }
 
-class DocumentListLoader<T> extends StatelessWidget {
-  const DocumentListLoader({
+class DocumentListBody<T> extends StatelessWidget {
+  const DocumentListBody({
     Key? key,
     required this.scrollController,
+    required this.inheritedDocument,
+    required this.documentConfig,
     required this.query,
   }) : super(key: key);
   final ScrollController scrollController;
+  final InheritedDocument inheritedDocument;
+  final DocumentConfig<T> documentConfig;
   final Query<T> query;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    debugPrint("Build documentListLoader with key: listScaffold_${key.toString()}");
+
+    return Container(
       key: ValueKey("listScaffold_${key.toString()}"),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Theme.of(context).colorScheme.background,
-        child: const Icon(Icons.add),
-        elevation: 0.2,
-        onPressed: () {
-          InheritedDocument.of(context)!.create(context: context);
-        },
-      ),
-      primary: false,
-      body: FirestoreListView<T>(
-        controller: scrollController,
-        query: query,
-        itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
-          return DocumentListItem<T>(
-            queryDocumentSnapshot: queryDocumentSnapshot,
-          );
-        },
-        loadingBuilder: (context) => FRouter.of(context).waitPage,
-        errorBuilder: (context, error, stackTrace) => FRouter.of(context).errorPage,
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: Theme.of(context).colorScheme.background,
+          child: const Icon(Icons.add),
+          elevation: 0.2,
+          onPressed: () {
+            inheritedDocument.create(context: context);
+          },
+        ),
+        primary: false,
+        body: FirestoreListView<T>(
+          controller: scrollController,
+          query: query,
+          itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
+            return DocumentListItem<T>(
+              queryDocumentSnapshot: queryDocumentSnapshot,
+            );
+          },
+          loadingBuilder: (context) => FRouter.of(context).waitPage,
+          errorBuilder: (context, error, stackTrace) => FRouter.of(context).errorPage,
+        ),
       ),
     );
   }

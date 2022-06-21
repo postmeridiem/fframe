@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
-import 'package:example/views/setting/setting.dart';
+import 'package:example/screens/setting/setting.dart';
 
 final settingNavigationTarget = NavigationTarget(
   path: "settings",

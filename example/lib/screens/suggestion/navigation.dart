@@ -1,7 +1,7 @@
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
-import 'package:example/views/suggestion/suggestion.dart';
+import 'package:example/screens/suggestion/suggestion.dart';
 
 final suggestionNavigationTarget = NavigationTarget(
     path: "suggestions",

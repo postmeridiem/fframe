@@ -14,22 +14,12 @@ class DocumentBodyLoader<T> extends StatefulWidget {
 class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
   @override
   Widget build(BuildContext context) {
+    debugPrint("build documentBodyLoader ${widget.key.toString()}");
     InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
-    bool readOnly = inheritedDocument.selectionState.readOnly;
-
-    inheritedDocument.selectionState.addListener(
-      () => {
-        if (readOnly != inheritedDocument.selectionState.readOnly)
-          {
-            setState(
-              () {},
-            )
-          }
-      },
-    );
 
     return DocumentBody<T>(
+      key: ValueKey("documentBody_${widget.key.toString()}"),
       queryState: widget.queryState,
       inheritedDocument: inheritedDocument,
       documentConfig: documentConfig,
@@ -51,9 +41,8 @@ class DocumentBody<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint("build documentBody ${key.toString()}");
     PreloadPageController preloadPageController;
-    // InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
-    // DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
     String tabIndexKey = inheritedDocument.documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
     int tabIndex = int.parse(FRouter.of(context).queryStringParam(tabIndexKey) ?? "0");
 
@@ -72,7 +61,8 @@ class DocumentBody<T> extends StatelessWidget {
             () {
               debugPrint("Navigate to tab ${tabController.index}");
               if (!tabController.indexIsChanging) {
-                if (inheritedDocument.selectionState.readOnly || inheritedDocument.validate(context: context)) {
+                bool validationState = inheritedDocument.selectionState.readOnly || inheritedDocument.validate(context: context);
+                if (validationState == true || inheritedDocument.selectionState.isNew) {
                   tabIndex = tabController.index;
                   FRouter.of(context).updateQueryString(queryParameters: {tabIndexKey: "${tabController.index}"});
                   preloadPageController.animateToPage(tabController.index, duration: const Duration(microseconds: 250), curve: Curves.easeOutCirc);

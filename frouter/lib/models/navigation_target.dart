@@ -5,7 +5,7 @@ class NavigationTarget {
   final Widget? contentPane;
 
   final String title;
-  final String path;
+  late String path;
   final Destination? destination;
   final List<String>? roles;
   final List<NavigationTab>? navigationTabs;

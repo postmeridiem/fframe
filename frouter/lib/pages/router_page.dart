@@ -6,6 +6,8 @@ import 'package:frouter/services/navigation_service.dart';
 import '../models/models.dart';
 
 class RouterPage extends Page {
+  const RouterPage();
+
   @override
   Route createRoute(BuildContext context) {
     debugPrint("RouterPage.createRoute");

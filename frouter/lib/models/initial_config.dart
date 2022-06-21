@@ -18,6 +18,7 @@ class RouterConfig {
         if (navigationTarget.navigationTabs != null && navigationTarget.navigationTabs!.isNotEmpty) {
           for (NavigationTab navigationTab in navigationTarget.navigationTabs!) {
             navigationTab.parentTarget = navigationTarget;
+            navigationTab.path = "${navigationTab.parentTarget.path}/${navigationTab.path}";
           }
         }
       }),

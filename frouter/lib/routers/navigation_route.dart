@@ -23,26 +23,36 @@ class FNavigationRouteInformationParser extends RouteInformationParser<Navigatio
 class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   @override
   final GlobalKey<NavigatorState> navigatorKey;
+  bool hasListener = false;
+
   FNavigationRouterDelegate() : navigatorKey = GlobalKey<NavigatorState>() {
-    navigationNotifier.addListener(() {
-      debugPrint("NavigationRouterDelegate.navigationNotifier updated to ${navigationNotifier.uri}");
-      notifyListeners();
-    });
+    // if (!hasListener) {
+    navigationNotifier.addListener(_navigationNotifierListener);
+    //   hasListener = true;
+    // }
+  }
+
+  _navigationNotifierListener() {
+    debugPrint("NavigationRouterDelegate.navigationNotifier updated to ${navigationNotifier.uri}, notifyListeners");
+    notifyListeners();
+    // navigationNotifier.removeListener(_navigationNotifierListener);
   }
 
   @override
   NavigationNotifier? get currentConfiguration {
     debugPrint("NavigationRouterDelegate.currentConfiguration => ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
     // currentConfiguration?.uri?.path;
+    // navigationNotifier.notifyListeners();
     return navigationNotifier;
   }
 
   @override
   Widget build(BuildContext context) {
     debugPrint("NavigationRouterDelegate.build");
+
     return Navigator(
       key: navigatorKey,
-      pages: [
+      pages: const [
         RouterPage(),
       ],
       onPopPage: (route, result) {
@@ -61,5 +71,11 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
 
     debugPrint("NavigationRouterDelegate.setNewRoutePath => ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
     return;
+  }
+
+  @override
+  void dispose() {
+    navigationNotifier.removeListener(_navigationNotifierListener);
+    super.dispose();
   }
 }

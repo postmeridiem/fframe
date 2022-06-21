@@ -85,10 +85,22 @@ class TargetState {
   }
 
   factory TargetState.defaultRoute() {
-    if (navigationNotifier.navigationConfig.navigationTargets.isEmpty && RouterConfig.instance.navigationConfig.navigationTargets.isNotEmpty && navigationNotifier.isSignedIn == false) {
-      //Assume there are no applicable routes within the access control. Route to the signin page
+    if (navigationNotifier.navigationConfig.navigationTargets.isEmpty && RouterConfig.instance.navigationConfig.navigationTargets.isNotEmpty) {
+      //There are no unauthenticated routes
+
+      if (navigationNotifier.pendingAuth == false && navigationNotifier.isSignedIn != true) {
+        //Assume there are no applicable routes within the access control. Route to the signin page or wait page
+
+        //Store the current path
+        return TargetState(
+          navigationTarget: navigationNotifier.navigationConfig.signInConfig.signInTarget,
+        );
+      }
+
+      //We are still awaiting the auth state.... wait for it to be known
+      //Store the current path
       return TargetState(
-        navigationTarget: navigationNotifier.navigationConfig.signInConfig.signInTarget,
+        navigationTarget: navigationNotifier.navigationConfig.waitPage,
       );
     }
     TargetState targetState = TargetState(
@@ -97,6 +109,12 @@ class TargetState {
         return navigationNotifier.navigationConfig.errorPage;
       }),
     );
+
+    if (targetState.navigationTarget.navigationTabs?.isNotEmpty == true) {
+      debugPrint("Route to the first available tab");
+      targetState = TargetState(navigationTarget: targetState.navigationTarget.navigationTabs!.first);
+    }
+
     debugPrint("DefaultRoute to ${targetState.navigationTarget.title} at ${targetState.navigationTarget.path}");
     return targetState;
   }
@@ -134,9 +152,20 @@ class QueryState {
   }
 }
 
+class NextState {
+  NextState({
+    required this.targetState,
+    required this.queryState,
+  });
+
+  final TargetState targetState;
+  final QueryState queryState;
+}
+
 class NavigationNotifier extends ChangeNotifier {
   final Ref ref;
   Uri? _uri;
+  List<NextState> _nextState = [];
 
   TargetState? _targetState;
   QueryState? _queryState;
@@ -144,7 +173,7 @@ class NavigationNotifier extends ChangeNotifier {
   bool _isbuilding = false;
   bool _buildPending = false;
 
-  bool _isSignedIn = false;
+  bool? _isSignedIn;
   List<String>? _roles;
 
   late NavigationConfig navigationConfig = RouterConfig.instance.navigationConfig;
@@ -154,7 +183,8 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   int selectedNavRailIndex = 0;
-  bool get isSignedIn => _isSignedIn;
+  bool get pendingAuth => _isSignedIn == null;
+  bool get isSignedIn => _isSignedIn ?? false;
 
   signIn({List<String>? roles}) {
     _roles = roles;
@@ -194,7 +224,7 @@ class NavigationNotifier extends ChangeNotifier {
 
   _filterNavigationRoutes() {
     navigationConfig = NavigationConfig.clone(RouterConfig.instance.navigationConfig);
-    if (_isSignedIn) {
+    if (_isSignedIn ?? false) {
       //Check routes for roles
       navigationConfig.navigationTargets.removeWhere(
         (NavigationTarget navigationTarget) {
@@ -241,7 +271,7 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   List<NavigationTab> _filterTabRoutes(List<NavigationTab> navigationTabs) {
-    if (_isSignedIn) {
+    if (_isSignedIn ?? false) {
       navigationTabs.removeWhere((NavigationTab navigationTab) {
         //Signed in. Keep private routes
         if (navigationTab.private == false) {
@@ -276,10 +306,23 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   parseRouteInformation({required Uri uri}) {
+    debugPrint("*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--");
+    debugPrint("FRouter.parseRouteInformation: $uri) ${uri.userInfo}}");
+
+    // if (navigationNotifier.pendingAuth) {
+    //   return TargetState(navigationTarget: navigationNotifier.navigationConfig.waitPage);
+    // }
+
     TargetState? targetState = TargetState.fromUri(uri);
     QueryState? queryState = QueryState.fromUri(uri);
 
-    debugPrint("FRouter.generateRoute: ${targetState.toString()} :: ${queryState.toString()}");
+    if (uri.path != "/") {
+      debugPrint("NavigationNotifier.parseRouteInformation => Store initial link for later use");
+      _nextState.add(NextState(targetState: targetState, queryState: queryState));
+      // _nextUri.add(uri);
+    }
+
+    debugPrint("FRouter.parseRouteInformation: ${targetState.toString()} :: ${queryState.toString()}");
 
     if (_targetState == null && _queryState == null) {
       debugPrint("NavigationNotifier.parseRouteInformation => Initial load, set defaults");
@@ -295,16 +338,7 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   Uri composeUri() {
-    String pathComponent = "/";
-    if (_targetState != null) {
-      if (_targetState!.navigationTarget is NavigationTab) {
-        NavigationTab navigationTab = _targetState!.navigationTarget as NavigationTab;
-        pathComponent = "${navigationTab.parentTarget.path}/${_targetState!.navigationTarget.path}";
-      } else {
-        pathComponent = _targetState!.navigationTarget.path;
-      }
-    }
-    // String pathComponent = (_targetState == null) ? _uri?.path ?? "/" : _targetState!.navigationTarget.path;
+    String pathComponent = (_targetState == null) ? _uri?.path ?? "/" : _targetState!.navigationTarget.path;
     String queryComponent = (_queryState == null) ? _uri?.query ?? "" : _queryState!.queryString;
 
     //Trigger the setter and te external method with it;

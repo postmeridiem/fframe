@@ -17,7 +17,7 @@ class Tab01 extends StatelessWidget {
     // register shared validator class for common patterns
     Validator validator = Validator();
 
-    debugPrint("Loading suggestion: ${suggestion.name ?? 'new'}");
+    // debugPrint("Loading suggestion: ${suggestion.name ?? 'new'}");
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

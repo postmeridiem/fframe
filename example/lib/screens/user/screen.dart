@@ -3,8 +3,8 @@ import 'package:example/pages/empty_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
-import 'package:example/views/user/user.dart';
-import 'package:example/views/user/tabs/tabs.dart';
+import 'package:example/screens/user/user.dart';
+import 'package:example/screens/user/tabs/tabs.dart';
 
 import '../../models/models.dart';
 

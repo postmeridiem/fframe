@@ -40,7 +40,6 @@ class DocumentScreen<T> extends StatelessWidget {
     if (parentInheritedDocument != null) {
       debugPrint("This is an embedded instance of the DocumentScreen initalize FormCeption");
       if (queryStringIdParam == parentInheritedDocument.documentConfig.queryStringIdParam) {
-        debugPrint("Correct the colliding queryStringIdParam properties");
         _queryStringIdParam = "child${toBeginningOfSentenceCase(parentInheritedDocument.documentConfig.queryStringIdParam)}";
       }
       _embeddedDocument = true;
@@ -108,7 +107,7 @@ class InheritedDocument extends InheritedWidget {
   }
 
   toggleReadOnly<T>({required BuildContext context}) {
-    selectionState.state = SelectionState<T>(data: selectionState.data!, docId: selectionState.docId, isNew: false, readOnly: !selectionState.readOnly);
+    selectionState.setState(SelectionState<T>(data: selectionState.data!, docId: selectionState.docId, isNew: false, readOnly: !selectionState.readOnly), notify: true);
   }
 
   delete<T>({required BuildContext context}) async {
@@ -186,12 +185,12 @@ class InheritedDocument extends InheritedWidget {
     }
   }
 
-  close<T>({required BuildContext context}) async {
-    if (selectionState.readOnly == true) {
+  close<T>({required BuildContext context, bool skipWarning = false}) async {
+    if (selectionState.readOnly == true || skipWarning == true) {
+      selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
       FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
       return;
     }
-    //TODO: make confirmation dialog optional
     if (await (confirmationDialog(
             context: context,
             cancelText: L10n.string(
@@ -216,7 +215,7 @@ class InheritedDocument extends InheritedWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Icon(
                       Icons.question_mark,
-                      color: Colors.red.shade900,
+                      color: Colors.yellowAccent.shade200,
                     ),
                   ),
                   Column(
@@ -241,20 +240,25 @@ class InheritedDocument extends InheritedWidget {
               ),
             ))) ==
         true) {
+      selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
       FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
     }
   }
 
   // ignore: unused_element
   copy<T>({required BuildContext context}) {
-    selectionState.state = SelectionState<T>(data: selectionState.data!, docId: "copy", isNew: true, readOnly: false);
+    selectionState.setState(SelectionState<T>(data: selectionState.data!, docId: "copy", isNew: true, readOnly: false));
     FRouter.of(context).updateQueryString(queryParameters: {documentConfig.queryStringIdParam: selectionState.docId!}, resetQueryString: selectionState.isNew);
   }
 
   create<T>({required BuildContext context}) {
-    T instance = documentConfig.createNew();
-    selectionState.state = SelectionState<T>(data: instance, docId: "new", isNew: true, readOnly: false);
-    FRouter.of(context).updateQueryString(queryParameters: {documentConfig.queryStringIdParam: selectionState.docId!}, resetQueryString: selectionState.isNew);
+    //Clear the cache
+    selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
+    if (documentConfig.document.tabs.length == 1) {
+      FRouter.of(context).updateQueryString<T>(queryParameters: {"new": "true"}, resetQueryString: true);
+    } else {
+      FRouter.of(context).updateQueryString<T>(queryParameters: {"new": "true", "tabIndex": "0"}, resetQueryString: true);
+    }
   }
 
   load<T>({required String docId}) async {
@@ -268,7 +272,7 @@ class InheritedDocument extends InheritedWidget {
     );
 
     if (documentSnapshot?.exists ?? false) {
-      selectionState.state = SelectionState(data: documentSnapshot!.data(), docId: docId);
+      selectionState.setState(SelectionState(data: documentSnapshot!.data(), docId: docId));
     }
   }
 
@@ -304,7 +308,7 @@ class InheritedDocument extends InheritedWidget {
       if (saveResult.result) {
         //Success
         debugPrint("Save was successfull");
-        close(context: context);
+        close(context: context, skipWarning: true);
       } else {
         debugPrint("Save failed");
 
@@ -322,7 +326,6 @@ class InheritedDocument extends InheritedWidget {
 
   bool validate<T>({required BuildContext context, bool showPopup = false}) {
     DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
-    debugPrint("callValidate");
     if (_documentConfig.formKey.currentState!.validate()) {
       if (showPopup) {
         _snackbar(
@@ -344,7 +347,7 @@ class InheritedDocument extends InheritedWidget {
           context: context,
           text: L10n.string(
             'validator_failed',
-            placeholder: "Form is invalid, please update highligted fields.",
+            placeholder: "Form is invalid, please update highlighted fields.",
           ),
           icon: Icon(
             Icons.close,
@@ -443,6 +446,20 @@ class InheritedDocument extends InheritedWidget {
             // validate();
           },
         ),
+      IconButton(
+        tooltip: L10n.string(
+          "iconbutton_document_new",
+          placeholder: "Create new document",
+        ),
+        icon: Icon(
+          Icons.add,
+          color: Theme.of(context).colorScheme.onBackground,
+        ),
+        onPressed: () {
+          create<T>(context: context);
+          // validate();
+        },
+      ),
     ];
 
     //Add any extra configured buttons to the list
@@ -458,6 +475,7 @@ class DocumentLoader<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    debugPrint("build DocumentLoader: ${key.toString()}");
     DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
 
     return Row(
@@ -475,7 +493,7 @@ class DocumentLoader<T> extends ConsumerWidget {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(0.0),
-                    child: DocumentListBuilder<T>(
+                    child: DocumentListLoader<T>(
                       key: ValueKey("DocumentListBuilder_${documentConfig.collection}"),
                     ),
                   ),
@@ -483,9 +501,11 @@ class DocumentLoader<T> extends ConsumerWidget {
               ],
             ),
           ),
-        if (documentConfig.documentList != null) const VerticalDivider(thickness: 1, width: 1),
+        // if (documentConfig.documentList != null) const VerticalDivider(thickness: 1, width: 1),
         Expanded(
-          child: ScreenBody<T>(),
+          child: ScreenBody<T>(
+            key: ValueKey("ScreenBody_${documentConfig.collection}"),
+          ),
         ),
       ],
     );
@@ -502,6 +522,7 @@ class ScreenBody<T> extends ConsumerStatefulWidget {
 class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
   @override
   Widget build(BuildContext context) {
+    debugPrint("build screenBodyState ${widget.key.toString()}");
     QueryState queryState = ref.watch(queryStateProvider);
     Widget returnWidget = queryState.queryString.isEmpty ? FRouter.of(context).emptyPage : DocumentBodyLoader<T>(key: ValueKey(queryState.queryString), queryState: queryState);
 
@@ -509,6 +530,12 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
     if (queryState.queryParameters == null) {
       //Cannot contain a form
       return FRouter.of(context).emptyPage;
+    } else if (inheritedDocument.selectionState.data == null && inheritedDocument.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
+      debugPrint("Spawn a new document");
+      inheritedDocument.selectionState.setState(SelectionState<T>(data: inheritedDocument.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false));
+    } else if (inheritedDocument.selectionState.data is T && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
+      debugPrint("Spawn new document from cache");
+      return returnWidget;
     } else if (!queryState.queryParameters!.containsKey(inheritedDocument.documentConfig.queryStringIdParam)) {
       return FRouter.of(context).emptyPage;
     } else if (((inheritedDocument.selectionState.docId != queryState.queryParameters?[inheritedDocument.documentConfig.queryStringIdParam]) || (inheritedDocument.selectionState.data == null && queryState.queryParameters != null))) {

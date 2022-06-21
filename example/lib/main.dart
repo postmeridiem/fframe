@@ -9,10 +9,10 @@ import 'package:example/firebase_options.dart';
 
 import 'package:example/themes/themes.dart';
 
-import 'package:example/views/signInPage/signin_page.dart';
-import 'package:example/views/suggestion/suggestion.dart';
-import 'package:example/views/setting/setting.dart';
-import 'package:example/views/user/user.dart';
+import 'package:example/screens/signInPage/signin_page.dart';
+import 'package:example/screens/suggestion/suggestion.dart';
+import 'package:example/screens/setting/setting.dart';
+import 'package:example/screens/user/user.dart';
 
 void main() {
   runApp(const MainApp());
