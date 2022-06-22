@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 
 import 'package:fframe/controllers/selection_state_controller.dart';
 import 'package:fframe/helper_widgets/init_l10n.dart';
-import 'package:fframe/helpers/curved_bottom_navbar.dart';
 import 'package:fframe/helpers/documentlist_search.dart';
 import 'package:fframe/helper_widgets/init_firebase.dart';
 import 'package:fframe/helpers/l10n.dart';

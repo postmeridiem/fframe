@@ -23,15 +23,17 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    _tabController = TabController(
-      initialIndex: FRouter.of(context).currentTab,
-      vsync: this,
-      length: FRouter.of(context).tabLength,
-    );
+    if (FRouter.of(context).hasTabs) {
+      _tabController = TabController(
+        initialIndex: FRouter.of(context).currentTab,
+        vsync: this,
+        length: FRouter.of(context).tabLength,
+      );
 
-    _tabController.addListener(
-      () => FRouter.of(context).tabSwitch(tabController: _tabController),
-    );
+      _tabController.addListener(
+        () => FRouter.of(context).tabSwitch(tabController: _tabController),
+      );
+    }
 
     return Scaffold(
       key: _scaffoldKey,

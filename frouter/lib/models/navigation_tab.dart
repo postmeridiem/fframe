@@ -6,7 +6,7 @@ class NavigationTab extends NavigationTarget {
     required String title,
     required String path,
     required Widget contentPane,
-    Destination? destination,
+    required Destination destination,
     List<String>? roles,
     public = false,
     private = true,
