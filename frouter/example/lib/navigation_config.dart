@@ -14,7 +14,7 @@ final NavigationConfig navigationConfig = NavigationConfig(
       contentPane: const DocumentScreen(),
       destination: const Destination(
         icon: Icon(Icons.lock),
-        label: Text('Item 1'),
+        navigationLabel: Text('Item 1'),
       ),
       public: false,
       landingPage: true,
@@ -25,7 +25,7 @@ final NavigationConfig navigationConfig = NavigationConfig(
         contentPane: const DocumentScreen(),
         destination: const Destination(
           icon: Icon(Icons.lock),
-          label: Text('Item 2'),
+          navigationLabel: Text('Item 2'),
         ),
         navigationTabs: [
           NavigationTab(
@@ -35,7 +35,7 @@ final NavigationConfig navigationConfig = NavigationConfig(
             roles: ['user'],
             destination: const Destination(
               icon: Icon(Icons.onetwothree),
-              label: Text('Tab 1'),
+              navigationLabel: Text('Tab 1'),
             ),
           ),
           NavigationTab(
@@ -46,7 +46,7 @@ final NavigationConfig navigationConfig = NavigationConfig(
             private: false,
             destination: const Destination(
               icon: Icon(Icons.onetwothree),
-              label: Text('Tab 3'),
+              navigationLabel: Text('Tab 3'),
             ),
           ),
           NavigationTab(
@@ -56,7 +56,7 @@ final NavigationConfig navigationConfig = NavigationConfig(
             contentPane: const DocumentScreen(),
             destination: const Destination(
               icon: Icon(Icons.onetwothree),
-              label: Text('Tab 3'),
+              navigationLabel: Text('Tab 3'),
             ),
           )
         ]),
@@ -66,7 +66,7 @@ final NavigationConfig navigationConfig = NavigationConfig(
       contentPane: const DocumentScreen(),
       destination: const Destination(
         icon: Icon(Icons.arrow_forward),
-        label: Text('Item 3'),
+        navigationLabel: Text('Item 3'),
       ),
       public: true,
       landingPage: true,
@@ -77,7 +77,7 @@ final NavigationConfig navigationConfig = NavigationConfig(
       contentPane: const DocumentScreen(),
       destination: const Destination(
         icon: Icon(Icons.alternate_email),
-        label: Text('Item 4'),
+        navigationLabel: Text('Item 4'),
       ),
       public: true,
       private: false,
@@ -91,7 +91,7 @@ final NavigationConfig navigationConfig = NavigationConfig(
       contentPane: const FakeLogin(),
       destination: const Destination(
         icon: Icon(Icons.login),
-        label: Text('Login'),
+        navigationLabel: Text('Login'),
       ),
     ),
   ),

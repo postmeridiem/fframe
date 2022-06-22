@@ -23,7 +23,7 @@ final usersNavigationTarget = NavigationTarget(
   ],
   destination: const Destination(
     icon: Icon(Icons.person),
-    label: Text('Users'),
+    navigationLabel: Text('Users'),
   ),
   roles: ["User", 'UserAdmin', 'SuperAdmin'],
   private: true,

@@ -9,12 +9,14 @@ class Destination {
   const Destination({
     required this.icon,
     Widget? selectedIcon,
-    required this.label,
+    required this.navigationLabel,
+    this.tabLabel,
     this.padding,
   }) : selectedIcon = selectedIcon ?? icon;
 
   final Widget icon;
   final Widget selectedIcon;
-  final Widget label;
+  final Widget navigationLabel;
+  final String? tabLabel;
   final EdgeInsetsGeometry? padding;
 }

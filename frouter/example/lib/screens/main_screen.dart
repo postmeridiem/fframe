@@ -56,7 +56,7 @@ class _MainScreenState extends State<MainScreen> {
         ),
         signOutDestination: const Destination(
           icon: Icon(Icons.logout),
-          label: Text("Sign out"),
+          navigationLabel: Text("Sign out"),
         ),
       ),
       endDrawer: FRouter.of(context).drawer(

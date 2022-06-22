@@ -17,11 +17,22 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late TabController _tabController;
 
   @override
   Widget build(BuildContext context) {
+    _tabController = TabController(
+      initialIndex: FRouter.of(context).currentTab,
+      vsync: this,
+      length: FRouter.of(context).tabLength,
+    );
+
+    _tabController.addListener(
+      () => FRouter.of(context).tabSwitch(tabController: _tabController),
+    );
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -54,22 +65,25 @@ class _MainScreenState extends State<MainScreen> {
               },
               icon: const Icon(Icons.menu)),
         ],
+        bottom: FRouter.of(context).hasTabs
+            ? TabBar(
+                controller: _tabController,
+                tabs: FRouter.of(context).tabBar(context),
+              )
+            : null,
       ),
       drawer: FRouter.of(context).drawer(
         context: context,
-        drawerHeader: const DrawerHeader(
-          decoration: BoxDecoration(
+        drawerHeader: DrawerHeader(
+          decoration: const BoxDecoration(
             color: Colors.blue,
           ),
-          child: Text("FRouter Example"),
+          child: Text(widget.appTitle),
         ),
         signOutDestination: const Destination(
           icon: Icon(Icons.logout),
-          label: Text("Sign out"),
+          navigationLabel: Text("Sign out"),
         ),
-      ),
-      endDrawer: FRouter.of(context).drawer(
-        context: context,
       ),
       body: Center(
         child: Row(
@@ -98,5 +112,11 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 }

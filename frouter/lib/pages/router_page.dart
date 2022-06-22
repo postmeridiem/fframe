@@ -19,6 +19,7 @@ class RouterPage extends Page {
           ref: ref,
           child: const RouterScreen(),
         );
+        ;
       }),
     );
   }
@@ -100,10 +101,6 @@ class FRouter extends InheritedWidget {
     return navigationNotifier.currentTarget.navigationTarget;
   }
 
-  bool get hasTabs {
-    return navigationNotifier.hasTabs;
-  }
-
   List<NavigationTab> get navigationTabs {
     return navigationNotifier.navigationTabs;
   }
@@ -136,7 +133,7 @@ class FRouter extends InheritedWidget {
                   children: [
                     ListTile(
                       leading: navigationTarget.destination?.icon,
-                      title: navigationTarget.destination?.label,
+                      title: navigationTarget.destination?.navigationLabel,
                       onTap: () {
                         navigateTo(navigationTarget: navigationTarget);
                         Navigator.pop(context);
@@ -155,7 +152,7 @@ class FRouter extends InheritedWidget {
                                 ),
                             child: ListTile(
                               leading: navigationTab.destination?.icon,
-                              title: navigationTab.destination?.label,
+                              title: navigationTab.destination?.navigationLabel,
                               onTap: () {
                                 navigateTo(navigationTarget: navigationTab);
                                 Navigator.pop(context);
@@ -170,7 +167,7 @@ class FRouter extends InheritedWidget {
           if (!navigationNotifier.isSignedIn && navigationNotifier.navigationConfig.signInConfig.signInTarget.destination != null)
             ListTile(
               leading: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination?.icon,
-              title: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.label,
+              title: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.navigationLabel,
               onTap: () {
                 navigateTo(navigationTarget: navigationNotifier.navigationConfig.signInConfig.signInTarget);
                 Navigator.pop(context);
@@ -179,7 +176,7 @@ class FRouter extends InheritedWidget {
           if (signOutDestination != null && navigationNotifier.isSignedIn)
             ListTile(
               leading: signOutDestination.icon,
-              title: signOutDestination.label,
+              title: signOutDestination.navigationLabel,
               onTap: () {
                 logout();
                 Navigator.pop(context);
@@ -188,6 +185,45 @@ class FRouter extends InheritedWidget {
         ],
       ),
     );
+  }
+
+  bool get hasTabs {
+    return navigationNotifier.hasTabs;
+  }
+
+  int get tabLength {
+    return navigationNotifier.navigationTabs.length;
+  }
+
+  int get currentTab {
+    return navigationNotifier.navigationTabs.indexWhere(
+      (NavigationTab navigationTab) => navigationTab.path == navigationNotifier.currentTarget.navigationTarget.path,
+    );
+  }
+
+  tabSwitch({required TabController tabController, required}) {
+    if (!tabController.indexIsChanging) {
+      NavigationTarget currentTarget = navigationNotifier.currentTarget.navigationTarget;
+      NavigationTarget pendingTarget = navigationNotifier.navigationTabs[tabController.index];
+      if (currentTarget.path != pendingTarget.path) {
+        debugPrint("Switch from ${currentTarget.path} to ${pendingTarget.path}.");
+        navigateTo(navigationTarget: pendingTarget);
+      }
+    }
+  }
+
+  List<Tab> tabBar(BuildContext context) {
+    return navigationNotifier.navigationTabs
+        .where(
+          ((NavigationTab navigationTab) => navigationTab.destination != null),
+        )
+        .map(
+          (NavigationTab navigationTab) => Tab(
+            icon: navigationTab.destination?.icon,
+            text: navigationTab.destination?.tabLabel ?? '',
+          ),
+        )
+        .toList();
   }
 
   Widget navigationRail({NavigationRailDestination? signOutDestination}) {
@@ -219,7 +255,7 @@ class FRouter extends InheritedWidget {
                 (NavigationTarget navigationTarget) => NavigationRailDestination(
                   icon: navigationTarget.destination!.icon,
                   selectedIcon: navigationTarget.destination!.selectedIcon,
-                  label: navigationTarget.destination!.label,
+                  label: navigationTarget.destination!.navigationLabel,
                   padding: navigationTarget.destination!.padding,
                 ),
               ),
@@ -227,7 +263,7 @@ class FRouter extends InheritedWidget {
             NavigationRailDestination(
               icon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.icon,
               selectedIcon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
-              label: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.label,
+              label: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.navigationLabel,
               padding: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.padding,
             ),
           if (signOutDestination != null && navigationNotifier.isSignedIn) signOutDestination,
@@ -266,6 +302,3 @@ class _RouterScreenState extends State<RouterScreen> {
     return RouterConfig.instance.mainScreen;
   }
 }
-
-// typedef DocumentBuilder = Widget Function(BuildContext context, Key key, QueryState queryState);
-typedef EmptyPageBuilder = Widget Function(BuildContext context);

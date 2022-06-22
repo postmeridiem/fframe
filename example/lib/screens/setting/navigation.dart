@@ -8,7 +8,7 @@ final settingNavigationTarget = NavigationTarget(
   contentPane: const SettingScreen(),
   destination: const Destination(
     icon: Icon(Icons.tune),
-    label: Text('Settings'),
+    navigationLabel: Text('Settings'),
   ),
   roles: ['UserAdmin', 'SuperAdmin'],
   private: true,
