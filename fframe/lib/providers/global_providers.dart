@@ -20,6 +20,35 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return provider;
 });
 
+final authNotifierProvider = ChangeNotifierProvider<AuthNotifier>((ref) {
+  ref.watch(authenticationWatchProvider);
+  AuthNotifier authNotifier = AuthNotifier();
+  authNotifier.refresh();
+  return AuthNotifier();
+});
+
+class AuthNotifier with ChangeNotifier {
+  FFrameUser? _fFrameUser = FFrameUser();
+
+  FFrameUser? get fFrameUser => _fFrameUser;
+  set user(User? user) {
+    if (user == null) {
+      _fFrameUser = null;
+      notifyListeners();
+      return;
+    }
+    _fFrameUser = FFrameUser.fromFirebaseUser(firebaseUser: user);
+    notifyListeners();
+  }
+
+  void refresh() {
+    notifyListeners();
+  }
+}
+
+
+
+
 // // final userProvider = FutureProvider<User?>((ref) async {
 // //   User? user = ref.watch(authStateProvider).value;
 // //   NavigationNotifier navigationNotifier = ref.read(navigationProvider);

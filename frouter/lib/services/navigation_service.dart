@@ -41,7 +41,9 @@ class NavigationNotifier extends ChangeNotifier {
 
   NavigationNotifier({required this.ref}) {
     _filterNavigationRoutes();
-    RouterConfig.instance.refreshListenable?.addListener(() {});
+    RouterConfig.instance.refreshListenable?.addListener(() {
+      debugPrint("authChangeListener");
+    });
   }
 
   int selectedNavRailIndex = 0;

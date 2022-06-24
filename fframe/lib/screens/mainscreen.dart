@@ -20,9 +20,13 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
+  late bool _userOverlayActive = false;
+  late OverlayState overlayState;
+  late OverlayEntry overlayEntry;
 
   @override
   Widget build(BuildContext context) {
+    overlayState = Overlay.of(context)!;
     if (FRouter.of(context).hasTabs) {
       _tabController = TabController(
         initialIndex: FRouter.of(context).currentTab,
@@ -49,22 +53,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             },
             icon: const Icon(Icons.menu)),
         actions: [
-          if (FRouter.of(context).isSignedIn)
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () {
-                FirebaseAuth.instance.signOut();
-              },
-            ),
-          IconButton(
-              onPressed: () {
-                if (_scaffoldKey.currentState!.isEndDrawerOpen) {
-                  _scaffoldKey.currentState!.closeEndDrawer();
-                } else {
-                  _scaffoldKey.currentState!.openEndDrawer();
-                }
-              },
-              icon: const Icon(Icons.menu)),
+          profileButton(),
         ],
         bottom: FRouter.of(context).hasTabs
             ? TabBar(
@@ -113,6 +102,136 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+
+  Widget profileButton() {
+    return StreamBuilder(
+      stream: FirebaseAuth.instance.userChanges(),
+      initialData: null,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+            return const CircularProgressIndicator();
+          case ConnectionState.waiting:
+            return const CircularProgressIndicator();
+          case ConnectionState.done:
+            return const IgnorePointer();
+          case ConnectionState.active:
+            if (snapshot.hasError) {
+              return Icon(Icons.error, color: Colors.redAccent.shade700);
+            }
+
+            if (snapshot.hasData) {
+              return ElevatedButton(
+                child: circleAvatar(),
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(4),
+                  primary: Colors.transparent, // <-- Button color
+                  onPrimary: Colors.red, // <-- Splash color
+                ),
+                onPressed: () {
+                  showUserOverlay();
+                },
+              );
+            }
+            return const IgnorePointer();
+        }
+      },
+    );
+  }
+
+  CircleAvatar circleAvatar({double? radius}) {
+    User user = FirebaseAuth.instance.currentUser!;
+    List<String>? avatarText = user.displayName?.split(' ').map((part) => part.trim().substring(0, 1)).toList();
+    return CircleAvatar(
+      radius: radius ?? 12.0,
+      backgroundImage: (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
+      backgroundColor: (user.photoURL == null) ? Colors.amber : Colors.transparent,
+      child: (user.photoURL == null && avatarText != null)
+          ? Text(
+              "${avatarText.first}${avatarText.last}",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            )
+          : null,
+    );
+  }
+
+  showUserOverlay() {
+    overlayEntry = OverlayEntry(builder: (context) {
+      bool isSigningOut = false;
+      return Stack(
+        children: <Widget>[
+          Positioned.fill(
+              child: GestureDetector(
+            onTap: () {
+              overlayEntry.remove();
+            },
+            child: Container(
+              color: Colors.transparent,
+            ),
+          )),
+          Positioned(
+            top: kToolbarHeight,
+            right: 5.0,
+            child: Material(
+              child: SizedBox(
+                height: 250.0,
+                width: 250.0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        children: [
+                          circleAvatar(
+                            radius: 24,
+                          ),
+                          Text(FirebaseAuth.instance.currentUser!.displayName!)
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.person,
+                          size: 24.0,
+                        ),
+                        label: const Text('Profile'),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          setState(() {
+                            isSigningOut = true;
+                          });
+                          await FirebaseAuth.instance.signOut();
+                          overlayEntry.remove();
+                        },
+                        icon: isSigningOut
+                            ? const CircularProgressIndicator()
+                            : const Icon(
+                                Icons.logout,
+                                size: 24.0,
+                              ),
+                        label: const Text('sign Out'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    });
+
+    overlayState.insert(overlayEntry);
   }
 
   @override
