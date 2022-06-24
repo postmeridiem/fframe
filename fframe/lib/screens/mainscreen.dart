@@ -34,7 +34,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         () => FRouter.of(context).tabSwitch(tabController: _tabController),
       );
     }
-
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -54,7 +53,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
-                FRouter.of(context).logout();
+                FirebaseAuth.instance.signOut();
               },
             ),
           IconButton(
@@ -118,7 +117,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
-    _tabController.dispose();
+    // _tabController.dispose();
     super.dispose();
   }
 }

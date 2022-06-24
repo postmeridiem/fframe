@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
     return FRouterLoader(
       mainScreen: const MainScreen(),
       navigationConfig: navigationConfig,
+      // isSignedIn: false,
       routerBuilder: (context) {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,

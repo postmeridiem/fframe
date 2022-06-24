@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:frouter/models/initial_config.dart';
+import 'package:frouter/providers/state_providers.dart';
 import 'package:frouter/services/navigation_service.dart';
+import 'package:frouter/services/query_state.dart';
+import 'package:frouter/services/target_state.dart';
 
 import '../models/models.dart';
 
@@ -17,9 +20,8 @@ class RouterPage extends Page {
         debugPrint("Build FRouter");
         return FRouter(
           ref: ref,
-          child: const RouterScreen(),
         );
-        ;
+        
       }),
     );
   }
@@ -30,10 +32,13 @@ class RouterPage extends Page {
 class FRouter extends InheritedWidget {
   const FRouter({
     Key? key,
-    required Widget child,
     required this.ref,
-  }) : super(key: key, child: child);
+    // required this.signedIn,
+    // this.roles,
+  }) : super(key: key, child: const RouterScreen());
   final WidgetRef ref;
+  // final bool signedIn;
+  // final List<String>? roles;
 
   ///Path Only
   ///FRouter.of(context).navigateTo(navigationTarget: widget.navigationTarget);
@@ -83,12 +88,12 @@ class FRouter extends InheritedWidget {
   }
 
   ///Request a logout
-  logout() {
+  signOut() {
     navigationNotifier.signOut();
   }
 
   ///Notify a login, optionally parse a list of current user roles
-  login({List<String>? roles}) {
+  signIn({List<String>? roles}) {
     navigationNotifier.signIn(roles: roles);
   }
 
@@ -178,7 +183,7 @@ class FRouter extends InheritedWidget {
               leading: signOutDestination.icon,
               title: signOutDestination.navigationLabel,
               onTap: () {
-                logout();
+                signOut();
                 Navigator.pop(context);
               },
             ),
@@ -238,7 +243,7 @@ class FRouter extends InheritedWidget {
           } else {
             debugPrint("Sign in/out action");
             if (isSignedIn) {
-              logout();
+              signIn();
             } else {
               NavigationTarget navigationTarget = navigationNotifier.navigationConfig.signInConfig.signInTarget;
               navigateTo(navigationTarget: navigationTarget);

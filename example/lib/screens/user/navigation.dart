@@ -31,7 +31,7 @@ final usersNavigationTarget = NavigationTarget(
             Icons.close,
             color: Colors.redAccent.shade700,
           ),
-          navigationLabel: const Text("Inactove"),
+          navigationLabel: const Text("Inactive"),
           tabLabel: "Inactive"),
     )
   ],

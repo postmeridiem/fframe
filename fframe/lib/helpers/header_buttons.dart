@@ -94,18 +94,3 @@ class BarButtonFeedback extends StatelessWidget {
   }
 }
 
-class BarButtonProfile extends StatelessWidget {
-  const BarButtonProfile({Key? key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: _signOut,
-      icon: const Icon(Icons.logout_outlined),
-      tooltip: L10n.string('header_logout', placeholder: 'Log out...', namespace: 'fframe'),
-    );
-  }
-}
-
-Future<void> _signOut() async {
-  await FirebaseAuth.instance.signOut();
-}

@@ -1,6 +1,4 @@
 import 'package:fframe/fframe.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class InitializeFirebase extends StatelessWidget {
@@ -23,21 +21,7 @@ class InitializeFirebase extends StatelessWidget {
           case ConnectionState.waiting:
             return navigationConfig.waitPage.contentPane ?? const Center(child: CircularProgressIndicator());
           case ConnectionState.done:
-            FirebaseAuth.instance.authStateChanges().listen((User? user) {
-              if (user == null) {
-                //As frouter is not accesible this high in the tree, speak to the notifier directly
-                navigationNotifier.signOut();
-                // FRouter.of(context).logout();
-              } else {
-                //As frouter is not accesible this high in the tree, speak to the notifier directly
-                navigationNotifier.signIn(roles: ["user"]);
-                // FRouter.of(context).login();
-              }
-            });
-
-            //Until the auth state is known..... just keep spinngn
             return child;
-          // return navigationConfig.waitPage.contentPane!; // ?? const Center(child: CircularProgressIndicator());
         }
       },
     );

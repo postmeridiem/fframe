@@ -32,7 +32,7 @@ class _MainScreenState extends State<MainScreen> {
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
-                FRouter.of(context).logout();
+                FRouter.of(context).signOut();
               },
             ),
           IconButton(

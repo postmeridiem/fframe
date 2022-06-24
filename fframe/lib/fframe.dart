@@ -6,6 +6,7 @@ export 'package:firebase_auth/firebase_auth.dart';
 export 'package:flutterfire_ui/firestore.dart';
 import 'dart:async';
 import 'package:fframe/helper_widgets/confirmation_dialog.dart';
+import 'package:fframe/providers/global_providers.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fframe/controllers/selection_state_controller.dart';

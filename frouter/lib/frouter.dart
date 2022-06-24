@@ -13,6 +13,9 @@ export 'models/models.dart';
 export 'pages/router_page.dart';
 export 'routers/navigation_route.dart';
 export 'services/navigation_service.dart';
+export 'services/query_state.dart';
+export 'services/target_state.dart';
+export 'providers/state_providers.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 
 //FFRame Router
@@ -32,7 +35,6 @@ class FRouterLoader extends StatelessWidget {
 
   final Widget mainScreen;
   final NavigationConfig navigationConfig;
-
   final RouterBuilder routerBuilder;
 
   /// The route information parser used by the go router.
@@ -48,7 +50,7 @@ class FRouterLoader extends StatelessWidget {
     );
     return ProviderScope(
       child: Consumer(
-        builder: (context, ref, child) {
+        builder: (context, ref, _) {
           navigationNotifier = ref.read(navigationProvider);
           routerDelegate = FNavigationRouterDelegate();
           return routerBuilder(context);

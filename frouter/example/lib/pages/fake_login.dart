@@ -13,7 +13,7 @@ class FakeLogin extends StatelessWidget {
           ElevatedButton(
             child: const Text("Fake Login (without roles)"),
             onPressed: () {
-              FRouter.of(context).login();
+              FRouter.of(context).signIn();
             },
           ),
           const SizedBox(
@@ -22,7 +22,7 @@ class FakeLogin extends StatelessWidget {
           ElevatedButton(
             child: const Text("Fake Login (with role: user)"),
             onPressed: () {
-              FRouter.of(context).login(roles: ["user"]);
+              FRouter.of(context).signIn(roles: ["user"]);
             },
           ),
         ],

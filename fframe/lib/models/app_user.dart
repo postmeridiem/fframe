@@ -2,19 +2,19 @@ part of fframe;
 
 class FFrameUser extends StateNotifier {
   FFrameUser({
-    required this.uid,
+    this.uid,
     this.displayName,
     this.email,
     this.photoUrl,
-    required this.metaData,
+    this.metaData,
     this.roles,
   }) : super(null);
 
   final String? displayName;
-  final String uid;
+  final String? uid;
   final String? email;
   final String? photoUrl;
-  final UserMetadata metaData;
+  final UserMetadata? metaData;
   final List<String>? roles;
 
   factory FFrameUser.fromFirebaseUser({required User firebaseUser, List<String>? roles}) {

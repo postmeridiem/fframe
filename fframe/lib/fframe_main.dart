@@ -1,7 +1,8 @@
 part of fframe;
 
-class Fframe extends StatefulWidget {
-  const Fframe({
+// ignore: must_be_immutable
+class Fframe extends InheritedWidget {
+  Fframe({
     Key? key,
     this.title = "FlutFrame",
     required this.firebaseOptions,
@@ -10,7 +11,8 @@ class Fframe extends StatefulWidget {
     required this.lightMode,
     required this.l10nConfig,
     this.issuePageLink,
-  }) : super(key: key);
+  }) : super(key: key, child: const FFramePreload());
+
   final String title;
   final String? issuePageLink;
   final FirebaseOptions firebaseOptions;
@@ -19,11 +21,44 @@ class Fframe extends StatefulWidget {
   final ThemeData lightMode;
   final L10nConfig l10nConfig;
 
+  FFrameUser? user;
+
+  static Fframe? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<Fframe>();
+  }
+
   @override
-  State<Fframe> createState() => _FframeState();
+  bool updateShouldNotify(Fframe oldWidget) {
+    return true;
+  }
 }
 
-class _FframeState extends State<Fframe> {
+class FFramePreload extends StatelessWidget {
+  const FFramePreload({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    WidgetsFlutterBinding.ensureInitialized();
+
+    return const ProviderScope(
+      child: RootRestorationScope(
+        restorationId: 'fframe',
+        child: FframeFirebaseLoader(),
+      ),
+    );
+  }
+}
+
+class FframeFirebaseLoader extends StatefulWidget {
+  const FframeFirebaseLoader({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<FframeFirebaseLoader> createState() => _FframeLoaderState();
+}
+
+class _FframeLoaderState extends State<FframeFirebaseLoader> {
   @override
   initState() {
     super.initState();
@@ -31,402 +66,139 @@ class _FframeState extends State<Fframe> {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsFlutterBinding.ensureInitialized();
-
-    debugPrint("Initialize the router");
-
-    return FRouterLoader(
-      mainScreen: MainScreen(
-        appTitle: widget.title,
-        issuePageLink: widget.issuePageLink,
-        l10nConfig: widget.l10nConfig,
-      ),
-      navigationConfig: widget.navigationConfig,
-      routerBuilder: (context) {
-        return InitializeFirebase(
-          firebaseOptions: widget.firebaseOptions,
-          navigationConfig: widget.navigationConfig,
-          child: InitializeL10n(
-              navigationConfig: widget.navigationConfig,
-              l10nConfig: widget.l10nConfig,
-              l10Builder: (context, l10n) {
-                if (l10n == null) {
-                  //Apparently stil loading.... give it a bit of time...
-                  return widget.navigationConfig.waitPage.contentPane!;
-                }
-
-                return MaterialApp.router(
-                  restorationScopeId: 'app',
-                  // routeInformationProvider:
-                  routeInformationParser: FNavigationRouteInformationParser(),
-                  routerDelegate: FNavigationRouterDelegate(),
-                  debugShowCheckedModeBanner: false,
-                  theme: widget.lightMode,
-                  darkTheme: widget.darkMode,
-                  themeMode: ThemeMode.system,
-                  locale: L10n.getLocale(),
-                );
-              }),
-        );
+    return FutureBuilder<FirebaseApp>(
+      future: Firebase.initializeApp(options: Fframe.of(context)!.firebaseOptions),
+      builder: (BuildContext context, AsyncSnapshot<FirebaseApp> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return MaterialApp(
+              home: Scaffold(
+                body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
+              ),
+            );
+          case ConnectionState.done:
+            if (snapshot.error != null) {
+              return MaterialApp(
+                home: Scaffold(
+                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                ),
+              );
+            }
+            return const MaterialApp(
+              home: Scaffold(
+                body: FframeL10nLoader(),
+              ),
+            );
+        }
       },
     );
-
-    // return FutureBuilder(
-    //   future: Firebase.initializeApp(
-    //     options: widget.firebaseOptions,
-    //   ),
-    //   // initialData: InitialData,
-    //   builder: (BuildContext context, AsyncSnapshot snapshot) {
-    //     // debugPrint(snapshot.connectionState.toString());
-
-    //     switch (snapshot.connectionState) {
-    //       case ConnectionState.none:
-    //       case ConnectionState.active:
-    //       case ConnectionState.waiting:
-    //         return const Center(child: CircularProgressIndicator());
-    //       case ConnectionState.done:
-    //         return RootRestorationScope(
-    //           restorationId: 'fframe',
-    //           child: ProviderScope(
-    //             child: Consumer(
-    //               builder: (context, ref, child) {
-    //                 UserState userState = ref.watch(userStateNotifierProvider);
-    //                 if (userState.runtimeType != UserStateSignedIn && userState.runtimeType != UserStateSignedOut) {
-    //                   return const UnknownStateLoader();
-    //                 }
-    //                 // Initialize the language engine.
-    //                 return FutureBuilder(
-    //                     future: L10nReader.read(context, widget.l10nConfig),
-    //                     builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> localeSnap) {
-    //                       switch (localeSnap.connectionState) {
-    //                         case ConnectionState.none:
-    //                         case ConnectionState.active:
-    //                         case ConnectionState.waiting:
-    //                           return const Center(child: CircularProgressIndicator());
-    //                         case ConnectionState.done:
-    //                           if (localeSnap.hasData) {
-    //                             Map<String, dynamic> _localeData = localeSnap.data as Map<String, dynamic>;
-    //                             // create the language engine
-    //                             L10n(
-    //                               l10nConfig: widget.l10nConfig,
-    //                               localeData: _localeData,
-    //                             );
-    //                             debugPrint("L10N: Language engine loaded.");
-    //                           } else {
-    //                             // create the language engine
-    //                             L10n(
-    //                               l10nConfig: widget.l10nConfig,
-    //                               localeData: {},
-    //                             );
-    //                             debugPrint("L10N ERROR: Language engine failed to load.");
-    //                           }
-    //                           // start building the Fframe App
-    //                           return App(
-    //                             title: widget.title,
-    //                             issuePageLink: widget.issuePageLink,
-    //                             navigationConfig: widget.navigationConfig,
-    //                             // authenticatedNavigationTargets: widget.authenticatedNavigationTargets,
-    //                             // unAuthenticatedNavigationTargets: widget.unAuthenticatedNavigationTargets,
-    //                             lightMode: widget.lightMode,
-    //                             darkMode: widget.darkMode,
-    //                           );
-    //                       }
-    //                     });
-    //               },
-    //             ),
-    //           ),
-    //         );
-    //     }
-    //   },
-    // );
   }
 }
 
-// class App extends StatefulWidget {
-//   const App({
-//     Key? key,
-//     required this.title,
-//     required this.navigationConfig,
-//     // required this.authenticatedNavigationTargets,
-//     // required this.unAuthenticatedNavigationTargets,
-//     required this.darkMode,
-//     required this.lightMode,
-//     this.issuePageLink,
-//   }) : super(key: key);
+class FframeL10nLoader extends StatefulWidget {
+  const FframeL10nLoader({Key? key}) : super(key: key);
 
-//   final String title;
-//   final String? issuePageLink;
-//   final NavigationConfig navigationConfig;
-//   // final List<NavigationTarget> authenticatedNavigationTargets;
-//   // final List<NavigationTarget> unAuthenticatedNavigationTargets;
-//   final ThemeData darkMode;
-//   final ThemeData lightMode;
+  @override
+  State<FframeL10nLoader> createState() => _FframeL10nLoaderState();
+}
 
-//   // global access to a buildcontext, so I can access the translation from anywhere.
-//   // static BuildContext context = GlobalKey<NavigatorState>().currentContext as BuildContext;
+class _FframeL10nLoaderState extends State<FframeL10nLoader> {
+  @override
+  Widget build(BuildContext context) {
+    return InitializeL10n(
+      navigationConfig: Fframe.of(context)!.navigationConfig,
+      l10nConfig: Fframe.of(context)!.l10nConfig,
+      l10Builder: (context, l10n) {
+        if (l10n == null) {
+          //Apparently stil loading.... give it a bit of time...
+          return MaterialApp(
+            home: Scaffold(
+              body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
+            ),
+          );
+        }
 
-//   @override
-//   State<App> createState() => _AppState();
-// }
+        return const FrouterLoader();
+      },
+    );
+  }
+}
 
-// class _AppState extends State<App> {
-//   // with RestorationMixin {
-//   @override
-//   // String get restorationId => 'wrapper';
-//   // String _initialLocation = '/';
+class FrouterLoader extends ConsumerStatefulWidget {
+  const FrouterLoader({Key? key}) : super(key: key);
 
-//   // // @override
-//   // void restoreState(RestorationBucket? oldBucket, bool initialRestore) {
-//   //   // todo: implement restoreState for you app
-//   // }
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _FrouterLoaderState();
+}
 
-//   // List<NavigationTarget> _navigationTargets(UserState userState) {
-//   //   //Get the current auth state
-//   //   bool isSignedIn = userState.runtimeType == UserStateSignedIn;
-//   //   List<NavigationTarget> _navigationTargets = isSignedIn ? List<NavigationTarget>.from(widget.authenticatedNavigationTargets) : List<NavigationTarget>.from(widget.unAuthenticatedNavigationTargets);
-//   //   NavigationTarget _initialNavigationTarget;
-//   //   //Return if unauthed
+class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.userChanges(),
+      initialData: null,
+      builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.done:
+            return MaterialApp(
+              home: Scaffold(
+                body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
+              ),
+            );
+          case ConnectionState.active:
+            if (snapshot.error != null) {
+              return MaterialApp(
+                home: Scaffold(
+                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                ),
+              );
+            }
 
-//   //   if (!isSignedIn) {
-//   //     try {
-//   //       _initialNavigationTarget = _navigationTargets.singleWhere((navigationTarget) => navigationTarget.signInPage == true);
-//   //       _initialLocation = "/${_initialNavigationTarget.path}";
-//   //       return _navigationTargets;
-//   //     } catch (_) {
-//   //       throw ("The Unauthenticated NavigationTargets do not contain a target configured as initial Navigation target!");
-//   //     }
-//   //   } else {
-//   //     debugPrint("Signed in user, filter on roles");
-//   //     UserStateSignedIn _userState = userState as UserStateSignedIn;
+            //Store the user
+            if (snapshot.data != null) {
+              Fframe.of(context)!.user = FFrameUser.fromFirebaseUser(firebaseUser: snapshot.data!);
+            } else {
+              Fframe.of(context)!.user = null;
+            }
 
-//   //     if (_userState.fFrameUser.roles == null) {
-//   //       debugPrint("Remove all paths wich require a role");
-//   //       _navigationTargets.removeWhere((navigationTarget) => navigationTarget.roles != null);
-//   //     } else {
-//   //       List<String> userRoles = _userState.fFrameUser.roles!;
-//   //       debugPrint("Current user roles: ${userRoles.join(",")}");
+            return FRouterLoader(
+                mainScreen: MainScreen(
+                  appTitle: Fframe.of(context)!.title,
+                  issuePageLink: Fframe.of(context)!.issuePageLink,
+                  l10nConfig: Fframe.of(context)!.l10nConfig,
+                ),
+                navigationConfig: Fframe.of(context)!.navigationConfig,
+                routerBuilder: (context) {
+                  if (Fframe.of(context)!.user != null) {
+                    FRouter.of(context).signIn();
+                  }
 
-//   //       _navigationTargets.removeWhere((navigationTarget) {
-//   //         if (navigationTarget.roles == null) {
-//   //           debugPrint("Allow ${navigationTarget.title}");
-//   //           return true;
-//   //         }
-//   //         List<String> targetRoles = navigationTarget.roles!.map((targetRole) => targetRole.toLowerCase()).toList();
-//   //         debugPrint("Roles for ${navigationTarget.title}: ${targetRoles.join(",")}");
-//   //         bool allow = !targetRoles.any(
-//   //           (targetRole) => userRoles.contains(targetRole),
-//   //         );
-//   //         debugPrint("Allowed roles for ${navigationTarget.title}: ${targetRoles.join(",")} => $allow");
-//   //         return allow;
-//   //       });
-//   //     }
-//   //   }
+                  return const FframeBuilder();
+                });
+        }
+      },
+    );
+  }
+}
 
-//   //   if (_navigationTargets.isNotEmpty) {
-//   //     //Determine the first navigatablepath for this user
-//   //     _initialNavigationTarget = _navigationTargets.first;
-//   //     if (_initialNavigationTarget.navigationTabs == null) {
-//   //       _initialLocation = "/${_initialNavigationTarget.path}";
-//   //     } else {
-//   //       _initialLocation = "/${_initialNavigationTarget.path}/${_initialNavigationTarget.navigationTabs!.first.path}";
-//   //     }
-//   //   } else {
-//   //     debugPrint("No routes available");
-//   //     _navigationTargets.add(
-//   //       NavigationTarget(
-//   //         path: 'error',
-//   //         title: "configuration error",
-//   //         contentPane: ErrorScreen(
-//   //           error: Exception("No routes left after evaluating user access."),
-//   //         ),
-//   //       ),
-//   //     );
-//   //     _initialNavigationTarget = _navigationTargets.first;
-//   //     _initialLocation = "/${_initialNavigationTarget.path}";
-//   //   }
-//   //   return _navigationTargets;
-//   // }
+class FframeBuilder extends StatelessWidget {
+  const FframeBuilder({Key? key}) : super(key: key);
 
-//   // Iterable<GoRoute> _goRouteTargets(List<NavigationTarget> navigationTargets) {
-//   //   return navigationTargets.map((navigationTarget) {
-//   //     //Prepare the subtabs
-//   //     List<GoRoute>? navigationTabs = navigationTarget.navigationTabs?.map(
-//   //       (NavigationTab navigationTab) {
-//   //         return GoRoute(
-//   //           path: navigationTab.path,
-//   //           name: navigationTab.path,
-//   //           pageBuilder: (context, state) {
-//   //             return CustomTransitionPage<void>(
-//   //               key: state.pageKey,
-//   //               child: ContentScreen(
-//   //                 key: state.pageKey,
-//   //                 navigationTarget: navigationTarget,
-//   //                 goRouterState: state,
-//   //               ),
-//   //               transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
-//   //             );
-//   //           },
-//   //         );
-//   //       },
-//   //     ).toList();
-
-//   //     //Apply the main routes. Add the subtabs if needed
-//   //     return GoRoute(
-//   //       path: navigationTarget.path,
-//   //       name: navigationTarget.path,
-//   //       pageBuilder: (context, state) {
-//   //         if (navigationTarget.navigationTabs != null) {
-//   //           return MaterialPage<void>(
-//   //             key: state.pageKey,
-//   //             child: const CircularProgressIndicator(),
-//   //           );
-//   //         }
-//   //         return CustomTransitionPage<void>(
-//   //           key: state.pageKey,
-//   //           child: ContentScreen(
-//   //             key: state.pageKey,
-//   //             navigationTarget: navigationTarget,
-//   //             goRouterState: state,
-//   //           ),
-//   //           transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
-//   //             opacity: animation,
-//   //             child: child,
-//   //           ),
-//   //         );
-//   //       },
-//   //       routes: navigationTarget.navigationTabs != null ? navigationTabs! : [],
-//   //     );
-//   //   }).toList();
-//   // }
-
-//   // GoRouter _goRouter(WidgetRef ref) {
-//   //   UserState userState = ref.watch(userStateNotifierProvider);
-//   //   bool isSignedIn = userState.runtimeType == UserStateSignedIn;
-//   //   _navigationTargets(userState);
-
-//   //   return GoRouter(
-//   //     debugLogDiagnostics: false,
-//   //     restorationScopeId: 'router',
-//   //     routes: [
-//   //       GoRoute(
-//   //         path: '/',
-//   //         name: '/',
-//   //         pageBuilder: (context, state) {
-//   //           return CustomTransitionPage<void>(
-//   //             key: state.pageKey,
-//   //             child: const WaitScreen(
-//   //               color: Colors.blueGrey,
-//   //             ),
-//   //             transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(opacity: animation, child: child),
-//   //           );
-//   //         },
-//   //         routes: _goRouteTargets(_navigationTargets(userState)).toList(),
-//   //       ),
-//   //     ],
-//   //     redirect: (goRouterState) {
-//   //       if (!isSignedIn && goRouterState.subloc != '/' && goRouterState.subloc != _initialLocation) {
-//   //         debugPrint("<a> Redirect to $_initialLocation with deeplink to ${goRouterState.subloc}");
-//   //         ref.read(navigationStateProvider).state.redirectState = goRouterState.subloc;
-//   //       }
-
-//   //       if (isSignedIn && goRouterState.queryParams.containsKey('redirectTo')) {
-//   //         debugPrint("<b> Redirect to queryParam instuction ${goRouterState.queryParams["redirectTo"]}");
-//   //         return goRouterState.queryParams["redirectTo"];
-//   //       }
-//   //       // String _deepLink =  ? '?redirectTo=${goRouterState.subloc}' : '';
-
-//   //       // debugPrint("RedirectRequest to ${goRouterState.subloc} _initialLocation: $_initialLocation deepLink: $_deepLink");
-
-//   //       if (goRouterState.subloc == "/" && goRouterState.subloc != _initialLocation) {
-//   //         debugPrint("<c> Redirect to $_initialLocation");
-//   //         return _initialLocation;
-//   //       }
-
-//   //       if (goRouterState.queryParams.isNotEmpty) {
-//   //         debugPrint("Process redirect");
-//   //         SelectionState selectionState = SelectionState(data: null, queryParams: goRouterState.queryParams, docId: null);
-//   //         ref.read(selectionStateProvider.notifier).state = selectionState;
-//   //         return null;
-//   //       }
-
-//   //       // NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
-
-//   //       debugPrint("No redirection, return Null");
-//   //       return null;
-//   //     },
-//   //     // errorBuilder: (context, state) => ErrorScreen(error: state.error!, initiallLocation: _initialLocation),
-//   //     navigatorBuilder: (context, state, child) {
-//   //       try {
-//   //         debugPrint("-=-=-=-=-=-=-navigatorBuilder rebuild=-=-=-=-=-=-=-=-=-");
-//   //         List<NavigationTarget> navigationTargets = _navigationTargets(userState);
-
-//   //         // if (navigationTargets.isNotEmpty) {
-//   //         return MainScreen(
-//   //           key: state.pageKey,
-//   //           appTitle: widget.title,
-//   //           child: child,
-//   //           issuePageLink: widget.issuePageLink,
-//   //           navigationTargets: navigationTargets,
-//   //           lightMode: widget.lightMode,
-//   //           darkMode: widget.darkMode,
-//   //           // l10nConfig: widget.l10nConfig,
-//   //         );
-//   //         // } else {
-//   //         //   return ErrorScreen(error: Exception("Nowhere to route to."));
-//   //         // }
-//   //       } catch (e) {
-//   //         return ErrorScreen(
-//   //           error: Exception(e),
-//   //           initiallLocation: _initialLocation,
-//   //         );
-//   //       }
-//   //     },
-//   //   );
-//   // }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return FRouterLoader(
-//         mainScreen: MainScreen(
-//             appTitle: widget.title,
-//             issuePageLink: widget.issuePageLink,
-//             lightMode: widget.lightMode,
-//             darkMode: widget.darkMode,
-//             l10nConfig: widget.,
-//             ),
-//         navigationConfig: widget.navigationConfig,
-//         routerBuilder: (context) {
-//           return MaterialApp.router(
-//             restorationScopeId: 'app',
-//             // routeInformationProvider:
-//             routeInformationParser: FNavigationRouteInformationParser(),
-//             routerDelegate: FNavigationRouterDelegate(),
-//             themeMode: ThemeMode.system,
-//             debugShowCheckedModeBanner: false,
-//             theme: ThemeData(
-//               brightness: Brightness.light,
-//               visualDensity: VisualDensity.adaptivePlatformDensity,
-//               inputDecorationTheme: const InputDecorationTheme(
-//                 border: OutlineInputBorder(),
-//               ),
-//             ),
-//             // locale: L10n.getLocale(),
-//           );
-//         });
-//   }
-
-//   // @override
-//   // // TODO: implement restorationId
-//   // String? get restorationId => throw UnimplementedError();
-// }
-
-// class UnknownStateLoader extends StatelessWidget {
-//   const UnknownStateLoader({Key? key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return const WaitScreen(
-//       color: Colors.blueAccent,
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      restorationScopeId: 'app',
+      routeInformationParser: FNavigationRouteInformationParser(),
+      routerDelegate: FNavigationRouterDelegate(),
+      debugShowCheckedModeBanner: false,
+      theme: Fframe.of(context)!.lightMode,
+      darkTheme: Fframe.of(context)!.darkMode,
+      themeMode: ThemeMode.system,
+      locale: L10n.getLocale(),
+    );
+  }
+}
