@@ -1,6 +1,6 @@
+import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:flutter/material.dart';
-import 'package:frouter/models/navigation_config.dart';
 
 class InitializeL10n extends StatelessWidget {
   const InitializeL10n({

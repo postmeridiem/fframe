@@ -1,6 +1,8 @@
 import 'package:fframe/helpers/l10n.dart';
+import 'package:fframe/providers/state_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MainScreen extends StatefulWidget {
   final String appTitle;

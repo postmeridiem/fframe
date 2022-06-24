@@ -1,5 +1,7 @@
 import 'package:fframe/fframe.dart';
+import 'package:fframe/providers/state_providers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ContentScreen extends ConsumerWidget {
   const ContentScreen({Key? key}) : super(key: key);

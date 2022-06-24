@@ -171,7 +171,6 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
                   issuePageLink: Fframe.of(context)!.issuePageLink,
                   l10nConfig: Fframe.of(context)!.l10nConfig,
                 ),
-                refreshListenable: ref.watch(authNotifierProvider),
                 navigationConfig: Fframe.of(context)!.navigationConfig,
                 routerBuilder: (context) {
                   return const FframeBuilder();
