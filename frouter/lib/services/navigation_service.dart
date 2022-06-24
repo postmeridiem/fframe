@@ -41,11 +41,16 @@ class NavigationNotifier extends ChangeNotifier {
 
   NavigationNotifier({required this.ref}) {
     _filterNavigationRoutes();
+    RouterConfig.instance.refreshListenable?.addListener(() {});
   }
 
   int selectedNavRailIndex = 0;
   bool get pendingAuth => _isSignedIn == null;
   bool get isSignedIn => _isSignedIn ?? false;
+
+  authChangeListener() {
+    debugPrint("authChangeListener");
+  }
 
   signIn({List<String>? roles}) {
     // User user;

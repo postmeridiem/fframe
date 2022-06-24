@@ -171,12 +171,9 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
                   issuePageLink: Fframe.of(context)!.issuePageLink,
                   l10nConfig: Fframe.of(context)!.l10nConfig,
                 ),
+                // refreshListenable: FirebaseAuth.instance.userChanges(),
                 navigationConfig: Fframe.of(context)!.navigationConfig,
                 routerBuilder: (context) {
-                  if (Fframe.of(context)!.user != null) {
-                    FRouter.of(context).signIn();
-                  }
-
                   return const FframeBuilder();
                 });
         }

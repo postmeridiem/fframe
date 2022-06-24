@@ -29,6 +29,7 @@ class FRouterLoader extends StatelessWidget {
     this.debugMode = false,
     required this.routerBuilder,
     required this.mainScreen,
+    this.refreshListenable,
   }) : super(key: key);
 
   final bool debugMode;
@@ -36,6 +37,7 @@ class FRouterLoader extends StatelessWidget {
   final Widget mainScreen;
   final NavigationConfig navigationConfig;
   final RouterBuilder routerBuilder;
+  Listenable? refreshListenable;
 
   /// The route information parser used by the go router.
   final FNavigationRouteInformationParser routeInformationParser = FNavigationRouteInformationParser();
