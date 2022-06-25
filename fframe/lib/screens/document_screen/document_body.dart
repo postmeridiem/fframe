@@ -128,7 +128,7 @@ class DocumentBody<T> extends StatelessWidget {
                             preloadPagesCount: documentConfig.document.tabs.length,
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (BuildContext context, int position) {
-                              debugPrint("Build tab $position");
+                              // debugPrint("Build tab $position");
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Container(

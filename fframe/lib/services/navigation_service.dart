@@ -22,7 +22,7 @@ class NextState {
 class NavigationNotifier extends ChangeNotifier {
   final Ref ref;
   Uri? _uri;
-  List<NextState> _nextState = [];
+  // List<NextState> _nextState = [];
 
   TargetState? _targetState;
   QueryState? _queryState;
@@ -183,7 +183,7 @@ class NavigationNotifier extends ChangeNotifier {
 
     if (uri.path != "/") {
       debugPrint("NavigationNotifier.parseRouteInformation => Store initial link for later use");
-      _nextState.add(NextState(targetState: targetState, queryState: queryState));
+      // _nextState.add(NextState(targetState: targetState, queryState: queryState));
       // _nextUri.add(uri);
     }
 

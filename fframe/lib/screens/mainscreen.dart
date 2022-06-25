@@ -1,3 +1,4 @@
+import 'package:fframe/constants/constants.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/providers/state_providers.dart';
 import 'package:flutter/material.dart';
@@ -22,12 +23,18 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
-  late bool _userOverlayActive = false;
   late OverlayState overlayState;
   late OverlayEntry overlayEntry;
 
   @override
   Widget build(BuildContext context) {
+    ScreenSize screenSize = (MediaQuery.of(context).size.width <= 400)
+        ? ScreenSize.phone
+        : (MediaQuery.of(context).size.width < 1000)
+            ? ScreenSize.tablet
+            : ScreenSize.large;
+
+    debugPrint("Build _MainScreenState ${screenSize.toString()}");
     overlayState = Overlay.of(context)!;
     if (FRouter.of(context).hasTabs) {
       _tabController = TabController(
@@ -44,16 +51,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       key: _scaffoldKey,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        // title: const Text("fFrame Example"),
-        leading: IconButton(
-            onPressed: () {
-              if (_scaffoldKey.currentState!.isDrawerOpen) {
-                _scaffoldKey.currentState!.closeDrawer();
-              } else {
-                _scaffoldKey.currentState!.openDrawer();
-              }
-            },
-            icon: const Icon(Icons.menu)),
+        title: Text(Fframe.of(context)?.title ?? ""),
+        leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
+            ? IconButton(
+                onPressed: () {
+                  if (_scaffoldKey.currentState!.isDrawerOpen) {
+                    _scaffoldKey.currentState!.closeDrawer();
+                  } else {
+                    _scaffoldKey.currentState!.openDrawer();
+                  }
+                },
+                icon: const Icon(Icons.menu))
+            : const IgnorePointer(),
         actions: [
           profileButton(),
         ],
@@ -72,20 +81,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           ),
           child: Text(widget.appTitle),
         ),
-        signOutDestination: const Destination(
-          icon: Icon(Icons.logout),
-          navigationLabel: Text("Sign out"),
-        ),
       ),
       body: Center(
         child: Row(
           children: [
-            FRouter.of(context).navigationRail(
-              signOutDestination: const NavigationRailDestination(
-                icon: Icon(Icons.logout),
-                label: Text("Sign out"),
-              ),
-            ),
+            if (screenSize == ScreenSize.large) FRouter.of(context).navigationRail(),
             Expanded(
               child: Consumer(
                 builder: (context, ref, child) {

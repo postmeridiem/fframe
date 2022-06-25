@@ -222,7 +222,7 @@ class FRouter extends InheritedWidget {
         .toList();
   }
 
-  Widget navigationRail({NavigationRailDestination? signOutDestination}) {
+  Widget navigationRail() {
     if (navigationNotifier.navigationConfig.navigationTargets.length >= 2) {
       return NavigationRail(
         selectedIndex: navigationNotifier.selectedNavRailIndex,
@@ -262,7 +262,6 @@ class FRouter extends InheritedWidget {
               label: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.navigationLabel,
               padding: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.padding,
             ),
-          if (signOutDestination != null && navigationNotifier.isSignedIn) signOutDestination,
         ],
       );
     }

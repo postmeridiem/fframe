@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fframe/helpers/l10n.dart';
 
 import 'package:clipboard/clipboard.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class BarButtonShare extends ConsumerWidget {

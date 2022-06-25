@@ -205,11 +205,9 @@ class GoogleSignInWidgetState extends State<GoogleSignInWidget> {
   // Signing into Google.
   Future<void> _signInWithGoogle() async {
     try {
-      UserCredential userCredential;
-
       if (kIsWeb) {
         // var googleProvider = GoogleAuthProvider();
-        userCredential = await _auth.signInWithPopup(googleProvider);
+        await _auth.signInWithPopup(googleProvider);
       } else {
         final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
         final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
@@ -217,13 +215,8 @@ class GoogleSignInWidgetState extends State<GoogleSignInWidget> {
           accessToken: googleAuth.accessToken,
           idToken: googleAuth.idToken,
         );
-        userCredential = await _auth.signInWithCredential(googleAuthCredential);
+        await _auth.signInWithCredential(googleAuthCredential);
       }
-
-      final user = userCredential.user;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Sign In ${user!.uid} with Google'),
-      ));
     } catch (e) {
       debugPrint(e.toString());
       ScaffoldMessenger.of(context).showSnackBar(

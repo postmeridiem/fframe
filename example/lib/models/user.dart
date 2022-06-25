@@ -1,16 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fframe/fframe.dart';
 import 'package:flutter/foundation.dart';
 
 class AppUser extends ChangeNotifier {
-  AppUser({
-    this.uid,
-    this.displayName,
-    this.active,
-    this.customClaims,
-    this.email,
-    this.photoURL,
-    this.creationDate,
-  });
+  AppUser({this.uid, this.displayName, this.active, this.customClaims, this.email, this.photoURL, this.creationDate, this.tennant});
 
   factory AppUser.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? snapshotOptions) {
     Map<String, dynamic> json = snapshot.data()!;
@@ -31,6 +23,7 @@ class AppUser extends ChangeNotifier {
   bool? active;
   Map<String, dynamic>? customClaims;
   String? email;
+  String? tennant;
   String? photoURL;
   Timestamp? creationDate;
 

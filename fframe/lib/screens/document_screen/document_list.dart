@@ -71,8 +71,9 @@ class DocumentListItem<T> extends ConsumerWidget {
 class DocumentListLoader<T> extends StatefulWidget {
   const DocumentListLoader({
     Key? key,
+    required this.ref,
   }) : super(key: key);
-
+  final WidgetRef ref;
   @override
   State<DocumentListLoader<T>> createState() => _DocumentListLoaderState<T>();
 }
@@ -102,6 +103,7 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
       inheritedDocument: inheritedDocument,
       documentConfig: documentConfig,
       query: query,
+      ref: widget.ref,
     );
   }
 }
@@ -113,38 +115,63 @@ class DocumentListBody<T> extends StatelessWidget {
     required this.inheritedDocument,
     required this.documentConfig,
     required this.query,
+    required this.ref,
   }) : super(key: key);
   final ScrollController scrollController;
   final InheritedDocument inheritedDocument;
   final DocumentConfig<T> documentConfig;
   final Query<T> query;
-
+  final WidgetRef ref;
   @override
   Widget build(BuildContext context) {
+    ScreenSize screenSize = (MediaQuery.of(context).size.width <= 400)
+        ? ScreenSize.phone
+        : (MediaQuery.of(context).size.width < 1000)
+            ? ScreenSize.tablet
+            : ScreenSize.large;
+
     debugPrint("Build documentListLoader with key: listScaffold_${key.toString()}");
 
-    return Container(
-      key: ValueKey("listScaffold_${key.toString()}"),
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Theme.of(context).colorScheme.background,
-          child: const Icon(Icons.add),
-          elevation: 0.2,
-          onPressed: () {
-            inheritedDocument.create(context: context);
-          },
-        ),
-        primary: false,
-        body: FirestoreListView<T>(
-          controller: scrollController,
-          query: query,
-          itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
-            return DocumentListItem<T>(
-              queryDocumentSnapshot: queryDocumentSnapshot,
-            );
-          },
-          loadingBuilder: (context) => FRouter.of(context).waitPage,
-          errorBuilder: (context, error, stackTrace) => FRouter.of(context).errorPage,
+    double listWidth = 250;
+    if (ScreenSize.phone == screenSize) {
+      listWidth = MediaQuery.of(context).size.width;
+      Map<String, String>? queryParameters = ref.watch(queryStateProvider).queryParameters;
+      if (queryParameters != null) {
+        if (queryParameters.isNotEmpty) {
+          //Some document is loaded
+          listWidth = 0;
+        }
+      }
+    }
+
+    return SizedBox(
+      width: listWidth,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Container(
+          key: ValueKey("listScaffold_${key.toString()}"),
+          child: Scaffold(
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: Theme.of(context).colorScheme.background,
+              child: const Icon(Icons.add),
+              elevation: 0.2,
+              onPressed: () {
+                inheritedDocument.create(context: context);
+              },
+            ),
+            primary: false,
+            body: FirestoreListView<T>(
+              controller: scrollController,
+              query: query,
+              itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
+                return DocumentListItem<T>(
+                  queryDocumentSnapshot: queryDocumentSnapshot,
+                );
+              },
+              loadingBuilder: (context) => FRouter.of(context).waitPage,
+              errorBuilder: (context, error, stackTrace) => FRouter.of(context).errorPage,
+            ),
+          ),
         ),
       ),
     );

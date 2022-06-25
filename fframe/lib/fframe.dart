@@ -2,15 +2,16 @@ library fframe;
 
 export 'package:firebase_core/firebase_core.dart';
 export 'package:firebase_auth/firebase_auth.dart';
+export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:flutterfire_ui/firestore.dart';
 
+import 'package:fframe/constants/constants.dart';
 import 'package:fframe/services/navigation_service.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fframe/providers/providers.dart';
 import 'package:fframe/routers/navigation_route.dart';
 import 'package:fframe/helper_widgets/confirmation_dialog.dart';
-import 'package:fframe/providers/global_providers.dart';
 
 import 'package:fframe/controllers/selection_state_controller.dart';
 import 'package:fframe/helper_widgets/init_l10n.dart';
