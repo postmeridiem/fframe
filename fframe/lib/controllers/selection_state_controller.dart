@@ -9,7 +9,7 @@ class SelectionState<T> with ChangeNotifier {
     this.docId,
     this.data,
     this.isNew = false,
-    this.readOnly = true,
+    this.readOnly = false,
   });
 
   setState(SelectionState selectionState, {bool notify = false}) {
