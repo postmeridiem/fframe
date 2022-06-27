@@ -29,6 +29,8 @@ class Fframe extends InheritedWidget {
     return context.dependOnInheritedWidgetOfExactType<Fframe>();
   }
 
+  String? errorText;
+
   @override
   bool updateShouldNotify(Fframe oldWidget) {
     return true;

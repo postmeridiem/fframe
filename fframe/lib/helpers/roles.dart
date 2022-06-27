@@ -107,11 +107,9 @@ class _RolesManagerState extends State<RolesManager> {
         builder: (context, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
-              return FRouter.of(context).waitPage;
-            case ConnectionState.waiting:
-              return FRouter.of(context).waitPage;
             case ConnectionState.active:
-              return FRouter.of(context).waitPage;
+            case ConnectionState.waiting:
+              return FRouter.of(context).waitPage(context: context, text: "Loading user roles");
             case ConnectionState.done:
               if (snapshot.hasData) {
                 userRoles = snapshot.data!;

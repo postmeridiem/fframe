@@ -168,8 +168,8 @@ class DocumentListBody<T> extends StatelessWidget {
                   queryDocumentSnapshot: queryDocumentSnapshot,
                 );
               },
-              loadingBuilder: (context) => FRouter.of(context).waitPage,
-              errorBuilder: (context, error, stackTrace) => FRouter.of(context).errorPage,
+              loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
+              errorBuilder: (context, error, stackTrace) => FRouter.of(context).errorPage(context: context, errorText: error.toString()),
             ),
           ),
         ),

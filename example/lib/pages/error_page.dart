@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
 class ErrorPage extends StatefulWidget {
@@ -46,9 +46,9 @@ class _ErrorPageState extends State<ErrorPage> {
             ),
             crossFadeState: _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
           ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Text("Something failed succesfully"),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(Fframe.of(context)?.errorText ?? "Something failed succesfully"),
           ),
         ],
       ),

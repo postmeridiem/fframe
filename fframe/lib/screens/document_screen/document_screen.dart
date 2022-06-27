@@ -518,13 +518,13 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
     Widget returnWidget = queryState.queryString.isEmpty
         ? (screenSize == ScreenSize.phone)
             ? const IgnorePointer()
-            : FRouter.of(context).emptyPage
+            : FRouter.of(context).emptyPage()
         : DocumentBodyLoader<T>(key: ValueKey(queryState.queryString), queryState: queryState);
 
     InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
     if (queryState.queryParameters == null) {
       //Cannot contain a form
-      return (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage;
+      return (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
     } else if (inheritedDocument.selectionState.data == null && inheritedDocument.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn a new document");
       inheritedDocument.selectionState.setState(SelectionState<T>(data: inheritedDocument.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false));
@@ -532,7 +532,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
       debugPrint("Spawn new document from cache");
       return returnWidget;
     } else if (!queryState.queryParameters!.containsKey(inheritedDocument.documentConfig.queryStringIdParam)) {
-      return (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage;
+      return (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
     } else if (((inheritedDocument.selectionState.docId != queryState.queryParameters?[inheritedDocument.documentConfig.queryStringIdParam]) || (inheritedDocument.selectionState.data == null && queryState.queryParameters != null))) {
       inheritedDocument.selectionState.addListener(() {
         debugPrint("Our document has arrived");
@@ -540,7 +540,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
         setState(() {});
       });
       inheritedDocument.load(docId: queryState.queryParameters![inheritedDocument.documentConfig.queryStringIdParam]!);
-      return FRouter.of(context).waitPage;
+      return FRouter.of(context).waitPage(context: context, text: "Loading document");
     }
 
     // return returnWidget;
