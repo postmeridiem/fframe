@@ -33,6 +33,7 @@ class _ErrorPageState extends State<ErrorPage> {
         children: [
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 500),
+            reverseDuration: const Duration(milliseconds: 500),
             firstChild: const Icon(
               Icons.error,
               size: 48.0,
