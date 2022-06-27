@@ -12,8 +12,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  frouter:
-    path: ../frouter
   intl: ^0.17.0
   firebase_core:
   firebase_auth:
@@ -26,7 +24,6 @@ dependencies:
   # googleapis_auth:
   flutterfire_ui: 
   file_picker: 
-  go_router: 
   firebase_analytics: 
   flutter_riverpod:
   clipboard:

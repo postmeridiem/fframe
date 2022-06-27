@@ -40,8 +40,6 @@ class Setting extends ChangeNotifier {
     DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? snapshotOptions,
   ) {
-    debugPrint("reading <Setting>");
-
     Map<String, dynamic> json = snapshot.data()!;
     Setting setting = Setting(
       id: snapshot.id,

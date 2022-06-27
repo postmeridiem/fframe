@@ -1,6 +1,9 @@
+import 'package:fframe/constants/constants.dart';
 import 'package:fframe/helpers/l10n.dart';
+import 'package:fframe/providers/state_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MainScreen extends StatefulWidget {
   final String appTitle;
@@ -17,72 +20,72 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  late TabController _tabController;
+  late OverlayState overlayState;
+  late OverlayEntry overlayEntry;
 
   @override
   Widget build(BuildContext context) {
+    ScreenSize screenSize = (MediaQuery.of(context).size.width <= 400)
+        ? ScreenSize.phone
+        : (MediaQuery.of(context).size.width < 1000)
+            ? ScreenSize.tablet
+            : ScreenSize.large;
+
+    debugPrint("Build _MainScreenState ${screenSize.toString()}");
+    overlayState = Overlay.of(context)!;
+    if (FRouter.of(context).hasTabs) {
+      _tabController = TabController(
+        initialIndex: FRouter.of(context).currentTab,
+        vsync: this,
+        length: FRouter.of(context).tabLength,
+      );
+
+      _tabController.addListener(
+        () => FRouter.of(context).tabSwitch(tabController: _tabController),
+      );
+    }
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text("fFrame Example"),
-        leading: IconButton(
-            onPressed: () {
-              if (_scaffoldKey.currentState!.isDrawerOpen) {
-                _scaffoldKey.currentState!.closeDrawer();
-              } else {
-                _scaffoldKey.currentState!.openDrawer();
-              }
-            },
-            icon: const Icon(Icons.menu)),
+        title: Text(Fframe.of(context)?.title ?? ""),
+        leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
+            ? IconButton(
+                onPressed: () {
+                  if (_scaffoldKey.currentState!.isDrawerOpen) {
+                    _scaffoldKey.currentState!.closeDrawer();
+                  } else {
+                    _scaffoldKey.currentState!.openDrawer();
+                  }
+                },
+                icon: const Icon(Icons.menu))
+            : const IgnorePointer(),
         actions: [
-          if (FRouter.of(context).isSignedIn)
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed: () {
-                FRouter.of(context).logout();
-              },
-            ),
-          IconButton(
-              onPressed: () {
-                if (_scaffoldKey.currentState!.isEndDrawerOpen) {
-                  _scaffoldKey.currentState!.closeEndDrawer();
-                } else {
-                  _scaffoldKey.currentState!.openEndDrawer();
-                }
-              },
-              icon: const Icon(Icons.menu)),
+          profileButton(),
         ],
+        bottom: FRouter.of(context).hasTabs
+            ? TabBar(
+                controller: _tabController,
+                tabs: FRouter.of(context).tabBar(context),
+              )
+            : null,
       ),
       drawer: FRouter.of(context).drawer(
         context: context,
-        drawerHeader: const DrawerHeader(
-          decoration: BoxDecoration(
+        drawerHeader: DrawerHeader(
+          decoration: const BoxDecoration(
             color: Colors.blue,
           ),
-          child: Text("FRouter Example"),
+          child: Text(widget.appTitle),
         ),
-        signOutDestination: const Destination(
-          icon: Icon(Icons.logout),
-          label: Text("Sign out"),
-        ),
-      ),
-      endDrawer: FRouter.of(context).drawer(
-        context: context,
       ),
       body: Center(
         child: Row(
           children: [
-            FRouter.of(context).navigationRail(
-              signOutDestination: const NavigationRailDestination(
-                icon: Icon(Icons.logout),
-                label: Text("Sign out"),
-              ),
-            ),
-            const VerticalDivider(
-              color: Colors.blueGrey,
-            ),
+            if (screenSize == ScreenSize.large) FRouter.of(context).navigationRail(),
             Expanded(
               child: Consumer(
                 builder: (context, ref, child) {
@@ -102,199 +105,140 @@ class _MainScreenState extends State<MainScreen> {
       ),
     );
   }
+
+  Widget profileButton() {
+    return StreamBuilder(
+      stream: FirebaseAuth.instance.userChanges(),
+      initialData: null,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+            return const CircularProgressIndicator();
+          case ConnectionState.waiting:
+            return const CircularProgressIndicator();
+          case ConnectionState.done:
+            return const IgnorePointer();
+          case ConnectionState.active:
+            if (snapshot.hasError) {
+              return Icon(Icons.error, color: Colors.redAccent.shade700);
+            }
+
+            if (snapshot.hasData) {
+              return ElevatedButton(
+                child: circleAvatar(),
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(4),
+                  primary: Colors.transparent, // <-- Button color
+                  onPrimary: Colors.red, // <-- Splash color
+                ),
+                onPressed: () {
+                  showUserOverlay();
+                },
+              );
+            }
+            return const IgnorePointer();
+        }
+      },
+    );
+  }
+
+  CircleAvatar circleAvatar({double? radius}) {
+    User user = FirebaseAuth.instance.currentUser!;
+    List<String>? avatarText = user.displayName?.split(' ').map((part) => part.trim().substring(0, 1)).toList();
+    return CircleAvatar(
+      radius: radius ?? 12.0,
+      backgroundImage: (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
+      backgroundColor: (user.photoURL == null) ? Colors.amber : Colors.transparent,
+      child: (user.photoURL == null && avatarText != null)
+          ? Text(
+              "${avatarText.first}${avatarText.last}",
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            )
+          : null,
+    );
+  }
+
+  showUserOverlay() {
+    overlayEntry = OverlayEntry(builder: (context) {
+      bool isSigningOut = false;
+      return Stack(
+        children: <Widget>[
+          Positioned.fill(
+              child: GestureDetector(
+            onTap: () {
+              overlayEntry.remove();
+            },
+            child: Container(
+              color: Colors.transparent,
+            ),
+          )),
+          Positioned(
+            top: kToolbarHeight,
+            right: 5.0,
+            child: Material(
+              child: SizedBox(
+                height: 250.0,
+                width: 250.0,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: Column(
+                        children: [
+                          circleAvatar(
+                            radius: 24,
+                          ),
+                          Text(FirebaseAuth.instance.currentUser!.displayName!)
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(
+                          Icons.person,
+                          size: 24.0,
+                        ),
+                        label: const Text('Profile'),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          setState(() {
+                            isSigningOut = true;
+                          });
+                          await FirebaseAuth.instance.signOut();
+                          overlayEntry.remove();
+                        },
+                        icon: isSigningOut
+                            ? const CircularProgressIndicator()
+                            : const Icon(
+                                Icons.logout,
+                                size: 24.0,
+                              ),
+                        label: const Text('sign Out'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+    });
+
+    overlayState.insert(overlayEntry);
+  }
+
+  @override
+  void dispose() {
+    // _tabController.dispose();
+    super.dispose();
+  }
 }
-
-
-// class MainScreen extends StatelessWidget {
-//   final String appTitle;
-//   final String? issuePageLink;
-//   // final Widget child;
-//   // final NavigationState navigationState;
-//   // final List<NavigationTarget> navigationTargets;
-//   final ThemeData darkMode;
-//   final ThemeData lightMode;
-//   // final L10nConfig l10nConfig;
-//   const MainScreen({
-//     Key? key,
-//     required this.appTitle,
-//     // required this.child,
-//     // required this.navigationState,
-//     // required this.navigationTargets,
-//     required this.darkMode,
-//     required this.lightMode,
-//     // required this.l10nConfig,
-//     this.issuePageLink,
-//   }) : super(key: key);
-
-//   // ActiveTarget getActiveTarget() {
-//   //   try {
-//   //     //This is the only applicable target
-//   //     if (navigationTargets.length == 1) {
-//   //       return ActiveTarget(currentTarget: navigationTargets.first);
-//   //     }
-//   //     //Get the first applicable target
-//   //     // navigationState.
-//   //     // List<String> subloc = state.subloc.split('/');
-//   //     List<String> subloc = ["suggestions"];
-//   //     subloc.removeWhere((String element) => element == ''); //Clean out any empty strings
-//   //     List<NavigationTarget> _navigationTargets = List<NavigationTarget>.from(navigationTargets);
-
-//   //     NavigationTarget? activeTarget = _navigationTargets.firstWhere((navigationTarget) => navigationTarget.path == subloc.first);
-//   //     if (subloc.length == 1) {
-//   //       return ActiveTarget(currentTarget: activeTarget, parentTarget: null);
-//   //     } else {
-//   //       activeTarget = activeTarget.navigationTabs!.firstWhere((navigationTarget) => navigationTarget.path == subloc.last);
-
-//   //       // activeTarget = _navigationTargets.firstWhere((navigationTarget) => navigationTarget.path == subloc.join('/'));
-//   //       return ActiveTarget(currentTarget: activeTarget, parentTarget: null);
-//   //     }
-
-//   //     // //Research the tabs
-//   //     // if (_navigationTargets.first.navigationTabs != null) {
-//   //     //   List<NavigationTarget> _parentNavigationTargets = List<NavigationTarget>.from(_navigationTargets.first.navigationTabs!);
-//   //     //   _parentNavigationTargets.removeWhere((NavigationTarget navigationTarget) => navigationTarget.path != subloc.last);
-//   //     //   return ActiveTarget(currentTarget: _parentNavigationTargets.first, parentTarget: _navigationTargets.first);
-//   //     // }
-//   //   } catch (e) {
-//   //     debugPrint("Exception on getActiveTarget. could not determine selected target: ${e.toString()}");
-//   //     return ActiveTarget(currentTarget: navigationTargets.first);
-//   //   }
-//   // }
-
-//   // String _pageTitle(ActiveTarget activeTarget) {
-//   //   return (activeTarget.parentTarget == null) ? activeTarget.currentTarget.title : "${activeTarget.parentTarget!.title} - ${activeTarget.currentTarget.title}";
-//   // }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     // debugPrint("Build mainScreen ${state.location} ${state.queryParams.toString()}");
-
-//     // if (navigationTargets.isEmpty) {
-//     //   return const EmptyScreen();
-//     // }
-
-//     // ActiveTarget? _activeTarget = getActiveTarget();
-//     final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-//     // String pageTitle = _pageTitle(_activeTarget);
-
-//     // return MaterialApp(
-//     //   debugShowCheckedModeBanner: false,
-//     //   title: appTitle,
-//     //   theme: lightMode,
-//     //   darkTheme: darkMode,
-//     //   themeMode: ThemeMode.system,
-//     //   localizationsDelegates: L10n.getDelegates(),
-//     //   supportedLocales: L10n.getLocales(),
-//     //   locale: L10n.getLocale(),
-
-//     return Scaffold(
-//       key: _scaffoldKey,
-//       appBar: AppBar(
-//         centerTitle: true,
-//         title: Consumer(
-//           builder: (context, ref, _) {
-//             return const Text("todo: title");
-//             // String subTitle = ref.watch(navigationStateProvider).state.currentTarget?.title != null ? ":: ${ref.watch(navigationStateProvider).state.currentTarget!.title}" : "";
-//             // return (subTitle.isEmpty) ? Text(pageTitle) : Text("$pageTitle - $subTitle");
-//           },
-//         ),
-//         actions: [
-//           const BarButtonShare(),
-//           const BarButtonDuplicate(),
-//           BarButtonFeedback(issuePageLink: issuePageLink),
-//           if (FirebaseAuth.instance.currentUser != null) const BarButtonProfile(),
-//         ],
-//       ),
-//       body: const Text("We have loaded"),
-//     );
-//   }
-// }
-
-// // class MainBody extends ConsumerWidget {
-// //   const MainBody({
-// //     // required this.activeTarget,
-// //     // required this.state,
-// //     // required this.navigationTargets,
-// //     Key? key,
-// //     this.child,
-// //   }) : super(key: key);
-// //   final Widget? child;
-// //   // final GoRouterState state;
-// //   // final List<NavigationTarget> navigationTargets;
-// //   // final NavigationTarget? activeTarget;
-
-// //   @override
-// //   Widget build(BuildContext context, WidgetRef ref) {
-// //     // debugPrint("Build MainBody => ${state.queryParams.toString()} ${activeTarget?.contentPane.toString()}");
-
-// //     // NavigationStateNotifier navigationState = ref.read(navigationStateProvider);
-
-// //     // List<NavigationTarget>? _navigationTargets = List<NavigationTarget>.from(navigationTargets);
-// //     // _navigationTargets.retainWhere((navigationTarget) => navigationTarget.navigationRailDestination != null);
-// //     return Scaffold(
-// //       body:
-// //           //  _navigationTargets.length > 1
-// //           //     ? Row(
-// //           //         children: <Widget>[
-// //           //           // TODO: Navbar goes here
-// //           //           // LayoutBuilder(
-// //           //           //   builder: (context, constraint) {
-// //           //           //     return SingleChildScrollView(
-// //           //           //       child: ConstrainedBox(
-// //           //           //         constraints: BoxConstraints(minHeight: constraint.maxHeight),
-// //           //           //         child: IntrinsicHeight(
-// //           //           //           child: AnimatedSwitcher(
-// //           //           //             duration: const Duration(milliseconds: 500),
-// //           //           //             child: IconTheme(
-// //           //           //               data: const IconThemeData(color: null),
-// //           //           //               child: NavigationRail(
-// //           //           //                 selectedIndex: ref.read(navigationStateProvider).currentIndex,
-// //           //           //                 onDestinationSelected: (int index) {
-// //           //           //                   navigationState.currentIndex = index;
-// //           //           //                   NavigationTarget navigationTarget = _navigationTargets[index];
-// //           //           //                   if (navigationTarget.navigationTabs == null) {
-// //           //           //                     context.go("/${navigationTarget.path}");
-// //           //           //                   } else {
-// //           //           //                     context.go("/${navigationTarget.path}/${navigationTarget.navigationTabs!.first.path}");
-// //           //           //                   }
-// //           //           //                 },
-// //           //           //                 labelType: NavigationRailLabelType.all,
-// //           //           //                 destinations: <NavigationRailDestination>[
-// //           //           //                   ..._navigationTargets.map((navigationTarget) {
-// //           //           //                     return navigationTarget.navigationRailDestination!;
-// //           //           //                   })
-// //           //           //                 ],
-// //           //           //               ),
-// //           //           //             ),
-// //           //           //           ),
-// //           //           //         ),
-// //           //           //       ),
-// //           //           //     );
-// //           //           //   },
-// //           //           // ),
-// //           //           const VerticalDivider(thickness: 1, width: 1),
-// //           //           // This is the main content.
-// //           //           Expanded(
-// //           //             child: AnimatedSwitcher(
-// //           //               duration: const Duration(milliseconds: 300),
-// //           //               child: child,
-// //           //             ),
-// //           //           )
-// //           //         ],
-// //           //       )
-// //           //     :
-// //           AnimatedSwitcher(
-// //         duration: const Duration(milliseconds: 300),
-// //         child: child,
-// //       ),
-// //     );
-// //   }
-// // }
-
-// // class ActiveTarget {
-// //   final NavigationTarget currentTarget;
-// //   final NavigationTarget? parentTarget;
-
-// //   ActiveTarget({required this.currentTarget, this.parentTarget});
-// // }
