@@ -95,195 +95,98 @@ class BarButtonFeedback extends StatelessWidget {
   }
 }
 
-// class BarButtonProfile extends StatelessWidget {
-//   const BarButtonProfile({Key? key}) : super(key: key);
-//   @override
-//   Widget build(BuildContext context) {
-//     String? _photoUrl = FirebaseAuth.instance.currentUser!.photoURL;
-//     print(_photoUrl);
-//     String _profileName =
-//         FirebaseAuth.instance.currentUser!.displayName as String;
-//     List<String>? _avatarText = _profileName
-//         .split(' ')
-//         .map((part) => part.trim().substring(0, 1))
-//         .toList();
-//     CircleAvatar? _circleAvatar = CircleAvatar(
-//       radius: 16.0,
-//       child: (_photoUrl == null)
-//           ? Text(
-//               "${_avatarText.first}${_avatarText.last}",
-//               style: const TextStyle(fontWeight: FontWeight.bold),
-//             )
-//           : null,
-//       backgroundImage: (_photoUrl == null) ? null : NetworkImage(_photoUrl),
-//       backgroundColor: (_photoUrl == null) ? Colors.amber : Colors.white,
-//     );
+class ThemeDropdown extends StatefulWidget {
+  const ThemeDropdown({Key? key}) : super(key: key);
 
-//     return PopupMenuButton(
-//       color: Theme.of(context).colorScheme.tertiary,
-//       offset: Offset.fromDirection(100.0),
-//       icon: _circleAvatar,
-//       onSelected: (item) => _onSelected(context, item),
-//       itemBuilder: (context) => [
-//         PopupMenuItem<String>(
-//           value: "profile",
-//           child: Card(
-//             color: Theme.of(context).colorScheme.primaryContainer,
-//             child: ListTile(
-//               mouseCursor: SystemMouseCursors.click,
-//               leading: _circleAvatar,
-//               title: Text(
-//                 _profileName,
-//                 style: TextStyle(
-//                     color: Theme.of(context).colorScheme.onPrimaryContainer),
-//               ),
-//               subtitle: Text(
-//                 L10n.string("header_profilelabel",
-//                     placeholder: "Click to open profile...",
-//                     namespace: "fframe"),
-//                 style: TextStyle(
-//                     color: Theme.of(context).colorScheme.onPrimaryContainer,
-//                     fontSize: 12),
-//               ),
-//             ),
-//           ),
-//         ),
-//         // PopupMenuDivider(),
-//         const PopupMenuItem<String>(
-//           child: ThemeDropdown(),
-//         ),
-//         const PopupMenuItem<String>(
-//           child: LocaleDropdown(),
-//         ),
-//         // PopupMenuDivider(),
-//         PopupMenuItem<String>(
-//           value: "logout",
-//           child: ListTile(
-//             leading: Icon(Icons.logout_outlined,
-//                 color: Theme.of(context).colorScheme.onTertiary),
-//             title: Text(
-//               L10n.string("header_signout",
-//                   placeholder: "Sign out...", namespace: "fframe"),
-//               style: TextStyle(color: Theme.of(context).colorScheme.onTertiary),
-//             ),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
+  @override
+  State<ThemeDropdown> createState() => _ThemeDropdownState();
+}
 
-//   void _onSelected(BuildContext context, item) {
-//     switch (item) {
-//       case 'logout':
-//         _signOut();
-//         break;
-//       case 'profile':
-//         debugPrint('Open profile');
-//         break;
-//       case 'void':
-//         break;
-//       default:
-//         break;
-//     }
-//   }
-// }
+class _ThemeDropdownState extends State<ThemeDropdown> {
+  String dropdownValue = 'Theme: auto';
 
-// Future<void> _signOut() async {
-//   await FirebaseAuth.instance.signOut();
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        canvasColor: Theme.of(context).colorScheme.tertiary,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          DropdownButton<String>(
+            value: dropdownValue,
+            elevation: 16,
+            underline: Container(
+              height: 2,
+            ),
+            onChanged: (String? newValue) {
+              setState(() {
+                dropdownValue = newValue!;
+              });
+            },
+            items: <String>['Theme: auto', 'Theme: light', 'Theme: dark']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(
+                  value,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onTertiary),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
 
-// class ThemeDropdown extends StatefulWidget {
-//   const ThemeDropdown({Key? key}) : super(key: key);
+class LocaleDropdown extends StatefulWidget {
+  const LocaleDropdown({Key? key}) : super(key: key);
 
-//   @override
-//   State<ThemeDropdown> createState() => _ThemeDropdownState();
-// }
+  @override
+  State<LocaleDropdown> createState() => _LocaleDropdownState();
+}
 
-// class _ThemeDropdownState extends State<ThemeDropdown> {
-//   String dropdownValue = 'Theme: auto';
+class _LocaleDropdownState extends State<LocaleDropdown> {
+  String dropdownValue = 'Locale: en-US';
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Theme(
-//       data: Theme.of(context).copyWith(
-//         canvasColor: Theme.of(context).colorScheme.tertiary,
-//       ),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           DropdownButton<String>(
-//             value: dropdownValue,
-//             elevation: 16,
-//             underline: Container(
-//               height: 2,
-//             ),
-//             onChanged: (String? newValue) {
-//               setState(() {
-//                 dropdownValue = newValue!;
-//               });
-//             },
-//             items: <String>['Theme: auto', 'Theme: light', 'Theme: dark']
-//                 .map<DropdownMenuItem<String>>((String value) {
-//               return DropdownMenuItem<String>(
-//                 value: value,
-//                 child: Text(
-//                   value,
-//                   style: TextStyle(
-//                       color: Theme.of(context).colorScheme.onTertiary),
-//                 ),
-//               );
-//             }).toList(),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// class LocaleDropdown extends StatefulWidget {
-//   const LocaleDropdown({Key? key}) : super(key: key);
-
-//   @override
-//   State<LocaleDropdown> createState() => _LocaleDropdownState();
-// }
-
-// class _LocaleDropdownState extends State<LocaleDropdown> {
-//   String dropdownValue = 'Locale: en-US';
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Theme(
-//       data: Theme.of(context).copyWith(
-//         canvasColor: Theme.of(context).colorScheme.tertiary,
-//       ),
-//       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         children: [
-//           DropdownButton<String>(
-//             value: dropdownValue,
-//             elevation: 16,
-//             underline: Container(
-//               height: 2,
-//             ),
-//             onChanged: (String? newValue) {
-//               setState(() {
-//                 dropdownValue = newValue!;
-//               });
-//             },
-//             items: <String>['Locale: en-US', 'Locale: nl-NL']
-//                 .map<DropdownMenuItem<String>>((String value) {
-//               return DropdownMenuItem<String>(
-//                 value: value,
-//                 child: Text(
-//                   value,
-//                   style: TextStyle(
-//                       color: Theme.of(context).colorScheme.onTertiary),
-//                 ),
-//               );
-//             }).toList(),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(
+        canvasColor: Theme.of(context).colorScheme.tertiary,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          DropdownButton<String>(
+            value: dropdownValue,
+            elevation: 16,
+            underline: Container(
+              height: 2,
+            ),
+            onChanged: (String? newValue) {
+              setState(() {
+                dropdownValue = newValue!;
+              });
+            },
+            items: <String>['Locale: en-US', 'Locale: nl-NL']
+                .map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(
+                  value,
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.onTertiary),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}

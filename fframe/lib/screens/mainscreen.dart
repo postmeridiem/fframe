@@ -4,6 +4,7 @@ import 'package:fframe/providers/state_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fframe/helpers/header_buttons.dart';
 
 class MainScreen extends StatefulWidget {
   final String appTitle;
@@ -65,16 +66,23 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     icon: const Icon(Icons.menu))
                 : const IgnorePointer(),
         actions: [
+          const BarButtonShare(),
+          const BarButtonDuplicate(),
+          const BarButtonFeedback(),
           profileButton(),
         ],
       ),
       drawer: FRouter.of(context).drawer(
         context: context,
         drawerHeader: DrawerHeader(
-          decoration: const BoxDecoration(
-            color: Colors.blue,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.primaryContainer,
           ),
-          child: Text(widget.appTitle),
+          child: Text(
+            widget.appTitle,
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimaryContainer),
+          ),
         ),
       ),
       body: Row(
@@ -127,7 +135,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             return const IgnorePointer();
           case ConnectionState.active:
             if (snapshot.hasError) {
-              return Icon(Icons.error, color: Colors.redAccent.shade700);
+              return Icon(Icons.error,
+                  color: Theme.of(context).colorScheme.error);
             }
 
             if (snapshot.hasData) {
@@ -136,11 +145,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
                   padding: const EdgeInsets.all(4),
-                  primary:
-                      Theme.of(context).colorScheme.primary, // <-- Button color
+                  primary: Theme.of(context)
+                      .colorScheme
+                      .primaryContainer, // <-- Button color
                   onPrimary: Theme.of(context)
                       .colorScheme
-                      .onPrimary, // <-- Splash color
+                      .onPrimaryContainer, // <-- Splash color
                 ),
                 onPressed: () {
                   showUserOverlay();
@@ -192,6 +202,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             top: kToolbarHeight,
             right: 5.0,
             child: Material(
+              color: Theme.of(context).colorScheme.secondary,
               child: SizedBox(
                 height: 250.0,
                 width: 250.0,
@@ -200,43 +211,73 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   children: [
                     Expanded(
                       flex: 3,
-                      child: Column(
-                        children: [
-                          circleAvatar(
-                            radius: 24,
-                          ),
-                          Text(FirebaseAuth.instance.currentUser!.displayName!)
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: ElevatedButton.icon(
-                        onPressed: () {},
-                        icon: const Icon(
-                          Icons.person,
-                          size: 24.0,
-                        ),
-                        label: const Text('Profile'),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          setState(() {
-                            isSigningOut = true;
-                          });
-                          await FirebaseAuth.instance.signOut();
-                          overlayEntry.remove();
-                        },
-                        icon: isSigningOut
-                            ? const CircularProgressIndicator()
-                            : const Icon(
-                                Icons.logout,
-                                size: 24.0,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            ListTile(
+                              mouseCursor: SystemMouseCursors.click,
+                              leading: circleAvatar(
+                                radius: 24,
                               ),
-                        label: const Text('sign Out'),
+                              title: Text(
+                                FirebaseAuth.instance.currentUser!.displayName!,
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary),
+                              ),
+                              subtitle: Text(
+                                L10n.string("header_profilelabel",
+                                    placeholder: "Click to open profile...",
+                                    namespace: "fframe"),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary,
+                                    fontSize: 12),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.onSecondary,
+                    ),
+                    Expanded(
+                      flex: 1,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            TextButton.icon(
+                              onPressed: () async {
+                                setState(() {
+                                  isSigningOut = true;
+                                });
+                                await FirebaseAuth.instance.signOut();
+                                overlayEntry.remove();
+                              },
+                              icon: isSigningOut
+                                  ? const CircularProgressIndicator()
+                                  : Icon(Icons.logout,
+                                      size: 24.0,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSecondary),
+                              label: Text(
+                                L10n.string("header_signout",
+                                    placeholder: "Sign out...",
+                                    namespace: "fframe"),
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
