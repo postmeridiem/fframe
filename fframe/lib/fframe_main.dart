@@ -11,6 +11,7 @@ class Fframe extends InheritedWidget {
     required this.lightMode,
     required this.l10nConfig,
     this.issuePageLink,
+    this.debugShowCheckedModeBanner = true,
   }) : super(key: key, child: const FFramePreload());
 
   final String title;
@@ -20,6 +21,7 @@ class Fframe extends InheritedWidget {
   final ThemeData darkMode;
   final ThemeData lightMode;
   final L10nConfig l10nConfig;
+  final bool debugShowCheckedModeBanner;
 
   FFrameUser? user;
 
@@ -74,6 +76,7 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
           case ConnectionState.waiting:
           case ConnectionState.active:
             return MaterialApp(
+              debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
               home: Scaffold(
                 body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
               ),
@@ -81,13 +84,15 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
           case ConnectionState.done:
             if (snapshot.error != null) {
               return MaterialApp(
+                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
                 home: Scaffold(
                   body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
                 ),
               );
             }
-            return const MaterialApp(
-              home: Scaffold(
+            return MaterialApp(
+              debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+              home: const Scaffold(
                 body: FframeL10nLoader(),
               ),
             );
@@ -114,6 +119,7 @@ class _FframeL10nLoaderState extends State<FframeL10nLoader> {
         if (l10n == null) {
           //Apparently stil loading.... give it a bit of time...
           return MaterialApp(
+            debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
             home: Scaffold(
               body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
             ),
@@ -145,6 +151,7 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
           case ConnectionState.waiting:
           case ConnectionState.done:
             return MaterialApp(
+              debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
               home: Scaffold(
                 body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
               ),
@@ -152,6 +159,7 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
           case ConnectionState.active:
             if (snapshot.error != null) {
               return MaterialApp(
+                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
                 home: Scaffold(
                   body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
                 ),

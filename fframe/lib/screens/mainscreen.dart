@@ -51,6 +51,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       if (screenSize == ScreenSize.large) FRouter.of(context).navigationRail(),
       Expanded(
         child: Scaffold(
+          
           key: _scaffoldKey,
           appBar: AppBar(
             automaticallyImplyLeading: false,

@@ -83,6 +83,7 @@ class MainApp extends StatelessWidget {
       darkMode: appDarkTheme,
       l10nConfig: l10nConfig,
       issuePageLink: "https://github.com/postmeridiem/fframe/issues",
+      debugShowCheckedModeBanner: false,
     );
   }
 }
