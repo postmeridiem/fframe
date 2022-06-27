@@ -86,8 +86,9 @@ class TargetState {
         navigationTarget: navigationNotifier.navigationConfig.waitPage,
       );
     }
+    List<NavigationTarget> navigationTargets = navigationNotifier.navigationConfig.navigationTargets;
     TargetState targetState = TargetState(
-      navigationTarget: navigationNotifier.navigationConfig.navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.landingPage, orElse: () {
+      navigationTarget: navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.landingPage, orElse: () {
         debugPrint("***** No default route has been configured. Please update the navigation config. *****");
         return navigationNotifier.navigationConfig.errorPage;
       }),

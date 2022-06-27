@@ -45,9 +45,34 @@ class NavigationNotifier extends ChangeNotifier {
   bool get isSignedIn => _isSignedIn ?? false;
 
   authChangeListener(User? user) async {
-    debugPrint("authChangeListener $user");
     if (user != null) {
-      signIn();
+      try {
+        IdTokenResult idTokenResult = await user.getIdTokenResult();
+        List<String>? roles = [];
+
+        Map<String, dynamic>? _claims = idTokenResult.claims;
+
+        if (_claims != null && _claims.containsKey("roles") == true) {
+          debugPrint("Has roles in ${_claims["roles"].runtimeType}");
+
+          if ("${_claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
+            roles = List<String>.from(_claims["roles"]);
+          } else if (List<dynamic> == _claims["roles"].runtimeType || List<String> == _claims["roles"].runtimeType) {
+            roles = List<String>.from(_claims["roles"]);
+          } else {
+            //Legacy mode... it's a map..
+            Map<String, dynamic>? _rolesMap = Map<String, dynamic>.from(_claims["roles"]);
+            _rolesMap.removeWhere((key, value) => value == false);
+            roles = List<String>.from(_rolesMap.keys);
+          }
+        }
+        roles = roles.map((role) => role.toLowerCase()).toList();
+        debugPrint("User is signed in as ${user.uid} ${user.displayName} with roles: ${roles.join(", ")}");
+        signIn(roles: roles);
+      } catch (e) {
+        debugPrint("Unable to interpret claims ${e.toString()}");
+        signIn();
+      }
     } else {
       signOut();
     }
@@ -119,8 +144,8 @@ class NavigationNotifier extends ChangeNotifier {
           }
 
           //Check if the intersection contains a value. If so return false
-          Set<String> userRoles = _roles!.toSet();
-          Set<String> targetRoles = navigationTarget.roles!.toSet();
+          Set<String> userRoles = _roles!.map((role) => role.toLowerCase()).toSet();
+          Set<String> targetRoles = navigationTarget.roles!.map((role) => role.toLowerCase()).toSet();
 
           Set<String> interSection = userRoles.intersection(targetRoles);
           return interSection.isEmpty;
