@@ -52,17 +52,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text(Fframe.of(context)?.title ?? ""),
-        leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
-            ? IconButton(
-                onPressed: () {
-                  if (_scaffoldKey.currentState!.isDrawerOpen) {
-                    _scaffoldKey.currentState!.closeDrawer();
-                  } else {
-                    _scaffoldKey.currentState!.openDrawer();
-                  }
-                },
-                icon: const Icon(Icons.menu))
-            : const IgnorePointer(),
+        leading:
+            (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
+                ? IconButton(
+                    onPressed: () {
+                      if (_scaffoldKey.currentState!.isDrawerOpen) {
+                        _scaffoldKey.currentState!.closeDrawer();
+                      } else {
+                        _scaffoldKey.currentState!.openDrawer();
+                      }
+                    },
+                    icon: const Icon(Icons.menu))
+                : const IgnorePointer(),
         actions: [
           profileButton(),
         ],
@@ -78,7 +79,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       ),
       body: Row(
         children: [
-          if (screenSize == ScreenSize.large) FRouter.of(context).navigationRail(),
+          if (screenSize == ScreenSize.large)
+            FRouter.of(context).navigationRail(),
           Expanded(
             child: Scaffold(
               primary: false,
@@ -97,7 +99,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
                     child: Container(
-                      key: ValueKey("navTarget_${targetState.navigationTarget.title}"),
+                      key: ValueKey(
+                          "navTarget_${targetState.navigationTarget.title}"),
                       child: targetState.navigationTarget.contentPane,
                     ),
                   );
@@ -128,13 +131,16 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             }
 
             if (snapshot.hasData) {
-              return ElevatedButton(
+              return TextButton(
                 child: circleAvatar(),
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
                   padding: const EdgeInsets.all(4),
-                  primary: Colors.transparent, // <-- Button color
-                  onPrimary: Colors.red, // <-- Splash color
+                  primary:
+                      Theme.of(context).colorScheme.primary, // <-- Button color
+                  onPrimary: Theme.of(context)
+                      .colorScheme
+                      .onPrimary, // <-- Splash color
                 ),
                 onPressed: () {
                   showUserOverlay();
@@ -149,11 +155,16 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   CircleAvatar circleAvatar({double? radius}) {
     User user = FirebaseAuth.instance.currentUser!;
-    List<String>? avatarText = user.displayName?.split(' ').map((part) => part.trim().substring(0, 1)).toList();
+    List<String>? avatarText = user.displayName
+        ?.split(' ')
+        .map((part) => part.trim().substring(0, 1))
+        .toList();
     return CircleAvatar(
       radius: radius ?? 12.0,
-      backgroundImage: (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
-      backgroundColor: (user.photoURL == null) ? Colors.amber : Colors.transparent,
+      backgroundImage:
+          (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
+      backgroundColor:
+          (user.photoURL == null) ? Colors.amber : Colors.transparent,
       child: (user.photoURL == null && avatarText != null)
           ? Text(
               "${avatarText.first}${avatarText.last}",
