@@ -83,6 +83,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             child: Scaffold(
               primary: false,
               appBar: AppBar(
+                toolbarHeight: 0,
                 bottom: FRouter.of(context).hasTabs
                     ? TabBar(
                         controller: _tabController,

@@ -191,6 +191,9 @@ class InheritedDocument extends InheritedWidget {
       FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
       return;
     }
+    FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
+    return;
+    //TODO: reenable warning;
     if (await (confirmationDialog(
             context: context,
             cancelText: L10n.string(
