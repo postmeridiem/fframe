@@ -51,6 +51,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
+        elevation: 2,
         automaticallyImplyLeading: false,
         title: Text(Fframe.of(context)?.title ?? ""),
         leading:
@@ -204,41 +205,30 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             child: Material(
               color: Theme.of(context).colorScheme.secondary,
               child: SizedBox(
-                height: 250.0,
-                width: 250.0,
+                height: 400.0,
+                width: 300.0,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            ListTile(
-                              mouseCursor: SystemMouseCursors.click,
-                              leading: circleAvatar(
-                                radius: 24,
-                              ),
-                              title: Text(
-                                FirebaseAuth.instance.currentUser!.displayName!,
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary),
-                              ),
-                              subtitle: Text(
-                                L10n.string("header_profilelabel",
-                                    placeholder: "Click to open profile...",
-                                    namespace: "fframe"),
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary,
-                                    fontSize: 12),
-                              ),
-                            )
-                          ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ListTile(
+                        mouseCursor: SystemMouseCursors.click,
+                        leading: circleAvatar(
+                          radius: 24,
+                        ),
+                        title: Text(
+                          FirebaseAuth.instance.currentUser!.displayName!,
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSecondary),
+                        ),
+                        subtitle: Text(
+                          L10n.string("header_profilelabel",
+                              placeholder: "Click to open profile...",
+                              namespace: "fframe"),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSecondary,
+                              fontSize: 12),
                         ),
                       ),
                     ),
@@ -247,36 +237,38 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     ),
                     Expanded(
                       flex: 1,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            TextButton.icon(
-                              onPressed: () async {
-                                setState(() {
-                                  isSigningOut = true;
-                                });
-                                await FirebaseAuth.instance.signOut();
-                                overlayEntry.remove();
-                              },
-                              icon: isSigningOut
-                                  ? const CircularProgressIndicator()
-                                  : Icon(Icons.logout,
-                                      size: 24.0,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSecondary),
-                              label: Text(
-                                L10n.string("header_signout",
-                                    placeholder: "Sign out...",
-                                    namespace: "fframe"),
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSecondary),
-                              ),
-                            ),
-                          ],
+                      child: Column(
+                        children: const [
+                          ThemeDropdown(),
+                          LocaleDropdown(),
+                        ],
+                      ),
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.onSecondary,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8, right: 8, top: 8, bottom: 16),
+                      child: TextButton.icon(
+                        onPressed: () async {
+                          setState(() {
+                            isSigningOut = true;
+                          });
+                          await FirebaseAuth.instance.signOut();
+                          overlayEntry.remove();
+                        },
+                        icon: isSigningOut
+                            ? const CircularProgressIndicator()
+                            : Icon(Icons.logout,
+                                size: 24.0,
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary),
+                        label: Text(
+                          L10n.string("header_signout",
+                              placeholder: "Sign out...", namespace: "fframe"),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSecondary),
                         ),
                       ),
                     ),
