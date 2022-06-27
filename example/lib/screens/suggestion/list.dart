@@ -27,7 +27,6 @@ class SuggestionListItem extends StatelessWidget {
       selectedColor: Theme.of(context).colorScheme.onTertiary,
       selectedTileColor: Theme.of(context).colorScheme.tertiary,
       leading: Icon(iconMap[suggestion.icon]),
-      trailing: Icon(iconMap[suggestion.icon]),
     );
   }
 }
