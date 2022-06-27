@@ -215,8 +215,16 @@ class FRouter extends InheritedWidget {
         )
         .map(
           (NavigationTab navigationTab) => Tab(
-            icon: navigationTab.destination?.icon,
-            text: navigationTab.destination?.tabLabel ?? '',
+            icon: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                navigationTab.destination?.icon ?? const IgnorePointer(),
+                (navigationTab.destination?.icon != null && navigationTab.destination?.tabLabel != null) ? const Text(" ") : const IgnorePointer(),
+                Text(navigationTab.destination?.tabLabel ?? ''),
+              ],
+            ),
+            // text: navigationTab.destination?.tabLabel ?? '',
           ),
         )
         .toList();

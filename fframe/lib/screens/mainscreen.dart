@@ -47,60 +47,66 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         () => FRouter.of(context).tabSwitch(tabController: _tabController),
       );
     }
-    return Row(children: [
-      if (screenSize == ScreenSize.large) FRouter.of(context).navigationRail(),
-      Expanded(
-        child: Scaffold(
-          
-          key: _scaffoldKey,
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: Text(Fframe.of(context)?.title ?? ""),
-            leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
-                ? IconButton(
-                    onPressed: () {
-                      if (_scaffoldKey.currentState!.isDrawerOpen) {
-                        _scaffoldKey.currentState!.closeDrawer();
-                      } else {
-                        _scaffoldKey.currentState!.openDrawer();
-                      }
-                    },
-                    icon: const Icon(Icons.menu))
-                : const IgnorePointer(),
-            actions: [
-              profileButton(),
-            ],
-            bottom: FRouter.of(context).hasTabs
-                ? TabBar(
-                    controller: _tabController,
-                    tabs: FRouter.of(context).tabBar(context),
-                  )
-                : null,
+    return Scaffold(
+      key: _scaffoldKey,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Text(Fframe.of(context)?.title ?? ""),
+        leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
+            ? IconButton(
+                onPressed: () {
+                  if (_scaffoldKey.currentState!.isDrawerOpen) {
+                    _scaffoldKey.currentState!.closeDrawer();
+                  } else {
+                    _scaffoldKey.currentState!.openDrawer();
+                  }
+                },
+                icon: const Icon(Icons.menu))
+            : const IgnorePointer(),
+        actions: [
+          profileButton(),
+        ],
+      ),
+      drawer: FRouter.of(context).drawer(
+        context: context,
+        drawerHeader: DrawerHeader(
+          decoration: const BoxDecoration(
+            color: Colors.blue,
           ),
-          drawer: FRouter.of(context).drawer(
-            context: context,
-            drawerHeader: DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(widget.appTitle),
-            ),
-          ),
-          body: Consumer(
-            builder: (context, ref, child) {
-              TargetState targetState = ref.watch(targetStateProvider);
-              return AnimatedSwitcher(
-                duration: const Duration(milliseconds: 250),
-                child: Container(
-                  key: ValueKey("navTarget_${targetState.navigationTarget.title}"),
-                  child: targetState.navigationTarget.contentPane,
-                ),
-              );
-            },
-          ),
+          child: Text(widget.appTitle),
         ),
       ),
-    ]);
+      body: Row(
+        children: [
+          if (screenSize == ScreenSize.large) FRouter.of(context).navigationRail(),
+          Expanded(
+            child: Scaffold(
+              primary: false,
+              appBar: AppBar(
+                bottom: FRouter.of(context).hasTabs
+                    ? TabBar(
+                        controller: _tabController,
+                        tabs: FRouter.of(context).tabBar(context),
+                      )
+                    : null,
+              ),
+              body: Consumer(
+                builder: (context, ref, child) {
+                  TargetState targetState = ref.watch(targetStateProvider);
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 250),
+                    child: Container(
+                      key: ValueKey("navTarget_${targetState.navigationTarget.title}"),
+                      child: targetState.navigationTarget.contentPane,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget profileButton() {
