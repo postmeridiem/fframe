@@ -6,7 +6,7 @@ import 'package:fframe/fframe.dart';
 import 'package:example/screens/user/user.dart';
 import 'package:example/screens/user/tabs/tabs.dart';
 
-import '../../models/models.dart';
+import 'package:example/models/appuser.dart';
 
 class UsersScreen extends StatelessWidget {
   const UsersScreen({
