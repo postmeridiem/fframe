@@ -29,7 +29,7 @@ class DocumentListItem<T> extends ConsumerWidget {
           child: Consumer(builder: (context, ref, child) {
             String docId = inheritedDocument.selectionState.docId ?? '';
             try {
-              return documentListItemBuilder(context, docId == queryDocumentSnapshot.id, queryDocumentSnapshot.data());
+              return documentListItemBuilder(context, docId == queryDocumentSnapshot.id, queryDocumentSnapshot.data(), Fframe.of(context)!.user);
             } catch (e) {
               String _error = e.toString();
               String _path = queryDocumentSnapshot.reference.path;

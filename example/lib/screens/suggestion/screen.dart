@@ -44,10 +44,11 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
-        builder: (context, selected, data) {
+        builder: (context, selected, data, user) {
           return SuggestionListItem(
             suggestion: data,
             selected: selected,
+            user: user,
           );
         },
       ),
@@ -60,11 +61,9 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
   Document<Suggestion> _document() {
     return Document<Suggestion>(
-      autoSave: false,
-      showEditToggleButton: true,
       tabs: [
         DocumentTab<Suggestion>(
-          tabBuilder: () {
+          tabBuilder: (user) {
             return const Tab(
               text: "Suggestion",
               icon: Icon(
@@ -81,7 +80,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           },
         ),
         DocumentTab<Suggestion>(
-          tabBuilder: () {
+          tabBuilder: (user) {
             return const Tab(
               text: "Placeholder",
               icon: Icon(
@@ -97,7 +96,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           },
         ),
         DocumentTab<Suggestion>(
-          tabBuilder: () {
+          tabBuilder: (user) {
             return const Tab(
               text: "Ok or Not?",
               icon: Icon(
@@ -165,10 +164,11 @@ class FormCeptionWidget extends StatelessWidget {
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
-        builder: (context, selected, data) {
+        builder: (context, selected, data, user) {
           return SuggestionListItem(
             suggestion: data,
             selected: selected,
+            user: user,
           );
         },
       ),
@@ -177,7 +177,7 @@ class FormCeptionWidget extends StatelessWidget {
       document: Document<Suggestion>(
         autoSave: false,
         tabs: [
-          DocumentTab<Suggestion>(tabBuilder: () {
+          DocumentTab<Suggestion>(tabBuilder: (user) {
             return const Tab(
               text: "Suggestion",
               icon: Icon(

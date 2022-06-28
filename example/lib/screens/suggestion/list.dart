@@ -1,4 +1,5 @@
 import 'package:example/models/suggestion.dart';
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
 import 'package:example/helpers/icons.dart';
@@ -7,9 +8,11 @@ class SuggestionListItem extends StatelessWidget {
   const SuggestionListItem({
     required this.suggestion,
     required this.selected,
+    required this.user,
     Key? key,
   }) : super(key: key);
   final Suggestion suggestion;
+  final FFrameUser? user;
   final bool selected;
 
   @override

@@ -34,10 +34,11 @@ class UsersScreen extends StatelessWidget {
       document: _document(),
       documentList: DocumentList(
         queryBuilder: (query) => query.where("active", isEqualTo: isActive),
-        builder: (context, selected, data) {
+        builder: (context, selected, data, fFrameUser) {
           return UserListItem(
             user: data,
             selected: selected,
+            fFrameUser: fFrameUser,
           );
         },
       ),
@@ -49,7 +50,7 @@ class UsersScreen extends StatelessWidget {
       autoSave: false,
       tabs: [
         DocumentTab<AppUser>(
-          tabBuilder: () {
+          tabBuilder: (fFrameUser) {
             return const Tab(
               text: "Profile",
               icon: Icon(
@@ -64,7 +65,7 @@ class UsersScreen extends StatelessWidget {
           },
         ),
         DocumentTab<AppUser>(
-          tabBuilder: () {
+          tabBuilder: (fFrameUser) {
             return const Tab(
               text: "Settings",
               icon: Icon(
@@ -79,7 +80,7 @@ class UsersScreen extends StatelessWidget {
           },
         ),
         DocumentTab<AppUser>(
-          tabBuilder: () {
+          tabBuilder: (fFrameUser) {
             return const Tab(
               text: "Roles",
               icon: Icon(

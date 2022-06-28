@@ -14,13 +14,14 @@ typedef DocumentListItemBuilder<T> = Widget Function(
   BuildContext context,
   bool selected,
   T data,
+  FFrameUser? user,
 );
 
 typedef DocumentStream<T> = Stream<DocumentSnapshot> Function(
   String? documentId,
 );
 
-typedef DocumentTabBuilder<T> = Widget Function();
+typedef DocumentTabBuilder<T> = Widget Function(FFrameUser? user);
 
 typedef DocumentTabChildBuilder<T> = Widget Function(
   T data,

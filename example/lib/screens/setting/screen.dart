@@ -31,7 +31,7 @@ class _SettingScreenState extends State<SettingScreen> {
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
-        builder: (context, selected, data) {
+        builder: (context, selected, data, user) {
           return SettingListItem(
             setting: data,
             selected: selected,
@@ -49,7 +49,7 @@ class _SettingScreenState extends State<SettingScreen> {
       autoSave: false,
       tabs: [
         DocumentTab<Setting>(
-          tabBuilder: () {
+          tabBuilder: (fFrameUser) {
             return const Tab(
               text: "Setting",
               icon: Icon(
