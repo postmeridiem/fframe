@@ -18,11 +18,6 @@ dependencies:
   #       url: https://github.com/postmeridiem/fframe.git
   #       path: fframe/
   #       ref: main
-  # frouter:
-  #     git:
-  #       url: https://github.com/postmeridiem/fframe.git
-  #       path: frouter/
-  #       ref: main
   fframe:
     path: ../fframe
   flutter_signin_button: 
