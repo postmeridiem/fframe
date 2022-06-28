@@ -1,7 +1,7 @@
 import 'package:fframe/helpers/roles.dart';
 import 'package:example/constants/constants.dart';
 import 'package:flutter/material.dart';
-import 'package:example/models/user.dart';
+import 'package:example/models/appuser.dart';
 
 class RolesTab extends StatelessWidget {
   const RolesTab({

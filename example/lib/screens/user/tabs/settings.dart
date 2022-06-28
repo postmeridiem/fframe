@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:example/models/user.dart';
+import 'package:example/models/appuser.dart';
 
 class SettingsTab extends StatelessWidget {
   const SettingsTab({
@@ -55,7 +55,9 @@ class _ThemeToggleState extends State<ThemeToggle> {
     return ToggleButtons(
       onPressed: (int index) {
         setState(() {
-          for (int buttonIndex = 0; buttonIndex < isSelected.length; buttonIndex++) {
+          for (int buttonIndex = 0;
+              buttonIndex < isSelected.length;
+              buttonIndex++) {
             if (buttonIndex == index) {
               isSelected[buttonIndex] = true;
             } else {
