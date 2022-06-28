@@ -54,7 +54,8 @@ class MainApp extends StatelessWidget {
     final L10nConfig l10nConfig = L10nConfig(
       // the default locale your App starts with
       // passed through url string reader here to enable url
-      // deeplinking of an l10n locale. You can also just pass a Locale.
+      // deeplinking of an l10n locale.
+      // You also pass the default Locale here.
       locale: L10nConfig.urlReader(const Locale('en', 'US')),
 
       // the list of locales that are supported by your app
