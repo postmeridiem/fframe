@@ -109,7 +109,7 @@ class _ThemeDropdownState extends State<ThemeDropdown> {
   Widget build(BuildContext context) {
     return Theme(
       data: Theme.of(context).copyWith(
-        canvasColor: Theme.of(context).colorScheme.tertiary,
+        canvasColor: Theme.of(context).colorScheme.secondary,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -132,7 +132,7 @@ class _ThemeDropdownState extends State<ThemeDropdown> {
                 child: Text(
                   value,
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.onTertiary),
+                      color: Theme.of(context).colorScheme.onSecondary),
                 ),
               );
             }).toList(),
@@ -157,7 +157,7 @@ class _LocaleDropdownState extends State<LocaleDropdown> {
   Widget build(BuildContext context) {
     return Theme(
       data: Theme.of(context).copyWith(
-        canvasColor: Theme.of(context).colorScheme.tertiary,
+        canvasColor: Theme.of(context).colorScheme.secondary,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -180,7 +180,7 @@ class _LocaleDropdownState extends State<LocaleDropdown> {
                 child: Text(
                   value,
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.onTertiary),
+                      color: Theme.of(context).colorScheme.onSecondary),
                 ),
               );
             }).toList(),
