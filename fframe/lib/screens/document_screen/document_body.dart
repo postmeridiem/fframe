@@ -16,8 +16,7 @@ class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
   Widget build(BuildContext context) {
     debugPrint("build documentBodyLoader ${widget.key.toString()}");
     InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
-    DocumentConfig<T> documentConfig =
-        InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
+    DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
 
     return DocumentBody<T>(
       key: ValueKey("documentBody_${widget.key.toString()}"),
@@ -44,11 +43,8 @@ class DocumentBody<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint("build documentBody ${key.toString()}");
     PreloadPageController preloadPageController;
-    String tabIndexKey = inheritedDocument.documentConfig.embeddedDocument
-        ? "childTabIndex"
-        : "tabIndex";
-    int tabIndex =
-        int.parse(FRouter.of(context).queryStringParam(tabIndexKey) ?? "0");
+    String tabIndexKey = inheritedDocument.documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
+    int tabIndex = int.parse(FRouter.of(context).queryStringParam(tabIndexKey) ?? "0");
 
     return DefaultTabController(
       animationDuration: Duration.zero,
@@ -59,24 +55,17 @@ class DocumentBody<T> extends StatelessWidget {
         builder: (BuildContext context) {
           final TabController tabController = DefaultTabController.of(context)!;
           tabController.index = tabIndex;
-          preloadPageController =
-              PreloadPageController(initialPage: tabController.index);
+          preloadPageController = PreloadPageController(initialPage: tabController.index);
 
           tabController.addListener(
             () {
               debugPrint("Navigate to tab ${tabController.index}");
               if (!tabController.indexIsChanging) {
-                bool validationState =
-                    inheritedDocument.selectionState.readOnly ||
-                        inheritedDocument.validate(context: context);
-                if (validationState == true ||
-                    inheritedDocument.selectionState.isNew) {
+                bool validationState = inheritedDocument.selectionState.readOnly || inheritedDocument.validate(context: context);
+                if (validationState == true || inheritedDocument.selectionState.isNew) {
                   tabIndex = tabController.index;
-                  FRouter.of(context).updateQueryString(
-                      queryParameters: {tabIndexKey: "${tabController.index}"});
-                  preloadPageController.animateToPage(tabController.index,
-                      duration: const Duration(microseconds: 250),
-                      curve: Curves.easeOutCirc);
+                  FRouter.of(context).updateQueryString(queryParameters: {tabIndexKey: "${tabController.index}"});
+                  preloadPageController.animateToPage(tabController.index, duration: const Duration(microseconds: 250), curve: Curves.easeOutCirc);
                 } else {
                   //Undo the user tab change
                   tabController.index = tabIndex;
@@ -97,54 +86,36 @@ class DocumentBody<T> extends StatelessWidget {
                     child: DefaultTabController(
                       length: documentConfig.document.tabs.length,
                       child: Scaffold(
-                        endDrawer:
-                            (documentConfig.document.contextCards != null &&
-                                    documentConfig
-                                        .document.contextCards!.isNotEmpty)
-                                ? ContextCanvas(
-                                    contextWidgets:
-                                        documentConfig.document.contextCards!
-                                            .map(
-                                              (contextCardBuilder) =>
-                                                  contextCardBuilder(
-                                                      inheritedDocument
-                                                          .selectionState.data),
-                                            )
-                                            .toList(),
-                                  )
-                                : null,
+                        endDrawer: (documentConfig.document.contextCards != null && documentConfig.document.contextCards!.isNotEmpty)
+                            ? ContextCanvas(
+                                contextWidgets: documentConfig.document.contextCards!
+                                    .map(
+                                      (contextCardBuilder) => contextCardBuilder(inheritedDocument.selectionState.data),
+                                    )
+                                    .toList(),
+                              )
+                            : null,
                         primary: false,
-                        backgroundColor:
-                            Theme.of(context).colorScheme.secondary,
+                        backgroundColor: Theme.of(context).colorScheme.secondary,
                         body: NestedScrollView(
-                          headerSliverBuilder:
-                              (BuildContext context, bool innerBoxIsScrolled) {
+                          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                             return <Widget>[
                               SliverAppBar(
-                                actions: const [
-                                  IgnorePointer()
-                                ], //To surpess the hamburger
+                                actions: const [IgnorePointer()], //To surpess the hamburger
                                 primary: false,
-                                title: documentConfig.titleBuilder != null
-                                    ? documentConfig.titleBuilder!(context,
-                                        inheritedDocument.selectionState.data)
-                                    : Text(inheritedDocument
-                                            .selectionState.docId ??
-                                        ""),
+                                title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : Text(inheritedDocument.selectionState.docId ?? ""),
                                 floating: true,
                                 pinned: false,
                                 snap: true,
                                 centerTitle: true,
                                 automaticallyImplyLeading: false,
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.secondary,
+                                backgroundColor: Theme.of(context).colorScheme.secondary,
                                 bottom: documentConfig.document.tabs.length != 1
                                     ? TabBar(
                                         controller: tabController,
                                         tabs: documentConfig.document.tabs
                                             .map(
-                                              (documentTab) =>
-                                                  documentTab.tabBuilder(),
+                                              (documentTab) => documentTab.tabBuilder(Fframe.of(context)!.user),
                                             )
                                             .toList(),
                                       )
@@ -154,27 +125,18 @@ class DocumentBody<T> extends StatelessWidget {
                           },
                           body: PreloadPageView.builder(
                             itemCount: documentConfig.document.tabs.length,
-                            preloadPagesCount:
-                                documentConfig.document.tabs.length,
+                            preloadPagesCount: documentConfig.document.tabs.length,
                             physics: const NeverScrollableScrollPhysics(),
                             itemBuilder: (BuildContext context, int position) {
                               // debugPrint("Build tab $position");
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Container(
-                                  key: ValueKey(
-                                      "PreloadPageView_${inheritedDocument.selectionState.docId}_${tabController.index}"),
+                                  key: ValueKey("PreloadPageView_${inheritedDocument.selectionState.docId}_${tabController.index}"),
                                   child: Scaffold(
                                     primary: false,
-                                    body: documentConfig.document.tabs[position]
-                                        .childBuilder(
-                                            inheritedDocument
-                                                .selectionState.data,
-                                            inheritedDocument
-                                                .selectionState.readOnly),
-                                    floatingActionButtonLocation:
-                                        FloatingActionButtonLocation
-                                            .miniCenterDocked,
+                                    body: documentConfig.document.tabs[position].childBuilder(inheritedDocument.selectionState.data, inheritedDocument.selectionState.readOnly),
+                                    floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
                                     bottomNavigationBar: BottomAppBar(
                                       elevation: 0,
                                       // TODO: JS: reapply this after you fix the default background on the tabs to be secondary
@@ -183,14 +145,10 @@ class DocumentBody<T> extends StatelessWidget {
                                       //     .background,
                                       // shape: const CircularNotchedRectangle(),
                                       child: IconTheme(
-                                        data: IconThemeData(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onPrimary),
+                                        data: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
                                         child: Row(
                                           children: [
-                                            ...inheritedDocument
-                                                .iconButtons<T>(context)!,
+                                            ...inheritedDocument.iconButtons<T>(context)!,
                                           ],
                                         ),
                                       ),
