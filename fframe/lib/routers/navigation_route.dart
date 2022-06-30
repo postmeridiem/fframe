@@ -26,6 +26,8 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
   bool hasListener = false;
 
   FNavigationRouterDelegate() : navigatorKey = GlobalKey<NavigatorState>() {
+    debugPrint("init FNavigationRouterDelegate");
+
     // if (!hasListener) {
     navigationNotifier.addListener(_navigationNotifierListener);
     //   hasListener = true;

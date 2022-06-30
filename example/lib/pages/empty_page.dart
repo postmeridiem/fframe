@@ -13,15 +13,22 @@ class _EmptyPageState extends State<EmptyPage> {
   final duration = const Duration(seconds: 10);
 
   bool _first = true;
+  late Timer _timer;
 
   @override
   void initState() {
-    Timer.periodic(duration, (timer) {
+    _timer = Timer.periodic(duration, (timer) {
       setState(() {
         _first = !_first;
       });
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   @override

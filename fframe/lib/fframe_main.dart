@@ -77,12 +77,16 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
           case ConnectionState.none:
           case ConnectionState.waiting:
           case ConnectionState.active:
-            return MaterialApp(
-              debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-              home: Scaffold(
-                body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
-              ),
-            );
+            return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                const Center(
+                  child: CircularProgressIndicator(),
+                );
+          // return MaterialApp(
+          //   debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+          //   home: Scaffold(
+          //     body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
+          //   ),
+          // );
           case ConnectionState.done:
             if (snapshot.error != null) {
               return MaterialApp(
@@ -92,12 +96,13 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
                 ),
               );
             }
-            return MaterialApp(
-              debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-              home: const Scaffold(
-                body: FframeL10nLoader(),
-              ),
-            );
+            return const FframeL10nLoader();
+          // return MaterialApp(
+          //   debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+          //   home: const Scaffold(
+          //     body: FframeL10nLoader(),
+          //   ),
+          // );
         }
       },
     );
@@ -120,12 +125,16 @@ class _FframeL10nLoaderState extends State<FframeL10nLoader> {
       l10Builder: (context, l10n) {
         if (l10n == null) {
           //Apparently stil loading.... give it a bit of time...
-          return MaterialApp(
-            debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-            home: Scaffold(
-              body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
-            ),
-          );
+          return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+              const Center(
+                child: CircularProgressIndicator(),
+              );
+          // return MaterialApp(
+          //   debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+          //   home: Scaffold(
+          //     body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
+          //   ),
+          // );
         }
 
         return const FrouterLoader();
@@ -152,12 +161,10 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
           case ConnectionState.none:
           case ConnectionState.waiting:
           case ConnectionState.done:
-            return MaterialApp(
-              debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-              home: Scaffold(
-                body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
-              ),
-            );
+            return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                const Center(
+                  child: CircularProgressIndicator(),
+                );
           case ConnectionState.active:
             if (snapshot.error != null) {
               return MaterialApp(
