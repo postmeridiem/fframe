@@ -34,22 +34,29 @@ class _ErrorPageState extends State<ErrorPage> {
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 500),
             reverseDuration: const Duration(milliseconds: 500),
-            firstChild: const Icon(
+            firstChild: Icon(
               Icons.error,
               size: 48.0,
-              key: ValueKey("error_icon_white"),
+              key: const ValueKey("error_icon_white"),
+              color: Theme.of(context).colorScheme.onBackground,
             ),
             secondChild: Icon(
               Icons.error,
               size: 48.0,
-              color: Colors.redAccent.shade700,
+              color: Theme.of(context).colorScheme.error,
               key: const ValueKey("error_icon_red"),
             ),
-            crossFadeState: _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+            crossFadeState:
+                _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(Fframe.of(context)?.errorText ?? "Something failed succesfully"),
+            child: Text(
+              Fframe.of(context)?.errorText ?? "Something failed succesfully",
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onBackground,
+              ),
+            ),
           ),
         ],
       ),
