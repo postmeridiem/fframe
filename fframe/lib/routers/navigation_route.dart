@@ -5,7 +5,7 @@ import 'package:fframe/services/navigation_service.dart';
 class FNavigationRouteInformationParser extends RouteInformationParser<NavigationNotifier> {
   @override
   Future<NavigationNotifier> parseRouteInformation(RouteInformation routeInformation) async {
-    debugPrint("NavigationRouteInformationParser.parseRouteInformation");
+    debugPrint("NavigationRouteInformationParser.parseRouteInformation ${routeInformation.location!}");
     navigationNotifier.parseRouteInformation(uri: Uri.parse(routeInformation.location!));
     return navigationNotifier;
   }
@@ -28,10 +28,7 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
   FNavigationRouterDelegate() : navigatorKey = GlobalKey<NavigatorState>() {
     debugPrint("init FNavigationRouterDelegate");
 
-    // if (!hasListener) {
     navigationNotifier.addListener(_navigationNotifierListener);
-    //   hasListener = true;
-    // }
   }
 
   _navigationNotifierListener() {

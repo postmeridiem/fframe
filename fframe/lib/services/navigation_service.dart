@@ -22,7 +22,7 @@ class NextState {
 class NavigationNotifier extends ChangeNotifier {
   final Ref ref;
   Uri? _uri;
-  // List<NextState> _nextState = [];
+  List<NextState> nextState = [];
 
   TargetState? _targetState;
   QueryState? _queryState;
@@ -33,7 +33,8 @@ class NavigationNotifier extends ChangeNotifier {
   bool? _isSignedIn;
   List<String>? _roles;
 
-  late NavigationConfig navigationConfig = RouterConfig.instance.navigationConfig;
+  final NavigationConfig navigationConfig = RouterConfig.instance.navigationConfig;
+  late NavigationConfig filteredNavigationConfig = RouterConfig.instance.navigationConfig;
 
   NavigationNotifier({required this.ref}) {
     _filterNavigationRoutes();
@@ -85,7 +86,10 @@ class NavigationNotifier extends ChangeNotifier {
     _isSignedIn = true;
     _filterNavigationRoutes();
     TargetState? targetState = TargetState.defaultRoute();
-    QueryState? queryState = QueryState(queryParameters: null);
+    QueryState? queryState = QueryState.defaultroute();
+    if (navigationNotifier.nextState.isNotEmpty) {
+      navigationNotifier.nextState.removeAt(0);
+    }
     processRouteInformation(targetState: targetState, queryState: queryState);
   }
 
@@ -117,10 +121,10 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   _filterNavigationRoutes() {
-    navigationConfig = NavigationConfig.clone(RouterConfig.instance.navigationConfig);
+    filteredNavigationConfig = NavigationConfig.clone(navigationConfig);
     if (_isSignedIn ?? false) {
       //Check routes for roles
-      navigationConfig.navigationTargets.removeWhere(
+      filteredNavigationConfig.navigationTargets.removeWhere(
         (NavigationTarget navigationTarget) {
           //Check tabs first(if any)
           if (navigationTarget.navigationTabs != null) {
@@ -153,7 +157,7 @@ class NavigationNotifier extends ChangeNotifier {
       );
     } else {
       //Not signed in. Keep public routes
-      navigationConfig.navigationTargets.removeWhere((NavigationTarget navigationTarget) {
+      filteredNavigationConfig.navigationTargets.removeWhere((NavigationTarget navigationTarget) {
         if (navigationTarget.navigationTabs != null) {
           List<NavigationTab> navigationTabs = _filterTabRoutes(navigationTarget.navigationTabs!);
           return navigationTabs.isEmpty;
@@ -208,8 +212,7 @@ class NavigationNotifier extends ChangeNotifier {
 
     if (uri.path != "/") {
       debugPrint("NavigationNotifier.parseRouteInformation => Store initial link for later use");
-      // _nextState.add(NextState(targetState: targetState, queryState: queryState));
-      // _nextUri.add(uri);
+      nextState.add(NextState(targetState: targetState, queryState: queryState));
     }
 
     debugPrint("FRouter.parseRouteInformation: ${targetState.toString()} :: ${queryState.toString()}");

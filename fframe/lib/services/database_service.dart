@@ -159,7 +159,6 @@ class DatabaseService<T> {
   Future<SaveState> deleteDocument({
     required String collection,
     required String documentId,
-    required T data,
     required T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore,
     required Map<String, Object?> Function(T, SetOptions?) toFirestore,
   }) async {

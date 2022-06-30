@@ -12,7 +12,7 @@ class SelectionState<T> with ChangeNotifier {
     this.readOnly = false,
   });
 
-  setState(SelectionState selectionState, {bool notify = false}) {
+  setState(SelectionState<T> selectionState, {bool notify = false}) {
     data = selectionState.data;
     docId = selectionState.docId;
     isNew = selectionState.isNew;

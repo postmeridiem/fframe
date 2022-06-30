@@ -48,24 +48,25 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         () => FRouter.of(context).tabSwitch(tabController: _tabController),
       );
     }
+
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
+        centerTitle: true,
         elevation: 2,
         automaticallyImplyLeading: false,
         title: Text(Fframe.of(context)?.title ?? ""),
-        leading:
-            (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
-                ? IconButton(
-                    onPressed: () {
-                      if (_scaffoldKey.currentState!.isDrawerOpen) {
-                        _scaffoldKey.currentState!.closeDrawer();
-                      } else {
-                        _scaffoldKey.currentState!.openDrawer();
-                      }
-                    },
-                    icon: const Icon(Icons.menu))
-                : const IgnorePointer(),
+        leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
+            ? IconButton(
+                onPressed: () {
+                  if (_scaffoldKey.currentState!.isDrawerOpen) {
+                    _scaffoldKey.currentState!.closeDrawer();
+                  } else {
+                    _scaffoldKey.currentState!.openDrawer();
+                  }
+                },
+                icon: const Icon(Icons.menu))
+            : const IgnorePointer(),
         actions: [
           const BarButtonShare(),
           const BarButtonDuplicate(),
@@ -81,15 +82,13 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           ),
           child: Text(
             widget.appTitle,
-            style: TextStyle(
-                color: Theme.of(context).colorScheme.onPrimaryContainer),
+            style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
           ),
         ),
       ),
       body: Row(
         children: [
-          if (screenSize == ScreenSize.large)
-            FRouter.of(context).navigationRail(),
+          if (screenSize == ScreenSize.large) FRouter.of(context).navigationRail(),
           Expanded(
             child: Scaffold(
               primary: false,
@@ -108,8 +107,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
                     child: Container(
-                      key: ValueKey(
-                          "navTarget_${targetState.navigationTarget.title}"),
+                      key: ValueKey("navTarget_${targetState.navigationTarget.title}"),
                       child: targetState.navigationTarget.contentPane,
                     ),
                   );
@@ -136,8 +134,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             return const IgnorePointer();
           case ConnectionState.active:
             if (snapshot.hasError) {
-              return Icon(Icons.error,
-                  color: Theme.of(context).colorScheme.error);
+              return Icon(Icons.error, color: Theme.of(context).colorScheme.error);
             }
 
             if (snapshot.hasData) {
@@ -146,12 +143,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
                   padding: const EdgeInsets.all(4),
-                  primary: Theme.of(context)
-                      .colorScheme
-                      .primaryContainer, // <-- Button color
-                  onPrimary: Theme.of(context)
-                      .colorScheme
-                      .onPrimaryContainer, // <-- Splash color
+                  primary: Theme.of(context).colorScheme.primaryContainer, // <-- Button color
+                  onPrimary: Theme.of(context).colorScheme.onPrimaryContainer, // <-- Splash color
                 ),
                 onPressed: () {
                   showUserOverlay();
@@ -166,16 +159,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   CircleAvatar circleAvatar({double? radius}) {
     User user = FirebaseAuth.instance.currentUser!;
-    List<String>? avatarText = user.displayName
-        ?.split(' ')
-        .map((part) => part.trim().substring(0, 1))
-        .toList();
+    List<String>? avatarText = user.displayName?.split(' ').map((part) => part.trim().substring(0, 1)).toList();
     return CircleAvatar(
       radius: radius ?? 12.0,
-      backgroundImage:
-          (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
-      backgroundColor:
-          (user.photoURL == null) ? Colors.amber : Colors.transparent,
+      backgroundImage: (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
+      backgroundColor: (user.photoURL == null) ? Colors.amber : Colors.transparent,
       child: (user.photoURL == null && avatarText != null)
           ? Text(
               "${avatarText.first}${avatarText.last}",
@@ -219,16 +207,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         ),
                         title: Text(
                           FirebaseAuth.instance.currentUser!.displayName!,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSecondary),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
                         ),
                         subtitle: Text(
-                          L10n.string("header_profilelabel",
-                              placeholder: "Click to open profile...",
-                              namespace: "fframe"),
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                              fontSize: 12),
+                          L10n.string("header_profilelabel", placeholder: "Click to open profile...", namespace: "fframe"),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 12),
                         ),
                       ),
                     ),
@@ -248,8 +231,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       color: Theme.of(context).colorScheme.onSecondary,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left: 8, right: 8, top: 8, bottom: 16),
+                      padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 16),
                       child: TextButton.icon(
                         onPressed: () async {
                           setState(() {
@@ -258,17 +240,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           await FirebaseAuth.instance.signOut();
                           overlayEntry.remove();
                         },
-                        icon: isSigningOut
-                            ? const CircularProgressIndicator()
-                            : Icon(Icons.logout,
-                                size: 24.0,
-                                color:
-                                    Theme.of(context).colorScheme.onSecondary),
+                        icon: isSigningOut ? const CircularProgressIndicator() : Icon(Icons.logout, size: 24.0, color: Theme.of(context).colorScheme.onSecondary),
                         label: Text(
-                          L10n.string("header_signout",
-                              placeholder: "Sign out...", namespace: "fframe"),
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSecondary),
+                          L10n.string("header_signout", placeholder: "Sign out...", namespace: "fframe"),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
                         ),
                       ),
                     ),

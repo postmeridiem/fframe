@@ -91,8 +91,8 @@ class InheritedDocument extends InheritedWidget {
         behavior: SnackBarBehavior.floating,
         margin: EdgeInsets.only(
           bottom: kBottomNavigationBarHeight,
-          left: MediaQuery.of(context).size.width / 4,
-          right: MediaQuery.of(context).size.width / 4,
+          left: MediaQuery.of(context).size.width * 0.1,
+          right: MediaQuery.of(context).size.width * 0.1,
         ),
         content: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -164,7 +164,6 @@ class InheritedDocument extends InheritedWidget {
       SaveState saveResult = await DatabaseService<T>().deleteDocument(
         collection: documentConfig.collection,
         documentId: selectionState.docId!,
-        data: selectionState.data!,
         fromFirestore: _documentConfig.fromFirestore,
         toFirestore: _documentConfig.toFirestore,
       );
@@ -264,18 +263,50 @@ class InheritedDocument extends InheritedWidget {
     }
   }
 
-  load<T>({required String docId}) async {
-    DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
+  load<T>({required BuildContext context, required String docId}) async {
+    try {
+      DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
 
-    DocumentSnapshot<T>? documentSnapshot = await DatabaseService<T>().documentSnapshot(
-      collection: _documentConfig.collection,
-      documentId: docId,
-      fromFirestore: _documentConfig.fromFirestore,
-      toFirestore: _documentConfig.toFirestore,
-    );
+      DocumentSnapshot<T>? documentSnapshot = await DatabaseService<T>().documentSnapshot(
+        collection: _documentConfig.collection,
+        documentId: docId,
+        fromFirestore: _documentConfig.fromFirestore,
+        toFirestore: _documentConfig.toFirestore,
+      );
 
-    if (documentSnapshot?.exists ?? false) {
-      selectionState.setState(SelectionState(data: documentSnapshot!.data(), docId: docId));
+      if (documentSnapshot?.exists ?? false) {
+        debugPrint("Assign loaded document $docId to selectionState and notify");
+        selectionState.setState(
+          SelectionState<T>(
+            data: documentSnapshot!.data(),
+            docId: docId,
+          ),
+          notify: true,
+        );
+      } else {
+        debugPrint("Document does not exist");
+        FRouter.of(context).updateQueryString(
+          queryParameters: {},
+          resetQueryString: true,
+        );
+        _snackbar(
+          context: context,
+          text: "Referenced document could not be loaded: $docId",
+          icon: Icon(
+            Icons.error,
+            color: Colors.red.shade900,
+          ),
+        );
+      }
+    } catch (e) {
+      _snackbar(
+        context: context,
+        text: "Referenced document could not be loaded: $docId \n ${e.toString()}",
+        icon: Icon(
+          Icons.error,
+          color: Colors.red.shade900,
+        ),
+      );
     }
   }
 
@@ -542,7 +573,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
         inheritedDocument.selectionState.removeListener(() {});
         setState(() {});
       });
-      inheritedDocument.load(docId: queryState.queryParameters![inheritedDocument.documentConfig.queryStringIdParam]!);
+      inheritedDocument.load<T>(context: context, docId: queryState.queryParameters![inheritedDocument.documentConfig.queryStringIdParam]!);
       return FRouter.of(context).waitPage(context: context, text: "Loading document");
     }
 

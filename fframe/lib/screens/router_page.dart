@@ -102,7 +102,7 @@ class FRouter extends InheritedWidget {
   }
 
   NavigationConfig get navigationConfig {
-    return navigationNotifier.navigationConfig;
+    return navigationNotifier.filteredNavigationConfig;
   }
 
   Widget waitPage({required BuildContext context, String? text}) {
@@ -126,7 +126,7 @@ class FRouter extends InheritedWidget {
         padding: EdgeInsets.zero,
         children: [
           drawerHeader ?? const IgnorePointer(),
-          ...navigationNotifier.navigationConfig.navigationTargets
+          ...navigationNotifier.filteredNavigationConfig.navigationTargets
               .where(
                 ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
               )
@@ -166,12 +166,12 @@ class FRouter extends InheritedWidget {
                   ],
                 ),
               ),
-          if (!navigationNotifier.isSignedIn && navigationNotifier.navigationConfig.signInConfig.signInTarget.destination != null)
+          if (!navigationNotifier.isSignedIn && navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination != null)
             ListTile(
-              leading: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination?.icon,
-              title: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.navigationLabel,
+              leading: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination?.icon,
+              title: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel,
               onTap: () {
-                navigateTo(navigationTarget: navigationNotifier.navigationConfig.signInConfig.signInTarget);
+                navigateTo(navigationTarget: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget);
                 Navigator.pop(context);
               },
             ),
@@ -237,27 +237,27 @@ class FRouter extends InheritedWidget {
   }
 
   Widget navigationRail() {
-    if (navigationNotifier.navigationConfig.navigationTargets.length >= 2) {
+    if (navigationNotifier.filteredNavigationConfig.navigationTargets.length >= 2) {
       return NavigationRail(
         selectedIndex: navigationNotifier.selectedNavRailIndex,
         onDestinationSelected: (int index) {
-          if (index < navigationNotifier.navigationConfig.navigationTargets.length) {
+          if (index < navigationNotifier.filteredNavigationConfig.navigationTargets.length) {
             navigationNotifier.selectedNavRailIndex = index;
-            NavigationTarget navigationTarget = navigationNotifier.navigationConfig.navigationTargets[index];
+            NavigationTarget navigationTarget = navigationNotifier.filteredNavigationConfig.navigationTargets[index];
             navigateTo(navigationTarget: navigationTarget);
           } else {
             debugPrint("Sign in/out action");
             if (isSignedIn) {
               signIn();
             } else {
-              NavigationTarget navigationTarget = navigationNotifier.navigationConfig.signInConfig.signInTarget;
+              NavigationTarget navigationTarget = navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget;
               navigateTo(navigationTarget: navigationTarget);
             }
           }
         },
         labelType: NavigationRailLabelType.all,
         destinations: [
-          ...navigationNotifier.navigationConfig.navigationTargets
+          ...navigationNotifier.filteredNavigationConfig.navigationTargets
               .where(
                 ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
               )
@@ -269,12 +269,12 @@ class FRouter extends InheritedWidget {
                   padding: navigationTarget.destination!.padding,
                 ),
               ),
-          if (!navigationNotifier.isSignedIn && navigationNotifier.navigationConfig.signInConfig.signInTarget.destination != null)
+          if (!navigationNotifier.isSignedIn && navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination != null)
             NavigationRailDestination(
-              icon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.icon,
-              selectedIcon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
-              label: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.navigationLabel,
-              padding: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.padding,
+              icon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.icon,
+              selectedIcon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
+              label: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel,
+              padding: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.padding,
             ),
         ],
       );

@@ -17,6 +17,15 @@ class QueryState {
     return QueryState(queryParameters: newQueryParameters); //, context: context);
   }
 
+  factory QueryState.defaultroute() {
+    if (navigationNotifier.nextState.isNotEmpty) {
+      debugPrint("Route to ${navigationNotifier.nextState.first.queryState.queryString}");
+      return navigationNotifier.nextState.first.queryState;
+    }
+
+    return QueryState();
+  }
+
   String get queryString {
     return queryParameters?.entries.map((queryParameter) => "${queryParameter.key}=${queryParameter.value}").join("&") ?? "";
   }
