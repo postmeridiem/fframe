@@ -555,25 +555,26 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
             : FRouter.of(context).emptyPage()
         : DocumentBodyLoader<T>(key: ValueKey(queryState.queryString), queryState: queryState);
 
-    DocumentScreenConfig iocumentScreenConfig = DocumentScreenConfig.of(context)!;
+    //Handle document loads...
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
     if (queryState.queryParameters == null) {
       //Cannot contain a form
       return (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
-    } else if (iocumentScreenConfig.selectionState.data == null && iocumentScreenConfig.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
+    } else if (documentScreenConfig.selectionState.data == null && documentScreenConfig.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn a new document");
-      iocumentScreenConfig.selectionState.setState(SelectionState<T>(data: iocumentScreenConfig.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false));
-    } else if (iocumentScreenConfig.selectionState.data is T && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
+      documentScreenConfig.selectionState.setState(SelectionState<T>(data: documentScreenConfig.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false));
+    } else if (documentScreenConfig.selectionState.data is T && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn new document from cache");
       return returnWidget;
-    } else if (!queryState.queryParameters!.containsKey(iocumentScreenConfig.documentConfig.queryStringIdParam)) {
+    } else if (!queryState.queryParameters!.containsKey(documentScreenConfig.documentConfig.queryStringIdParam)) {
       return (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
-    } else if (((iocumentScreenConfig.selectionState.docId != queryState.queryParameters?[iocumentScreenConfig.documentConfig.queryStringIdParam]) || (iocumentScreenConfig.selectionState.data == null && queryState.queryParameters != null))) {
-      iocumentScreenConfig.selectionState.addListener(() {
+    } else if (((documentScreenConfig.selectionState.docId != queryState.queryParameters?[documentScreenConfig.documentConfig.queryStringIdParam]) || (documentScreenConfig.selectionState.data == null && queryState.queryParameters != null))) {
+      documentScreenConfig.selectionState.addListener(() {
         debugPrint("Our document has arrived");
-        iocumentScreenConfig.selectionState.removeListener(() {});
+        documentScreenConfig.selectionState.removeListener(() {});
         setState(() {});
       });
-      iocumentScreenConfig.load<T>(context: context, docId: queryState.queryParameters![iocumentScreenConfig.documentConfig.queryStringIdParam]!);
+      documentScreenConfig.load<T>(context: context, docId: queryState.queryParameters![documentScreenConfig.documentConfig.queryStringIdParam]!);
       return FRouter.of(context).waitPage(context: context, text: "Loading document");
     }
 

@@ -36,7 +36,7 @@ class ContextDrawer<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DocumentScreenConfig iocumentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
     if (contextDrawerOpen) {
       // if the document canvas gets too small, render this
@@ -46,7 +46,7 @@ class ContextDrawer<T> extends StatelessWidget {
           child: ContextCanvas(
             contextWidgets: documentConfig.document.contextCards!
                 .map(
-                  (contextCardBuilder) => contextCardBuilder(iocumentScreenConfig.selectionState.data),
+                  (contextCardBuilder) => contextCardBuilder(documentScreenConfig.selectionState.data),
                 )
                 .toList(),
           ),
