@@ -29,7 +29,12 @@ class Fframe extends InheritedWidget {
     return context.dependOnInheritedWidgetOfExactType<Fframe>();
   }
 
-  String? errorText;
+  String errorText = '';
+
+  Widget showError({required BuildContext context, required String errorText}) {
+    errorText = errorText;
+    return FRouter.of(context).errorPage(context: context);
+  }
 
   @override
   bool updateShouldNotify(Fframe oldWidget) {

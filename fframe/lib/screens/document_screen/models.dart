@@ -30,6 +30,9 @@ class DocumentConfig<T> {
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
   final bool embeddedDocument;
+
+  late PreloadPageController preloadPageController;
+  late TabController tabController;
 }
 
 class Document<T> {
@@ -46,7 +49,7 @@ class Document<T> {
     this.showDeleteButton = false,
   });
   final Key? key;
-  final List<DocumentTab> tabs;
+  final List<DocumentTab<T>> tabs;
   final List<ContextCardBuilder>? contextCards;
   bool autoSave;
   bool readOnly;
@@ -63,7 +66,7 @@ class DocumentTab<T> {
   ///
   final DocumentTabBuilder<T> tabBuilder;
   final DocumentTabChildBuilder childBuilder;
-
+  late GlobalKey<FormState> formKey = GlobalKey<FormState>();
   DocumentTab({
     required this.tabBuilder,
     required this.childBuilder,

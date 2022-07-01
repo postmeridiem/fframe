@@ -173,7 +173,7 @@ class DocumentListBody<T> extends StatelessWidget {
                       );
                     },
                     loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
-                    errorBuilder: (context, error, stackTrace) => FRouter.of(context).errorPage(context: context, errorText: error.toString()),
+                    errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showError(context: context, errorText: error.toString()),
                   ),
                 ),
               ],

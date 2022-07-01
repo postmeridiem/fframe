@@ -311,7 +311,7 @@ class DocumentScreenConfig extends InheritedWidget {
   }
 
   save<T>({required BuildContext context}) async {
-    if (validate<T>(context: context)) {
+    if (validate<T>(context: context, moveToTab: true) == -1) {
       DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
       String? docId = selectionState.docId;
       if (docId == null || selectionState.isNew == true) {
@@ -358,9 +358,19 @@ class DocumentScreenConfig extends InheritedWidget {
     }
   }
 
-  bool validate<T>({required BuildContext context, bool showPopup = false}) {
+  int validate<T>({required BuildContext context, bool showPopup = false, bool moveToTab = false}) {
     DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
-    if (_documentConfig.formKey.currentState!.validate()) {
+
+    int invalidTab = _documentConfig.document.tabs
+        .map((DocumentTab tab) {
+          bool result = tab.formKey.currentState!.validate();
+          debugPrint("tab validation: $result");
+          return tab.formKey.currentState!.validate();
+        })
+        .toList()
+        .indexWhere((bool validationResult) => validationResult == false);
+    // .toDouble();
+    if (invalidTab == -1) {
       if (showPopup) {
         _snackbar(
           context: context,
@@ -374,23 +384,13 @@ class DocumentScreenConfig extends InheritedWidget {
           ),
         );
       }
-      return true;
     } else {
-      if (showPopup) {
-        _snackbar(
-          context: context,
-          text: L10n.string(
-            'validator_failed',
-            placeholder: "Form is invalid, please update highlighted fields.",
-          ),
-          icon: Icon(
-            Icons.close,
-            color: Colors.red.shade900,
-          ),
-        );
+      if (_documentConfig.tabController.index != invalidTab || moveToTab) {
+        _documentConfig.tabController.animateTo(invalidTab);
+        // _documentConfig.preloadPageController.animateTo(invalidTab, duration: const Duration(microseconds: 250), curve: Curves.easeOutCirc);
       }
-      return false;
     }
+    return invalidTab.toInt();
   }
 
   List<IconButton>? iconButtons<T>(BuildContext context) {

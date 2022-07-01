@@ -110,8 +110,7 @@ class FRouter extends InheritedWidget {
   }
 
   Widget emptyPage() => RouterConfig.instance.navigationConfig.emptyPage.contentPane ?? const Center(child: Text("Much empty"));
-  Widget errorPage({required BuildContext context, required String errorText}) {
-    Fframe.of(context)!.errorText = errorText;
+  Widget errorPage({required BuildContext context}) {
     return RouterConfig.instance.navigationConfig.errorPage.contentPane ?? const Center(child: Icon((Icons.error)));
   }
 
