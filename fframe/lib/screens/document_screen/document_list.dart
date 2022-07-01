@@ -10,16 +10,16 @@ class DocumentListItem<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
-    DocumentConfig<T> documentConfig = inheritedDocument.documentConfig as DocumentConfig<T>;
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
     DocumentListItemBuilder<T> documentListItemBuilder = documentConfig.documentList!.builder;
     try {
       return Card(
         child: GestureDetector(
           onTap: () {
-            bool embeddedDocument = inheritedDocument.documentConfig.embeddedDocument;
+            bool embeddedDocument = documentScreenConfig.documentConfig.embeddedDocument;
             String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
-            inheritedDocument.selectionState.setState(SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
+            documentScreenConfig.selectionState.setState(SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
             if (documentConfig.document.tabs.length == 1) {
               FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: !embeddedDocument);
             } else {
@@ -27,7 +27,7 @@ class DocumentListItem<T> extends ConsumerWidget {
             }
           },
           child: Consumer(builder: (context, ref, child) {
-            String docId = inheritedDocument.selectionState.docId ?? '';
+            String docId = documentScreenConfig.selectionState.docId ?? '';
             try {
               return documentListItemBuilder(context, docId == queryDocumentSnapshot.id, queryDocumentSnapshot.data(), Fframe.of(context)!.user);
             } catch (e) {
@@ -84,8 +84,8 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
   @override
   Widget build(BuildContext context) {
     debugPrint("Build DocumentList with key ${widget.key.toString()}");
-    InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
-    DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
 
     Query<T> query = DatabaseService<T>().query(
       collection: documentConfig.collection,
@@ -100,7 +100,7 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
     return DocumentListBody<T>(
       key: ValueKey("documentListBody_${widget.key.toString()}"),
       scrollController: scrollController,
-      inheritedDocument: inheritedDocument,
+      documentScreenConfig: documentScreenConfig,
       documentConfig: documentConfig,
       query: query,
       ref: widget.ref,
@@ -112,19 +112,19 @@ class DocumentListBody<T> extends StatelessWidget {
   const DocumentListBody({
     Key? key,
     required this.scrollController,
-    required this.inheritedDocument,
+    required this.documentScreenConfig,
     required this.documentConfig,
     required this.query,
     required this.ref,
   }) : super(key: key);
   final ScrollController scrollController;
-  final InheritedDocument inheritedDocument;
+  final DocumentScreenConfig documentScreenConfig;
   final DocumentConfig<T> documentConfig;
   final Query<T> query;
   final WidgetRef ref;
   @override
   Widget build(BuildContext context) {
-    ScreenSize screenSize = (MediaQuery.of(context).size.width <= 400)
+    ScreenSize screenSize = (MediaQuery.of(context).size.width <= 599)
         ? ScreenSize.phone
         : (MediaQuery.of(context).size.width < 1000)
             ? ScreenSize.tablet
@@ -138,7 +138,7 @@ class DocumentListBody<T> extends StatelessWidget {
       Map<String, String>? queryParameters = ref.watch(queryStateProvider).queryParameters;
       if (queryParameters != null) {
         if (queryParameters.isNotEmpty) {
-          //Some document is loaded
+          //Some document is loaded, and we are on a phone. Don't show the selector
           listWidth = 0;
         }
       }
@@ -156,20 +156,27 @@ class DocumentListBody<T> extends StatelessWidget {
               child: const Icon(Icons.add),
               elevation: 0.2,
               onPressed: () {
-                inheritedDocument.create(context: context);
+                documentScreenConfig.create(context: context);
               },
             ),
             primary: false,
-            body: FirestoreListView<T>(
-              controller: scrollController,
-              query: query,
-              itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
-                return DocumentListItem<T>(
-                  queryDocumentSnapshot: queryDocumentSnapshot,
-                );
-              },
-              loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
-              errorBuilder: (context, error, stackTrace) => FRouter.of(context).errorPage(context: context, errorText: error.toString()),
+            body: Column(
+              children: [
+                // const DocSearch(),
+                Expanded(
+                  child: FirestoreListView<T>(
+                    controller: scrollController,
+                    query: query,
+                    itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
+                      return DocumentListItem<T>(
+                        queryDocumentSnapshot: queryDocumentSnapshot,
+                      );
+                    },
+                    loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
+                    errorBuilder: (context, error, stackTrace) => FRouter.of(context).errorPage(context: context, errorText: error.toString()),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

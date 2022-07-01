@@ -10,7 +10,7 @@ class DocumentScreen<T> extends StatelessWidget {
     required this.fromFirestore,
     required this.toFirestore,
     this.documentList,
-    // this.documentBuilder,
+    this.initialQuery,
     this.titleBuilder,
     required this.document,
     this.extraActionButtons,
@@ -20,7 +20,7 @@ class DocumentScreen<T> extends StatelessWidget {
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final DocumentList<T>? documentList;
-  // final DocumentBuilder<T>? documentBuilder;
+  final Query<T>? initialQuery;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
   final List<IconButton>? extraActionButtons;
@@ -34,19 +34,19 @@ class DocumentScreen<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    InheritedDocument? parentInheritedDocument = InheritedDocument.of(context);
+    DocumentScreenConfig? parentDocumentScreenConfig = DocumentScreenConfig.of(context);
     String? _queryStringIdParam;
     bool? _embeddedDocument;
-    if (parentInheritedDocument != null) {
+    if (parentDocumentScreenConfig != null) {
       debugPrint("This is an embedded instance of the DocumentScreen initalize FormCeption");
-      if (queryStringIdParam == parentInheritedDocument.documentConfig.queryStringIdParam) {
-        _queryStringIdParam = "child${toBeginningOfSentenceCase(parentInheritedDocument.documentConfig.queryStringIdParam)}";
+      if (queryStringIdParam == parentDocumentScreenConfig.documentConfig.queryStringIdParam) {
+        _queryStringIdParam = "child${toBeginningOfSentenceCase(parentDocumentScreenConfig.documentConfig.queryStringIdParam)}";
       }
       _embeddedDocument = true;
     }
     return Form(
       key: formKey,
-      child: InheritedDocument(
+      child: DocumentScreenConfig(
         // key:
         child: DocumentLoader<T>(
           key: ValueKey("DocumentLoader_$collection"),
@@ -71,17 +71,17 @@ class DocumentScreen<T> extends StatelessWidget {
   }
 }
 
-class InheritedDocument extends InheritedWidget {
-  InheritedDocument({Key? key, required this.documentConfig, required child}) : super(key: key, child: child);
+class DocumentScreenConfig extends InheritedWidget {
+  DocumentScreenConfig({Key? key, required this.documentConfig, required child}) : super(key: key, child: child);
 
   final DocumentConfig documentConfig;
   final SelectionState selectionState = SelectionState();
-  static InheritedDocument? of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<InheritedDocument>();
+  static DocumentScreenConfig? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<DocumentScreenConfig>();
   }
 
   @override
-  bool updateShouldNotify(InheritedDocument oldWidget) {
+  bool updateShouldNotify(DocumentScreenConfig oldWidget) {
     return true;
   }
 
@@ -510,7 +510,7 @@ class DocumentLoader<T> extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     debugPrint("build DocumentLoader: ${key.toString()}");
-    DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
+    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
 
     //  (queryParameters != null || (queryParameters == null && queryParameters!.isNotEmpty)));
 
@@ -541,7 +541,7 @@ class ScreenBody<T> extends ConsumerStatefulWidget {
 class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
   @override
   Widget build(BuildContext context) {
-    ScreenSize screenSize = (MediaQuery.of(context).size.width <= 400)
+    ScreenSize screenSize = (MediaQuery.of(context).size.width <= 599)
         ? ScreenSize.phone
         : (MediaQuery.of(context).size.width < 1000)
             ? ScreenSize.tablet
@@ -555,25 +555,25 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
             : FRouter.of(context).emptyPage()
         : DocumentBodyLoader<T>(key: ValueKey(queryState.queryString), queryState: queryState);
 
-    InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
+    DocumentScreenConfig iocumentScreenConfig = DocumentScreenConfig.of(context)!;
     if (queryState.queryParameters == null) {
       //Cannot contain a form
       return (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
-    } else if (inheritedDocument.selectionState.data == null && inheritedDocument.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
+    } else if (iocumentScreenConfig.selectionState.data == null && iocumentScreenConfig.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn a new document");
-      inheritedDocument.selectionState.setState(SelectionState<T>(data: inheritedDocument.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false));
-    } else if (inheritedDocument.selectionState.data is T && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
+      iocumentScreenConfig.selectionState.setState(SelectionState<T>(data: iocumentScreenConfig.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false));
+    } else if (iocumentScreenConfig.selectionState.data is T && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn new document from cache");
       return returnWidget;
-    } else if (!queryState.queryParameters!.containsKey(inheritedDocument.documentConfig.queryStringIdParam)) {
+    } else if (!queryState.queryParameters!.containsKey(iocumentScreenConfig.documentConfig.queryStringIdParam)) {
       return (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
-    } else if (((inheritedDocument.selectionState.docId != queryState.queryParameters?[inheritedDocument.documentConfig.queryStringIdParam]) || (inheritedDocument.selectionState.data == null && queryState.queryParameters != null))) {
-      inheritedDocument.selectionState.addListener(() {
+    } else if (((iocumentScreenConfig.selectionState.docId != queryState.queryParameters?[iocumentScreenConfig.documentConfig.queryStringIdParam]) || (iocumentScreenConfig.selectionState.data == null && queryState.queryParameters != null))) {
+      iocumentScreenConfig.selectionState.addListener(() {
         debugPrint("Our document has arrived");
-        inheritedDocument.selectionState.removeListener(() {});
+        iocumentScreenConfig.selectionState.removeListener(() {});
         setState(() {});
       });
-      inheritedDocument.load<T>(context: context, docId: queryState.queryParameters![inheritedDocument.documentConfig.queryStringIdParam]!);
+      iocumentScreenConfig.load<T>(context: context, docId: queryState.queryParameters![iocumentScreenConfig.documentConfig.queryStringIdParam]!);
       return FRouter.of(context).waitPage(context: context, text: "Loading document");
     }
 

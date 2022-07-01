@@ -15,13 +15,13 @@ class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
   @override
   Widget build(BuildContext context) {
     debugPrint("build documentBodyLoader ${widget.key.toString()}");
-    InheritedDocument inheritedDocument = InheritedDocument.of(context)!;
-    DocumentConfig<T> documentConfig = InheritedDocument.of(context)!.documentConfig as DocumentConfig<T>;
+    DocumentScreenConfig iocumentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
 
     return DocumentBody<T>(
       key: ValueKey("documentBody_${widget.key.toString()}"),
       queryState: widget.queryState,
-      inheritedDocument: inheritedDocument,
+      iocumentScreenConfig: iocumentScreenConfig,
       documentConfig: documentConfig,
     );
   }
@@ -31,19 +31,19 @@ class DocumentBody<T> extends StatelessWidget {
   const DocumentBody({
     Key? key,
     required this.queryState,
-    required this.inheritedDocument,
+    required this.iocumentScreenConfig,
     required this.documentConfig,
   }) : super(key: key);
 
   final QueryState queryState;
-  final InheritedDocument inheritedDocument;
+  final DocumentScreenConfig iocumentScreenConfig;
   final DocumentConfig<T> documentConfig;
 
   @override
   Widget build(BuildContext context) {
     debugPrint("build documentBody ${key.toString()}");
     PreloadPageController preloadPageController;
-    String tabIndexKey = inheritedDocument.documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
+    String tabIndexKey = iocumentScreenConfig.documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
     int tabIndex = int.parse(FRouter.of(context).queryStringParam(tabIndexKey) ?? "0");
 
     return DefaultTabController(
@@ -61,8 +61,8 @@ class DocumentBody<T> extends StatelessWidget {
             () {
               debugPrint("Navigate to tab ${tabController.index}");
               if (!tabController.indexIsChanging) {
-                bool validationState = inheritedDocument.selectionState.readOnly || inheritedDocument.validate(context: context);
-                if (validationState == true || inheritedDocument.selectionState.isNew) {
+                bool validationState = iocumentScreenConfig.selectionState.readOnly || iocumentScreenConfig.validate(context: context);
+                if (validationState == true || iocumentScreenConfig.selectionState.isNew) {
                   tabIndex = tabController.index;
                   FRouter.of(context).updateQueryString(queryParameters: {tabIndexKey: "${tabController.index}"});
                   preloadPageController.animateToPage(tabController.index, duration: const Duration(microseconds: 250), curve: Curves.easeOutCirc);
@@ -90,7 +90,7 @@ class DocumentBody<T> extends StatelessWidget {
                             ? ContextCanvas(
                                 contextWidgets: documentConfig.document.contextCards!
                                     .map(
-                                      (contextCardBuilder) => contextCardBuilder(inheritedDocument.selectionState.data),
+                                      (contextCardBuilder) => contextCardBuilder(iocumentScreenConfig.selectionState.data),
                                     )
                                     .toList(),
                               )
@@ -103,7 +103,7 @@ class DocumentBody<T> extends StatelessWidget {
                               SliverAppBar(
                                 actions: const [IgnorePointer()], //To surpess the hamburger
                                 primary: false,
-                                title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, inheritedDocument.selectionState.data) : Text(inheritedDocument.selectionState.docId ?? ""),
+                                title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, iocumentScreenConfig.selectionState.data) : Text(iocumentScreenConfig.selectionState.docId ?? ""),
                                 floating: true,
                                 pinned: false,
                                 snap: true,
@@ -132,10 +132,10 @@ class DocumentBody<T> extends StatelessWidget {
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Container(
-                                  key: ValueKey("PreloadPageView_${inheritedDocument.selectionState.docId}_${tabController.index}"),
+                                  key: ValueKey("PreloadPageView_${iocumentScreenConfig.selectionState.docId}_${tabController.index}"),
                                   child: Scaffold(
                                     primary: false,
-                                    body: documentConfig.document.tabs[position].childBuilder(inheritedDocument.selectionState.data, inheritedDocument.selectionState.readOnly),
+                                    body: documentConfig.document.tabs[position].childBuilder(iocumentScreenConfig.selectionState.data, iocumentScreenConfig.selectionState.readOnly),
                                     floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
                                     bottomNavigationBar: BottomAppBar(
                                       elevation: 0,
@@ -148,7 +148,7 @@ class DocumentBody<T> extends StatelessWidget {
                                         data: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
                                         child: Row(
                                           children: [
-                                            ...inheritedDocument.iconButtons<T>(context)!,
+                                            ...iocumentScreenConfig.iconButtons<T>(context)!,
                                           ],
                                         ),
                                       ),

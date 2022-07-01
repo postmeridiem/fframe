@@ -6,6 +6,7 @@ export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:flutterfire_ui/firestore.dart';
 
 import 'package:fframe/constants/constants.dart';
+import 'package:fframe/screens/document_screen/document_search.dart';
 import 'package:fframe/services/navigation_service.dart';
 import 'package:flutter/material.dart';
 

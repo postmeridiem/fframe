@@ -6,7 +6,7 @@ import 'package:example/screens/suggestion/suggestion.dart';
 final suggestionNavigationTarget = NavigationTarget(
   path: "suggestions",
   title: "Suggestions",
-  contentPane: const SuggestionScreen(),
+  // contentPane: const SuggestionScreen(suggestionQueryState),
   destination: const Destination(
     icon: Icon(Icons.pest_control),
     navigationLabel: Text('Suggestions'),
@@ -19,7 +19,7 @@ final suggestionNavigationTarget = NavigationTarget(
       title: "Active",
       path: "active",
       private: true,
-      contentPane: const SuggestionScreen(),
+      contentPane: const SuggestionScreen(suggestionQueryState: SuggestionQueryStates.active),
       destination: const Destination(
         icon: Icon(Icons.check_box),
         navigationLabel: Text("Active"),
@@ -30,7 +30,7 @@ final suggestionNavigationTarget = NavigationTarget(
       title: "Done",
       path: "done",
       private: true,
-      contentPane: const SuggestionScreen(),
+      contentPane: const SuggestionScreen(suggestionQueryState: SuggestionQueryStates.done),
       destination: Destination(
         icon: Icon(
           Icons.check,
@@ -38,20 +38,6 @@ final suggestionNavigationTarget = NavigationTarget(
         ),
         navigationLabel: const Text("Done"),
         tabLabel: "Done",
-      ),
-    ),
-    NavigationTab(
-      title: "Rejected",
-      path: "rejected",
-      private: true,
-      contentPane: const SuggestionScreen(),
-      destination: Destination(
-        icon: Icon(
-          Icons.not_interested,
-          color: Colors.redAccent[700],
-        ),
-        navigationLabel: const Text("Rejected"),
-        tabLabel: "Rejected",
       ),
     ),
   ],

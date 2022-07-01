@@ -10,18 +10,25 @@ class ErrorPage extends StatefulWidget {
 }
 
 class _ErrorPageState extends State<ErrorPage> {
-  final duration = const Duration(seconds: 2);
+  final duration = const Duration(seconds: 10);
 
-  bool _first = false;
+  bool _first = true;
+  late Timer _timer;
 
   @override
   void initState() {
-    Timer.periodic(duration, (timer) {
+    _timer = Timer.periodic(duration, (timer) {
       setState(() {
         _first = !_first;
       });
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   @override
@@ -46,8 +53,7 @@ class _ErrorPageState extends State<ErrorPage> {
               color: Theme.of(context).colorScheme.error,
               key: const ValueKey("error_icon_red"),
             ),
-            crossFadeState:
-                _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+            crossFadeState: _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),

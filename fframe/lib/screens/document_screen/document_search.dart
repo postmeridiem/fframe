@@ -9,7 +9,6 @@ class DocSearch extends ConsumerStatefulWidget {
   }) : super(key: key);
   final Widget? child;
   @override
-  // _BottomNavBarV2State createState() => _BottomNavBarV2State();
   ConsumerState<DocSearch> createState() => _DocSearchState();
 }
 
@@ -18,11 +17,11 @@ class _DocSearchState extends ConsumerState<DocSearch> {
   // should somehow get provided to the fframe user in the screen.dart
   // so they can use it in the query builder. Will try applying a double where()
   // to apply before it even gets there.
-  late Map<String, Map> doclistqueries = {
-    "q": {"query": "", "selected": true, "removable": false},
-    // "active": {"query": "true", "selected": false, "removable": false},
-    // "email": {"query": "me@jsc.im", "selected": false, "removable": true},
-    // "name": {"query": "Jeroen Schweitzer", "selected": true, "removable": true},
+  Map<String, Map> docListQuerySelections = {};
+  late Map<String, Map> docListQueryOptions = {
+    "active": {"query": "true", "selected": false, "removable": false},
+    "email": {"query": "me@jsc.im", "selected": false, "removable": true},
+    "name": {"query": "Jeroen Schweitzer", "selected": true, "removable": true},
   };
 
   @override
@@ -33,28 +32,50 @@ class _DocSearchState extends ConsumerState<DocSearch> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           queryChips(),
+          // DropdownButtonHideUnderline(
+          //   child: DropdownButton<String>(
+          //     hint: Text("Start typing"),
+          //     value: "",
+          //     items: [
+          //       const DropdownMenuItem<String>(
+          //         value: "1111",
+          //         child: Text("1:"),
+          //       ),
+          //       const DropdownMenuItem<String>(
+          //         value: "2222",
+          //         child: Text("2:"),
+          //       ),
+          //       // ...docListQueryOptions.entries
+          //       //     .map((MapEntry<String, Map<dynamic, dynamic>> entry) => DropdownMenuItem<String>(
+          //       //           value: entry.key,
+          //       //           child: Text(entry.key),
+          //       //         ))
+          //       //     .toList(),
+          //     ],
+          //     onChanged: (value) {},
+          //   ),
+          // ),
           TextField(
-            autofocus: true,
+            autofillHints: docListQueryOptions.entries.map((MapEntry<String, Map<dynamic, dynamic>> entry) => "${entry.key}:").toList(),
+            textInputAction: TextInputAction.newline,
             onChanged: (String query) {
-              if (query.substring((query.length - 1).clamp(0, query.length)) ==
-                  ":") {
+              if (query.substring((query.length - 1).clamp(0, query.length)) == ":") {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(
                       L10n.string(
                         'doclistsearch_filterchiptip',
-                        placeholder:
-                            "TIP: Hit enter after typing ':' to create a filter chip...",
+                        placeholder: "TIP: Hit enter after typing ':' to create a filter chip...",
                       ),
                     ),
                   ),
                 );
               }
-              doclistqueries["q"]!["query"] = query;
+              docListQueryOptions["q"]!["query"] = query;
             },
             onSubmitted: (String query) {
               if (query.contains(":")) {
-                doclistqueries["q"]!["query"] = "";
+                docListQueryOptions["q"]!["query"] = "";
                 Map<String, dynamic> newChip = {
                   "query": "true",
                   "selected": false,
@@ -64,7 +85,7 @@ class _DocSearchState extends ConsumerState<DocSearch> {
                 List queryList = query.split(":");
                 String chipKey = queryList[0];
                 newChip["query"] = queryList[1];
-                doclistqueries[chipKey] = newChip;
+                docListQueryOptions[chipKey] = newChip;
                 // if user types a : here, it should auto chip
                 // put some trottling in: only one chip at a time
                 // so we don't overload the firestore index?
@@ -75,11 +96,10 @@ class _DocSearchState extends ConsumerState<DocSearch> {
                   content: Text("Search not implemented yet..."),
                 ),
               );
-              debugPrint("$doclistqueries");
+              debugPrint("$docListQueryOptions");
             },
             decoration: const InputDecoration(
-              contentPadding:
-                  EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
+              contentPadding: EdgeInsets.only(top: 12, bottom: 12, left: 8, right: 8),
               prefixIcon: Icon(Icons.search),
             ),
           ),
@@ -91,7 +111,7 @@ class _DocSearchState extends ConsumerState<DocSearch> {
   queryChips() {
     List<Widget> chips = [];
 
-    doclistqueries.forEach(
+    docListQuerySelections.forEach(
       (key, value) {
         if (key != "q") {
           debugPrint("Chip created for $key: ${value["query"]}");
@@ -104,27 +124,23 @@ class _DocSearchState extends ConsumerState<DocSearch> {
                     children: <TextSpan>[
                       TextSpan(
                         text: "$key: ",
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).colorScheme.onBackground),
+                        style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onBackground),
                       ),
                       TextSpan(
                         text: value["query"],
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).colorScheme.primary),
+                        style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary),
                       ),
                     ],
                   ),
                 ),
                 backgroundColor: Theme.of(context).colorScheme.background,
-                selected: doclistqueries[key]!["selected"],
+                selected: docListQueryOptions[key]!["selected"],
                 onSelected: (bool selected) {
                   // TODO: figure out why this does not work.
-                  doclistqueries[key]!["selected"] = selected;
-                  debugPrint("$doclistqueries");
+                  docListQueryOptions[key]!["selected"] = selected;
+                  debugPrint("$docListQueryOptions");
                 },
-                onDeleted: doclistqueries[key]!["removable"] ? () {} : null,
+                onDeleted: docListQueryOptions[key]!["removable"] ? () {} : null,
               ),
             ),
           );

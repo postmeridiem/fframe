@@ -5,8 +5,14 @@ import 'package:fframe/fframe.dart';
 import 'package:example/models/suggestion.dart';
 import 'suggestion.dart';
 
+enum SuggestionQueryStates { active, done }
+
 class SuggestionScreen<Suggestion> extends StatefulWidget {
-  const SuggestionScreen({Key? key}) : super(key: key);
+  const SuggestionScreen({
+    Key? key,
+    required this.suggestionQueryState,
+  }) : super(key: key);
+  final SuggestionQueryStates suggestionQueryState;
 
   @override
   State<SuggestionScreen> createState() => _SuggestionScreenState();
@@ -28,6 +34,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       },
 
       createNew: () => Suggestion(
+        active: true,
         createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
       ),
 
@@ -43,15 +50,21 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       // queryStringIdParam: "docId",
 
       // Optional Left hand (navigation/document selection pane)
-      documentList: DocumentList(
-        builder: (context, selected, data, user) {
-          return SuggestionListItem(
-            suggestion: data,
-            selected: selected,
-            user: user,
-          );
-        },
-      ),
+      documentList: DocumentList(builder: (context, selected, data, user) {
+        return SuggestionListItem(
+          suggestion: data,
+          selected: selected,
+          user: user,
+        );
+      }, queryBuilder: (query) {
+        switch (widget.suggestionQueryState) {
+          case SuggestionQueryStates.active:
+            return query.where("active", isEqualTo: true);
+
+          case SuggestionQueryStates.done:
+            return query.where("active", isEqualTo: false);
+        }
+      }),
 
       // Center part, shows a firestore doc. Tabs possible
       document: _document(),
@@ -111,16 +124,6 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             );
           },
         ),
-        // DocumentTab<Suggestion>(tabBuilder: () {
-        //   return const Tab(
-        //     text: "FormCeption?",
-        //     icon: Icon(
-        //       Icons.settings_overscan,
-        //     ),
-        //   );
-        // }, childBuilder: (suggestion, readOnly) {
-        //   return const FormCeptionWidget();
-        // },),
       ],
       contextCards: [
         (suggestion) => ContextCard(
@@ -139,8 +142,6 @@ class FormCeptionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DocumentScreen<Suggestion>(
-      //Indicate where the documents are located and how to convert them to and fromt their models.
-      // formKey: GlobalKey<FormState>(),
       collection: "suggestions",
       fromFirestore: Suggestion.fromFirestore,
       toFirestore: (suggestion, options) {
