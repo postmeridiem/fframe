@@ -21,8 +21,8 @@ class StorageImage extends StatelessWidget {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
-            return const Center(
-              child: Icon(Icons.warning),
+            return Center(
+              child: Icon(Icons.warning, color: Theme.of(context).errorColor),
             );
           case ConnectionState.waiting:
             return const Center(
@@ -38,9 +38,9 @@ class StorageImage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Icon(
+                   Icon(
                     Icons.error,
-                    color: Colors.redAccent,
+                    color: Theme.of(context).errorColor,
                   ),
                   Text(snapshot.error!.toString()),
                 ],
@@ -54,9 +54,9 @@ class StorageImage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Icon(
+                   Icon(
                     Icons.error,
-                    color: Colors.redAccent,
+                    color: Theme.of(context).errorColor,
                   ),
                   Text(error.toString()),
                 ],

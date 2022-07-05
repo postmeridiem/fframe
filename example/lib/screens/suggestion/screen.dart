@@ -50,21 +50,25 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       // queryStringIdParam: "docId",
 
       // Optional Left hand (navigation/document selection pane)
-      documentList: DocumentList(builder: (context, selected, data, user) {
-        return SuggestionListItem(
-          suggestion: data,
-          selected: selected,
-          user: user,
-        );
-      }, queryBuilder: (query) {
-        switch (widget.suggestionQueryState) {
-          case SuggestionQueryStates.active:
-            return query.where("active", isEqualTo: true);
+      documentList: DocumentList(
+        builder: (context, selected, data, user) {
+          return SuggestionListItem(
+            suggestion: data,
+            selected: selected,
+            user: user,
+          );
+        },
+        queryBuilder: (query) {
+          switch (widget.suggestionQueryState) {
+            case SuggestionQueryStates.active:
+              return query.where("active", isEqualTo: true);
 
-          case SuggestionQueryStates.done:
-            return query.where("active", isEqualTo: false);
-        }
-      }),
+            case SuggestionQueryStates.done:
+              return query.where("active", isEqualTo: false);
+          }
+        },
+        hoverSelect: false,
+      ),
 
       // Center part, shows a firestore doc. Tabs possible
       document: _document(),

@@ -4,26 +4,36 @@ class DocumentListItem<T> extends ConsumerWidget {
   const DocumentListItem({
     Key? key,
     required this.queryDocumentSnapshot,
+    required this.hoverSelect,
   }) : super(key: key);
 
   final QueryDocumentSnapshot<T> queryDocumentSnapshot;
+  final bool hoverSelect;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
     DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
     DocumentListItemBuilder<T> documentListItemBuilder = documentConfig.documentList!.builder;
+
+    selectDocument() {
+      bool embeddedDocument = documentScreenConfig.documentConfig.embeddedDocument;
+      String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
+      documentScreenConfig.selectionState.setState(SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
+      if (documentConfig.document.tabs.length == 1) {
+        FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: !embeddedDocument);
+      } else {
+        FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id, tabIndexKey: "0"}, resetQueryString: !embeddedDocument);
+      }
+    }
+
     try {
-      return Card(
-        child: GestureDetector(
-          onTap: () {
-            bool embeddedDocument = documentScreenConfig.documentConfig.embeddedDocument;
-            String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
-            documentScreenConfig.selectionState.setState(SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
-            if (documentConfig.document.tabs.length == 1) {
-              FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: !embeddedDocument);
-            } else {
-              FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id, tabIndexKey: "0"}, resetQueryString: !embeddedDocument);
+      return GestureDetector(
+        onTap: selectDocument,
+        child: MouseRegion(
+          onHover: (_) {
+            if (hoverSelect) {
+              selectDocument();
             }
           },
           child: Consumer(builder: (context, ref, child) {
@@ -33,24 +43,22 @@ class DocumentListItem<T> extends ConsumerWidget {
             } catch (e) {
               String _error = e.toString();
               String _path = queryDocumentSnapshot.reference.path;
-              return Card(
-                child: ListTile(
-                  leading: const Icon(Icons.warning, color: Colors.amberAccent),
-                  subtitle: Text(
-                    L10n.interpolated(
-                      'errors_dataissue',
-                      placeholder: "Data Issue: $_error in $_path",
-                      replacers: [
-                        L10nReplacer(
-                          from: "{error}",
-                          replace: _error,
-                        ),
-                        L10nReplacer(
-                          from: "{path}",
-                          replace: _path,
-                        ),
-                      ],
-                    ),
+              return ListTile(
+                leading: Icon(Icons.warning, color: Theme.of(context).errorColor),
+                subtitle: Text(
+                  L10n.interpolated(
+                    'errors_dataissue',
+                    placeholder: "Data Issue: $_error in $_path",
+                    replacers: [
+                      L10nReplacer(
+                        from: "{error}",
+                        replace: _error,
+                      ),
+                      L10nReplacer(
+                        from: "{path}",
+                        replace: _path,
+                      ),
+                    ],
                   ),
                 ),
               );
@@ -59,11 +67,11 @@ class DocumentListItem<T> extends ConsumerWidget {
         ),
       );
     } catch (e) {
-      return const Card(
-        child: ListTile(
-          leading: Icon(Icons.warning, color: Colors.amberAccent),
-        ),
-      );
+      return ListTile(
+          leading: Icon(
+        Icons.warning,
+        color: Theme.of(context).errorColor,
+      ));
     }
   }
 }
@@ -95,6 +103,9 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
     if (documentConfig.documentList?.queryBuilder != null) {
       debugPrint("Apply query builder");
       query = documentConfig.documentList!.queryBuilder!(query);
+    } else if (documentConfig.initialQuery != null) {
+      debugPrint("Apply initialQuery builder");
+      query = documentConfig.initialQuery!(query);
     }
 
     return DocumentListBody<T>(
@@ -146,41 +157,120 @@ class DocumentListBody<T> extends StatelessWidget {
 
     return SizedBox(
       width: listWidth,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          key: ValueKey("listScaffold_${key.toString()}"),
-          child: Scaffold(
-            floatingActionButton: FloatingActionButton(
-              backgroundColor: Theme.of(context).colorScheme.background,
-              child: const Icon(Icons.add),
-              elevation: 0.2,
-              onPressed: () {
-                documentScreenConfig.create(context: context);
-              },
-            ),
-            primary: false,
-            body: Column(
-              children: [
-                // const DocSearch(),
-                Expanded(
-                  child: FirestoreListView<T>(
-                    controller: scrollController,
-                    query: query,
-                    itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
-                      return DocumentListItem<T>(
-                        queryDocumentSnapshot: queryDocumentSnapshot,
-                      );
-                    },
-                    loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
-                    errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showError(context: context, errorText: error.toString()),
-                  ),
+      child: Container(
+        key: ValueKey("listScaffold_${key.toString()}"),
+        child: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Theme.of(context).colorScheme.background,
+            child: const Icon(Icons.add),
+            elevation: 0.2,
+            onPressed: () {
+              documentScreenConfig.create(context: context);
+            },
+          ),
+          primary: false,
+          body: Column(
+            children: [
+              // const DocSearch(),
+              Expanded(
+                child: FirestoreSeperatedListView<T>(
+                  showSeperator: documentConfig.documentList?.showSeperator ?? true,
+                  seperatorHeight: documentConfig.documentList?.seperatorHeight ?? 1,
+                  controller: scrollController,
+                  query: query,
+                  itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
+                    return DocumentListItem<T>(
+                      queryDocumentSnapshot: queryDocumentSnapshot,
+                      hoverSelect: documentConfig.documentList?.hoverSelect ?? false,
+                    );
+                  },
+                  loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
+                  errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showError(context: context, errorText: error.toString()),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+}
+
+class FirestoreSeperatedListView<Document> extends FirestoreQueryBuilder<Document> {
+  /// {@macro flutterfire_ui.firestorelistview}
+  FirestoreSeperatedListView({
+    Key? key,
+    required Query<Document> query,
+    required FirestoreItemBuilder<Document> itemBuilder,
+    bool showSeperator = true,
+    double seperatorHeight = 1,
+    int pageSize = 10,
+    FirestoreLoadingBuilder? loadingBuilder,
+    FirestoreErrorBuilder? errorBuilder,
+    Axis scrollDirection = Axis.vertical,
+    bool reverse = false,
+    ScrollController? controller,
+    bool? primary,
+    ScrollPhysics? physics,
+    bool shrinkWrap = false,
+    EdgeInsetsGeometry? padding,
+    double? itemExtent,
+    Widget? prototypeItem,
+    bool addAutomaticKeepAlives = true,
+    bool addRepaintBoundaries = true,
+    bool addSemanticIndexes = true,
+    double? cacheExtent,
+    int? semanticChildCount,
+    DragStartBehavior dragStartBehavior = DragStartBehavior.start,
+    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
+    String? restorationId,
+    Clip clipBehavior = Clip.hardEdge,
+  }) : super(
+          key: key,
+          query: query,
+          pageSize: pageSize,
+          builder: (context, snapshot, _) {
+            if (snapshot.isFetching) {
+              return loadingBuilder?.call(context) ?? const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError && errorBuilder != null) {
+              return errorBuilder(
+                context,
+                snapshot.error!,
+                snapshot.stackTrace!,
+              );
+            }
+
+            return ListView.separated(
+              itemCount: snapshot.docs.length,
+              itemBuilder: (context, index) {
+                final isLastItem = index + 1 == snapshot.docs.length;
+                if (isLastItem && snapshot.hasMore) snapshot.fetchMore();
+
+                final doc = snapshot.docs[index];
+                return itemBuilder(context, doc);
+              },
+              scrollDirection: scrollDirection,
+              reverse: reverse,
+              controller: controller,
+              primary: primary,
+              physics: physics,
+              separatorBuilder: (BuildContext context, int index) => showSeperator ? Divider(height: seperatorHeight, color: Theme.of(context).dividerColor) : const IgnorePointer(),
+              shrinkWrap: shrinkWrap,
+              padding: padding,
+              // itemExtent: itemExtent,
+              // prototypeItem: prototypeItem,
+              addAutomaticKeepAlives: addAutomaticKeepAlives,
+              addRepaintBoundaries: addRepaintBoundaries,
+              addSemanticIndexes: addSemanticIndexes,
+              cacheExtent: cacheExtent,
+              // semanticChildCount: semanticChildCount,
+              dragStartBehavior: dragStartBehavior,
+              keyboardDismissBehavior: keyboardDismissBehavior,
+              restorationId: restorationId,
+              clipBehavior: clipBehavior,
+            );
+          },
+        );
 }

@@ -32,7 +32,7 @@ class Fframe extends InheritedWidget {
   String errorText = '';
 
   Widget showError({required BuildContext context, required String errorText}) {
-    errorText = errorText;
+    this.errorText = errorText;
     return FRouter.of(context).errorPage(context: context);
   }
 
@@ -134,12 +134,6 @@ class _FframeL10nLoaderState extends State<FframeL10nLoader> {
               const Center(
                 child: CircularProgressIndicator(),
               );
-          // return MaterialApp(
-          //   debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-          //   home: Scaffold(
-          //     body: Fframe.of(context)!.navigationConfig.waitPage.contentPane!,
-          //   ),
-          // );
         }
 
         return const FrouterLoader();

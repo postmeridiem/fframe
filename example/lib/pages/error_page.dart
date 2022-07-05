@@ -33,21 +33,22 @@ class _ErrorPageState extends State<ErrorPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Rebuild Error page $_first");
+    debugPrint("build ErrorPage: ${Fframe.of(context)?.errorText}");
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           AnimatedCrossFade(
             duration: const Duration(milliseconds: 500),
             reverseDuration: const Duration(milliseconds: 500),
-            firstChild: Icon(
+            secondChild: Icon(
               Icons.error,
               size: 48.0,
               key: const ValueKey("error_icon_white"),
               color: Theme.of(context).colorScheme.onBackground,
             ),
-            secondChild: Icon(
+            firstChild: Icon(
               Icons.error,
               size: 48.0,
               color: Theme.of(context).colorScheme.error,
@@ -57,10 +58,13 @@ class _ErrorPageState extends State<ErrorPage> {
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(
-              Fframe.of(context)?.errorText ?? "Something failed succesfully",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onBackground,
+            child: Center(
+              child: Text(
+                Fframe.of(context)?.errorText ?? "Something failed succesfully",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onBackground,
+                ),
+                textAlign: TextAlign.center,
               ),
             ),
           ),

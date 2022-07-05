@@ -20,7 +20,7 @@ class DocumentScreen<T> extends StatelessWidget {
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final DocumentList<T>? documentList;
-  final Query<T>? initialQuery;
+  final Query<T> Function(Query<T> query)? initialQuery;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
   final List<IconButton>? extraActionButtons;
@@ -61,6 +61,7 @@ class DocumentScreen<T> extends StatelessWidget {
           document: document,
           toFirestore: toFirestore,
           fromFirestore: fromFirestore,
+          initialQuery: initialQuery,
           extraActionButtons: extraActionButtons,
           titleBuilder: titleBuilder as TitleBuilder<T>,
           contextCardBuilders: contextCardBuilders,
@@ -135,7 +136,7 @@ class DocumentScreenConfig extends InheritedWidget {
                     padding: const EdgeInsets.all(8.0),
                     child: Icon(
                       Icons.warning,
-                      color: Colors.red.shade900,
+                      color: Theme.of(context).errorColor,
                     ),
                   ),
                   Column(
@@ -177,7 +178,7 @@ class DocumentScreenConfig extends InheritedWidget {
           text: saveResult.errorMessage!,
           icon: Icon(
             Icons.error,
-            color: Colors.red.shade900,
+            color: Theme.of(context).errorColor,
           ),
         );
       }
@@ -294,7 +295,7 @@ class DocumentScreenConfig extends InheritedWidget {
           text: "Referenced document could not be loaded: $docId",
           icon: Icon(
             Icons.error,
-            color: Colors.red.shade900,
+            color: Theme.of(context).errorColor,
           ),
         );
       }
@@ -304,7 +305,7 @@ class DocumentScreenConfig extends InheritedWidget {
         text: "Referenced document could not be loaded: $docId \n ${e.toString()}",
         icon: Icon(
           Icons.error,
-          color: Colors.red.shade900,
+          color: Theme.of(context).errorColor,
         ),
       );
     }
@@ -351,7 +352,7 @@ class DocumentScreenConfig extends InheritedWidget {
           text: saveResult.errorMessage!,
           icon: Icon(
             Icons.error,
-            color: Colors.red.shade900,
+            color: Theme.of(context).errorColor,
           ),
         );
       }

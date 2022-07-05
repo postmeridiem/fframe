@@ -24,8 +24,8 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
-  late OverlayState overlayState;
-  late OverlayEntry overlayEntry;
+  // late OverlayState overlayState;
+  // late OverlayEntry overlayEntry;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             : ScreenSize.large;
 
     debugPrint("Build _MainScreenState ${screenSize.toString()}");
-    overlayState = Overlay.of(context)!;
+
     if (FRouter.of(context).hasTabs) {
       _tabController = TabController(
         initialIndex: FRouter.of(context).currentTab,
@@ -67,11 +67,11 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 },
                 icon: const Icon(Icons.menu))
             : const IgnorePointer(),
-        actions: [
-          const BarButtonShare(),
-          const BarButtonDuplicate(),
-          const BarButtonFeedback(),
-          profileButton(),
+        actions: const [
+          BarButtonShare(),
+          BarButtonDuplicate(),
+          BarButtonFeedback(),
+          ProfileButton(),
         ],
       ),
       drawer: FRouter.of(context).drawer(
@@ -120,7 +120,65 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget profileButton() {
+  // Widget profileButton() {
+  //   return StreamBuilder(
+  //     stream: FirebaseAuth.instance.userChanges(),
+  //     initialData: null,
+  //     builder: (BuildContext context, AsyncSnapshot snapshot) {
+  //       switch (snapshot.connectionState) {
+  //         case ConnectionState.none:
+  //           return const CircularProgressIndicator();
+  //         case ConnectionState.waiting:
+  //           return const CircularProgressIndicator();
+  //         case ConnectionState.done:
+  //           return const IgnorePointer();
+  //         case ConnectionState.active:
+  //           if (snapshot.hasError) {
+  //             return Icon(Icons.error, color: Theme.of(context).colorScheme.error);
+  //           }
+
+  //           if (snapshot.hasData) {
+  //             return TextButton(
+  //               child: circleAvatar(),
+  //               style: ElevatedButton.styleFrom(
+  //                 shape: const CircleBorder(),
+  //                 padding: const EdgeInsets.all(4),
+  //                 primary: Theme.of(context).colorScheme.primaryContainer, // <-- Button color
+  //                 onPrimary: Theme.of(context).colorScheme.onPrimaryContainer, // <-- Splash color
+  //               ),
+  //               onPressed: () {
+  //                 showUserOverlay();
+  //               },
+  //             );
+  //           }
+  //           return const IgnorePointer();
+  //       }
+  //     },
+  //   );
+  // }
+
+  @override
+  void dispose() {
+    // _tabController.dispose();
+    super.dispose();
+  }
+}
+
+class ProfileButton extends StatefulWidget {
+  const ProfileButton({Key? key}) : super(key: key);
+
+  @override
+  State<ProfileButton> createState() => _ProfileButtonState();
+}
+
+class _ProfileButtonState extends State<ProfileButton> {
+  late OverlayState overlayState;
+
+  late OverlayEntry overlayEntry;
+
+  @override
+  Widget build(BuildContext context) {
+    overlayState = Overlay.of(context)!;
     return StreamBuilder(
       stream: FirebaseAuth.instance.userChanges(),
       initialData: null,
@@ -257,11 +315,5 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     });
 
     overlayState.insert(overlayEntry);
-  }
-
-  @override
-  void dispose() {
-    // _tabController.dispose();
-    super.dispose();
   }
 }

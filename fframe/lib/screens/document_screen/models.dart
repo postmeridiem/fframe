@@ -8,6 +8,7 @@ class DocumentConfig<T> {
     this.createDocumentId,
     required this.fromFirestore,
     required this.toFirestore,
+    this.initialQuery,
     this.documentList,
     this.titleBuilder,
     required this.document,
@@ -26,6 +27,7 @@ class DocumentConfig<T> {
   final String collection;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
+  final Query<T> Function(Query<T> query)? initialQuery;
   final T Function() createNew;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
@@ -77,9 +79,17 @@ class DocumentList<T> {
   const DocumentList({
     required this.builder,
     this.queryBuilder,
+    this.autoSelectFirst = false,
+    this.hoverSelect = false,
+    this.showSeperator = true,
+    this.seperatorHeight = 1,
   });
   final DocumentListItemBuilder<T> builder;
   final Query<T> Function(Query<T> query)? queryBuilder;
+  final bool autoSelectFirst;
+  final bool hoverSelect;
+  final bool showSeperator;
+  final double seperatorHeight;
 }
 
 enum QueryStringStrategy { replace, append }

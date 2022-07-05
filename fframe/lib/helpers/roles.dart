@@ -34,10 +34,10 @@ class _RolesManagerState extends State<RolesManager> {
           content: ListTile(
             leading: Icon(
               Icons.error,
-              color: Colors.amber[900],
+              color: Theme.of(context).errorColor,
             ),
             title: Text('${e.message}'),
-            textColor: Colors.amber[900],
+            textColor: Theme.of(context).errorColor,
           ),
         ),
       );
@@ -62,10 +62,10 @@ class _RolesManagerState extends State<RolesManager> {
           content: ListTile(
             leading: Icon(
               Icons.error,
-              color: Colors.amber[900],
+              color: Theme.of(context).errorColor,
             ),
             title: Text('${e.message}'),
-            textColor: Colors.amber[900],
+            textColor: Theme.of(context).errorColor,
           ),
         ),
       );
@@ -87,10 +87,10 @@ class _RolesManagerState extends State<RolesManager> {
           content: ListTile(
             leading: Icon(
               Icons.error,
-              color: Colors.amber[900],
+              color: Theme.of(context).errorColor,
             ),
             title: Text('${e.message}'),
-            textColor: Colors.amber[900],
+            textColor: Theme.of(context).errorColor,
           ),
         ),
       );

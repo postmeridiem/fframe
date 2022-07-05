@@ -5,9 +5,12 @@ export 'package:firebase_auth/firebase_auth.dart';
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:flutterfire_ui/firestore.dart';
 
+import 'dart:html';
+
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/screens/document_screen/document_search.dart';
 import 'package:fframe/services/navigation_service.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fframe/providers/providers.dart';

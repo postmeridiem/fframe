@@ -23,8 +23,9 @@ class UsersScreen extends StatelessWidget {
       fromFirestore: AppUser.fromFirestore,
       toFirestore: (user, options) => user.toFirestore(),
       createNew: () => AppUser(),
-      // createDocumentId: (User user) => {},
-      //Optional title widget
+      initialQuery: (Query<AppUser> query) {
+        return query.orderBy("lastName");
+      },
       titleBuilder: (context, data) {
         return Text(
           data.displayName ?? "New User",
@@ -33,7 +34,8 @@ class UsersScreen extends StatelessWidget {
       },
       document: _document(),
       documentList: DocumentList(
-        queryBuilder: (query) => query.where("active", isEqualTo: isActive),
+        hoverSelect: true,
+        queryBuilder: (query) => query.orderBy("displayName").where("active", isEqualTo: isActive),
         builder: (context, selected, data, fFrameUser) {
           return UserListItem(
             user: data,
