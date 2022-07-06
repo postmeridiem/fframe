@@ -171,7 +171,7 @@ class DocumentListBody<T> extends StatelessWidget {
           primary: false,
           body: Column(
             children: [
-              // const DocSearch(),
+              DocumentSearch<T>(),
               Expanded(
                 child: FirestoreSeperatedListView<T>(
                   showSeperator: documentConfig.documentList?.showSeperator ?? true,
