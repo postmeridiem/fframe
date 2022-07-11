@@ -13,7 +13,11 @@ class Validator {
 
   bool validInt(String? rawvalue) {
     // checks if the UI string is a safe integer
-    return true;
+    if (rawvalue!.isNotEmpty) {
+      return rawvalue is int;
+    } else {
+      return false;
+    }
   }
 
   bool validUUID(String? rawvalue) {
@@ -23,7 +27,13 @@ class Validator {
 
   bool validEmail(String? rawvalue) {
     // check if input is a valid email pattern
-    return true;
+    if (rawvalue!.isNotEmpty) {
+      return RegExp(
+              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+          .hasMatch(rawvalue);
+    } else {
+      return false;
+    }
   }
 
   bool validIcon(String? rawvalue) {
