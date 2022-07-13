@@ -11,6 +11,22 @@ class DocumentSearch<T> extends StatefulWidget {
 
 class _DocumentSearchState<T> extends State<DocumentSearch> {
   List<SearchOption> selectedOptions = [];
+  late FocusNode focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the focus node when the Form is disposed.
+    focusNode.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +100,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                         Expanded(
                           child: TextFormField(
                             style: const TextStyle(fontSize: 12.0),
+                            focusNode: focusNode,
                             onChanged: (String fieldValue) {
                               fireStoreQueryState.addQueryComponent(
                                 id: searchOption.field,
@@ -105,7 +122,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                     },
                   );
                 case SearchOptionType.boolean:
-                  return ChoiceChip(
+                  return InputChip(
                     label: Row(
                       children: [
                         Text(searchOption.caption),
@@ -126,6 +143,13 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                             return query.where(searchOption.field, isEqualTo: selected);
                           },
                         );
+                      });
+                    },
+                    deleteIcon: const Icon(Icons.close),
+                    onDeleted: () {
+                      setState(() {
+                        fireStoreQueryState.removeQueryComponent(id: searchOption.field);
+                        selectedOptions.remove(searchOption);
                       });
                     },
                   );
@@ -162,6 +186,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
       onSelected: (SearchOption searchOption) {
         setState(() {
           selectedOptions.add(searchOption);
+          focusNode.requestFocus();
         });
       },
     );
