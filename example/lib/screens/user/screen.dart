@@ -23,7 +23,7 @@ class UsersScreen extends StatelessWidget {
       fromFirestore: AppUser.fromFirestore,
       toFirestore: (user, options) => user.toFirestore(),
       createNew: () => AppUser(),
-      initialQuery: (Query<AppUser> query) {
+      query: (Query<AppUser> query) {
         return query.orderBy("lastName");
       },
       titleBuilder: (context, data) {

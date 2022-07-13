@@ -99,27 +99,22 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
       collection: documentConfig.collection,
       fromFirestore: documentConfig.fromFirestore,
     );
-
-    if (documentConfig.documentList?.queryBuilder != null) {
-      debugPrint("Apply query builder");
-      query = documentConfig.documentList!.queryBuilder!(query);
-    } else if (documentConfig.initialQuery != null) {
-      debugPrint("Apply initialQuery builder");
-      query = documentConfig.initialQuery!(query);
-    }
+    // FireStoreQueryState<T> fireStoreQueryState = FireStoreQueryState<T>(initialQuery: documentConfig.query);
+    FireStoreQueryState<T> fireStoreQueryState = DocumentScreenConfig.of(context)?.fireStoreQueryState as FireStoreQueryState<T>;
+    fireStoreQueryState.initialQuery = documentConfig.query;
 
     return DocumentListBody<T>(
       key: ValueKey("documentListBody_${widget.key.toString()}"),
       scrollController: scrollController,
       documentScreenConfig: documentScreenConfig,
       documentConfig: documentConfig,
-      query: query,
+      query: fireStoreQueryState.currentQuery(query),
       ref: widget.ref,
     );
   }
 }
 
-class DocumentListBody<T> extends StatelessWidget {
+class DocumentListBody<T> extends StatefulWidget {
   const DocumentListBody({
     Key? key,
     required this.scrollController,
@@ -133,6 +128,29 @@ class DocumentListBody<T> extends StatelessWidget {
   final DocumentConfig<T> documentConfig;
   final Query<T> query;
   final WidgetRef ref;
+
+  @override
+  State<DocumentListBody<T>> createState() => _DocumentListBodyState<T>();
+}
+
+class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
+  // @override
+  // void initState() {
+  //   widget.documentScreenConfig.fireStoreQueryState.addListener(() => queryUpdateListener());
+
+  //   super.initState();
+  // }
+
+  // @override
+  // dispose() {
+  //   widget.documentScreenConfig.fireStoreQueryState.removeListener(() => queryUpdateListener());
+  //   super.dispose();
+  // }
+
+  // queryUpdateListener() {
+  //   debugPrint("the query has changed...");
+  // }
+
   @override
   Widget build(BuildContext context) {
     ScreenSize screenSize = (MediaQuery.of(context).size.width <= 599)
@@ -141,12 +159,12 @@ class DocumentListBody<T> extends StatelessWidget {
             ? ScreenSize.tablet
             : ScreenSize.large;
 
-    debugPrint("Build documentListLoader with key: listScaffold_${key.toString()}");
+    debugPrint("Build documentListLoader with key: listScaffold_${widget.key.toString()}");
 
     double listWidth = 250;
     if (ScreenSize.phone == screenSize) {
       listWidth = MediaQuery.of(context).size.width;
-      Map<String, String>? queryParameters = ref.watch(queryStateProvider).queryParameters;
+      Map<String, String>? queryParameters = widget.ref.watch(queryStateProvider).queryParameters;
       if (queryParameters != null) {
         if (queryParameters.isNotEmpty) {
           //Some document is loaded, and we are on a phone. Don't show the selector
@@ -158,14 +176,14 @@ class DocumentListBody<T> extends StatelessWidget {
     return SizedBox(
       width: listWidth,
       child: Container(
-        key: ValueKey("listScaffold_${key.toString()}"),
+        key: ValueKey("listScaffold_${widget.key.toString()}"),
         child: Scaffold(
           floatingActionButton: FloatingActionButton(
             backgroundColor: Theme.of(context).colorScheme.background,
             child: const Icon(Icons.add),
             elevation: 0.2,
             onPressed: () {
-              documentScreenConfig.create(context: context);
+              widget.documentScreenConfig.create(context: context);
             },
           ),
           primary: false,
@@ -173,20 +191,25 @@ class DocumentListBody<T> extends StatelessWidget {
             children: [
               DocumentSearch<T>(),
               Expanded(
-                child: FirestoreSeperatedListView<T>(
-                  showSeperator: documentConfig.documentList?.showSeperator ?? true,
-                  seperatorHeight: documentConfig.documentList?.seperatorHeight ?? 1,
-                  controller: scrollController,
-                  query: query,
-                  itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
-                    return DocumentListItem<T>(
-                      queryDocumentSnapshot: queryDocumentSnapshot,
-                      hoverSelect: documentConfig.documentList?.hoverSelect ?? false,
-                    );
-                  },
-                  loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
-                  errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showError(context: context, errorText: error.toString()),
-                ),
+                child: AnimatedBuilder(
+                    animation: widget.documentScreenConfig.fireStoreQueryState,
+                    builder: (context, child) {
+                      Query<T> query = widget.documentScreenConfig.fireStoreQueryState.currentQuery(widget.query) as Query<T>;
+                      return FirestoreSeperatedListView<T>(
+                        showSeperator: widget.documentConfig.documentList?.showSeperator ?? true,
+                        seperatorHeight: widget.documentConfig.documentList?.seperatorHeight ?? 1,
+                        controller: widget.scrollController,
+                        query: query,
+                        itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
+                          return DocumentListItem<T>(
+                            queryDocumentSnapshot: queryDocumentSnapshot,
+                            hoverSelect: widget.documentConfig.documentList?.hoverSelect ?? false,
+                          );
+                        },
+                        loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
+                        errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showError(context: context, errorText: error.toString()),
+                      );
+                    }),
               ),
             ],
           ),

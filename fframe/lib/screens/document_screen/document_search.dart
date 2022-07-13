@@ -1,26 +1,6 @@
+import 'package:fframe/controllers/query_state_controller.dart';
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-
-class SearchConfig {
-  final List<SearchOption> searchOptions;
-
-  SearchConfig({required this.searchOptions});
-}
-
-class SearchOption {
-  final String caption;
-  final String field;
-  final SearchOptionType type;
-  late String stringValue = "";
-  late bool boolValue = true;
-  late DateTime dateTimeValue = DateTime.now();
-  SearchOption({required this.caption, required this.field, required this.type});
-}
-
-enum SearchOptionType {
-  string,
-  boolean,
-  datetime,
-}
 
 class DocumentSearch<T> extends StatefulWidget {
   const DocumentSearch({Key? key}) : super(key: key);
@@ -30,19 +10,20 @@ class DocumentSearch<T> extends StatefulWidget {
 }
 
 class _DocumentSearchState<T> extends State<DocumentSearch> {
-  final SearchConfig searchConfig = SearchConfig(searchOptions: [
-    SearchOption(caption: "Author", field: "createdBy", type: SearchOptionType.string),
-    SearchOption(caption: "Name", field: "name", type: SearchOptionType.string),
-    SearchOption(caption: "Creation date", field: "creationDate", type: SearchOptionType.datetime),
-    SearchOption(caption: "Active", field: "active", type: SearchOptionType.boolean),
-  ]);
-
   List<SearchOption> selectedOptions = [];
 
   @override
   Widget build(BuildContext context) {
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
+    SearchConfig<T>? searchConfig = documentConfig.searchConfig;
+    FireStoreQueryState<T> fireStoreQueryState = DocumentScreenConfig.of(context)?.fireStoreQueryState as FireStoreQueryState<T>;
+
+    if (searchConfig == null) {
+      return const IgnorePointer();
+    }
+
     return Autocomplete<SearchOption>(
-      // displayStringForOption: ((option) => option.caption),
       optionsBuilder: (TextEditingValue textEditingValue) {
         if (textEditingValue.text == '') {
           return const Iterable.empty();
@@ -100,9 +81,17 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                           padding: EdgeInsets.only(left: 1, right: 4),
                           child: Text(":"),
                         ),
-                        const Expanded(
-                          child: TextField(
-                            style: TextStyle(fontSize: 12.0),
+                        Expanded(
+                          child: TextFormField(
+                            style: const TextStyle(fontSize: 12.0),
+                            onChanged: (String fieldValue) {
+                              fireStoreQueryState.addQueryComponent(
+                                id: searchOption.field,
+                                queryComponent: (Query<T> query) {
+                                  return query.where(searchOption.field, isEqualTo: fieldValue);
+                                },
+                              );
+                            },
                           ),
                         )
                       ],
@@ -110,6 +99,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                     deleteIcon: const Icon(Icons.close),
                     onDeleted: () {
                       setState(() {
+                        fireStoreQueryState.removeQueryComponent(id: searchOption.field);
                         selectedOptions.remove(searchOption);
                       });
                     },
@@ -130,25 +120,15 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                     onSelected: (bool selected) {
                       setState(() {
                         searchOption.boolValue = selected;
+                        fireStoreQueryState.addQueryComponent(
+                          id: searchOption.field,
+                          queryComponent: (Query<T> query) {
+                            return query.where(searchOption.field, isEqualTo: selected);
+                          },
+                        );
                       });
                     },
                   );
-
-                // deleteIcon: const Icon(Icons.close),
-                // onDeleted: () {
-                //   setState(() {
-                //     selectedOptions.remove(searchOption);
-                //   });
-                // },
-
-                // chipContent = Switch(
-                //   value: searchOption.boolValue,
-                //   onChanged: (bool newValue) {
-                //     setState(() {
-                //       searchOption.boolValue = newValue;
-                //     });
-                //   },
-                // );
 
                 case SearchOptionType.datetime:
                   return Chip(
@@ -170,25 +150,6 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                     },
                   );
               }
-
-              // return Chip(
-              //   label: Row(
-              //     children: [
-              //       Text(searchOption.caption),
-              //       const Padding(
-              //         padding: EdgeInsets.only(left: 1, right: 4),
-              //         child: Text(":"),
-              //       ),
-              //       chipContent
-              //     ],
-              //   ),
-              //   deleteIcon: const Icon(Icons.close),
-              //   onDeleted: () {
-              //     setState(() {
-              //       selectedOptions.remove(searchOption);
-              //     });
-              //   },
-              // );
             }),
             TextField(
               focusNode: fieldFocusNode,
@@ -206,18 +167,3 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
     );
   }
 }
-
-// class SearchOptionSelector extends StatelessWidget {
-//   const SearchOptionSelector({Key? key, required this.searchOption}) : super(key: key);
-//   final SearchOption searchOption;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.all(2.0),
-//       child: Chip(
-//         label: Text(searchOption.caption),
-//       ),
-//     );
-//   }
-// }

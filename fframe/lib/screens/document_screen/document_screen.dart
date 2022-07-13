@@ -10,7 +10,8 @@ class DocumentScreen<T> extends StatelessWidget {
     required this.fromFirestore,
     required this.toFirestore,
     this.documentList,
-    this.initialQuery,
+    this.query,
+    this.searchConfig,
     this.titleBuilder,
     required this.document,
     this.extraActionButtons,
@@ -20,7 +21,8 @@ class DocumentScreen<T> extends StatelessWidget {
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final DocumentList<T>? documentList;
-  final Query<T> Function(Query<T> query)? initialQuery;
+  final Query<T> Function(Query<T> query)? query;
+  final SearchConfig<T>? searchConfig;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
   final List<IconButton>? extraActionButtons;
@@ -51,6 +53,7 @@ class DocumentScreen<T> extends StatelessWidget {
         child: DocumentLoader<T>(
           key: ValueKey("DocumentLoader_$collection"),
         ),
+
         documentConfig: DocumentConfig<T>(
           formKey: formKey,
           collection: collection,
@@ -61,22 +64,31 @@ class DocumentScreen<T> extends StatelessWidget {
           document: document,
           toFirestore: toFirestore,
           fromFirestore: fromFirestore,
-          initialQuery: initialQuery,
+          query: query,
+          searchConfig: searchConfig,
           extraActionButtons: extraActionButtons,
           titleBuilder: titleBuilder as TitleBuilder<T>,
           contextCardBuilders: contextCardBuilders,
           embeddedDocument: _embeddedDocument ?? false,
         ),
+        fireStoreQueryState: FireStoreQueryState<T>(),
       ),
     );
   }
 }
 
+//  =
 class DocumentScreenConfig extends InheritedWidget {
-  DocumentScreenConfig({Key? key, required this.documentConfig, required child}) : super(key: key, child: child);
+  DocumentScreenConfig({
+    Key? key,
+    required this.documentConfig,
+    required this.fireStoreQueryState,
+    required child,
+  }) : super(key: key, child: child);
 
   final DocumentConfig documentConfig;
   final SelectionState selectionState = SelectionState();
+  final FireStoreQueryState fireStoreQueryState;
   static DocumentScreenConfig? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<DocumentScreenConfig>();
   }

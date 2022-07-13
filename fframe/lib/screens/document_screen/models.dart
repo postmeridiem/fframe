@@ -8,7 +8,8 @@ class DocumentConfig<T> {
     this.createDocumentId,
     required this.fromFirestore,
     required this.toFirestore,
-    this.initialQuery,
+    this.query,
+    this.searchConfig,
     this.documentList,
     this.titleBuilder,
     required this.document,
@@ -27,7 +28,8 @@ class DocumentConfig<T> {
   final String collection;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
-  final Query<T> Function(Query<T> query)? initialQuery;
+  final Query<T> Function(Query<T> query)? query;
+  final SearchConfig<T>? searchConfig;
   final T Function() createNew;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
@@ -93,3 +95,25 @@ class DocumentList<T> {
 }
 
 enum QueryStringStrategy { replace, append }
+
+class SearchConfig<T> {
+  final List<SearchOption<T>> searchOptions;
+
+  SearchConfig({required this.searchOptions});
+}
+
+class SearchOption<T> {
+  final String caption;
+  final String field;
+  final SearchOptionType type;
+  late String stringValue = "";
+  late bool boolValue = true;
+  late DateTime dateTimeValue = DateTime.now();
+  SearchOption({required this.caption, required this.field, required this.type});
+}
+
+enum SearchOptionType {
+  string,
+  boolean,
+  datetime,
+}

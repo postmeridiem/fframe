@@ -49,6 +49,13 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       // Optional, override on the query string param which holds the document id
       // queryStringIdParam: "docId",
 
+      searchConfig: SearchConfig(searchOptions: [
+        SearchOption(caption: "Author", field: "createdBy", type: SearchOptionType.string),
+        SearchOption(caption: "Name", field: "name", type: SearchOptionType.string),
+        SearchOption(caption: "Creation date", field: "creationDate", type: SearchOptionType.datetime),
+        SearchOption(caption: "Active", field: "active", type: SearchOptionType.boolean),
+      ]),
+
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
         builder: (context, selected, data, user) {
@@ -126,6 +133,19 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
               suggestion: suggestion,
               readOnly: readOnly,
             );
+          },
+        ),
+        DocumentTab<Suggestion>(
+          tabBuilder: (user) {
+            return const Tab(
+              text: "FormCeption?",
+              icon: Icon(
+                Icons.settings_overscan,
+              ),
+            );
+          },
+          childBuilder: (suggestion, readOnly) {
+            return const FormCeptionWidget();
           },
         ),
       ],
