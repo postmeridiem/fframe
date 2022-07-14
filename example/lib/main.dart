@@ -1,3 +1,4 @@
+import 'package:example/firebase_options.dart';
 import 'package:example/pages/empty_page.dart';
 import 'package:example/pages/error_page.dart';
 import 'package:example/pages/wait_page.dart';
@@ -5,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/l10n.dart';
-import 'package:example/firebase_options.dart';
 
 import 'package:example/themes/themes.dart';
 
@@ -13,6 +13,7 @@ import 'package:example/screens/signInPage/signin_page.dart';
 import 'package:example/screens/suggestion/suggestion.dart';
 import 'package:example/screens/setting/setting.dart';
 import 'package:example/screens/user/user.dart';
+import 'package:flutterfire_ui/auth.dart';
 
 void main() {
   runApp(const MainApp());
@@ -83,6 +84,12 @@ class MainApp extends StatelessWidget {
       lightMode: appLightTheme,
       darkMode: appDarkTheme,
       l10nConfig: l10nConfig,
+      providerConfigs: const [
+        // EmailProviderConfiguration(),
+        GoogleProviderConfiguration(
+          clientId: "43505871602-e9dt1461ephd9pq233v585op5aan02lv.apps.googleusercontent.com",
+        ),
+      ],
       issuePageLink: "https://github.com/postmeridiem/fframe/issues",
       debugShowCheckedModeBanner: false,
     );

@@ -10,6 +10,7 @@ class Fframe extends InheritedWidget {
     required this.darkMode,
     required this.lightMode,
     required this.l10nConfig,
+    this.providerConfigs,
     this.issuePageLink,
     this.debugShowCheckedModeBanner = true,
   }) : super(key: key, child: const FFramePreload());
@@ -17,6 +18,7 @@ class Fframe extends InheritedWidget {
   final String title;
   final String? issuePageLink;
   final FirebaseOptions firebaseOptions;
+  final List<ProviderConfiguration>? providerConfigs;
   final NavigationConfig navigationConfig;
   final ThemeData darkMode;
   final ThemeData lightMode;

@@ -18,8 +18,11 @@ dependencies:
   #       url: https://github.com/postmeridiem/fframe.git
   #       path: fframe/
   #       ref: main
+
+  #Remove this fframe reference
   fframe:
     path: ../fframe
+  intl: ^0.17.0
   flutter_signin_button: 
   google_sign_in:
   flutterfire_ui:

@@ -13,8 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   intl: ^0.17.0
-  firebase_core:
-  firebase_auth:
+  # firebase_core:
   cloud_firestore:
   firebase_storage:
   uuid:  #to generate uids
