@@ -36,6 +36,9 @@ class _SignInPageState extends State<SignInPage> {
     }
 
     if (widget.useFlutterFireUI == false && webClientId != null) {
+      //Queue a silent sign in
+      silentSignIn();
+
       return Center(
         child: AnimatedCrossFade(
           firstChild: SizedBox(
@@ -95,6 +98,26 @@ class _SignInPageState extends State<SignInPage> {
       //   );
       // },
     );
+  }
+
+  silentSignIn() async {
+    final GoogleSignInAccount? googleUser = await GoogleSignIn(
+      clientId: webClientId,
+    ).signInSilently(suppressErrors: true, reAuthenticate: false);
+
+    if (googleUser != null) {
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      // Once signed in, return the UserCredential
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    }
   }
 
   Future<UserCredential> signInWithGoogle() async {
