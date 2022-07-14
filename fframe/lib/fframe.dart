@@ -5,8 +5,6 @@ export 'package:firebase_auth/firebase_auth.dart';
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:flutterfire_ui/firestore.dart';
 
-import 'dart:html';
-
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/controllers/query_state_controller.dart';
 import 'package:fframe/screens/document_screen/document_search.dart';
