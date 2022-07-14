@@ -1,4 +1,3 @@
-import 'package:example/pages/error_page.dart';
 import 'package:fframe/components/auth/decorations.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
