@@ -31,6 +31,7 @@ class _SettingScreenState extends State<SettingScreen> {
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
+        showCreateButton: false,
         builder: (_, selected, data, __) {
           return SettingListItem(
             setting: data,
