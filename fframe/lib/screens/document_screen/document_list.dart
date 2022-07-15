@@ -178,14 +178,16 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
       child: Container(
         key: ValueKey("listScaffold_${widget.key.toString()}"),
         child: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            backgroundColor: Theme.of(context).colorScheme.background,
-            child: const Icon(Icons.add),
-            elevation: 0.2,
-            onPressed: () {
-              widget.documentScreenConfig.create(context: context);
-            },
-          ),
+          floatingActionButton: (widget.documentConfig.documentList?.showCreateButton ?? true)
+              ? FloatingActionButton(
+                  backgroundColor: Theme.of(context).colorScheme.background,
+                  child: const Icon(Icons.add),
+                  elevation: 0.2,
+                  onPressed: () {
+                    widget.documentScreenConfig.create(context: context);
+                  },
+                )
+              : null,
           primary: false,
           body: Column(
             children: [
