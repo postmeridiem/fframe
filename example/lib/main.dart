@@ -88,7 +88,7 @@ class MainApp extends StatelessWidget {
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
           clientId:
-              "43505871602-e9dt1461ephd9pq233v585op5aan02lv.apps.googleusercontent.com",
+              "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
       issuePageLink: "https://github.com/postmeridiem/fframe/issues",
