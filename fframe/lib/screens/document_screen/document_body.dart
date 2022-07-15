@@ -18,6 +18,8 @@ class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
     DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
 
+
+
     return DocumentBody<T>(
       key: ValueKey("documentBody_${widget.key.toString()}"),
       queryState: widget.queryState,

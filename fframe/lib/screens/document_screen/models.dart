@@ -84,6 +84,7 @@ class DocumentList<T> {
     this.autoSelectFirst = false,
     this.hoverSelect = false,
     this.showSeperator = true,
+    this.showCreateButton = true,
     this.seperatorHeight = 1,
   });
   final DocumentListItemBuilder<T> builder;
@@ -91,6 +92,7 @@ class DocumentList<T> {
   final bool autoSelectFirst;
   final bool hoverSelect;
   final bool showSeperator;
+  final bool showCreateButton;
   final double seperatorHeight;
 }
 
