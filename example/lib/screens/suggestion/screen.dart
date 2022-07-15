@@ -51,22 +51,24 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       // queryStringIdParam: "docId",
 
       searchConfig: SearchConfig(
+        defaultField: "name",
         searchOptions: [
+          SearchOption(
+            caption: "Name",
+            field: "name",
+            type: SearchOptionType.string,
+            sort: SearchOptionSortOrder.asc,
+          ),
           SearchOption(
             caption: "Author",
             field: "createdBy",
             type: SearchOptionType.string,
           ),
           SearchOption(
-            caption: "Name",
-            field: "name",
-            type: SearchOptionType.string,
-            sort: SearchOptionSort.asc,
-          ),
-          SearchOption(
             caption: "Creation date",
             field: "creationDate",
             type: SearchOptionType.datetime,
+            comparisonOperator: SearchOptionComparisonOperator.greater,
           ),
           SearchOption(
             caption: "Active",
@@ -104,8 +106,9 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
   }
 
   Document<Suggestion> _document(BuildContext context) {
-    var documentScreenConfig = DocumentScreenConfig.of(context);
-    // if (documentScreenConfig!.isNew) {
+    // DocumentScreenConfig documentScreenConfig =
+    //     DocumentScreenConfig.of(context)!;
+    // if (documentScreenConfig.isNew) {
     //   debugPrint("Wow, such new");
     // }
     return Document<Suggestion>(

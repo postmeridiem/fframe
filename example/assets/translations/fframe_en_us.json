@@ -23,9 +23,6 @@
 	"header_copydeeplink_message": {
 		"translation": "Copied current location to clipboard."
 	},
-	"doclistsearch_filterchiptip": {
-		"translation": "TIP: Hit enter after typing ':' to create a filter chip...."
-	},
 	"validator_savesuccess": {
 		"translation": "Saved succesfully"
 	},
@@ -40,5 +37,14 @@
 	},
 	"errors_externalreference": {
 		"translation": "Launch external reference"
+	},
+	"doclistsearch_greater": {
+		"translation": "greater than"
+	},
+	"doclistsearch_lesser": {
+		"translation": "less than"
+	},
+	"doclistsearch_equal": {
+		"translation": "equal to"
 	}
 }

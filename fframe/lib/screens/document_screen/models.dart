@@ -101,8 +101,10 @@ enum QueryStringStrategy { replace, append }
 
 class SearchConfig<T> {
   final List<SearchOption<T>> searchOptions;
+  final String defaultField;
+  late Map<String, SearchOption> optionMap;
 
-  SearchConfig({required this.searchOptions});
+  SearchConfig({required this.searchOptions, required this.defaultField});
 }
 
 class SearchOption<T> {
@@ -112,23 +114,34 @@ class SearchOption<T> {
   late String stringValue = "";
   late bool boolValue = true;
   late DateTime dateTimeValue = DateTime.now();
-  late SearchOptionSort sort;
-  SearchOption({
-    required this.caption,
-    required this.field,
-    required this.type,
-    this.sort = SearchOptionSort.none,
-  });
+  late SearchOptionSortOrder sort;
+  late SearchOptionComparisonOperator comparisonOperator;
+  late bool isSelected = false;
+  SearchOption(
+      {required this.caption,
+      required this.field,
+      required this.type,
+      this.sort = SearchOptionSortOrder.none,
+      this.comparisonOperator = SearchOptionComparisonOperator.equal});
 }
 
 enum SearchOptionType {
   string,
   boolean,
   datetime,
+  date,
+  time,
+  int,
 }
 
-enum SearchOptionSort {
+enum SearchOptionSortOrder {
   none,
   asc,
   desc,
+}
+
+enum SearchOptionComparisonOperator {
+  lesser,
+  greater,
+  equal,
 }
