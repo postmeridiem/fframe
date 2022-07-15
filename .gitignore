@@ -48,3 +48,4 @@ firebase/.firebaserc
 example/android/app/google-services.json
 example/ios/firebase_app_id_file.json
 example/macos/Podfile.lock
+example/lib/firebase_options.dart
