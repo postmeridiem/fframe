@@ -24,6 +24,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
+  late TabController _subTabController;
   // late OverlayState overlayState;
   // late OverlayEntry overlayEntry;
 
@@ -46,6 +47,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
       _tabController.addListener(
         () => FRouter.of(context).tabSwitch(tabController: _tabController),
+      );
+    }
+    
+    if (FRouter.of(context).hasSubTabs) {
+      _subTabController = TabController(
+        initialIndex: FRouter.of(context).currentSubTab,
+        vsync: this,
+        length: FRouter.of(context).subTabLength,
+      );
+
+      _subTabController.addListener(
+        () => FRouter.of(context).tabSwitch(tabController: _subTabController),
       );
     }
 
@@ -101,17 +114,29 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                       )
                     : null,
               ),
-              body: Consumer(
-                builder: (context, ref, child) {
-                  TargetState targetState = ref.watch(targetStateProvider);
-                  return AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 250),
-                    child: Container(
-                      key: ValueKey("navTarget_${targetState.navigationTarget.title}"),
-                      child: targetState.navigationTarget.contentPane,
-                    ),
-                  );
-                },
+              body: Scaffold(
+                primary: false,
+                appBar: AppBar(
+                  toolbarHeight: 0,
+                  bottom: FRouter.of(context).hasSubTabs
+                      ? TabBar(
+                          controller: _subTabController,
+                          tabs: FRouter.of(context).subTabBar(context),
+                        )
+                      : null,
+                ),
+                body: Consumer(
+                  builder: (context, ref, child) {
+                    TargetState targetState = ref.watch(targetStateProvider);
+                    return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 250),
+                      child: Container(
+                        key: ValueKey("navTarget_${targetState.navigationTarget.title}"),
+                        child: targetState.navigationTarget.contentPane,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -119,43 +144,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       ),
     );
   }
-
-  // Widget profileButton() {
-  //   return StreamBuilder(
-  //     stream: FirebaseAuth.instance.userChanges(),
-  //     initialData: null,
-  //     builder: (BuildContext context, AsyncSnapshot snapshot) {
-  //       switch (snapshot.connectionState) {
-  //         case ConnectionState.none:
-  //           return const CircularProgressIndicator();
-  //         case ConnectionState.waiting:
-  //           return const CircularProgressIndicator();
-  //         case ConnectionState.done:
-  //           return const IgnorePointer();
-  //         case ConnectionState.active:
-  //           if (snapshot.hasError) {
-  //             return Icon(Icons.error, color: Theme.of(context).colorScheme.error);
-  //           }
-
-  //           if (snapshot.hasData) {
-  //             return TextButton(
-  //               child: circleAvatar(),
-  //               style: ElevatedButton.styleFrom(
-  //                 shape: const CircleBorder(),
-  //                 padding: const EdgeInsets.all(4),
-  //                 primary: Theme.of(context).colorScheme.primaryContainer, // <-- Button color
-  //                 onPrimary: Theme.of(context).colorScheme.onPrimaryContainer, // <-- Splash color
-  //               ),
-  //               onPressed: () {
-  //                 showUserOverlay();
-  //               },
-  //             );
-  //           }
-  //           return const IgnorePointer();
-  //       }
-  //     },
-  //   );
-  // }
 
   @override
   void dispose() {

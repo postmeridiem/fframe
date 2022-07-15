@@ -6,6 +6,7 @@ class NavigationTab extends NavigationTarget {
     required String path,
     required Widget contentPane,
     required Destination destination,
+    List<NavigationTab>? navigationTabs,
     List<String>? roles,
     public = false,
     private = true,
@@ -19,6 +20,7 @@ class NavigationTab extends NavigationTarget {
           roles: roles,
           public: public,
           private: private,
+          navigationTabs: navigationTabs,
         );
 
   late NavigationTarget parentTarget;

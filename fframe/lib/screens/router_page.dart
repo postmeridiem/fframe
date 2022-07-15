@@ -197,9 +197,10 @@ class FRouter extends InheritedWidget {
   }
 
   int get currentTab {
-    return navigationNotifier.navigationTabs.indexWhere(
+    int index = navigationNotifier.navigationTabs.indexWhere(
       (NavigationTab navigationTab) => navigationTab.path == navigationNotifier.currentTarget.navigationTarget.path,
     );
+    return index == -1 ? 0 : index;
   }
 
   tabSwitch({required TabController tabController, required}) {
@@ -215,6 +216,46 @@ class FRouter extends InheritedWidget {
 
   List<Tab> tabBar(BuildContext context) {
     return navigationNotifier.navigationTabs
+        .where(
+          ((NavigationTab navigationTab) => navigationTab.destination != null),
+        )
+        .map(
+          (NavigationTab navigationTab) => Tab(
+            icon: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                navigationTab.destination?.icon ?? const IgnorePointer(),
+                (navigationTab.destination?.icon != null && navigationTab.destination?.tabLabel != null) ? const Text(" ") : const IgnorePointer(),
+                Text(navigationTab.destination?.tabLabel ?? ''),
+              ],
+            ),
+            // text: navigationTab.destination?.tabLabel ?? '',
+          ),
+        )
+        .toList();
+  }
+
+  bool get hasSubTabs {
+    return navigationNotifier.hasSubTabs;
+  }
+
+  int get subTabLength {
+    return navigationNotifier.navigationSubTabs.length;
+  }
+
+  int get currentSubTab {
+    int index = navigationNotifier.navigationSubTabs.indexWhere(
+      (NavigationTab navigationTab) {
+        debugPrint("currentSubTab: ${navigationTab.path} == ${navigationNotifier.currentTarget.navigationTarget.path}");
+        return navigationTab.path == navigationNotifier.currentTarget.navigationTarget.path;
+      },
+    );
+    return index == -1 ? 0 : index;
+  }
+
+  List<Tab> subTabBar(BuildContext context) {
+    return navigationNotifier.navigationSubTabs
         .where(
           ((NavigationTab navigationTab) => navigationTab.destination != null),
         )

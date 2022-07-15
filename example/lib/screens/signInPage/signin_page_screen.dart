@@ -39,6 +39,14 @@ class _SignInPageState extends State<SignInPage> {
       //Queue a silent sign in
       silentSignIn();
 
+      //Sign out from Google when signed out from Firebase
+      FirebaseAuth.instance.authStateChanges().listen((User? user) {
+        if (user == null) {
+          debugPrint("User signed out. Sign out from Google as well.");
+          silentSignOut();
+        }
+      });
+
       return Center(
         child: AnimatedCrossFade(
           firstChild: SizedBox(
@@ -100,24 +108,26 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
+  silentSignOut() async {}
+
   silentSignIn() async {
-    final GoogleSignInAccount? googleUser = await GoogleSignIn(
-      clientId: webClientId,
-    ).signInSilently(suppressErrors: true, reAuthenticate: false);
+    // final GoogleSignInAccount? googleUser = await GoogleSignIn(
+    //   clientId: webClientId,
+    // ).signInSilently(suppressErrors: true, reAuthenticate: false);
 
-    if (googleUser != null) {
-      // Obtain the auth details from the request
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    // if (googleUser != null) {
+    //   // Obtain the auth details from the request
+    //   final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
 
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
+    //   // Create a new credential
+    //   final credential = GoogleAuthProvider.credential(
+    //     accessToken: googleAuth.accessToken,
+    //     idToken: googleAuth.idToken,
+    //   );
 
-      // Once signed in, return the UserCredential
-      return await FirebaseAuth.instance.signInWithCredential(credential);
-    }
+    //   // Once signed in, return the UserCredential
+    //   return await FirebaseAuth.instance.signInWithCredential(credential);
+    // }
   }
 
   Future<UserCredential> signInWithGoogle() async {
