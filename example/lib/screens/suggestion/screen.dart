@@ -35,7 +35,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
+            "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -49,12 +50,31 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       // Optional, override on the query string param which holds the document id
       // queryStringIdParam: "docId",
 
-      searchConfig: SearchConfig(searchOptions: [
-        SearchOption(caption: "Author", field: "createdBy", type: SearchOptionType.string),
-        SearchOption(caption: "Name", field: "name", type: SearchOptionType.string),
-        SearchOption(caption: "Creation date", field: "creationDate", type: SearchOptionType.datetime),
-        SearchOption(caption: "Active", field: "active", type: SearchOptionType.boolean),
-      ]),
+      searchConfig: SearchConfig(
+        searchOptions: [
+          SearchOption(
+            caption: "Author",
+            field: "createdBy",
+            type: SearchOptionType.string,
+          ),
+          SearchOption(
+            caption: "Name",
+            field: "name",
+            type: SearchOptionType.string,
+            sort: SearchOptionSort.asc,
+          ),
+          SearchOption(
+            caption: "Creation date",
+            field: "creationDate",
+            type: SearchOptionType.datetime,
+          ),
+          SearchOption(
+            caption: "Active",
+            field: "active",
+            type: SearchOptionType.boolean,
+          ),
+        ],
+      ),
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
@@ -78,12 +98,16 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       ),
 
       // Center part, shows a firestore doc. Tabs possible
-      document: _document(),
+      document: _document(context),
       // document: _document(),
     );
   }
 
-  Document<Suggestion> _document() {
+  Document<Suggestion> _document(BuildContext context) {
+    var documentScreenConfig = DocumentScreenConfig.of(context);
+    // if (documentScreenConfig!.isNew) {
+    //   debugPrint("Wow, such new");
+    // }
     return Document<Suggestion>(
       tabs: [
         DocumentTab<Suggestion>(
