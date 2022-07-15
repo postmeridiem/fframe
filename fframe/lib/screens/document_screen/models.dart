@@ -26,7 +26,8 @@ class DocumentConfig<T> {
   final List<IconButton>? extraActionButtons;
   final String queryStringIdParam;
   final String collection;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
+      fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
@@ -111,11 +112,23 @@ class SearchOption<T> {
   late String stringValue = "";
   late bool boolValue = true;
   late DateTime dateTimeValue = DateTime.now();
-  SearchOption({required this.caption, required this.field, required this.type});
+  late SearchOptionSort sort;
+  SearchOption({
+    required this.caption,
+    required this.field,
+    required this.type,
+    this.sort = SearchOptionSort.none,
+  });
 }
 
 enum SearchOptionType {
   string,
   boolean,
   datetime,
+}
+
+enum SearchOptionSort {
+  none,
+  asc,
+  desc,
 }
