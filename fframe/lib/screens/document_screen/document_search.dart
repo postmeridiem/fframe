@@ -131,21 +131,29 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                                 ),
                                 focusNode: focusNode,
                                 onChanged: (String fieldValue) {
-                                  fireStoreQueryState.addQueryComponent(
-                                    id: searchOption.field,
-                                    queryComponent: (Query<T> query) {
-                                      return query
-                                          .where(searchConfig.defaultField,
-                                              isGreaterThanOrEqualTo:
-                                                  fieldValue)
-                                          .where(searchConfig.defaultField,
-                                              isLessThanOrEqualTo:
-                                                  fieldValue + '~');
-                                    },
-                                  );
                                   fireStoreQueryState.removeQueryComponent(
                                     id: 'autocomplete',
                                   );
+                                  if (fieldValue != '') {
+                                    fireStoreQueryState.addQueryComponent(
+                                      id: searchOption.field,
+                                      queryComponent: (Query<T> query) {
+                                        return query
+                                            .where(searchOption.field,
+                                                isGreaterThanOrEqualTo:
+                                                    fieldValue)
+                                            .where(searchOption.field,
+                                                isLessThanOrEqualTo:
+                                                    fieldValue + '~');
+                                      },
+                                    );
+                                  } else {
+                                    setState(() {
+                                      fireStoreQueryState.removeQueryComponent(
+                                        id: searchOption.field,
+                                      );
+                                    });
+                                  }
                                 },
                                 onSubmitted: (String fieldValue) {
                                   setState(() {
@@ -160,6 +168,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                         deleteIcon: const Icon(Icons.close, size: 10),
                         onDeleted: () {
                           setState(() {
+                            searchOption.stringValue = '';
                             fireStoreQueryState.removeQueryComponent(
                                 id: searchOption.field);
                             selectedOptions.remove(searchOption);
@@ -245,6 +254,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                     ),
                   );
 
+                case SearchOptionType.user:
                 case SearchOptionType.int:
                 case SearchOptionType.datetime:
                 case SearchOptionType.date:
