@@ -8,7 +8,7 @@ class TargetState {
   final NavigationTarget navigationTarget;
 
   factory TargetState.processRouteRequest({required NavigationTarget navigationTarget}) {
-    if (navigationTarget.navigationTabs != null) {
+    if (navigationTarget.navigationTabs != null && navigationTarget is! NavigationTab) {
       debugPrint("Cannot route to a path which has tabs. Mandatory apply the first tab");
       navigationTarget = navigationTarget.navigationTabs!.first;
     }

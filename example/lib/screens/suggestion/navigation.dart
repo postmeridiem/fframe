@@ -39,6 +39,50 @@ final suggestionNavigationTarget = NavigationTarget(
         navigationLabel: const Text("Done"),
         tabLabel: "Done",
       ),
+      navigationTabs: [
+        NavigationTab(
+          title: "Done sub 1",
+          path: "donesub1",
+          private: true,
+          contentPane: const SuggestionScreen(suggestionQueryState: SuggestionQueryStates.done),
+          destination: Destination(
+            icon: Icon(
+              Icons.check,
+              color: Colors.greenAccent[700],
+            ),
+            navigationLabel: const Text("Done sub 1"),
+            tabLabel: "Done sub1",
+          ),
+        ),
+        NavigationTab(
+          title: "Done sub 2",
+          path: "donesub2",
+          private: true,
+          contentPane: const SuggestionScreen(suggestionQueryState: SuggestionQueryStates.done),
+          destination: Destination(
+            icon: Icon(
+              Icons.check,
+              color: Colors.greenAccent[700],
+            ),
+            navigationLabel: const Text("Done sub 2"),
+            tabLabel: "Done sub2",
+          ),
+        ),
+        NavigationTab(
+          title: "Done sub 3",
+          path: "donesub3",
+          private: true,
+          contentPane: const SuggestionScreen(suggestionQueryState: SuggestionQueryStates.done),
+          destination: Destination(
+            icon: Icon(
+              Icons.check,
+              color: Colors.greenAccent[700],
+            ),
+            navigationLabel: const Text("Done sub 3"),
+            tabLabel: "Done sub3",
+          ),
+        ),
+      ],
     ),
   ],
 );

@@ -119,6 +119,8 @@ class DocumentScreenConfig extends InheritedWidget {
     );
   }
 
+  bool get isNew => selectionState.isNew;
+
   toggleReadOnly<T>({required BuildContext context}) {
     selectionState.setState(SelectionState<T>(data: selectionState.data!, docId: selectionState.docId, isNew: false, readOnly: !selectionState.readOnly), notify: true);
   }

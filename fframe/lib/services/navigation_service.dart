@@ -111,11 +111,24 @@ class NavigationNotifier extends ChangeNotifier {
     return _targetState!.navigationTarget is NavigationTab;
   }
 
+  bool get hasSubTabs {
+    return _targetState!.navigationTarget.navigationTabs != null || (_targetState!.navigationTarget.navigationTabs != null && _targetState!.navigationTarget.navigationTabs!.isNotEmpty);
+  }
+
   List<NavigationTab> get navigationTabs {
     if (_targetState!.navigationTarget is NavigationTab) {
       NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
       NavigationTarget parentTarget = currentTab.parentTarget;
       return parentTarget.navigationTabs!;
+    }
+    return [];
+  }
+
+  List<NavigationTab> get navigationSubTabs {
+    if (hasSubTabs) {
+      NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
+      // NavigationTarget parentTarget = currentTab.parentTarget;
+      return currentTab.navigationTabs!;
     }
     return [];
   }
