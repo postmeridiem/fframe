@@ -132,6 +132,7 @@ enum SearchOptionType {
   date,
   time,
   int,
+  user,
 }
 
 enum SearchOptionSortOrder {
