@@ -223,7 +223,7 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
                           .currentQuery(widget.query) as Query<T>;
                       return FirestoreSeparatedListView<T>(
                         showSeperator:
-                            widget.documentConfig.documentList?.showSeperator ??
+                            widget.documentConfig.documentList?.showSeparator ??
                                 true,
                         seperatorHeight: widget
                                 .documentConfig.documentList?.seperatorHeight ??

@@ -84,7 +84,7 @@ class DocumentList<T> {
     this.queryBuilder,
     this.autoSelectFirst = false,
     this.hoverSelect = false,
-    this.showSeperator = true,
+    this.showSeparator = true,
     this.showCreateButton = true,
     this.seperatorHeight = 1,
   });
@@ -92,7 +92,7 @@ class DocumentList<T> {
   final Query<T> Function(Query<T> query)? queryBuilder;
   final bool autoSelectFirst;
   final bool hoverSelect;
-  final bool showSeperator;
+  final bool showSeparator;
   final bool showCreateButton;
   final double seperatorHeight;
 }
