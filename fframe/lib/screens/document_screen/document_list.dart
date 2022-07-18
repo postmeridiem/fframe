@@ -222,7 +222,7 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
                           .documentScreenConfig.fireStoreQueryState
                           .currentQuery(widget.query) as Query<T>;
                       return FirestoreSeparatedListView<T>(
-                        showSeperator:
+                        showSeparator:
                             widget.documentConfig.documentList?.showSeparator ??
                                 true,
                         seperatorHeight: widget
@@ -263,7 +263,7 @@ class FirestoreSeparatedListView<Document>
     Key? key,
     required Query<Document> query,
     required FirestoreItemBuilder<Document> itemBuilder,
-    bool showSeperator = true,
+    bool showSeparator = true,
     double seperatorHeight = 1,
     int pageSize = 10,
     FirestoreLoadingBuilder? loadingBuilder,
@@ -320,7 +320,7 @@ class FirestoreSeparatedListView<Document>
               primary: primary,
               physics: physics,
               separatorBuilder: (BuildContext context, int index) =>
-                  showSeperator
+                  showSeparator
                       ? Divider(
                           height: seperatorHeight,
                           color: Theme.of(context).dividerColor)
