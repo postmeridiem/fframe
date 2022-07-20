@@ -24,7 +24,7 @@ class DatabaseService<T> {
   Query<T> query({
     required String collection,
     required T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore,
-    Query<T> Function(Query query)? queryBuilder,
+    Query<T> Function(Query<T> query)? queryBuilder,
     int? limit,
   }) {
     Query<T> query = FirebaseFirestore.instance.collection(collection).withConverter(

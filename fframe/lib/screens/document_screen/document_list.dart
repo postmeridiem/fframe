@@ -12,28 +12,18 @@ class DocumentListItem<T> extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    DocumentScreenConfig documentScreenConfig =
-        DocumentScreenConfig.of(context)!;
-    DocumentConfig<T> documentConfig =
-        documentScreenConfig.documentConfig as DocumentConfig<T>;
-    DocumentListItemBuilder<T> documentListItemBuilder =
-        documentConfig.documentList!.builder;
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
+    DocumentListItemBuilder<T> documentListItemBuilder = documentConfig.documentList!.builder;
 
     selectDocument() {
-      bool embeddedDocument =
-          documentScreenConfig.documentConfig.embeddedDocument;
+      bool embeddedDocument = documentScreenConfig.documentConfig.embeddedDocument;
       String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
-      documentScreenConfig.selectionState.setState(SelectionState<T>(
-          docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
-      if (documentConfig.document.tabs.length == 1) {
-        FRouter.of(context).updateQueryString<T>(queryParameters: {
-          documentConfig.queryStringIdParam: queryDocumentSnapshot.id
-        }, resetQueryString: !embeddedDocument);
+      documentScreenConfig.selectionState.setState(SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
+      if (documentConfig.document.activeTabs == null || documentConfig.document.activeTabs!.length == 1) {
+        FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: !embeddedDocument);
       } else {
-        FRouter.of(context).updateQueryString<T>(queryParameters: {
-          documentConfig.queryStringIdParam: queryDocumentSnapshot.id,
-          tabIndexKey: "0"
-        }, resetQueryString: !embeddedDocument);
+        FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id, tabIndexKey: "0"}, resetQueryString: !embeddedDocument);
       }
     }
 
@@ -49,17 +39,12 @@ class DocumentListItem<T> extends ConsumerWidget {
           child: Consumer(builder: (context, ref, child) {
             String docId = documentScreenConfig.selectionState.docId ?? '';
             try {
-              return documentListItemBuilder(
-                  context,
-                  docId == queryDocumentSnapshot.id,
-                  queryDocumentSnapshot.data(),
-                  Fframe.of(context)!.user);
+              return documentListItemBuilder(context, docId == queryDocumentSnapshot.id, queryDocumentSnapshot.data(), Fframe.of(context)!.user);
             } catch (e) {
               String _error = e.toString();
               String _path = queryDocumentSnapshot.reference.path;
               return ListTile(
-                leading:
-                    Icon(Icons.warning, color: Theme.of(context).errorColor),
+                leading: Icon(Icons.warning, color: Theme.of(context).errorColor),
                 subtitle: Text(
                   L10n.interpolated(
                     'errors_dataissue',
@@ -107,19 +92,15 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
   @override
   Widget build(BuildContext context) {
     debugPrint("Build DocumentList with key ${widget.key.toString()}");
-    DocumentScreenConfig documentScreenConfig =
-        DocumentScreenConfig.of(context)!;
-    DocumentConfig<T> documentConfig =
-        DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
 
     Query<T> query = DatabaseService<T>().query(
       collection: documentConfig.collection,
       fromFirestore: documentConfig.fromFirestore,
     );
     // FireStoreQueryState<T> fireStoreQueryState = FireStoreQueryState<T>(initialQuery: documentConfig.query);
-    FireStoreQueryState<T> fireStoreQueryState =
-        DocumentScreenConfig.of(context)?.fireStoreQueryState
-            as FireStoreQueryState<T>;
+    FireStoreQueryState<T> fireStoreQueryState = DocumentScreenConfig.of(context)?.fireStoreQueryState as FireStoreQueryState<T>;
     fireStoreQueryState.initialQuery = documentConfig.query;
 
     return DocumentListBody<T>(
@@ -178,14 +159,12 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
             ? ScreenSize.tablet
             : ScreenSize.large;
 
-    debugPrint(
-        "Build documentListLoader with key: listScaffold_${widget.key.toString()}");
+    debugPrint("Build documentListLoader with key: listScaffold_${widget.key.toString()}");
 
     double listWidth = 250;
     if (ScreenSize.phone == screenSize) {
       listWidth = MediaQuery.of(context).size.width;
-      Map<String, String>? queryParameters =
-          widget.ref.watch(queryStateProvider).queryParameters;
+      Map<String, String>? queryParameters = widget.ref.watch(queryStateProvider).queryParameters;
       if (queryParameters != null) {
         if (queryParameters.isNotEmpty) {
           //Some document is loaded, and we are on a phone. Don't show the selector
@@ -199,17 +178,16 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
       child: Container(
         key: ValueKey("listScaffold_${widget.key.toString()}"),
         child: Scaffold(
-          floatingActionButton:
-              (widget.documentConfig.documentList?.showCreateButton ?? true)
-                  ? FloatingActionButton(
-                      backgroundColor: Theme.of(context).colorScheme.background,
-                      child: const Icon(Icons.add),
-                      elevation: 0.2,
-                      onPressed: () {
-                        widget.documentScreenConfig.create(context: context);
-                      },
-                    )
-                  : null,
+          floatingActionButton: (widget.documentConfig.documentList?.showCreateButton ?? true)
+              ? FloatingActionButton(
+                  backgroundColor: Theme.of(context).colorScheme.background,
+                  child: const Icon(Icons.add),
+                  elevation: 0.2,
+                  onPressed: () {
+                    widget.documentScreenConfig.create(context: context);
+                  },
+                )
+              : null,
           primary: false,
           body: Column(
             children: [
@@ -218,33 +196,20 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
                 child: AnimatedBuilder(
                     animation: widget.documentScreenConfig.fireStoreQueryState,
                     builder: (context, child) {
-                      Query<T> query = widget
-                          .documentScreenConfig.fireStoreQueryState
-                          .currentQuery(widget.query) as Query<T>;
+                      Query<T> query = widget.documentScreenConfig.fireStoreQueryState.currentQuery(widget.query) as Query<T>;
                       return FirestoreSeparatedListView<T>(
-                        showSeparator:
-                            widget.documentConfig.documentList?.showSeparator ??
-                                true,
-                        seperatorHeight: widget
-                                .documentConfig.documentList?.seperatorHeight ??
-                            1,
+                        showSeparator: widget.documentConfig.documentList?.showSeparator ?? true,
+                        seperatorHeight: widget.documentConfig.documentList?.seperatorHeight ?? 1,
                         controller: widget.scrollController,
                         query: query,
-                        itemBuilder: (context,
-                            QueryDocumentSnapshot<T> queryDocumentSnapshot) {
+                        itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
                           return DocumentListItem<T>(
                             queryDocumentSnapshot: queryDocumentSnapshot,
-                            hoverSelect: widget
-                                    .documentConfig.documentList?.hoverSelect ??
-                                false,
+                            hoverSelect: widget.documentConfig.documentList?.hoverSelect ?? false,
                           );
                         },
-                        loadingBuilder: (context) => FRouter.of(context)
-                            .waitPage(
-                                context: context, text: "Loading documents"),
-                        errorBuilder: (context, error, stackTrace) =>
-                            Fframe.of(context)!.showError(
-                                context: context, errorText: error.toString()),
+                        loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
+                        errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showError(context: context, errorText: error.toString()),
                       );
                     }),
               ),
@@ -256,8 +221,7 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
   }
 }
 
-class FirestoreSeparatedListView<Document>
-    extends FirestoreQueryBuilder<Document> {
+class FirestoreSeparatedListView<Document> extends FirestoreQueryBuilder<Document> {
   /// {@macro flutterfire_ui.firestorelistview}
   FirestoreSeparatedListView({
     Key? key,
@@ -283,8 +247,7 @@ class FirestoreSeparatedListView<Document>
     double? cacheExtent,
     int? semanticChildCount,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
-    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior =
-        ScrollViewKeyboardDismissBehavior.manual,
+    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
     String? restorationId,
     Clip clipBehavior = Clip.hardEdge,
   }) : super(
@@ -293,8 +256,7 @@ class FirestoreSeparatedListView<Document>
           pageSize: pageSize,
           builder: (context, snapshot, _) {
             if (snapshot.isFetching) {
-              return loadingBuilder?.call(context) ??
-                  const Center(child: CircularProgressIndicator());
+              return loadingBuilder?.call(context) ?? const Center(child: CircularProgressIndicator());
             }
 
             if (snapshot.hasError && errorBuilder != null) {
@@ -319,12 +281,7 @@ class FirestoreSeparatedListView<Document>
               controller: controller,
               primary: primary,
               physics: physics,
-              separatorBuilder: (BuildContext context, int index) =>
-                  showSeparator
-                      ? Divider(
-                          height: seperatorHeight,
-                          color: Theme.of(context).dividerColor)
-                      : const IgnorePointer(),
+              separatorBuilder: (BuildContext context, int index) => showSeparator ? Divider(height: seperatorHeight, color: Theme.of(context).dividerColor) : const IgnorePointer(),
               shrinkWrap: shrinkWrap,
               padding: padding,
               // itemExtent: itemExtent,

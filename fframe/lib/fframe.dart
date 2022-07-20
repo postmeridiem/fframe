@@ -57,4 +57,5 @@ part 'screens/document_screen/document_list.dart';
 part 'screens/router_page.dart';
 
 part 'helpers/validator.dart';
+part 'helpers/load_extra_data.dart';
 part 'models/app_user.dart';

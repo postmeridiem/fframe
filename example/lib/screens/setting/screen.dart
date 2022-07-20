@@ -48,46 +48,48 @@ class _SettingScreenState extends State<SettingScreen> {
   Document<Setting> _document() {
     return Document<Setting>(
       autoSave: false,
-      tabs: [
-        DocumentTab<Setting>(
-          tabBuilder: (fFrameUser) {
-            return const Tab(
-              text: "Setting",
-              icon: Icon(
-                Icons.tune,
-              ),
-            );
-          },
-          childBuilder: (setting, readOnly) {
-            switch (setting.id) {
-              case "01-generalsettings":
-                {
-                  return const SettingsGeneralForm();
-                }
-              case "70-managelists":
-                {
-                  return const SettingsListsForm();
-                }
-              case "80-managepages":
-                {
-                  return const SettingsPagesForm();
-                }
-              case "98-palette":
-                {
-                  return const PaletteForm();
-                }
-              case "99-advancedsettings":
-                {
-                  return const SettingsAdvancedForm();
-                }
-              default:
-                {
-                  return const Text("unconfigured");
-                }
-            }
-          },
-        ),
-      ],
+      documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
+        return [
+          DocumentTab<Setting>(
+            tabBuilder: (fFrameUser) {
+              return const Tab(
+                text: "Setting",
+                icon: Icon(
+                  Icons.tune,
+                ),
+              );
+            },
+            childBuilder: (setting, readOnly) {
+              switch (setting.id) {
+                case "01-generalsettings":
+                  {
+                    return const SettingsGeneralForm();
+                  }
+                case "70-managelists":
+                  {
+                    return const SettingsListsForm();
+                  }
+                case "80-managepages":
+                  {
+                    return const SettingsPagesForm();
+                  }
+                case "98-palette":
+                  {
+                    return const PaletteForm();
+                  }
+                case "99-advancedsettings":
+                  {
+                    return const SettingsAdvancedForm();
+                  }
+                default:
+                  {
+                    return const Text("unconfigured");
+                  }
+              }
+            },
+          ),
+        ];
+      },
       contextCards: [],
     );
   }

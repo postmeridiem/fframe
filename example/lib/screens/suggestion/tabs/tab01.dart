@@ -60,6 +60,9 @@ class Tab01 extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  onSaved: (String? value) {
+                    suggestion.fieldTab1 = value;
+                  },
                   readOnly: readOnly,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
@@ -70,7 +73,6 @@ class Tab01 extends StatelessWidget {
                     if (!validator.validString(value)) {
                       return 'Enter a valid value';
                     }
-                    suggestion.fieldTab1 = value;
                     return null;
                   },
                 ),

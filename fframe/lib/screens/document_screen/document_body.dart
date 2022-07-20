@@ -17,14 +17,14 @@ class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
     debugPrint("build documentBodyLoader ${widget.key.toString()}");
     DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
-
-
+    SelectionState<T> selectionState = documentScreenConfig.selectionState as SelectionState<T>;
 
     return DocumentBody<T>(
       key: ValueKey("documentBody_${widget.key.toString()}"),
       queryState: widget.queryState,
       documentScreenConfig: documentScreenConfig,
       documentConfig: documentConfig,
+      selectionState: selectionState,
     );
   }
 }
@@ -35,24 +35,28 @@ class DocumentBody<T> extends StatelessWidget {
     required this.queryState,
     required this.documentScreenConfig,
     required this.documentConfig,
+    required this.selectionState,
   }) : super(key: key);
 
   final QueryState queryState;
   final DocumentScreenConfig documentScreenConfig;
   final DocumentConfig<T> documentConfig;
+  final SelectionState<T> selectionState;
 
   @override
   Widget build(BuildContext context) {
     debugPrint("build documentBody ${key.toString()}");
+
     // PreloadPageController preloadPageController;
     String tabIndexKey = documentScreenConfig.documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
     int tabIndex = int.parse(FRouter.of(context).queryStringParam(tabIndexKey) ?? "0");
-    List<DocumentTab<T>> tabs = documentConfig.document.tabs as List<DocumentTab<T>>;
 
-    if (tabs.isNotEmpty) {
+    documentConfig.document.activeTabs = documentConfig.document.documentTabsBuilder!(context, selectionState.data!, selectionState.readOnly, selectionState.isNew, Fframe.of(context)!.user);
+
+    if (documentConfig.document.activeTabs!.isNotEmpty) {
       return DefaultTabController(
         animationDuration: Duration.zero,
-        length: tabs.length,
+        length: documentConfig.document.activeTabs!.length,
         // The Builder widget is used to have a different BuildContext to access
         // closest DefaultTabController.
         child: Builder(
@@ -95,7 +99,7 @@ class DocumentBody<T> extends StatelessWidget {
                     Flexible(
                       fit: FlexFit.tight,
                       child: DefaultTabController(
-                        length: tabs.length,
+                        length: documentConfig.document.activeTabs!.length,
                         child: Scaffold(
                           endDrawer: (documentConfig.document.contextCards != null && documentConfig.document.contextCards!.isNotEmpty)
                               ? ContextCanvas(
@@ -121,10 +125,10 @@ class DocumentBody<T> extends StatelessWidget {
                                   centerTitle: true,
                                   automaticallyImplyLeading: false,
                                   backgroundColor: Theme.of(context).colorScheme.secondary,
-                                  bottom: tabs.length != 1
+                                  bottom: documentConfig.document.activeTabs!.length != 1
                                       ? TabBar(
                                           controller: tabController,
-                                          tabs: tabs
+                                          tabs: documentConfig.document.activeTabs!
                                               .map(
                                                 (documentTab) => documentTab.tabBuilder(Fframe.of(context)!.user),
                                               )
@@ -135,12 +139,12 @@ class DocumentBody<T> extends StatelessWidget {
                               ];
                             },
                             body: PreloadPageView.builder(
-                              itemCount: tabs.length,
-                              preloadPagesCount: tabs.length,
+                              itemCount: documentConfig.document.activeTabs!.length,
+                              preloadPagesCount: documentConfig.document.activeTabs!.length,
                               physics: const NeverScrollableScrollPhysics(),
                               itemBuilder: (BuildContext context, int position) {
                                 // debugPrint("Build tab $position");
-                                tabs[position].formKey = GlobalKey<FormState>();
+                                documentConfig.document.activeTabs![position].formKey = GlobalKey<FormState>();
 
                                 return Padding(
                                   padding: const EdgeInsets.all(8.0),
@@ -149,9 +153,9 @@ class DocumentBody<T> extends StatelessWidget {
                                     child: Scaffold(
                                       primary: false,
                                       body: Form(
-                                        key: tabs[position].formKey,
+                                        key: documentConfig.document.activeTabs![position].formKey,
                                         autovalidateMode: AutovalidateMode.onUserInteraction,
-                                        child: tabs[position].childBuilder(documentScreenConfig.selectionState.data, documentScreenConfig.selectionState.readOnly),
+                                        child: documentConfig.document.activeTabs![position].childBuilder(documentScreenConfig.selectionState.data, documentScreenConfig.selectionState.readOnly),
                                       ),
                                       floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
                                       bottomNavigationBar: BottomAppBar(

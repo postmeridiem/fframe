@@ -2,6 +2,8 @@ import 'package:fframe/fframe.dart';
 import 'package:example/models/suggestion.dart';
 import 'package:flutter/material.dart';
 
+import '../../../models/models.dart';
+
 class Tab02 extends StatelessWidget {
   Tab02({
     Key? key,
@@ -36,11 +38,26 @@ class Tab02 extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(
-            child: Placeholder(fallbackHeight: 2000),
+          const Divider(),
+          const Text("List of users:"),
+          SizedBox(
+            child: QueryFromFireStore<AppUser>(
+              collection: "users",
+              fromFirestore: AppUser.fromFirestore,
+              toFirestore: (user, options) => user.toFirestore(),
+              builder: (BuildContext context, List<AppUser> appUsers) {
+                return Column(
+                    children: appUsers
+                        .map(
+                          (AppUser appUser) => Text(appUser.displayName ?? "?"),
+                        )
+                        .toList());
+              },
+            ),
           ),
         ],
       ),
     );
   }
 }
+// 

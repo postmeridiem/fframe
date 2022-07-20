@@ -50,53 +50,55 @@ class UsersScreen extends StatelessWidget {
   Document<AppUser> _document() {
     return Document<AppUser>(
       autoSave: false,
-      tabs: [
-        DocumentTab<AppUser>(
-          tabBuilder: (fFrameUser) {
-            return const Tab(
-              text: "Profile",
-              icon: Icon(
-                Icons.person,
-              ),
-            );
-          },
-          childBuilder: (user, readOnly) {
-            return ProfileTab(
-              user: user,
-            );
-          },
-        ),
-        DocumentTab<AppUser>(
-          tabBuilder: (fFrameUser) {
-            return const Tab(
-              text: "Settings",
-              icon: Icon(
-                Icons.settings,
-              ),
-            );
-          },
-          childBuilder: (user, readOnly) {
-            return SettingsTab(
-              user: user,
-            );
-          },
-        ),
-        DocumentTab<AppUser>(
-          tabBuilder: (fFrameUser) {
-            return const Tab(
-              text: "Roles",
-              icon: Icon(
-                Icons.lock_open,
-              ),
-            );
-          },
-          childBuilder: (user, readOnly) {
-            return RolesTab(
-              user: user,
-            );
-          },
-        ),
-      ],
+      documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
+        return [
+          DocumentTab<AppUser>(
+            tabBuilder: (fFrameUser) {
+              return const Tab(
+                text: "Profile",
+                icon: Icon(
+                  Icons.person,
+                ),
+              );
+            },
+            childBuilder: (user, readOnly) {
+              return ProfileTab(
+                user: user,
+              );
+            },
+          ),
+          DocumentTab<AppUser>(
+            tabBuilder: (fFrameUser) {
+              return const Tab(
+                text: "Settings",
+                icon: Icon(
+                  Icons.settings,
+                ),
+              );
+            },
+            childBuilder: (user, readOnly) {
+              return SettingsTab(
+                user: user,
+              );
+            },
+          ),
+          DocumentTab<AppUser>(
+            tabBuilder: (fFrameUser) {
+              return const Tab(
+                text: "Roles",
+                icon: Icon(
+                  Icons.lock_open,
+                ),
+              );
+            },
+            childBuilder: (user, readOnly) {
+              return RolesTab(
+                user: user,
+              );
+            },
+          ),
+        ];
+      },
       // contextCards: [
       //   // (user) => ContextCard(
       //   //       user: user,

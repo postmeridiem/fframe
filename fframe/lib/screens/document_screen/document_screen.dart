@@ -71,23 +71,24 @@ class DocumentScreen<T> extends StatelessWidget {
           contextCardBuilders: contextCardBuilders,
           embeddedDocument: _embeddedDocument ?? false,
         ),
-        fireStoreQueryState: FireStoreQueryState<T>(),
+        fireStoreQueryState: FireStoreQueryState<T>(), selectionState: SelectionState<T>(),
       ),
     );
   }
 }
 
 //  =
-class DocumentScreenConfig extends InheritedWidget {
-  DocumentScreenConfig({
+class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
+  const DocumentScreenConfig({
     Key? key,
     required this.documentConfig,
     required this.fireStoreQueryState,
+    required this.selectionState,
     required child,
   }) : super(key: key, child: child);
 
   final DocumentConfig documentConfig;
-  final SelectionState selectionState = SelectionState();
+  final SelectionState selectionState;
   final FireStoreQueryState fireStoreQueryState;
   static DocumentScreenConfig? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<DocumentScreenConfig>();
@@ -95,6 +96,11 @@ class DocumentScreenConfig extends InheritedWidget {
 
   @override
   bool updateShouldNotify(DocumentScreenConfig oldWidget) {
+    return true;
+  }
+
+  @override
+  bool updateShouldNotifyDependent(DocumentScreenConfig oldWidget, Set<DocumentScreenConfig> dependencies) {
     return true;
   }
 
@@ -271,7 +277,7 @@ class DocumentScreenConfig extends InheritedWidget {
   create<T>({required BuildContext context}) {
     //Clear the cache
     selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
-    if (documentConfig.document.tabs.length == 1) {
+    if (documentConfig.document.activeTabs!.length == 1) {
       FRouter.of(context).updateQueryString<T>(queryParameters: {"new": "true"}, resetQueryString: true);
     } else {
       FRouter.of(context).updateQueryString<T>(queryParameters: {"new": "true", "tabIndex": "0"}, resetQueryString: true);
@@ -376,7 +382,7 @@ class DocumentScreenConfig extends InheritedWidget {
   int validate<T>({required BuildContext context, bool showPopup = false, bool moveToTab = false}) {
     DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
 
-    int invalidTab = _documentConfig.document.tabs
+    int invalidTab = _documentConfig.document.activeTabs!
         .map((DocumentTab tab) {
           bool result = tab.formKey.currentState!.validate();
           debugPrint("tab validation: $result");
@@ -526,7 +532,6 @@ class DocumentLoader<T> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     debugPrint("build DocumentLoader: ${key.toString()}");
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
-
     //  (queryParameters != null || (queryParameters == null && queryParameters!.isNotEmpty)));
 
     return Row(
@@ -537,7 +542,14 @@ class DocumentLoader<T> extends ConsumerWidget {
             ref: ref,
           ),
         Expanded(
-          child: ScreenBody<T>(
+          child:
+              // AnimatedBuilder(
+              //   animation: documentScreenConfig.selectionState,
+              //   builder: (context, child) {
+              //     return Text("AnimatedBuilder ${documentScreenConfig.selectionState.data.toString()}");
+              //                 },
+              // ),
+              ScreenBody<T>(
             key: ValueKey("ScreenBody_${documentConfig.collection}"),
           ),
         ),
@@ -545,6 +557,20 @@ class DocumentLoader<T> extends ConsumerWidget {
     );
   }
 }
+
+// class ScreenBodySelectionState extends InheritedModel<SelectionState> {
+//   const ScreenBodySelectionState({Key? key, required Widget child}) : super(key: key, child: child);
+
+//   @override
+//   bool updateShouldNotify(ScreenBodySelectionState oldWidget) {
+//     return true;
+//   }
+
+//   @override
+//   bool updateShouldNotifyDependent(ScreenBodySelectionState oldWidget, Set<SelectionState> dependencies) {
+//     return true;
+//   }
+// }
 
 class ScreenBody<T> extends ConsumerStatefulWidget {
   const ScreenBody({Key? key}) : super(key: key);
@@ -596,7 +622,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
     // return returnWidget;
     return AnimatedSwitcher(
       key: ValueKey("query_${widget.key.toString()}"),
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 5),
       child: returnWidget,
     );
   }

@@ -35,8 +35,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
-            "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -112,70 +111,59 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
     //   debugPrint("Wow, such new");
     // }
     return Document<Suggestion>(
-      tabs: [
-        DocumentTab<Suggestion>(
-          tabBuilder: (user) {
-            return const Tab(
-              text: "Suggestion",
-              icon: Icon(
-                Icons.pest_control,
-              ),
-            );
-          },
-          childBuilder: (suggestion, readOnly) {
-            return Tab01(
-              suggestion: suggestion,
-              readOnly: readOnly,
-              // user: user,
-            );
-          },
-        ),
-        DocumentTab<Suggestion>(
-          tabBuilder: (user) {
-            return const Tab(
-              text: "Placeholder",
-              icon: Icon(
-                Icons.settings_overscan,
-              ),
-            );
-          },
-          childBuilder: (suggestion, readOnly) {
-            return Tab02(
-              suggestion: suggestion,
-              readOnly: readOnly,
-            );
-          },
-        ),
-        DocumentTab<Suggestion>(
-          tabBuilder: (user) {
-            return const Tab(
-              text: "Ok or Not?",
-              icon: Icon(
-                Icons.settings_overscan,
-              ),
-            );
-          },
-          childBuilder: (suggestion, readOnly) {
-            return Tab03(
-              suggestion: suggestion,
-              readOnly: readOnly,
-            );
-          },
-        ),
-        DocumentTab<Suggestion>(
-          tabBuilder: (user) {
-            return const Tab(
-              text: "FormCeption?",
-              icon: Icon(
-                Icons.settings_overscan,
-              ),
-            );
-          },
-          childBuilder: (suggestion, readOnly) {
-            return const FormCeptionWidget();
-          },
-        ),
-      ],
+      documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
+        return [
+          DocumentTab<Suggestion>(
+            tabBuilder: (user) {
+              return const Tab(
+                text: "Suggestion",
+                icon: Icon(
+                  Icons.pest_control,
+                ),
+              );
+            },
+            childBuilder: (suggestion, readOnly) {
+              return Tab01(
+                suggestion: suggestion,
+                readOnly: readOnly,
+                // user: user,
+              );
+            },
+          ),
+          DocumentTab<Suggestion>(
+            tabBuilder: (user) {
+              return const Tab(
+                text: "Placeholder",
+                icon: Icon(
+                  Icons.settings_overscan,
+                ),
+              );
+            },
+            childBuilder: (suggestion, readOnly) {
+              return Tab02(
+                suggestion: suggestion,
+                readOnly: readOnly,
+              );
+            },
+          ),
+          DocumentTab<Suggestion>(
+            tabBuilder: (user) {
+              return const Tab(
+                text: "Ok or Not?",
+                icon: Icon(
+                  Icons.settings_overscan,
+                ),
+              );
+            },
+            childBuilder: (suggestion, readOnly) {
+              return Tab03(
+                suggestion: suggestion,
+                readOnly: readOnly,
+              );
+            },
+          )
+        ];
+      },
       contextCards: [
         (suggestion) => ContextCard(
               suggestion: suggestion,
@@ -228,18 +216,20 @@ class FormCeptionWidget extends StatelessWidget {
       // Center part, shows a firestore doc. Tabs possible
       document: Document<Suggestion>(
         autoSave: false,
-        tabs: [
-          DocumentTab<Suggestion>(tabBuilder: (user) {
-            return const Tab(
-              text: "Suggestion",
-              icon: Icon(
-                Icons.pest_control,
-              ),
-            );
-          }, childBuilder: (suggestion, readOnly) {
-            return const Text("FormCeption");
-          })
-        ],
+        documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
+          return [
+            DocumentTab<Suggestion>(tabBuilder: (user) {
+              return const Tab(
+                text: "Suggestion",
+                icon: Icon(
+                  Icons.pest_control,
+                ),
+              );
+            }, childBuilder: (suggestion, readOnly) {
+              return const Text("FormCeption");
+            })
+          ];
+        },
       ),
     );
   }

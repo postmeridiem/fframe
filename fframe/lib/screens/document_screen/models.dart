@@ -22,12 +22,11 @@ class DocumentConfig<T> {
   final GlobalKey<FormState> formKey;
   final DocumentList<T>? documentList;
   final TitleBuilder<T>? titleBuilder;
-  final Document document;
+  final Document<T> document;
   final List<IconButton>? extraActionButtons;
   final String queryStringIdParam;
   final String collection;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
@@ -43,7 +42,7 @@ class DocumentConfig<T> {
 class Document<T> {
   Document({
     this.key,
-    required this.tabs,
+    required this.documentTabsBuilder,
     this.contextCards,
     this.autoSave = false,
     this.readOnly = false,
@@ -54,8 +53,9 @@ class Document<T> {
     this.showDeleteButton = false,
   });
   final Key? key;
-  final List<DocumentTab<T>> tabs;
+  final DocumentTabsBuilder<T>? documentTabsBuilder;
   final List<ContextCardBuilder>? contextCards;
+  List<DocumentTab<T>>? activeTabs;
   bool autoSave;
   bool readOnly;
   bool showEditToggleButton;
@@ -70,7 +70,7 @@ class DocumentTab<T> {
   ///
   ///
   final DocumentTabBuilder<T> tabBuilder;
-  final DocumentTabChildBuilder childBuilder;
+  final DocumentTabChildBuilder<T> childBuilder;
   late GlobalKey<FormState> formKey = GlobalKey<FormState>();
   DocumentTab({
     required this.tabBuilder,
@@ -117,12 +117,7 @@ class SearchOption<T> {
   late SearchOptionSortOrder sort;
   late SearchOptionComparisonOperator comparisonOperator;
   late bool isSelected = false;
-  SearchOption(
-      {required this.caption,
-      required this.field,
-      required this.type,
-      this.sort = SearchOptionSortOrder.none,
-      this.comparisonOperator = SearchOptionComparisonOperator.equal});
+  SearchOption({required this.caption, required this.field, required this.type, this.sort = SearchOptionSortOrder.none, this.comparisonOperator = SearchOptionComparisonOperator.equal});
 }
 
 enum SearchOptionType {

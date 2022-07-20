@@ -4,11 +4,13 @@ typedef ContextCardBuilder<T> = Widget Function(
   T data,
 );
 
-// typedef DocumentBuilder<T> = Widget Function(
-//   BuildContext context,
-//   T data,
-//   bool readOnly,
-// );
+typedef DocumentTabsBuilder<T> = List<DocumentTab<T>> Function(
+  BuildContext context,
+  T data,
+  bool isReadOnly,
+  bool isNew,
+  FFrameUser? user,
+);
 
 typedef DocumentListItemBuilder<T> = Widget Function(
   BuildContext context,
@@ -25,7 +27,7 @@ typedef DocumentTabBuilder<T> = Widget Function(FFrameUser? user);
 
 typedef DocumentTabChildBuilder<T> = Widget Function(
   T data,
-  bool readOnly,
+  bool isReadOnly,
 );
 
 typedef TitleBuilder<T> = Widget Function(

@@ -1,4 +1,3 @@
-import 'package:fframe/helpers/l10n.dart';
 import 'package:intl/intl.dart';
 
 import 'package:fframe/controllers/query_state_controller.dart';
