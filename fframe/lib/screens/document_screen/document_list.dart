@@ -16,25 +16,25 @@ class DocumentListItem<T> extends ConsumerWidget {
     DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
     DocumentListItemBuilder<T> documentListItemBuilder = documentConfig.documentList!.builder;
 
-    selectDocument() {
-      bool embeddedDocument = documentScreenConfig.documentConfig.embeddedDocument;
-      String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
-      documentScreenConfig.selectionState.setState(SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
-      if (documentConfig.document.activeTabs == null || documentConfig.document.activeTabs!.length == 1) {
-        FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: !embeddedDocument);
-      } else {
-        FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id, tabIndexKey: "0"}, resetQueryString: !embeddedDocument);
-      }
-    }
+    // selectDocument() {
+    //   bool embeddedDocument = documentScreenConfig.documentConfig.embeddedDocument;
+    //   String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
+    //   documentScreenConfig.selectionState.setState(SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
+    //   if (documentConfig.document.activeTabs == null || documentConfig.document.activeTabs!.length == 1) {
+    //     FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: !embeddedDocument);
+    //   } else {
+    //     FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id, tabIndexKey: "0"}, resetQueryString: !embeddedDocument);
+    //   }
+    // }
 
     try {
       return GestureDetector(
-        onTap: selectDocument,
+        onTap: () => documentScreenConfig.selectDocument(context, queryDocumentSnapshot),
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           onHover: (_) {
             if (hoverSelect) {
-              selectDocument();
+              documentScreenConfig.selectDocument(context, queryDocumentSnapshot);
             }
           },
           child: Builder(builder: (BuildContext context) {

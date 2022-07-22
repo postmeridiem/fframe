@@ -139,6 +139,17 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
   bool get isNew => selectionState.isNew;
 
+  selectDocument<T>(BuildContext context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
+    bool embeddedDocument = documentConfig.embeddedDocument;
+    String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
+    selectionState.setState(SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
+    if (documentConfig.document.activeTabs == null || documentConfig.document.activeTabs!.length == 1) {
+      FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: !embeddedDocument);
+    } else {
+      FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id, tabIndexKey: "0"}, resetQueryString: !embeddedDocument);
+    }
+  }
+
   toggleReadOnly<T>({required BuildContext context}) {
     selectionState.setState(SelectionState<T>(data: selectionState.data!, docId: selectionState.docId, isNew: false, readOnly: !selectionState.readOnly), notify: true);
   }
