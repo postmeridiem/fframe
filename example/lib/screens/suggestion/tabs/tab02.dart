@@ -1,5 +1,4 @@
 import 'package:fframe/fframe.dart';
-import 'package:example/models/suggestion.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/models.dart';

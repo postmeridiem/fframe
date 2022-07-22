@@ -11,12 +11,11 @@ class Fframe extends InheritedWidget {
     required this.lightMode,
     required this.l10nConfig,
     this.providerConfigs,
-    this.issuePageLink,
     this.debugShowCheckedModeBanner = true,
+    this.globalActions,
   }) : super(key: key, child: const FFramePreload());
 
   final String title;
-  final String? issuePageLink;
   final FirebaseOptions firebaseOptions;
   final List<ProviderConfiguration>? providerConfigs;
   final NavigationConfig navigationConfig;
@@ -24,6 +23,7 @@ class Fframe extends InheritedWidget {
   final ThemeData lightMode;
   final L10nConfig l10nConfig;
   final bool debugShowCheckedModeBanner;
+  final List<Widget>? globalActions;
 
   FFrameUser? user;
 
@@ -186,7 +186,6 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
             return FRouterLoader(
                 mainScreen: MainScreen(
                   appTitle: Fframe.of(context)!.title,
-                  issuePageLink: Fframe.of(context)!.issuePageLink,
                   l10nConfig: Fframe.of(context)!.l10nConfig,
                 ),
                 navigationConfig: Fframe.of(context)!.navigationConfig,

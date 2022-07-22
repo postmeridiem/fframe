@@ -44,8 +44,10 @@ class Document<T> {
     this.key,
     required this.documentTabsBuilder,
     this.contextCards,
+    this.documentHeaderBuilder,
     this.autoSave = false,
     this.readOnly = false,
+    this.showCreateButton = false,
     this.showCopyButton = false,
     this.showEditToggleButton = false,
     this.showValidateButton = false,
@@ -54,10 +56,12 @@ class Document<T> {
   });
   final Key? key;
   final DocumentTabsBuilder<T>? documentTabsBuilder;
+  final DocumentHeaderBuilder<T>? documentHeaderBuilder;
   final List<ContextCardBuilder>? contextCards;
   List<DocumentTab<T>>? activeTabs;
   bool autoSave;
   bool readOnly;
+  bool showCreateButton;
   bool showEditToggleButton;
   bool showDeleteButton;
   bool showCopyButton;
@@ -82,6 +86,8 @@ class DocumentList<T> {
   const DocumentList({
     required this.builder,
     this.queryBuilder,
+    this.headerBuilder,
+    this.footerBuilder,
     this.autoSelectFirst = false,
     this.hoverSelect = false,
     this.showSeparator = true,
@@ -90,6 +96,8 @@ class DocumentList<T> {
   });
   final DocumentListItemBuilder<T> builder;
   final Query<T> Function(Query<T> query)? queryBuilder;
+  final DocumentListHeaderBuilder<T>? headerBuilder;
+  final DocumentListFooterBuilder<T>? footerBuilder;
   final bool autoSelectFirst;
   final bool hoverSelect;
   final bool showSeparator;

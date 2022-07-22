@@ -46,6 +46,24 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         );
       },
 
+      // documentScreenHeaderBuilder: () => const SizedBox(
+      //   height: 40,
+      //   child: Placeholder(
+      //     child: Center(
+      //       child: Text("DocumentScreenHeaderBuilder"),
+      //     ),
+      //   ),
+      // ),
+
+      // documentScreenFooterBuilder: () => const SizedBox(
+      //   height: 40,
+      //   child: Placeholder(
+      //     child: Center(
+      //       child: Text("DocumentScreenFooterBuilder"),
+      //     ),
+      //   ),
+      // ),
+
       // Optional, override on the query string param which holds the document id
       // queryStringIdParam: "docId",
 
@@ -96,6 +114,27 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           }
         },
         hoverSelect: false,
+        autoSelectFirst: true,
+        // headerBuilder: ((context, snapshot) {
+        //   return const SizedBox(
+        //     height: 40,
+        //     child: Placeholder(
+        //       child: Center(
+        //         child: Text("DocumentListHeaderBuilder"),
+        //       ),
+        //     ),
+        //   );
+        // }),
+        // footerBuilder: ((context, snapshot) {
+        //   return SizedBox(
+        //     height: 40,
+        //     child: Placeholder(
+        //       child: Center(
+        //         child: Text("${snapshot.docs.length} of ${snapshot.hasMore ? "many" : snapshot.docs.length}"),
+        //       ),
+        //     ),
+        //   );
+        // }),
       ),
 
       // Center part, shows a firestore doc. Tabs possible

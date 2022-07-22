@@ -17,6 +17,8 @@ class DocumentScreen<T> extends StatelessWidget {
     this.extraActionButtons,
     this.contextCardBuilders,
     this.queryStringIdParam = "id",
+    this.documentScreenHeaderBuilder,
+    this.documentScreenFooterBuilder,
   }) : super(key: key);
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -33,6 +35,8 @@ class DocumentScreen<T> extends StatelessWidget {
   final T Function() createNew;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
+  final DocumentScreenHeaderBuilder? documentScreenHeaderBuilder;
+  final DocumentScreenFooterBuilder? documentScreenFooterBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -46,33 +50,41 @@ class DocumentScreen<T> extends StatelessWidget {
       }
       _embeddedDocument = true;
     }
-    return Form(
-      key: formKey,
-      child: DocumentScreenConfig(
-        // key:
-        child: DocumentLoader<T>(
-          key: ValueKey("DocumentLoader_$collection"),
-        ),
+    return Column(
+      children: [
+        if (documentScreenHeaderBuilder != null) documentScreenHeaderBuilder!(),
+        Expanded(
+          child: Form(
+            key: formKey,
+            child: DocumentScreenConfig(
+              // key:
+              child: DocumentLoader<T>(
+                key: ValueKey("DocumentLoader_$collection"),
+              ),
 
-        documentConfig: DocumentConfig<T>(
-          formKey: formKey,
-          collection: collection,
-          documentList: documentList,
-          queryStringIdParam: _queryStringIdParam ?? queryStringIdParam,
-          createNew: createNew,
-          createDocumentId: createDocumentId,
-          document: document,
-          toFirestore: toFirestore,
-          fromFirestore: fromFirestore,
-          query: query,
-          searchConfig: searchConfig,
-          extraActionButtons: extraActionButtons,
-          titleBuilder: titleBuilder as TitleBuilder<T>,
-          contextCardBuilders: contextCardBuilders,
-          embeddedDocument: _embeddedDocument ?? false,
+              documentConfig: DocumentConfig<T>(
+                formKey: formKey,
+                collection: collection,
+                documentList: documentList,
+                queryStringIdParam: _queryStringIdParam ?? queryStringIdParam,
+                createNew: createNew,
+                createDocumentId: createDocumentId,
+                document: document,
+                toFirestore: toFirestore,
+                fromFirestore: fromFirestore,
+                query: query,
+                searchConfig: searchConfig,
+                extraActionButtons: extraActionButtons,
+                titleBuilder: titleBuilder as TitleBuilder<T>,
+                contextCardBuilders: contextCardBuilders,
+                embeddedDocument: _embeddedDocument ?? false,
+              ),
+              fireStoreQueryState: FireStoreQueryState<T>(), selectionState: SelectionState<T>(),
+            ),
+          ),
         ),
-        fireStoreQueryState: FireStoreQueryState<T>(), selectionState: SelectionState<T>(),
-      ),
+        if (documentScreenFooterBuilder != null) documentScreenFooterBuilder!(),
+      ],
     );
   }
 }
@@ -501,20 +513,21 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
             // validate();
           },
         ),
-      // IconButton(
-      //   tooltip: L10n.string(
-      //     "iconbutton_document_new",
-      //     placeholder: "Create new document",
-      //   ),
-      //   icon: Icon(
-      //     Icons.add,
-      //     color: Theme.of(context).colorScheme.onBackground,
-      //   ),
-      //   onPressed: () {
-      //     create<T>(context: context);
-      //     // validate();
-      //   },
-      // ),
+      if (documentConfig.document.showCopyButton == true)
+        IconButton(
+          tooltip: L10n.string(
+            "iconbutton_document_new",
+            placeholder: "Create new document",
+          ),
+          icon: Icon(
+            Icons.add,
+            color: Theme.of(context).colorScheme.onBackground,
+          ),
+          onPressed: () {
+            create<T>(context: context);
+            // validate();
+          },
+        ),
     ];
 
     //Add any extra configured buttons to the list
@@ -532,7 +545,6 @@ class DocumentLoader<T> extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     debugPrint("build DocumentLoader: ${key.toString()}");
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
-    //  (queryParameters != null || (queryParameters == null && queryParameters!.isNotEmpty)));
 
     return Row(
       children: [
@@ -542,14 +554,7 @@ class DocumentLoader<T> extends ConsumerWidget {
             ref: ref,
           ),
         Expanded(
-          child:
-              // AnimatedBuilder(
-              //   animation: documentScreenConfig.selectionState,
-              //   builder: (context, child) {
-              //     return Text("AnimatedBuilder ${documentScreenConfig.selectionState.data.toString()}");
-              //                 },
-              // ),
-              ScreenBody<T>(
+          child: ScreenBody<T>(
             key: ValueKey("ScreenBody_${documentConfig.collection}"),
           ),
         ),
@@ -557,20 +562,6 @@ class DocumentLoader<T> extends ConsumerWidget {
     );
   }
 }
-
-// class ScreenBodySelectionState extends InheritedModel<SelectionState> {
-//   const ScreenBodySelectionState({Key? key, required Widget child}) : super(key: key, child: child);
-
-//   @override
-//   bool updateShouldNotify(ScreenBodySelectionState oldWidget) {
-//     return true;
-//   }
-
-//   @override
-//   bool updateShouldNotifyDependent(ScreenBodySelectionState oldWidget, Set<SelectionState> dependencies) {
-//     return true;
-//   }
-// }
 
 class ScreenBody<T> extends ConsumerStatefulWidget {
   const ScreenBody({Key? key}) : super(key: key);

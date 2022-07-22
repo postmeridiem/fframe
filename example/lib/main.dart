@@ -15,6 +15,8 @@ import 'package:example/screens/suggestion/suggestion.dart';
 import 'package:example/screens/setting/setting.dart';
 import 'package:example/screens/user/user.dart';
 
+import 'helpers/header_buttons.dart';
+
 void main() {
   runApp(const MainApp());
 }
@@ -87,12 +89,15 @@ class MainApp extends StatelessWidget {
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
-          clientId:
-              "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
+          clientId: "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
-      issuePageLink: "https://github.com/postmeridiem/fframe/issues",
       debugShowCheckedModeBanner: false,
+      globalActions: const [
+        BarButtonShare(),
+        BarButtonDuplicate(),
+        BarButtonFeedback(),
+      ],
     );
   }
 }

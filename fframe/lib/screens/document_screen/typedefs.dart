@@ -19,6 +19,16 @@ typedef DocumentListItemBuilder<T> = Widget Function(
   FFrameUser? user,
 );
 
+typedef DocumentListHeaderBuilder<T> = Widget Function(
+  BuildContext context,
+  FirestoreQueryBuilderSnapshot<T> snapshot,
+);
+
+typedef DocumentListFooterBuilder<T> = Widget Function(
+  BuildContext context,
+  FirestoreQueryBuilderSnapshot<T> snapshot,
+);
+
 typedef DocumentStream<T> = Stream<DocumentSnapshot> Function(
   String? documentId,
 );
@@ -34,3 +44,11 @@ typedef TitleBuilder<T> = Widget Function(
   BuildContext context,
   T data,
 );
+
+typedef DocumentHeaderBuilder<T> = Widget Function(
+  BuildContext context,
+  T data,
+);
+
+typedef DocumentScreenHeaderBuilder<T> = Widget Function();
+typedef DocumentScreenFooterBuilder<T> = Widget Function();

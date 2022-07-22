@@ -94,99 +94,111 @@ class DocumentBody<T> extends StatelessWidget {
                 final double docCanvasWidth = constraints.maxWidth;
                 final bool contextDrawerOpen = docCanvasWidth > 1000;
 
-                return Row(
+                return Column(
                   children: [
-                    Flexible(
-                      fit: FlexFit.tight,
-                      child: DefaultTabController(
-                        length: documentConfig.document.activeTabs!.length,
-                        child: Scaffold(
-                          endDrawer: (documentConfig.document.contextCards != null && documentConfig.document.contextCards!.isNotEmpty)
-                              ? ContextCanvas(
-                                  contextWidgets: documentConfig.document.contextCards!
-                                      .map(
-                                        (contextCardBuilder) => contextCardBuilder(documentScreenConfig.selectionState.data),
+                    if (documentConfig.document.documentHeaderBuilder != null)
+                      SizedBox(
+                        height: 40.0,
+                        width: double.infinity,
+                        child: documentConfig.document.documentHeaderBuilder!(context, documentScreenConfig.selectionState.data),
+                      ),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Flexible(
+                            fit: FlexFit.tight,
+                            child: DefaultTabController(
+                              length: documentConfig.document.activeTabs!.length,
+                              child: Scaffold(
+                                endDrawer: (documentConfig.document.contextCards != null && documentConfig.document.contextCards!.isNotEmpty)
+                                    ? ContextCanvas(
+                                        contextWidgets: documentConfig.document.contextCards!
+                                            .map(
+                                              (contextCardBuilder) => contextCardBuilder(documentScreenConfig.selectionState.data),
+                                            )
+                                            .toList(),
                                       )
-                                      .toList(),
-                                )
-                              : null,
-                          primary: false,
-                          backgroundColor: Theme.of(context).colorScheme.secondary,
-                          body: NestedScrollView(
-                            headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                              return <Widget>[
-                                SliverAppBar(
-                                  actions: const [IgnorePointer()], //To surpess the hamburger
-                                  primary: false,
-                                  title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, documentScreenConfig.selectionState.data) : Text(documentScreenConfig.selectionState.docId ?? ""),
-                                  floating: true,
-                                  pinned: false,
-                                  snap: true,
-                                  centerTitle: true,
-                                  automaticallyImplyLeading: false,
-                                  backgroundColor: Theme.of(context).colorScheme.secondary,
-                                  bottom: documentConfig.document.activeTabs!.length != 1
-                                      ? TabBar(
-                                          controller: tabController,
-                                          tabs: documentConfig.document.activeTabs!
-                                              .map(
-                                                (documentTab) => documentTab.tabBuilder(Fframe.of(context)!.user),
+                                    : null,
+                                primary: false,
+                                backgroundColor: Theme.of(context).colorScheme.secondary,
+                                body: NestedScrollView(
+                                  headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                                    return <Widget>[
+                                      SliverAppBar(
+                                        actions: const [IgnorePointer()], //To surpess the hamburger
+                                        primary: false,
+                                        title: documentConfig.titleBuilder != null ? documentConfig.titleBuilder!(context, documentScreenConfig.selectionState.data) : Text(documentScreenConfig.selectionState.docId ?? ""),
+                                        floating: true,
+                                        pinned: false,
+                                        snap: true,
+                                        centerTitle: true,
+                                        automaticallyImplyLeading: false,
+                                        backgroundColor: Theme.of(context).colorScheme.secondary,
+                                        bottom: documentConfig.document.activeTabs!.length != 1
+                                            ? TabBar(
+                                                controller: tabController,
+                                                tabs: documentConfig.document.activeTabs!
+                                                    .map(
+                                                      (documentTab) => documentTab.tabBuilder(Fframe.of(context)!.user),
+                                                    )
+                                                    .toList(),
                                               )
-                                              .toList(),
-                                        )
-                                      : null,
-                                ),
-                              ];
-                            },
-                            body: PreloadPageView.builder(
-                              itemCount: documentConfig.document.activeTabs!.length,
-                              preloadPagesCount: documentConfig.document.activeTabs!.length,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemBuilder: (BuildContext context, int position) {
-                                // debugPrint("Build tab $position");
-                                documentConfig.document.activeTabs![position].formKey = GlobalKey<FormState>();
-
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Container(
-                                    key: ValueKey("PreloadPageView_${documentScreenConfig.selectionState.docId}_${tabController.index}"),
-                                    child: Scaffold(
-                                      primary: false,
-                                      body: Form(
-                                        key: documentConfig.document.activeTabs![position].formKey,
-                                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                                        child: documentConfig.document.activeTabs![position].childBuilder(documentScreenConfig.selectionState.data, documentScreenConfig.selectionState.readOnly),
+                                            : null,
                                       ),
-                                      floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
-                                      bottomNavigationBar: BottomAppBar(
-                                        elevation: 0,
-                                        color: Theme.of(context).colorScheme.background,
-                                        shape: const CircularNotchedRectangle(),
-                                        child: IconTheme(
-                                          data: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
-                                          child: Row(
-                                            children: [
-                                              ...documentScreenConfig.iconButtons<T>(context)!,
-                                            ],
+                                    ];
+                                  },
+                                  body: PreloadPageView.builder(
+                                    itemCount: documentConfig.document.activeTabs!.length,
+                                    preloadPagesCount: documentConfig.document.activeTabs!.length,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    itemBuilder: (BuildContext context, int position) {
+                                      // debugPrint("Build tab $position");
+                                      documentConfig.document.activeTabs![position].formKey = GlobalKey<FormState>();
+
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Container(
+                                          key: ValueKey("PreloadPageView_${documentScreenConfig.selectionState.docId}_${tabController.index}"),
+                                          child: Scaffold(
+                                            primary: false,
+                                            body: Form(
+                                              key: documentConfig.document.activeTabs![position].formKey,
+                                              autovalidateMode: AutovalidateMode.onUserInteraction,
+                                              child: documentConfig.document.activeTabs![position].childBuilder(documentScreenConfig.selectionState.data, documentScreenConfig.selectionState.readOnly),
+                                            ),
+                                            floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
+                                            bottomNavigationBar: BottomAppBar(
+                                              elevation: 0,
+                                              color: Theme.of(context).colorScheme.background,
+                                              shape: const CircularNotchedRectangle(),
+                                              child: IconTheme(
+                                                data: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
+                                                child: Row(
+                                                  children: [
+                                                    ...documentScreenConfig.iconButtons<T>(context)!,
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                    ),
+                                      );
+                                    },
+                                    controller: documentConfig.preloadPageController,
                                   ),
-                                );
-                              },
-                              controller: documentConfig.preloadPageController,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
+                          ContextDrawer<T>(
+                            queryState: queryState,
+                            contextDrawerOpen: contextDrawerOpen,
+                          ),
+                        ],
+                        // ),
                       ),
                     ),
-                    ContextDrawer<T>(
-                      queryState: queryState,
-                      contextDrawerOpen: contextDrawerOpen,
-                    ),
                   ],
-                  // ),
                 );
               },
             );

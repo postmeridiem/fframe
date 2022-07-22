@@ -3,18 +3,16 @@ import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/providers/state_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:fframe/helpers/header_buttons.dart';
+
+import '../helpers/profile_buttons.dart';
 
 class MainScreen extends StatefulWidget {
   final String appTitle;
-  final String? issuePageLink;
   final L10nConfig l10nConfig;
   const MainScreen({
     Key? key,
     required this.appTitle,
     required this.l10nConfig,
-    this.issuePageLink,
   }) : super(key: key);
 
   @override
@@ -49,7 +47,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         () => FRouter.of(context).tabSwitch(tabController: _tabController),
       );
     }
-    
+
     if (FRouter.of(context).hasSubTabs) {
       _subTabController = TabController(
         initialIndex: FRouter.of(context).currentSubTab,
@@ -80,11 +78,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 },
                 icon: const Icon(Icons.menu))
             : const IgnorePointer(),
-        actions: const [
-          BarButtonShare(),
-          BarButtonDuplicate(),
-          BarButtonFeedback(),
-          ProfileButton(),
+        actions: [
+          ...?Fframe.of(context)?.globalActions,
+          const ProfileButton(),
         ],
       ),
       drawer: FRouter.of(context).drawer(

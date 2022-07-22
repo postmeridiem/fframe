@@ -1,6 +1,5 @@
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fframe/providers/state_providers.dart';
 
 late NavigationNotifier navigationNotifier;
