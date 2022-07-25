@@ -23,9 +23,9 @@ class UsersScreen extends StatelessWidget {
       fromFirestore: AppUser.fromFirestore,
       toFirestore: (user, options) => user.toFirestore(),
       createNew: () => AppUser(),
-      query: (Query<AppUser> query) {
-        return query.orderBy("lastName");
-      },
+      // query: (Query<AppUser> query) {
+      //   return query.orderBy("lastName");
+      // },
       titleBuilder: (context, data) {
         return Text(
           data.displayName ?? "New User",
@@ -35,7 +35,8 @@ class UsersScreen extends StatelessWidget {
       document: _document(),
       documentList: DocumentList(
         hoverSelect: true,
-        queryBuilder: (query) => query.orderBy("displayName").where("active", isEqualTo: isActive),
+        queryBuilder: (query) =>
+            query.orderBy("displayName").where("active", isEqualTo: isActive),
         builder: (context, selected, data, fFrameUser) {
           return UserListItem(
             user: data,
@@ -63,21 +64,6 @@ class UsersScreen extends StatelessWidget {
             },
             childBuilder: (user, readOnly) {
               return ProfileTab(
-                user: user,
-              );
-            },
-          ),
-          DocumentTab<AppUser>(
-            tabBuilder: (fFrameUser) {
-              return const Tab(
-                text: "Settings",
-                icon: Icon(
-                  Icons.settings,
-                ),
-              );
-            },
-            childBuilder: (user, readOnly) {
-              return SettingsTab(
                 user: user,
               );
             },
