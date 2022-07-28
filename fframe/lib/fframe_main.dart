@@ -78,7 +78,8 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<FirebaseApp>(
-      future: Firebase.initializeApp(options: Fframe.of(context)!.firebaseOptions),
+      future:
+          Firebase.initializeApp(options: Fframe.of(context)!.firebaseOptions),
       builder: (BuildContext context, AsyncSnapshot<FirebaseApp> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
@@ -97,9 +98,14 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
           case ConnectionState.done:
             if (snapshot.error != null) {
               return MaterialApp(
-                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                debugShowCheckedModeBanner:
+                    Fframe.of(context)!.debugShowCheckedModeBanner,
+                title: "lalala",
                 home: Scaffold(
-                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                  body: Fframe.of(context)!
+                      .navigationConfig
+                      .errorPage
+                      .contentPane!,
                 ),
               );
             }
@@ -169,16 +175,21 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
           case ConnectionState.active:
             if (snapshot.error != null) {
               return MaterialApp(
-                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                debugShowCheckedModeBanner:
+                    Fframe.of(context)!.debugShowCheckedModeBanner,
                 home: Scaffold(
-                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                  body: Fframe.of(context)!
+                      .navigationConfig
+                      .errorPage
+                      .contentPane!,
                 ),
               );
             }
 
             //Store the user
             if (snapshot.data != null) {
-              Fframe.of(context)!.user = FFrameUser.fromFirebaseUser(firebaseUser: snapshot.data!);
+              Fframe.of(context)!.user =
+                  FFrameUser.fromFirebaseUser(firebaseUser: snapshot.data!);
             } else {
               Fframe.of(context)!.user = null;
             }
@@ -212,6 +223,7 @@ class FframeBuilder extends StatelessWidget {
       darkTheme: Fframe.of(context)!.darkMode,
       themeMode: ThemeMode.system,
       locale: L10n.getLocale(),
+      title: Fframe.of(context)!.title,
     );
   }
 }
