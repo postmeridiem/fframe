@@ -3,9 +3,7 @@ part of fframe;
 class DocumentBodyLoader<T> extends StatefulWidget {
   const DocumentBodyLoader({
     Key? key,
-    required this.queryState,
   }) : super(key: key);
-  final QueryState queryState;
 
   @override
   State<DocumentBodyLoader> createState() => _DocumentBodyLoader<T>();
@@ -21,7 +19,6 @@ class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
 
     return DocumentBody<T>(
       key: ValueKey("documentBody_${widget.key.toString()}"),
-      queryState: widget.queryState,
       documentScreenConfig: documentScreenConfig,
       documentConfig: documentConfig,
       selectionState: selectionState,
@@ -32,13 +29,11 @@ class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
 class DocumentBody<T> extends StatelessWidget {
   const DocumentBody({
     Key? key,
-    required this.queryState,
     required this.documentScreenConfig,
     required this.documentConfig,
     required this.selectionState,
   }) : super(key: key);
 
-  final QueryState queryState;
   final DocumentScreenConfig documentScreenConfig;
   final DocumentConfig<T> documentConfig;
   final SelectionState<T> selectionState;
@@ -194,7 +189,6 @@ class DocumentBody<T> extends StatelessWidget {
                             ),
                           ),
                           ContextDrawer<T>(
-                            queryState: queryState,
                             contextDrawerOpen: contextDrawerOpen,
                           ),
                         ],

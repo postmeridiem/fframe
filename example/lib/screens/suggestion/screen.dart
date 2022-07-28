@@ -46,6 +46,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         );
       },
 
+      // query: (Query<Suggestion> query) {
+      //   return query.orderBy("creationDate", descending: true);
+      // },
+
       // documentScreenHeaderBuilder: () => const SizedBox(
       //   height: 40,
       //   child: Placeholder(
@@ -94,7 +98,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           ),
         ],
       ),
-      autoSelectFirst: true,
+      // autoSelectFirst: true,
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
         builder: (context, selected, data, user) {

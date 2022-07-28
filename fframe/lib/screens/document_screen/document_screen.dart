@@ -64,7 +64,12 @@ class DocumentScreen<T> extends StatelessWidget {
               child: DocumentLoader<T>(
                 key: ValueKey("DocumentLoader_$collection"),
               ),
-              fireStoreQueryState: FireStoreQueryState<T>(),
+              fireStoreQueryState: FireStoreQueryState<T>(
+                collection: collection,
+                fromFirestore: fromFirestore,
+                initialQuery: query,
+                listQuery: documentList?.queryBuilder,
+              ),
               selectionState: SelectionState<T>(),
               documentConfig: DocumentConfig<T>(
                 formKey: formKey,
@@ -612,17 +617,22 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
     debugPrint("build screenBodyState ${widget.key.toString()}");
     // List<QueryDocumentSnapshot<dynamic>>? queryDocumentSnapshots = ref.watch(queryBuilderStateProvider).queryBuilderSnapshot?.docs;
     QueryState queryState = ref.watch(queryStateProvider);
+
     Widget returnWidget = queryState.queryString.isEmpty
         ? (screenSize == ScreenSize.phone)
             ? const IgnorePointer()
             : FRouter.of(context).emptyPage()
-        : DocumentBodyLoader<T>(key: ValueKey(queryState.queryString), queryState: queryState);
+        : DocumentBodyLoader<T>(
+            key: ValueKey(queryState.queryString),
+          );
 
     //Handle document loads...
 
     // debugPrint("Read ${queryDocumentSnapshots?.length} docs from provider");
     if (queryState.queryParameters == null && documentScreenConfig.documentConfig.autoSelectFirst) {
-      returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading initial document");
+      returnWidget = AutoFirstDocumentLoader<T>(
+        documentConfig: DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>,
+      );
     } else if (queryState.queryParameters == null) {
       returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
     } else if (documentScreenConfig.selectionState.data == null && documentScreenConfig.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
@@ -653,5 +663,51 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
 
   postLoad({required DocumentScreenConfig documentScreenConfig}) async {
     debugPrint("PostLoad");
+  }
+}
+
+class AutoFirstDocumentLoader<T> extends StatefulWidget {
+  const AutoFirstDocumentLoader({
+    Key? key,
+    required this.documentConfig,
+  }) : super(key: key);
+
+  final DocumentConfig<T> documentConfig; // = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+
+  @override
+  State<AutoFirstDocumentLoader> createState() => _AutoFirstDocumentLoaderState<T>();
+}
+
+class _AutoFirstDocumentLoaderState<T> extends State<AutoFirstDocumentLoader<T>> {
+  @override
+  Widget build(BuildContext context) {
+    Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
+    return StreamBuilder<QuerySnapshot<T>>(
+      stream: query.snapshots(),
+      initialData: null,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> querySnapshot) {
+        switch (querySnapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.done:
+            return FRouter.of(context).waitPage(context: context, text: "Loading first document");
+          case ConnectionState.active:
+            if (querySnapshot.hasData && querySnapshot.data != null && querySnapshot.data!.docs.isNotEmpty) {
+              QueryDocumentSnapshot<T> queryDocumentSnapshot = querySnapshot.data!.docs.first;
+              SelectionState<T> selectionState = DocumentScreenConfig.of(context)!.selectionState as SelectionState<T>;
+              selectionState.setState(SelectionState<T>(
+                data: queryDocumentSnapshot.data(),
+                docId: queryDocumentSnapshot.id,
+                isNew: false,
+              ));
+              return DocumentBodyLoader<T>(
+                key: ValueKey(queryDocumentSnapshot.id),
+              );
+            }
+
+            return FRouter.of(context).emptyPage();
+        }
+      },
+    );
   }
 }

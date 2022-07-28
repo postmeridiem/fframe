@@ -27,11 +27,9 @@ class ContextCanvas extends StatelessWidget {
 class ContextDrawer<T> extends StatelessWidget {
   const ContextDrawer({
     Key? key,
-    required this.queryState,
     required this.contextDrawerOpen,
   }) : super(key: key);
 
-  final QueryState queryState;
   final bool contextDrawerOpen;
 
   @override

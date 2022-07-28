@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class ErrorPage extends StatefulWidget {
   const ErrorPage({Key? key}) : super(key: key);
@@ -33,7 +34,16 @@ class _ErrorPageState extends State<ErrorPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("build ErrorPage: ${Fframe.of(context)?.errorText}");
+    String errorText = Fframe.of(context)?.errorText ?? "Something failed succesfully";
+    String? httpLink;
+    int linkIndex = errorText.toLowerCase().split(" ").indexWhere((String word) => word.startsWith("http://") || word.startsWith("https://"));
+    if (linkIndex != -1) {
+      List<String> errorArray = errorText.split(" ");
+      httpLink = errorArray.elementAt(linkIndex);
+      errorArray.removeAt(linkIndex);
+      errorText = errorArray.join(" ");
+    }
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +70,7 @@ class _ErrorPageState extends State<ErrorPage> {
             padding: const EdgeInsets.all(8.0),
             child: Center(
               child: Text(
-                Fframe.of(context)?.errorText ?? "Something failed succesfully",
+                errorText,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onBackground,
                 ),
@@ -68,6 +78,20 @@ class _ErrorPageState extends State<ErrorPage> {
               ),
             ),
           ),
+          if (httpLink != null)
+            TextButton(
+              onPressed: () {
+                launchUrlString(httpLink!);
+              },
+              child: Text(
+                "link",
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onBackground,
+                  decoration: TextDecoration.underline,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            )
         ],
       ),
     );

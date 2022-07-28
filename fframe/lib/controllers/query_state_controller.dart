@@ -1,13 +1,33 @@
+import 'package:fframe/services/database_service.dart';
 import 'package:flutter/material.dart';
 
 import '../fframe.dart';
 
 class FireStoreQueryState<T> with ChangeNotifier {
-  late Query<T> Function(Query<T>)? initialQuery;
+  final Query<T> Function(Query<T>)? initialQuery;
+  final Query<T> Function(Query<T>)? listQuery;
+  late Query<T> baseQuery;
   late FirestoreQueryBuilderSnapshot queryBuilderSnapshot;
   final Map<String, Query<T> Function(Query<T>)> _queryComponents = {};
 
-  FireStoreQueryState();
+  final String collection;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+
+  FireStoreQueryState({
+    required this.collection,
+    required this.fromFirestore,
+    required this.initialQuery,
+    required this.listQuery,
+  }) {
+    baseQuery = DatabaseService<T>().query(
+      collection: collection,
+      fromFirestore: fromFirestore,
+    );
+
+    if (initialQuery != null) {
+      baseQuery = initialQuery!.call(baseQuery);
+    }
+  }
 
   reset() {
     _queryComponents.clear();
@@ -31,9 +51,22 @@ class FireStoreQueryState<T> with ChangeNotifier {
     notifyListeners();
   }
 
-  Query<T> currentQuery(Query<T> query) {
-    if (initialQuery != null) {
-      query = initialQuery!.call(query);
+  Query<T> firstDocumentQuery() {
+    Query<T> query = baseQuery;
+
+    if (listQuery != null) {
+      query = listQuery!.call(query);
+    }
+
+    query.limit(1);
+    return query;
+  }
+
+  Query<T> currentQuery() {
+    Query<T> query = baseQuery;
+
+    if (listQuery != null) {
+      query = listQuery!.call(query);
     }
 
     if (_queryComponents.isNotEmpty) {

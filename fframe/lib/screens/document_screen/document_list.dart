@@ -85,19 +85,11 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
     DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
 
-    Query<T> query = DatabaseService<T>().query(
-      collection: documentConfig.collection,
-      fromFirestore: documentConfig.fromFirestore,
-    );
-    FireStoreQueryState<T> fireStoreQueryState = DocumentScreenConfig.of(context)?.fireStoreQueryState as FireStoreQueryState<T>;
-    fireStoreQueryState.initialQuery = documentConfig.query;
-
     return DocumentListBody<T>(
       key: ValueKey("documentListBody_${widget.key.toString()}"),
       scrollController: scrollController,
       documentScreenConfig: documentScreenConfig,
       documentConfig: documentConfig,
-      query: query,
       ref: widget.ref,
     );
   }
@@ -109,13 +101,11 @@ class DocumentListBody<T> extends StatefulWidget {
     required this.scrollController,
     required this.documentScreenConfig,
     required this.documentConfig,
-    required this.query,
     required this.ref,
   }) : super(key: key);
   final ScrollController scrollController;
   final DocumentScreenConfig documentScreenConfig;
   final DocumentConfig<T> documentConfig;
-  final Query<T> query;
   final WidgetRef ref;
 
   @override
@@ -168,7 +158,7 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
                 child: AnimatedBuilder(
                     animation: widget.documentScreenConfig.fireStoreQueryState,
                     builder: (context, child) {
-                      Query<T> query = widget.documentScreenConfig.fireStoreQueryState.currentQuery(widget.query) as Query<T>;
+                      Query<T> query = widget.documentScreenConfig.fireStoreQueryState.currentQuery() as Query<T>;
                       return FirestoreSeparatedListView<T>(
                         documentList: widget.documentConfig.documentList!,
                         documentScreenConfig: widget.documentScreenConfig,
