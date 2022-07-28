@@ -94,7 +94,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           ),
         ],
       ),
-
+      autoSelectFirst: true,
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
         builder: (context, selected, data, user) {
@@ -114,7 +114,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           }
         },
         hoverSelect: false,
-        autoSelectFirst: true,
+
         // headerBuilder: ((context, snapshot) {
         //   return const SizedBox(
         //     height: 40,
@@ -150,13 +150,13 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
     //   debugPrint("Wow, such new");
     // }
     return Document<Suggestion>(
-      documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
+      documentTabsBuilder: (context, suggestion, isReadOnly, isNew, fFrameUser) {
         return [
           DocumentTab<Suggestion>(
             tabBuilder: (user) {
-              return const Tab(
-                text: "Suggestion",
-                icon: Icon(
+              return Tab(
+                text: "${suggestion.name}",
+                icon: const Icon(
                   Icons.pest_control,
                 ),
               );
@@ -215,12 +215,15 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 class FormCeptionWidget extends StatelessWidget {
   const FormCeptionWidget({
     Key? key,
+    required this.suggestion,
   }) : super(key: key);
+
+  final Suggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
     return DocumentScreen<Suggestion>(
-      collection: "suggestions",
+      collection: "suggestions/${suggestion.id}/subcollectionname",
       fromFirestore: Suggestion.fromFirestore,
       toFirestore: (suggestion, options) {
         return suggestion.toFirestore();

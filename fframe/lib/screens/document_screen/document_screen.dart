@@ -6,10 +6,12 @@ class DocumentScreen<T> extends StatelessWidget {
     // required this.formKey,
     required this.collection,
     required this.createNew,
+    this.preSave,
     this.createDocumentId,
     required this.fromFirestore,
     required this.toFirestore,
     this.documentList,
+    this.autoSelectFirst = false,
     this.query,
     this.searchConfig,
     this.titleBuilder,
@@ -27,12 +29,14 @@ class DocumentScreen<T> extends StatelessWidget {
   final SearchConfig<T>? searchConfig;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
-  final List<IconButton>? extraActionButtons;
+  final ExtraActionButtonsBuilder? extraActionButtons;
   final String queryStringIdParam;
   final String collection;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final T Function() createNew;
+  final T Function(T)? preSave;
+  final bool autoSelectFirst;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
   final DocumentScreenHeaderBuilder? documentScreenHeaderBuilder;
@@ -57,15 +61,16 @@ class DocumentScreen<T> extends StatelessWidget {
           child: Form(
             key: formKey,
             child: DocumentScreenConfig(
-              // key:
               child: DocumentLoader<T>(
                 key: ValueKey("DocumentLoader_$collection"),
               ),
-
+              fireStoreQueryState: FireStoreQueryState<T>(),
+              selectionState: SelectionState<T>(),
               documentConfig: DocumentConfig<T>(
                 formKey: formKey,
                 collection: collection,
                 documentList: documentList,
+                autoSelectFirst: autoSelectFirst,
                 queryStringIdParam: _queryStringIdParam ?? queryStringIdParam,
                 createNew: createNew,
                 createDocumentId: createDocumentId,
@@ -74,12 +79,10 @@ class DocumentScreen<T> extends StatelessWidget {
                 fromFirestore: fromFirestore,
                 query: query,
                 searchConfig: searchConfig,
-                extraActionButtons: extraActionButtons,
                 titleBuilder: titleBuilder as TitleBuilder<T>,
                 contextCardBuilders: contextCardBuilders,
                 embeddedDocument: _embeddedDocument ?? false,
               ),
-              fireStoreQueryState: FireStoreQueryState<T>(), selectionState: SelectionState<T>(),
             ),
           ),
         ),
@@ -319,7 +322,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
       );
 
       if (documentSnapshot?.exists ?? false) {
-        debugPrint("Assign loaded document $docId to selectionState and notify");
+        debugPrint("Loaded document $docId to selectionState and notify");
         selectionState.setState(
           SelectionState<T>(
             data: documentSnapshot!.data(),
@@ -540,11 +543,6 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
           },
         ),
     ];
-
-    //Add any extra configured buttons to the list
-    if (documentConfig.extraActionButtons != null) {
-      iconButtons.addAll(documentConfig.extraActionButtons!);
-    }
     return iconButtons;
   }
 }
@@ -582,8 +580,29 @@ class ScreenBody<T> extends ConsumerStatefulWidget {
 }
 
 class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
+  QueryDocumentSnapshot<dynamic>? firstDoc;
+  bool building = true;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    debugPrint("build _ScreenBodyState");
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    if (firstDoc != null) {
+      debugPrint("First doc");
+    }
+
+    if (documentScreenConfig.documentConfig.autoSelectFirst) {
+      debugPrint("autoSelectFirst");
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        postLoad(documentScreenConfig: documentScreenConfig);
+      });
+    }
+
     ScreenSize screenSize = (MediaQuery.of(context).size.width <= 599)
         ? ScreenSize.phone
         : (MediaQuery.of(context).size.width < 1000)
@@ -591,6 +610,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
             : ScreenSize.large;
 
     debugPrint("build screenBodyState ${widget.key.toString()}");
+    // List<QueryDocumentSnapshot<dynamic>>? queryDocumentSnapshots = ref.watch(queryBuilderStateProvider).queryBuilderSnapshot?.docs;
     QueryState queryState = ref.watch(queryStateProvider);
     Widget returnWidget = queryState.queryString.isEmpty
         ? (screenSize == ScreenSize.phone)
@@ -599,33 +619,41 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
         : DocumentBodyLoader<T>(key: ValueKey(queryState.queryString), queryState: queryState);
 
     //Handle document loads...
-    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+
+    // // debugPrint("Read ${queryDocumentSnapshots?.length} docs from provider");
+    // if (queryState.queryParameters == null && documentScreenConfig.documentConfig.autoSelectFirst) {
+    //   // postLoad(ref: ref, documentScreenConfig: documentScreenConfig);
+    //   returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading initial document");
+    // } else
     if (queryState.queryParameters == null) {
-      //Cannot contain a form
-      return (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
+      returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
     } else if (documentScreenConfig.selectionState.data == null && documentScreenConfig.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn a new document");
       documentScreenConfig.selectionState.setState(SelectionState<T>(data: documentScreenConfig.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false));
     } else if (documentScreenConfig.selectionState.data is T && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn new document from cache");
-      return returnWidget;
+      // return returnWidget;
     } else if (!queryState.queryParameters!.containsKey(documentScreenConfig.documentConfig.queryStringIdParam)) {
-      return (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
+      returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
     } else if (((documentScreenConfig.selectionState.docId != queryState.queryParameters?[documentScreenConfig.documentConfig.queryStringIdParam]) || (documentScreenConfig.selectionState.data == null && queryState.queryParameters != null))) {
       documentScreenConfig.selectionState.addListener(() {
-        debugPrint("Our document has arrived");
         documentScreenConfig.selectionState.removeListener(() {});
         setState(() {});
       });
       documentScreenConfig.load<T>(context: context, docId: queryState.queryParameters![documentScreenConfig.documentConfig.queryStringIdParam]!);
-      return FRouter.of(context).waitPage(context: context, text: "Loading document");
+      returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading document");
     }
 
-    // return returnWidget;
+    debugPrint("Load the AnimatedSwitcher ");
+    // postLoad(ref: ref, documentScreenConfig: documentScreenConfig);
     return AnimatedSwitcher(
       key: ValueKey("query_${widget.key.toString()}"),
       duration: const Duration(milliseconds: 5),
       child: returnWidget,
     );
+  }
+
+  postLoad({required DocumentScreenConfig documentScreenConfig}) async {
+    debugPrint("PostLoad");
   }
 }

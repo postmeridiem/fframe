@@ -12,8 +12,8 @@ class DocumentConfig<T> {
     this.searchConfig,
     this.documentList,
     this.titleBuilder,
+    required this.autoSelectFirst,
     required this.document,
-    this.extraActionButtons,
     this.contextCardBuilders,
     this.queryStringIdParam = "id",
     this.embeddedDocument = false,
@@ -23,9 +23,10 @@ class DocumentConfig<T> {
   final DocumentList<T>? documentList;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
-  final List<IconButton>? extraActionButtons;
+
   final String queryStringIdParam;
   final String collection;
+  final bool autoSelectFirst;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final Query<T> Function(Query<T> query)? query;
@@ -43,6 +44,7 @@ class Document<T> {
   Document({
     this.key,
     required this.documentTabsBuilder,
+    this.extraActionButtons,
     this.contextCards,
     this.documentHeaderBuilder,
     this.autoSave = false,
@@ -58,6 +60,7 @@ class Document<T> {
   final DocumentTabsBuilder<T>? documentTabsBuilder;
   final DocumentHeaderBuilder<T>? documentHeaderBuilder;
   final List<ContextCardBuilder>? contextCards;
+  final ExtraActionButtonsBuilder<T>? extraActionButtons;
   List<DocumentTab<T>>? activeTabs;
   bool autoSave;
   bool readOnly;
@@ -88,7 +91,6 @@ class DocumentList<T> {
     this.queryBuilder,
     this.headerBuilder,
     this.footerBuilder,
-    this.autoSelectFirst = false,
     this.hoverSelect = false,
     this.showSeparator = true,
     this.showCreateButton = true,
@@ -98,7 +100,6 @@ class DocumentList<T> {
   final Query<T> Function(Query<T> query)? queryBuilder;
   final DocumentListHeaderBuilder<T>? headerBuilder;
   final DocumentListFooterBuilder<T>? footerBuilder;
-  final bool autoSelectFirst;
   final bool hoverSelect;
   final bool showSeparator;
   final bool showCreateButton;

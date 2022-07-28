@@ -5,6 +5,7 @@ class SelectionState<T> with ChangeNotifier {
   late String? docId;
   late bool isNew;
   late bool readOnly;
+
   SelectionState({
     this.docId,
     this.data,
@@ -17,6 +18,7 @@ class SelectionState<T> with ChangeNotifier {
     docId = selectionState.docId;
     isNew = selectionState.isNew;
     readOnly = selectionState.readOnly;
+
     if (notify) {
       notifyListeners();
     }

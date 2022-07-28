@@ -1,8 +1,10 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+
+import '../fframe.dart';
 
 class FireStoreQueryState<T> with ChangeNotifier {
   late Query<T> Function(Query<T>)? initialQuery;
+  late FirestoreQueryBuilderSnapshot queryBuilderSnapshot;
   final Map<String, Query<T> Function(Query<T>)> _queryComponents = {};
 
   FireStoreQueryState();

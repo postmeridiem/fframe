@@ -12,6 +12,14 @@ typedef DocumentTabsBuilder<T> = List<DocumentTab<T>> Function(
   FFrameUser? user,
 );
 
+typedef ExtraActionButtonsBuilder<T> = List<IconButton> Function(
+  BuildContext context,
+  T data,
+  bool isReadOnly,
+  bool isNew,
+  FFrameUser? user,
+);
+
 typedef DocumentListItemBuilder<T> = Widget Function(
   BuildContext context,
   bool selected,

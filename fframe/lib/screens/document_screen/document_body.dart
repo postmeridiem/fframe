@@ -176,6 +176,9 @@ class DocumentBody<T> extends StatelessWidget {
                                                 child: Row(
                                                   children: [
                                                     ...documentScreenConfig.iconButtons<T>(context)!,
+                                                    //Add any extra configured buttons to the list
+                                                    if (documentConfig.document.extraActionButtons != null)
+                                                      ...documentConfig.document.extraActionButtons!(context, selectionState.data!, selectionState.readOnly, selectionState.isNew, Fframe.of(context)!.user),
                                                   ],
                                                 ),
                                               ),
