@@ -76,7 +76,7 @@ class _SignInPageState extends State<SignInPage> {
     }
 
     if (Fframe.of(context)?.providerConfigs == null || (Fframe.of(context)?.providerConfigs != null && Fframe.of(context)!.providerConfigs!.isEmpty)) {
-      Fframe.of(context)!.showError(context: context, errorText: "Missign auth provider configuration");
+      Fframe.of(context)!.showErrorPage(context: context, errorText: "Missign auth provider configuration");
     }
 
     return SignInScreen(

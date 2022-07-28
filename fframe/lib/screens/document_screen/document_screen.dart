@@ -620,12 +620,10 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
 
     //Handle document loads...
 
-    // // debugPrint("Read ${queryDocumentSnapshots?.length} docs from provider");
-    // if (queryState.queryParameters == null && documentScreenConfig.documentConfig.autoSelectFirst) {
-    //   // postLoad(ref: ref, documentScreenConfig: documentScreenConfig);
-    //   returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading initial document");
-    // } else
-    if (queryState.queryParameters == null) {
+    // debugPrint("Read ${queryDocumentSnapshots?.length} docs from provider");
+    if (queryState.queryParameters == null && documentScreenConfig.documentConfig.autoSelectFirst) {
+      returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading initial document");
+    } else if (queryState.queryParameters == null) {
       returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
     } else if (documentScreenConfig.selectionState.data == null && documentScreenConfig.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn a new document");

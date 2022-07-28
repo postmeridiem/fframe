@@ -106,6 +106,7 @@ class FRouter extends InheritedWidget {
   }
 
   Widget waitPage({required BuildContext context, String? text}) {
+    Fframe.of(context)?.waitText = text;
     return RouterConfig.instance.navigationConfig.waitPage.contentPane ?? const Center(child: CircularProgressIndicator());
   }
 

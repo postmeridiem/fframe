@@ -209,7 +209,7 @@ class DocumentBody<T> extends StatelessWidget {
         ),
       );
     } else {
-      return Fframe.of(context)!.showError(context: context, errorText: "Incorrect form configuration");
+      return Fframe.of(context)!.showErrorPage(context: context, errorText: "Incorrect form configuration");
     }
   }
 }

@@ -31,10 +31,16 @@ class Fframe extends InheritedWidget {
     return context.dependOnInheritedWidgetOfExactType<Fframe>();
   }
 
-  String errorText = '';
+  String? errorText;
+  String? waitText;
 
-  Widget showError({required BuildContext context, required String errorText}) {
+  Widget showErrorPage({required BuildContext context, required String errorText}) {
     this.errorText = errorText;
+    return FRouter.of(context).errorPage(context: context);
+  }
+
+  Widget showWaitPage({required BuildContext context, required String waitText}) {
+    this.waitText = waitText;
     return FRouter.of(context).errorPage(context: context);
   }
 
@@ -78,8 +84,7 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<FirebaseApp>(
-      future:
-          Firebase.initializeApp(options: Fframe.of(context)!.firebaseOptions),
+      future: Firebase.initializeApp(options: Fframe.of(context)!.firebaseOptions),
       builder: (BuildContext context, AsyncSnapshot<FirebaseApp> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
@@ -98,14 +103,10 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
           case ConnectionState.done:
             if (snapshot.error != null) {
               return MaterialApp(
-                debugShowCheckedModeBanner:
-                    Fframe.of(context)!.debugShowCheckedModeBanner,
+                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
                 title: "lalala",
                 home: Scaffold(
-                  body: Fframe.of(context)!
-                      .navigationConfig
-                      .errorPage
-                      .contentPane!,
+                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
                 ),
               );
             }
@@ -175,21 +176,16 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
           case ConnectionState.active:
             if (snapshot.error != null) {
               return MaterialApp(
-                debugShowCheckedModeBanner:
-                    Fframe.of(context)!.debugShowCheckedModeBanner,
+                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
                 home: Scaffold(
-                  body: Fframe.of(context)!
-                      .navigationConfig
-                      .errorPage
-                      .contentPane!,
+                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
                 ),
               );
             }
 
             //Store the user
             if (snapshot.data != null) {
-              Fframe.of(context)!.user =
-                  FFrameUser.fromFirebaseUser(firebaseUser: snapshot.data!);
+              Fframe.of(context)!.user = FFrameUser.fromFirebaseUser(firebaseUser: snapshot.data!);
             } else {
               Fframe.of(context)!.user = null;
             }

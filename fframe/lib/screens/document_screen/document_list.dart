@@ -184,7 +184,7 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
                           );
                         },
                         loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
-                        errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showError(context: context, errorText: error.toString()),
+                        errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showErrorPage(context: context, errorText: error.toString()),
                       );
                     }),
               ),
