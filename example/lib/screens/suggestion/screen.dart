@@ -108,6 +108,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             user: user,
           );
         },
+        // showCreateButton: true,
         queryBuilder: (query) {
           // return query.where("active", isNull: true);
 
@@ -156,6 +157,13 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
     //   debugPrint("Wow, such new");
     // }
     return Document<Suggestion>(
+      showCloseButton: true,
+      showCopyButton: true,
+      showEditToggleButton: true,
+      showCreateButton: true,
+      showDeleteButton: true,
+      showSaveButton: true,
+      showValidateButton: true,
       extraActionButtons: (context, suggestion, isReadOnly, isNew, user) {
         return [
           if (suggestion.active == false)

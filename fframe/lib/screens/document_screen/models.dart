@@ -50,6 +50,7 @@ class Document<T> {
     this.readOnly = false,
     this.showCreateButton = false,
     this.showCopyButton = false,
+    this.showCloseButton = true,
     this.showEditToggleButton = false,
     this.showValidateButton = false,
     this.showSaveButton = true,
@@ -67,6 +68,7 @@ class Document<T> {
   bool showEditToggleButton;
   bool showDeleteButton;
   bool showCopyButton;
+  bool showCloseButton;
   bool showValidateButton;
   bool showSaveButton;
 }

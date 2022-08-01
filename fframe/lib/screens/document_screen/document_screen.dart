@@ -449,108 +449,121 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   }
 
   List<IconButton>? iconButtons<T>(BuildContext context) {
-    List<IconButton>? iconButtons = [
-      IconButton(
-        tooltip: L10n.string(
-          "iconbutton_document_close",
-          placeholder: "Close this document",
-        ),
-        icon: Icon(
-          Icons.close,
-          color: Theme.of(context).colorScheme.onBackground,
-        ),
-        onPressed: () {
-          close<T>(context: context);
-        },
-      ),
-      if (!selectionState.isNew && selectionState.readOnly == true && documentConfig.document.showEditToggleButton == true)
+    DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
+    Document<T> document = _documentConfig.document;
+    SelectionState<T> selectionState = DocumentScreenConfig.of(context)!.selectionState as SelectionState<T>;
+    List<IconButton>? iconButtons = [];
+
+    if (document.showCloseButton) {
+      iconButtons.add(
         IconButton(
           tooltip: L10n.string(
-            "iconbutton_document_edit",
-            placeholder: "Edit this document",
+            "iconbutton_document_close",
+            placeholder: "Close this document",
           ),
           icon: Icon(
-            Icons.edit,
+            Icons.close,
             color: Theme.of(context).colorScheme.onBackground,
           ),
           onPressed: () {
-            toggleReadOnly<T>(context: context);
+            close<T>(context: context);
           },
         ),
-      if (!selectionState.isNew)
-        IconButton(
-          tooltip: L10n.string(
-            "iconbutton_document_delete",
-            placeholder: "Delete this document",
+      );
+    }
+
+    if (!selectionState.isNew) {
+      if (document.showDeleteButton) {
+        iconButtons.add(
+          IconButton(
+            tooltip: L10n.string(
+              "iconbutton_document_delete",
+              placeholder: "Delete this document",
+            ),
+            icon: Icon(
+              Icons.delete_forever,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+            onPressed: () {
+              copy<T>(context: context);
+            },
           ),
-          icon: Icon(
-            Icons.delete,
-            color: Theme.of(context).colorScheme.onBackground,
+        );
+      }
+      if (document.showCopyButton) {
+        iconButtons.add(
+          IconButton(
+            tooltip: L10n.string(
+              "iconbutton_document_copy",
+              placeholder: "Copy this document",
+            ),
+            icon: Icon(
+              Icons.copy_outlined,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+            onPressed: () {
+              copy<T>(context: context);
+            },
           ),
-          onPressed: () {
-            delete<T>(context: context);
-          },
-        ),
-      if (!selectionState.isNew)
-        IconButton(
-          tooltip: L10n.string(
-            "iconbutton_document_copy",
-            placeholder: "Copy this document",
+        );
+      }
+      if (selectionState.readOnly == true && document.showEditToggleButton) {
+        iconButtons.add(
+          IconButton(
+            tooltip: L10n.string(
+              "iconbutton_document_edit",
+              placeholder: "Edit this document",
+            ),
+            icon: Icon(
+              Icons.edit,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+            onPressed: () {
+              toggleReadOnly<T>(context: context);
+            },
           ),
-          icon: Icon(
-            Icons.copy_outlined,
-            color: Theme.of(context).colorScheme.onBackground,
+        );
+      }
+    }
+
+    if (selectionState.readOnly == false) {
+      if (document.showValidateButton) {
+        iconButtons.add(
+          IconButton(
+            tooltip: L10n.string(
+              "iconbutton_document_validate",
+              placeholder: "Validate this document",
+            ),
+            icon: Icon(
+              Icons.check,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+            onPressed: () {
+              validate<T>(context: context, showPopup: true);
+              // validate();
+            },
           ),
-          onPressed: () {
-            copy<T>(context: context);
-          },
-        ),
-      if (!selectionState.readOnly)
-        IconButton(
-          tooltip: L10n.string(
-            "iconbutton_document_validate",
-            placeholder: "Validate this document",
+        );
+      }
+      if (document.showSaveButton) {
+        iconButtons.add(
+          IconButton(
+            tooltip: L10n.string(
+              "iconbutton_document_save",
+              placeholder: "Save this document",
+            ),
+            icon: Icon(
+              Icons.save,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+            onPressed: () {
+              save<T>(context: context);
+              // validate();
+            },
           ),
-          icon: Icon(
-            Icons.check,
-            color: Theme.of(context).colorScheme.onBackground,
-          ),
-          onPressed: () {
-            validate<T>(context: context, showPopup: true);
-            // validate();
-          },
-        ),
-      if (!selectionState.readOnly)
-        IconButton(
-          tooltip: L10n.string(
-            "iconbutton_document_save",
-            placeholder: "Save this document",
-          ),
-          icon: Icon(
-            Icons.save,
-            color: Theme.of(context).colorScheme.onBackground,
-          ),
-          onPressed: () {
-            save<T>(context: context);
-            // validate();
-          },
-        ),
-      if (documentConfig.document.showCopyButton == true)
-        IconButton(
-          tooltip: L10n.string(
-            "iconbutton_document_new",
-            placeholder: "Create new document",
-          ),
-          icon: Icon(
-            Icons.add,
-            color: Theme.of(context).colorScheme.onBackground,
-          ),
-          onPressed: () {
-            create<T>(context: context);
-            // validate();
-          },
-        ),
-    ];
+        );
+      }
+    }
     return iconButtons;
   }
 }
