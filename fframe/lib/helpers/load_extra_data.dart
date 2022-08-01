@@ -167,6 +167,95 @@ class QueryFromFireStore<T> extends StatelessWidget {
   }
 }
 
+class QueryStreamFromFireStore<T> extends StatelessWidget {
+  const QueryStreamFromFireStore({
+    required this.builder,
+    this.errorBuilder,
+    this.waitBuilder,
+    this.notFoundBuilder,
+    required this.fromFirestore,
+    required this.toFirestore,
+    this.query,
+    required this.collection,
+    this.limit,
+    Key? key,
+  }) : super(key: key);
+
+  final ResultsBuilder<T> builder;
+  final ErrorBuilder? errorBuilder;
+  final WaitBuilder? waitBuilder;
+  final NotFoundBuilder? notFoundBuilder;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
+  final Query<T> Function(Query<T>)? query;
+  final String collection;
+  final int? limit;
+
+  @override
+  Widget build(BuildContext context) {
+    Query<T> query = DatabaseService<T>().query(
+      collection: collection,
+      fromFirestore: fromFirestore,
+      queryBuilder: this.query,
+      limit: limit,
+    );
+
+    return StreamBuilder<QuerySnapshot<T>>(
+      stream: query.snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.done:
+            if (waitBuilder == null) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            return waitBuilder!(context);
+
+          case ConnectionState.active:
+            if (snapshot.hasError) {
+              //Something has gone wrong
+              if (errorBuilder == null) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error),
+                    Text(snapshot.error.toString()),
+                  ],
+                );
+              }
+              return errorBuilder!(context, snapshot.error.toString());
+            }
+            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.docs.isEmpty) {
+              if (notFoundBuilder == null) {
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.warning),
+                    Text("Not found"),
+                  ],
+                );
+              }
+              return notFoundBuilder!(context);
+            }
+
+            return builder(
+                context,
+                snapshot.data!.docs
+                    .map(
+                      (QueryDocumentSnapshot<T> queryDocument) => queryDocument.data(),
+                    )
+                    .toList());
+        }
+      },
+    );
+  }
+}
+
 typedef ResultBuilder<T> = Widget Function(
   BuildContext context,
   T data,
