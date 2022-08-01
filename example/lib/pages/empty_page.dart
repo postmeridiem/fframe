@@ -55,7 +55,7 @@ class _EmptyPageState extends State<EmptyPage> {
                 _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
           ),
           Text(
-            "Much emptyyyeee",
+            "Much empty",
             style: TextStyle(
               color: Theme.of(context).colorScheme.onBackground,
             ),
