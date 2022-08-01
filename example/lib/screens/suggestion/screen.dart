@@ -47,7 +47,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       },
 
       // query: (Query<Suggestion> query) {
-      //   return query.orderBy("creationDate", descending: true);
+      //   return query.where("active", isEqualTo: null);
       // },
 
       // documentScreenHeaderBuilder: () => const SizedBox(
@@ -98,7 +98,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           ),
         ],
       ),
-      // autoSelectFirst: true,
+      autoSelectFirst: true,
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
         builder: (context, selected, data, user) {
@@ -109,6 +109,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           );
         },
         queryBuilder: (query) {
+          // return query.where("active", isNull: true);
+
           switch (widget.suggestionQueryState) {
             case SuggestionQueryStates.active:
               return query.where("active", isEqualTo: true);
@@ -154,6 +156,28 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
     //   debugPrint("Wow, such new");
     // }
     return Document<Suggestion>(
+      extraActionButtons: (context, suggestion, isReadOnly, isNew, user) {
+        return [
+          if (suggestion.active == false)
+            TextButton.icon(
+              onPressed: () {
+                suggestion.active = true;
+                DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+              },
+              icon: const Icon(Icons.check, color: Colors.redAccent),
+              label: const Text("Mark as Active"),
+            ),
+          if (suggestion.active == true)
+            TextButton.icon(
+              onPressed: () {
+                suggestion.active = false;
+                DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+              },
+              icon: const Icon(Icons.close, color: Colors.greenAccent),
+              label: const Text("Mark as Done"),
+            ),
+        ];
+      },
       documentTabsBuilder: (context, suggestion, isReadOnly, isNew, fFrameUser) {
         return [
           DocumentTab<Suggestion>(

@@ -3,7 +3,6 @@ part of fframe;
 class DocumentScreen<T> extends StatelessWidget {
   DocumentScreen({
     Key? key,
-    // required this.formKey,
     required this.collection,
     required this.createNew,
     this.preSave,
@@ -16,7 +15,6 @@ class DocumentScreen<T> extends StatelessWidget {
     this.searchConfig,
     this.titleBuilder,
     required this.document,
-    this.extraActionButtons,
     this.contextCardBuilders,
     this.queryStringIdParam = "id",
     this.documentScreenHeaderBuilder,
@@ -29,7 +27,6 @@ class DocumentScreen<T> extends StatelessWidget {
   final SearchConfig<T>? searchConfig;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
-  final ExtraActionButtonsBuilder? extraActionButtons;
   final String queryStringIdParam;
   final String collection;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
@@ -362,7 +359,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     }
   }
 
-  save<T>({required BuildContext context}) async {
+  save<T>({required BuildContext context, bool closeAfterSave = true}) async {
     if (validate<T>(context: context, moveToTab: true) == -1) {
       DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
       String? docId = selectionState.docId;
@@ -394,7 +391,13 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
       if (saveResult.result) {
         //Success
         debugPrint("Save was successfull");
-        close(context: context, skipWarning: true);
+        // if (FRouter.of(context).isQueryStringEmpty && documentConfig.autoSelectFirst == true) {
+        //   //Do not unload the current document, the autoload should pick it up
+        //   return;
+        // }
+        if (closeAfterSave) {
+          close<T>(context: context, skipWarning: true);
+        }
       } else {
         debugPrint("Save failed");
 

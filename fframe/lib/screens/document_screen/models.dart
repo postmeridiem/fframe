@@ -23,7 +23,6 @@ class DocumentConfig<T> {
   final DocumentList<T>? documentList;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
-
   final String queryStringIdParam;
   final String collection;
   final bool autoSelectFirst;

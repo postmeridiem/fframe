@@ -22,6 +22,16 @@ class Tab01 extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // const SizedBox(
+        //   height: 100.0,
+        //   width: double.infinity,
+        //   child: Placeholder(
+        //     color: Colors.indigo,
+        //     child: Center(
+        //       child: Text("Static header"),
+        //     ),
+        //   ),
+        // ),
         Expanded(
           child: ListView(
             children: [

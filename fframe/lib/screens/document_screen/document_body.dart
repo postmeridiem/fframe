@@ -10,12 +10,23 @@ class DocumentBodyLoader<T> extends StatefulWidget {
 }
 
 class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
+  late DocumentScreenConfig documentScreenConfig;
+  late DocumentConfig<T> documentConfig;
+  late SelectionState<T> selectionState;
+  @override
+  void didChangeDependencies() {
+    documentScreenConfig = DocumentScreenConfig.of(context)!;
+    documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+    selectionState = documentScreenConfig.selectionState as SelectionState<T>;
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     debugPrint("build documentBodyLoader ${widget.key.toString()}");
-    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
-    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
-    SelectionState<T> selectionState = documentScreenConfig.selectionState as SelectionState<T>;
+    documentScreenConfig = DocumentScreenConfig.of(context)!;
+    documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+    selectionState = documentScreenConfig.selectionState as SelectionState<T>;
 
     return DocumentBody<T>(
       key: ValueKey("documentBody_${widget.key.toString()}"),

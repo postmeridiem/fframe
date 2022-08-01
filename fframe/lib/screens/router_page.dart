@@ -64,6 +64,12 @@ class FRouter extends InheritedWidget {
   }
 
   //Get a value from the QueryString
+  bool get isQueryStringEmpty {
+    QueryState queryState = ref.read(queryStateProvider);
+    return queryState.queryParameters?.isEmpty ?? true;
+  }
+
+  //Get a value from the QueryString
   bool hasQueryStringParam(String key) {
     QueryState queryState = ref.read(queryStateProvider);
     return queryState.queryParameters?.containsKey(key) ?? false;
@@ -208,6 +214,9 @@ class FRouter extends InheritedWidget {
     if (!tabController.indexIsChanging) {
       NavigationTarget currentTarget = navigationNotifier.currentTarget.navigationTarget;
       NavigationTarget pendingTarget = navigationNotifier.navigationTabs[tabController.index];
+
+      pendingTarget = (pendingTarget.navigationTabs != null && pendingTarget.navigationTabs!.isNotEmpty) ? pendingTarget.navigationTabs!.first : pendingTarget;
+
       if (currentTarget.path != pendingTarget.path) {
         debugPrint("Switch from ${currentTarget.path} to ${pendingTarget.path}.");
         navigateTo(navigationTarget: pendingTarget);

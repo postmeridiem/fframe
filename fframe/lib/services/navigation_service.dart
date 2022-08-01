@@ -37,7 +37,7 @@ class NavigationNotifier extends ChangeNotifier {
 
   NavigationNotifier({required this.ref}) {
     _filterNavigationRoutes();
-    FirebaseAuth.instance.userChanges().listen((User? user) => authChangeListener(user));
+    FirebaseAuth.instance.authStateChanges().listen((User? user) => authChangeListener(user));
   }
 
   int selectedNavRailIndex = 0;
@@ -111,7 +111,16 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   bool get hasSubTabs {
-    return _targetState!.navigationTarget.navigationTabs != null || (_targetState!.navigationTarget.navigationTabs != null && _targetState!.navigationTarget.navigationTabs!.isNotEmpty);
+    // if (_targetState == null) {
+    //   return false;
+    // }
+
+    if (_targetState!.navigationTarget is NavigationTab) {
+      NavigationTab navigationTab = _targetState!.navigationTarget as NavigationTab;
+      return navigationTab.navigationTabs != null || (navigationTab.navigationTabs != null && navigationTab.navigationTabs!.isNotEmpty) || (navigationTab.parentTarget is NavigationTab);
+    }
+    return false;
+    // return _targetState!.navigationTarget.navigationTabs != null || (_targetState!.navigationTarget.navigationTabs != null && _targetState!.navigationTarget.navigationTabs!.isNotEmpty);
   }
 
   List<NavigationTab> get navigationTabs {
@@ -126,7 +135,9 @@ class NavigationNotifier extends ChangeNotifier {
   List<NavigationTab> get navigationSubTabs {
     if (hasSubTabs) {
       NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
-      // NavigationTarget parentTarget = currentTab.parentTarget;
+      if ((currentTab.parentTarget is NavigationTab)) {
+        return currentTab.parentTarget.navigationTabs!;
+      }
       return currentTab.navigationTabs!;
     }
     return [];
@@ -183,7 +194,7 @@ class NavigationNotifier extends ChangeNotifier {
   List<NavigationTab> _filterTabRoutes(List<NavigationTab> navigationTabs) {
     if (_isSignedIn ?? false) {
       navigationTabs.removeWhere((NavigationTab navigationTab) {
-        //Signed in. Keep private routes
+        //Sign  ed in. Keep private routes
         if (navigationTab.private == false) {
           return true;
         }
@@ -247,7 +258,7 @@ class NavigationNotifier extends ChangeNotifier {
     String queryComponent = (_queryState == null) ? _uri?.query ?? "" : _queryState!.queryString;
 
     //Trigger the setter and te external method with it;
-    return Uri.parse("/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}");
+    return Uri.parse("/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}".replaceAll("//", "/"));
   }
 
   String restoreRouteInformation() {
