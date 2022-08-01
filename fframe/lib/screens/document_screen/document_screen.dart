@@ -121,7 +121,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     return true;
   }
 
-  _snackbar({required BuildContext context, required String text, Icon? icon}) {
+  snackbar({required BuildContext context, required String text, Icon? icon}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
@@ -221,7 +221,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
         FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
       } else {
         //show the error
-        _snackbar(
+        snackbar(
           context: context,
           text: saveResult.errorMessage!,
           icon: Icon(
@@ -338,7 +338,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
           queryParameters: {},
           resetQueryString: true,
         );
-        _snackbar(
+        snackbar(
           context: context,
           text: "Referenced document could not be loaded: $docId",
           icon: Icon(
@@ -348,7 +348,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
         );
       }
     } catch (e) {
-      _snackbar(
+      snackbar(
         context: context,
         text: "Referenced document could not be loaded: $docId \n ${e.toString()}",
         icon: Icon(
@@ -401,7 +401,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
       } else {
         debugPrint("Save failed");
 
-        _snackbar(
+        snackbar(
           context: context,
           text: saveResult.errorMessage!,
           icon: Icon(
@@ -427,7 +427,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     // .toDouble();
     if (invalidTab == -1) {
       if (showPopup) {
-        _snackbar(
+        snackbar(
           context: context,
           text: L10n.string(
             'validator_success',
