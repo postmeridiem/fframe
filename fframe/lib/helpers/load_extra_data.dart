@@ -154,13 +154,7 @@ class QueryFromFireStore<T> extends StatelessWidget {
               return notFoundBuilder!(context);
             }
 
-            return builder(
-                context,
-                snapshot.data!.docs
-                    .map(
-                      (QueryDocumentSnapshot<T> queryDocument) => queryDocument.data(),
-                    )
-                    .toList());
+            return builder(context, snapshot.data!.docs.map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(queryDocument: queryDocument)).toList());
         }
       },
     );
@@ -243,16 +237,22 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
               return notFoundBuilder!(context);
             }
 
-            return builder(
-                context,
-                snapshot.data!.docs
-                    .map(
-                      (QueryDocumentSnapshot<T> queryDocument) => queryDocument.data(),
-                    )
-                    .toList());
+            return builder(context, snapshot.data!.docs.map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(queryDocument: queryDocument)).toList());
         }
       },
     );
+  }
+}
+
+class FirestoreDocument<T> {
+  FirestoreDocument({required this.queryDocument});
+
+  final QueryDocumentSnapshot<T> queryDocument;
+
+  T get data => queryDocument.data();
+
+  save(T data) {
+    queryDocument.reference.set(data, SetOptions(merge: true));
   }
 }
 
@@ -263,7 +263,7 @@ typedef ResultBuilder<T> = Widget Function(
 
 typedef ResultsBuilder<T> = Widget Function(
   BuildContext context,
-  List<T> data,
+  List<FirestoreDocument<T>> firestoreDocuments,
 );
 
 typedef WaitBuilder<T> = Widget Function(

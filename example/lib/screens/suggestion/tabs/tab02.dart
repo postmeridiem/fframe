@@ -44,11 +44,11 @@ class Tab02 extends StatelessWidget {
               collection: "users",
               fromFirestore: AppUser.fromFirestore,
               toFirestore: (user, options) => user.toFirestore(),
-              builder: (BuildContext context, List<AppUser> appUsers) {
+              builder: (BuildContext context, List<FirestoreDocument<AppUser>> firestoreDocuments) {
                 return Column(
-                    children: appUsers
+                    children: firestoreDocuments
                         .map(
-                          (AppUser appUser) => Text(appUser.displayName ?? "?"),
+                          (FirestoreDocument<AppUser> firestoreDocument) => Text(firestoreDocument.data.displayName ?? "?"),
                         )
                         .toList());
               },
