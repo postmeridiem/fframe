@@ -6,6 +6,7 @@ export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:flutterfire_ui/firestore.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
+export 'package:url_launcher/url_launcher_string.dart';
 
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/controllers/query_state_controller.dart';
