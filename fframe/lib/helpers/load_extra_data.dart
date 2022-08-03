@@ -263,9 +263,9 @@ class FirestoreDocument<T> {
 
   T get data => queryDocument.data();
 
-  save() async {
+  Future<SaveState> save() async {
     debugPrint("Save document ${queryDocument.reference.parent.path} :: ${queryDocument.id}");
-    DatabaseService<T>().updateDocument(collection: queryDocument.reference.parent.path, documentId: queryDocument.id, data: data, fromFirestore: fromFirestore, toFirestore: toFirestore);
+    return DatabaseService<T>().updateDocument(collection: queryDocument.reference.parent.path, documentId: queryDocument.id, data: data, fromFirestore: fromFirestore, toFirestore: toFirestore);
     // return queryDocument.reference.set(queryDocument.data(), SetOptions(merge: true));
   }
 }
