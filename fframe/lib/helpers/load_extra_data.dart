@@ -154,7 +154,10 @@ class QueryFromFireStore<T> extends StatelessWidget {
               return notFoundBuilder!(context);
             }
 
-            return builder(context, snapshot.data!.docs.map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(queryDocument: queryDocument)).toList());
+            return builder(
+              context,
+              snapshot.data!.docs.map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(queryDocument: queryDocument, fromFirestore: fromFirestore, toFirestore: toFirestore)).toList(),
+            );
         }
       },
     );
@@ -237,7 +240,10 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
               return notFoundBuilder!(context);
             }
 
-            return builder(context, snapshot.data!.docs.map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(queryDocument: queryDocument)).toList());
+            return builder(
+              context,
+              snapshot.data!.docs.map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(queryDocument: queryDocument, fromFirestore: fromFirestore, toFirestore: toFirestore)).toList(),
+            );
         }
       },
     );
@@ -245,14 +251,22 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
 }
 
 class FirestoreDocument<T> {
-  FirestoreDocument({required this.queryDocument});
+  FirestoreDocument({
+    required this.fromFirestore,
+    required this.toFirestore,
+    required this.queryDocument,
+  });
 
   final QueryDocumentSnapshot<T> queryDocument;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
 
   T get data => queryDocument.data();
 
-  save(T data) {
-    queryDocument.reference.set(data, SetOptions(merge: true));
+  save() async {
+    debugPrint("Save document ${queryDocument.id}");
+    DatabaseService<T>().updateDocument(collection: queryDocument.reference.parent.path, documentId: queryDocument.id, data: data, fromFirestore: fromFirestore, toFirestore: toFirestore);
+    // return queryDocument.reference.set(queryDocument.data(), SetOptions(merge: true));
   }
 }
 
