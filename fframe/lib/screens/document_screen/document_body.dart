@@ -128,6 +128,7 @@ class DocumentBody<T> extends StatelessWidget {
                                 primary: false,
                                 backgroundColor: Theme.of(context).colorScheme.secondary,
                                 body: NestedScrollView(
+                                  physics: documentConfig.document.scrollableHeader ? const AlwaysScrollableScrollPhysics() : const NeverScrollableScrollPhysics(),
                                   headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
                                     return <Widget>[
                                       SliverAppBar(
