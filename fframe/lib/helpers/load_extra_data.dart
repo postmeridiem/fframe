@@ -155,12 +155,9 @@ class QueryFromFireStore<T> extends StatelessWidget {
             }
 
             return builder(
-                context,
-                snapshot.data!.docs
-                    .map(
-                      (QueryDocumentSnapshot<T> queryDocument) => queryDocument.data(),
-                    )
-                    .toList());
+              context,
+              snapshot.data!.docs.map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(queryDocument: queryDocument, fromFirestore: fromFirestore, toFirestore: toFirestore)).toList(),
+            );
         }
       },
     );
@@ -244,15 +241,32 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
             }
 
             return builder(
-                context,
-                snapshot.data!.docs
-                    .map(
-                      (QueryDocumentSnapshot<T> queryDocument) => queryDocument.data(),
-                    )
-                    .toList());
+              context,
+              snapshot.data!.docs.map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(queryDocument: queryDocument, fromFirestore: fromFirestore, toFirestore: toFirestore)).toList(),
+            );
         }
       },
     );
+  }
+}
+
+class FirestoreDocument<T> {
+  FirestoreDocument({
+    required this.fromFirestore,
+    required this.toFirestore,
+    required this.queryDocument,
+  });
+
+  final QueryDocumentSnapshot<T> queryDocument;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final Map<String, Object?> Function(T, SetOptions?) toFirestore;
+
+  T get data => queryDocument.data();
+
+  Future<SaveState> save(T newData) async {
+    debugPrint("Save document ${queryDocument.reference.parent.path} :: ${queryDocument.id}");
+    return DatabaseService<T>().updateDocument(collection: queryDocument.reference.parent.path, documentId: queryDocument.id, data: newData, fromFirestore: fromFirestore, toFirestore: toFirestore);
+    // return queryDocument.reference.set(queryDocument.data(), SetOptions(merge: true));
   }
 }
 
@@ -263,7 +277,7 @@ typedef ResultBuilder<T> = Widget Function(
 
 typedef ResultsBuilder<T> = Widget Function(
   BuildContext context,
-  List<T> data,
+  List<FirestoreDocument<T>> firestoreDocuments,
 );
 
 typedef WaitBuilder<T> = Widget Function(

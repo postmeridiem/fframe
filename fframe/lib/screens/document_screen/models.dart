@@ -46,6 +46,7 @@ class Document<T> {
     this.extraActionButtons,
     this.contextCards,
     this.documentHeaderBuilder,
+    this.scrollableHeader = true,
     this.autoSave = false,
     this.readOnly = false,
     this.showCreateButton = false,
@@ -62,6 +63,7 @@ class Document<T> {
   final List<ContextCardBuilder>? contextCards;
   final ExtraActionButtonsBuilder<T>? extraActionButtons;
   List<DocumentTab<T>>? activeTabs;
+  final bool scrollableHeader;
   bool autoSave;
   bool readOnly;
   bool showCreateButton;
