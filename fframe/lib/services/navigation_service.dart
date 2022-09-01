@@ -32,8 +32,8 @@ class NavigationNotifier extends ChangeNotifier {
   bool? _isSignedIn;
   List<String>? _roles;
 
-  final NavigationConfig navigationConfig = RouterConfig.instance.navigationConfig;
-  late NavigationConfig filteredNavigationConfig = RouterConfig.instance.navigationConfig;
+  final NavigationConfig navigationConfig = FRouterConfig.instance.navigationConfig;
+  late NavigationConfig filteredNavigationConfig = FRouterConfig.instance.navigationConfig;
 
   NavigationNotifier({required this.ref}) {
     _filterNavigationRoutes();

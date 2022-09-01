@@ -1,16 +1,16 @@
 part of fframe;
 
-class RouterConfig {
+class FRouterConfig {
   late NavigationConfig navigationConfig;
   // late NavigationConfig appliedNavigationConfig;
   late Widget mainScreen;
   late RouterBuilder routerBuilder;
 
-  static final RouterConfig instance = RouterConfig._internal();
+  static final FRouterConfig instance = FRouterConfig._internal();
 
-  RouterConfig._internal();
+  FRouterConfig._internal();
 
-  factory RouterConfig({
+  factory FRouterConfig({
     required RouterBuilder routerBuilder,
     required NavigationConfig navigationConfig,
     required Widget mainScreen,

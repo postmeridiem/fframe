@@ -113,12 +113,12 @@ class FRouter extends InheritedWidget {
 
   Widget waitPage({required BuildContext context, String? text}) {
     Fframe.of(context)?.waitText = text;
-    return RouterConfig.instance.navigationConfig.waitPage.contentPane ?? const Center(child: CircularProgressIndicator());
+    return FRouterConfig.instance.navigationConfig.waitPage.contentPane ?? const Center(child: CircularProgressIndicator());
   }
 
-  Widget emptyPage() => RouterConfig.instance.navigationConfig.emptyPage.contentPane ?? const Center(child: Text("Much empty"));
+  Widget emptyPage() => FRouterConfig.instance.navigationConfig.emptyPage.contentPane ?? const Center(child: Text("Much empty"));
   Widget errorPage({required BuildContext context}) {
-    return RouterConfig.instance.navigationConfig.errorPage.contentPane ?? const Center(child: Icon((Icons.error)));
+    return FRouterConfig.instance.navigationConfig.errorPage.contentPane ?? const Center(child: Icon((Icons.error)));
   }
 
   ///Get a drawer for the current context
@@ -358,6 +358,6 @@ class _RouterScreenState extends State<RouterScreen> {
       navigationNotifier.isBuilding = false;
     });
     debugPrint("Build RouterScreen");
-    return RouterConfig.instance.mainScreen;
+    return FRouterConfig.instance.mainScreen;
   }
 }

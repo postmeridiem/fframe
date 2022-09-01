@@ -25,7 +25,7 @@ class FRouterLoader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    RouterConfig(
+    FRouterConfig(
       navigationConfig: navigationConfig,
       routerBuilder: routerBuilder,
       mainScreen: mainScreen,

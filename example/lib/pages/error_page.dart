@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+
 
 class ErrorPage extends StatefulWidget {
   const ErrorPage({Key? key}) : super(key: key);
