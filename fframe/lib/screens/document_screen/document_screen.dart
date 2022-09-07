@@ -370,6 +370,12 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
           docId = const Uuid().v4();
         }
       }
+
+      //optional presave script
+      if (_documentConfig.preSave != null) {
+        selectionState.data = _documentConfig.preSave!(selectionState.data!);
+      }
+
       debugPrint("Save item $docId in collection ${_documentConfig.collection}");
 
       SaveState saveResult = selectionState.isNew
