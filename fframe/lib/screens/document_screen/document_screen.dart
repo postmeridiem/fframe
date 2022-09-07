@@ -6,6 +6,8 @@ class DocumentScreen<T> extends StatelessWidget {
     required this.collection,
     required this.createNew,
     this.preSave,
+    this.postOpen,
+    this.postRefresh,
     this.createDocumentId,
     required this.fromFirestore,
     required this.toFirestore,
@@ -33,6 +35,8 @@ class DocumentScreen<T> extends StatelessWidget {
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final T Function() createNew;
   final T Function(T)? preSave;
+  final T Function(T)? postOpen;
+  final T Function(T)? postRefresh;
   final bool autoSelectFirst;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
