@@ -3,7 +3,7 @@ import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
 final inviteUserNavigationTarget = NavigationTarget(
-  path: "invitesers",
+  path: "inviteusers",
   title: "Invite Users",
   contentPane: const InviteUser(),
   destination: const Destination(

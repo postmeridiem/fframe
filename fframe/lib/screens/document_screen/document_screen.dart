@@ -76,6 +76,7 @@ class DocumentScreen<T> extends StatelessWidget {
                 queryStringIdParam: _queryStringIdParam ?? queryStringIdParam,
                 createNew: createNew,
                 createDocumentId: createDocumentId,
+                preSave: preSave,
                 document: document,
                 toFirestore: toFirestore,
                 fromFirestore: fromFirestore,

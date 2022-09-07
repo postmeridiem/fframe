@@ -33,6 +33,12 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         return "${suggestion.name}";
       },
 
+      preSave: (Suggestion suggestion) {
+        //Here you can do presave stuff to the context document.
+        suggestion.saveCount++;
+        return suggestion;
+      },
+
       createNew: () => Suggestion(
         active: true,
         createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",

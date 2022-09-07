@@ -16,6 +16,7 @@ class Suggestion extends ChangeNotifier {
     this.icon,
     this.creationDate,
     this.createdBy,
+    this.saveCount = 0,
   });
 
   /// Suggestion class
@@ -45,10 +46,7 @@ class Suggestion extends ChangeNotifier {
   ///
 
   // fromFirestore<Suggestion>(DocumentSnapshot<Map<String, dynamic>> snapshot) {
-  factory Suggestion.fromFirestore(
-      DocumentSnapshot<Map<String, dynamic>> snapshot,
-      SnapshotOptions? snapshotOptions) {
-
+  factory Suggestion.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot, SnapshotOptions? snapshotOptions) {
     Map<String, dynamic> json = snapshot.data()!;
     Suggestion suggestion = Suggestion(
       id: snapshot.id,
@@ -58,10 +56,9 @@ class Suggestion extends ChangeNotifier {
       fieldTab3: json['fieldTab3'] as String?,
       active: json['active'] == null ? true : json['active'] as bool,
       icon: json['icon'] == null ? 'question_mark' : json['icon'] as String,
-      creationDate: json['creationDate'] != null
-          ? json['creationDate'] as Timestamp
-          : null,
+      creationDate: json['creationDate'] != null ? json['creationDate'] as Timestamp : null,
       createdBy: json['createdBy'] != null ? json['createdBy'] as String : null,
+      saveCount: json['saveCount'] != null ? json['saveCount'] as double : 0,
     );
 
     return suggestion;
@@ -76,10 +73,10 @@ class Suggestion extends ChangeNotifier {
   String? fieldTab3;
   Timestamp? creationDate;
   String? createdBy;
+  double saveCount = 0;
 
   Map<String, Object?> toFirestore() {
-    String updatedBy =
-        FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous";
+    String updatedBy = FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous";
 
     final Map<String, Timestamp> changeHistory = {updatedBy: Timestamp.now()};
 
@@ -92,9 +89,8 @@ class Suggestion extends ChangeNotifier {
       "fieldTab2": fieldTab2,
       "fieldTab3": fieldTab3,
       "creationDate": creationDate ?? Timestamp.now(),
-      "createdBy": createdBy ??
-          FirebaseAuth.instance.currentUser?.displayName ??
-          "Anonymous",
+      "createdBy": createdBy ?? FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous",
+      "saveCount": saveCount,
       "changeHistory": FieldValue.arrayUnion([changeHistory]),
     };
   }
