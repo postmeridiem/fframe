@@ -35,6 +35,7 @@ class UsersScreen extends StatelessWidget {
       document: _document(),
       documentList: DocumentList(
         hoverSelect: true,
+        showCreateButton: false,
         queryBuilder: (query) =>
             query.orderBy("displayName").where("active", isEqualTo: isActive),
         builder: (context, selected, data, fFrameUser) {
