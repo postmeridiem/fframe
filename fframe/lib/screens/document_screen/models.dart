@@ -6,6 +6,8 @@ class DocumentConfig<T> {
     required this.collection,
     required this.createNew,
     this.preSave,
+    this.postOpen,
+    this.postRefresh,
     this.createDocumentId,
     required this.fromFirestore,
     required this.toFirestore,
@@ -32,7 +34,9 @@ class DocumentConfig<T> {
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
   final T Function() createNew;
-    final T Function(T)? preSave;
+  final T Function(T)? preSave;
+  final T Function(T)? postOpen;
+  final T Function(T)? postRefresh;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
   final bool embeddedDocument;
