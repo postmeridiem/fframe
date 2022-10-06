@@ -8,6 +8,8 @@ export 'package:flutterfire_ui/firestore.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 export 'package:url_launcher/url_launcher_string.dart';
 
+import 'dart:convert';
+
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/controllers/query_state_controller.dart';
 import 'package:fframe/screens/document_screen/document_search.dart';
@@ -32,6 +34,8 @@ import 'package:fframe/services/database_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterfire_ui/firestore.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+
 // ignore: unused_import
 import 'package:firebase_storage/firebase_storage.dart';
 // ignore: unused_import
