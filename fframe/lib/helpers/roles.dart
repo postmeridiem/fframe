@@ -2,8 +2,8 @@ import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
-class RolesManager extends StatefulWidget {
-  const RolesManager({
+class FframeRolesManager extends StatefulWidget {
+  const FframeRolesManager({
     Key? key,
     required this.uid,
     required this.appRoles,
@@ -12,21 +12,26 @@ class RolesManager extends StatefulWidget {
   final String uid;
 
   @override
-  State<RolesManager> createState() => _RolesManagerState();
+  State<FframeRolesManager> createState() => _FframeRolesManagerState();
 }
 
-class _RolesManagerState extends State<RolesManager> {
+class _FframeRolesManagerState extends State<FframeRolesManager> {
   List<String> userRoles = [];
 
   addUserRole(BuildContext context, String role) async {
     try {
-      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-addUserRole");
-      HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
+      HttpsCallable callable =
+          FirebaseFunctions.instanceFor(region: 'europe-west1')
+              .httpsCallable("fframeAuth-addUserRole");
+      HttpsCallableResult<List<dynamic>> functionResults =
+          await callable(<String, dynamic>{
         'uid': widget.uid,
         'role': role,
       });
       setState(() {
-        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
+        userRoles = functionResults.data
+            .map((roleDynamic) => roleDynamic.toString())
+            .toList();
       });
     } on FirebaseFunctionsException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -48,13 +53,18 @@ class _RolesManagerState extends State<RolesManager> {
 
   removeUserRole(BuildContext context, String role) async {
     try {
-      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-removeUserRole");
-      HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
+      HttpsCallable callable =
+          FirebaseFunctions.instanceFor(region: 'europe-west1')
+              .httpsCallable("fframeAuth-removeUserRole");
+      HttpsCallableResult<List<dynamic>> functionResults =
+          await callable(<String, dynamic>{
         'uid': widget.uid,
         'role': role,
       });
       setState(() {
-        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
+        userRoles = functionResults.data
+            .map((roleDynamic) => roleDynamic.toString())
+            .toList();
       });
     } on FirebaseFunctionsException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -76,11 +86,16 @@ class _RolesManagerState extends State<RolesManager> {
 
   Future<List<String>> getUserRoles(BuildContext context) async {
     try {
-      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-getUserRoles");
-      HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
+      HttpsCallable callable =
+          FirebaseFunctions.instanceFor(region: 'europe-west1')
+              .httpsCallable("fframeAuth-getUserRoles");
+      HttpsCallableResult<List<dynamic>> functionResults =
+          await callable(<String, dynamic>{
         'uid': widget.uid,
       });
-      return functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
+      return functionResults.data
+          .map((roleDynamic) => roleDynamic.toString())
+          .toList();
     } on FirebaseFunctionsException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -109,7 +124,8 @@ class _RolesManagerState extends State<RolesManager> {
             case ConnectionState.none:
             case ConnectionState.active:
             case ConnectionState.waiting:
-              return FRouter.of(context).waitPage(context: context, text: "Loading user roles");
+              return FRouter.of(context)
+                  .waitPage(context: context, text: "Loading user roles");
             case ConnectionState.done:
               if (snapshot.hasData) {
                 userRoles = snapshot.data!;
@@ -121,7 +137,10 @@ class _RolesManagerState extends State<RolesManager> {
                         title: Text("${mapEntry.value}"),
                         value: userRoles.contains(mapEntry.key),
                         onChanged: (bool newValue) => {
-                          if (newValue == false) {removeUserRole(context, mapEntry.key)} else {addUserRole(context, mapEntry.key)}
+                          if (newValue == false)
+                            {removeUserRole(context, mapEntry.key)}
+                          else
+                            {addUserRole(context, mapEntry.key)}
                         },
                       ),
                     )
