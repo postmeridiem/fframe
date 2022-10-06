@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-import 'package:example/models/models.dart';
+import 'package:example/models/fframe_list.dart';
 import 'package:example/helpers/icons.dart';
 import 'package:example/helpers/strings.dart';
 
@@ -20,7 +21,7 @@ class _SettingsListsFormState extends State<SettingsListsForm> {
   @override
   Widget build(BuildContext context) {
     debugPrint("presenting SettingsListsForm");
-    String path = 'fframe/lists/collections';
+    String path = 'fframe/lists/collection';
     CollectionReference col = FirebaseFirestore.instance.collection(path);
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -95,17 +96,34 @@ class _SettingsListsFormState extends State<SettingsListsForm> {
         Expanded(
           flex: 1,
           child: Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(top: 24.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 currentListId != ''
                     ? CurrentListEditor(currentList: curList)
-                    : const Text("Select a list..."),
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.arrow_back,
+                            size: 32,
+                            color: Theme.of(context).colorScheme.onBackground,
+                          ),
+                          Text(
+                            "Select a list",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onBackground,
+                              fontSize: 20,
+                            ),
+                          ),
+                        ],
+                      ),
               ],
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -255,7 +273,32 @@ class _CurrentListEditorState extends State<CurrentListEditor> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             OutlinedButton.icon(
-              onPressed: () {},
+              label: const Text('Firestore Document',
+                  style: TextStyle(
+                    fontSize: 16,
+                  )),
+              icon: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.list,
+                  color: Theme.of(context).colorScheme.onBackground,
+                  size: 32,
+                ),
+              ),
+              onPressed: () {
+                launchUrl(
+                  Uri.https(
+                    "console.firebase.google.com",
+                    "/project/fframe-dev/firestore/data/~2Ffframe~2Flists~2Fcollections~2F${widget.currentList.id}",
+                  ),
+                );
+              },
+            ),
+            OutlinedButton.icon(
+              label: const Text('Save Changes',
+                  style: TextStyle(
+                    fontSize: 16,
+                  )),
               icon: Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
@@ -264,10 +307,7 @@ class _CurrentListEditorState extends State<CurrentListEditor> {
                   size: 32,
                 ),
               ),
-              label: const Text('Save Changes',
-                  style: TextStyle(
-                    fontSize: 16,
-                  )),
+              onPressed: () {},
             ),
           ],
         ),
