@@ -48,6 +48,7 @@ class _SettingScreenState extends State<SettingScreen> {
   Document<Setting> _document() {
     return Document<Setting>(
       autoSave: false,
+      showSaveButton: false,
       documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
         return [
           DocumentTab<Setting>(
