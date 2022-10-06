@@ -197,11 +197,74 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
                 ),
                 navigationConfig: Fframe.of(context)!.navigationConfig,
                 routerBuilder: (context) {
-                  return const FframeBuilder();
+                  return const EmailAuthManager();
                 });
         }
       },
     );
+  }
+}
+
+class EmailAuthManager extends StatefulWidget {
+  const EmailAuthManager({Key? key}) : super(key: key);
+
+  @override
+  _EmailAuthManagerState createState() => _EmailAuthManagerState();
+}
+
+class _EmailAuthManagerState extends State<EmailAuthManager> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    debugPrint("dynamic link research: ${Uri.base} => ${FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())}");
+    Uri uri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
+
+    if (FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())) {
+      if (uri.queryParameters.containsKey("hash")) {
+        String hash = uri.queryParameters["hash"]!;
+        String emailAddress = utf8.decode(base64.decode(hash));
+        debugPrint(emailAddress);
+
+        debugPrint(emailAddress);
+        return FutureBuilder<UserCredential>(
+            future: FirebaseAuth.instance.signInWithEmailLink(email: emailAddress, emailLink: Uri.base.toString()),
+            builder: (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.none:
+                  return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                      const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                case ConnectionState.waiting:
+                  return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                      const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                case ConnectionState.active:
+                  return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                      const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                case ConnectionState.done:
+                  if (snapshot.hasError) {
+                    debugPrint("Link sign in failed: ${snapshot.error}");
+                    return const FframeBuilder();
+                  }
+
+                  UserCredential? userCredential = snapshot.data;
+                  debugPrint("Resulting user: ${userCredential?.user?.email}");
+                  return const FframeBuilder();
+              }
+            });
+      } else {
+        debugPrint("emailAddress not found in hash");
+      }
+    }
+    return const FframeBuilder();
   }
 }
 
