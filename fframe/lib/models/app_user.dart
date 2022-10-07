@@ -8,14 +8,19 @@ class FFrameUser extends StateNotifier {
     this.photoUrl,
     this.metaData,
     this.roles,
-  }) : super(null);
+    this.firebaseUser,
+  }) : super(null) {
+    timeStamp = DateTime.now();
+  }
 
   final String? displayName;
   final String? uid;
   final String? email;
   final String? photoUrl;
   final UserMetadata? metaData;
-  final List<String>? roles;
+  late List<String>? roles;
+  final User? firebaseUser;
+  late DateTime? timeStamp;
 
   factory FFrameUser.fromFirebaseUser({required User firebaseUser, List<String>? roles}) {
     return FFrameUser(
@@ -25,6 +30,7 @@ class FFrameUser extends StateNotifier {
       photoUrl: firebaseUser.photoURL,
       metaData: firebaseUser.metadata,
       roles: roles,
+      firebaseUser: firebaseUser,
     );
   }
 }

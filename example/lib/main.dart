@@ -2,7 +2,7 @@ import 'package:example/firebase_options.dart';
 import 'package:example/pages/empty_page.dart';
 import 'package:example/pages/error_page.dart';
 import 'package:example/pages/wait_page.dart';
-import 'package:example/screens/invite_user/navigation.dart';
+import 'package:example/screens/user_info/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 
@@ -33,7 +33,7 @@ class MainApp extends StatelessWidget {
         suggestionNavigationTarget,
         settingNavigationTarget,
         usersNavigationTarget,
-        inviteUserNavigationTarget,
+        userInfoNavigationTarget,
       ],
       signInConfig: SignInConfig(signInTarget: signInPageNavigationTarget),
       errorPage: NavigationTarget(

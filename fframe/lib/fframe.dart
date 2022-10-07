@@ -8,6 +8,7 @@ export 'package:flutterfire_ui/firestore.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 export 'package:url_launcher/url_launcher_string.dart';
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:fframe/constants/constants.dart';
@@ -34,6 +35,7 @@ import 'package:fframe/services/database_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterfire_ui/firestore.dart';
+// ignore: unused_import
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
 // ignore: unused_import
@@ -54,6 +56,7 @@ part 'package:fframe/models/navigation_target.dart';
 part 'package:fframe/models/sign_in_config.dart';
 part 'package:fframe/models/router_config.dart';
 part 'package:fframe/models/navigation_config.dart';
+part 'package:fframe/providers/global_providers.dart';
 
 part 'package:fframe/services/target_state.dart';
 part 'package:fframe/services/query_state.dart';
