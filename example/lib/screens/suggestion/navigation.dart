@@ -1,15 +1,22 @@
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
+import 'package:fframe/helpers/l10n.dart';
 import 'package:example/screens/suggestion/suggestion.dart';
 
 final suggestionNavigationTarget = NavigationTarget(
   path: "suggestions",
   title: "Suggestions",
   // contentPane: const SuggestionScreen(suggestionQueryState),
-  destination: const Destination(
-    icon: Icon(Icons.pest_control),
-    navigationLabel: Text('Suggestions'),
+  destination: Destination(
+    icon: const Icon(Icons.pest_control),
+    navigationLabel: Text(
+      L10n.string(
+        'suggestions',
+        placeholder: 'Suggestions',
+        namespace: 'global',
+      ),
+    ),
   ),
   roles: ['user'],
   private: true,
@@ -19,25 +26,45 @@ final suggestionNavigationTarget = NavigationTarget(
       title: "Active",
       path: "active",
       private: true,
-      contentPane: const SuggestionScreen(suggestionQueryState: SuggestionQueryStates.active),
-      destination: const Destination(
-        icon: Icon(Icons.check_box),
-        navigationLabel: Text("Active"),
-        tabLabel: "Active",
+      contentPane: const SuggestionScreen(
+          suggestionQueryState: SuggestionQueryStates.active),
+      destination: Destination(
+        icon: const Icon(Icons.check_box),
+        navigationLabel: Text(L10n.string(
+          'suggestions_tab_active',
+          placeholder: 'Active (placeholder)',
+          namespace: 'global',
+        )),
+        tabLabel: L10n.string(
+          'suggestions_tab_active',
+          placeholder: 'Active (placeholder)',
+          namespace: 'global',
+        ),
       ),
     ),
     NavigationTab(
       title: "Done",
       path: "done",
       private: true,
-      contentPane: const SuggestionScreen(suggestionQueryState: SuggestionQueryStates.done),
+      contentPane: const SuggestionScreen(
+          suggestionQueryState: SuggestionQueryStates.done),
       destination: Destination(
         icon: Icon(
           Icons.check,
           color: Colors.greenAccent[700],
         ),
-        navigationLabel: const Text("Done"),
-        tabLabel: "Done",
+        navigationLabel: Text(
+          L10n.string(
+            'suggestions_tab_done',
+            placeholder: 'Done (placeholder)',
+            namespace: 'global',
+          ),
+        ),
+        tabLabel: L10n.string(
+          'suggestions_tab_done',
+          placeholder: 'Done (placeholder)',
+          namespace: 'global',
+        ),
       ),
       // navigationTabs: [ TODO: Allow subtabs
       //   NavigationTab(

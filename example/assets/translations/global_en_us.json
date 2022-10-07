@@ -1,5 +1,47 @@
 {
 	"test": {
 		"translation": "Test label from the dynamically loaded {locale} file"
+	},
+	"suggestions": {
+		"translation": "Suggestions"
+	},
+	"suggestions_tab_active": {
+		"translation": "Active (from keys)"
+	},
+	"suggestions_tab_done": {
+		"translation": "Done (from keys)"
+	},
+	"firestore_tools_stamper_title": {
+		"translation": "--== Firestore fucker-upper ==--"
+	},
+	"firestore_tools_stamper_collection_label": {
+		"translation": "Collection"
+	},
+	"firestore_tools_stamper_operation_label": {
+		"translation": "Operation"
+	},
+	"firestore_tools_stamper_fieldname_label": {
+		"translation": "Field name"
+	},
+	"firestore_tools_stamper_datatype_label": {
+		"translation": "Data type"
+	},
+	"firestore_tools_stamper_targetvalue_label": {
+		"translation": "Target value"
+	},
+	"firestore_tools_stamper_collection_hint": {
+		"translation": "enter the collection path you want to stamp-update"
+	},
+	"firestore_tools_stamper_fieldname_hint": {
+		"translation": "enter the field do you want to stamp-update (or newly add)"
+	},
+	"firestore_tools_stamper_targetvalue_hint": {
+		"translation": "enter the value you want to stamp-update to all docs in collection"
+	},
+	"firestore_tools_stamper_firestore_button": {
+		"translation": "Open collection in FS..."
+	},
+	"firestore_tools_stamper_apply_button": {
+		"translation": "Apply values to collection"
 	}
 }

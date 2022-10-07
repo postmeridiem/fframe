@@ -10,6 +10,6 @@ final settingNavigationTarget = NavigationTarget(
     icon: Icon(Icons.tune),
     navigationLabel: Text('Settings'),
   ),
-  roles: ['UserAdmin', 'SuperAdmin'],
+  roles: ['User', 'Developer', 'SuperAdmin'],
   private: true,
 );
