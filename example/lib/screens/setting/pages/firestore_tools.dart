@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
+
+import 'package:fframe/helpers/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:example/helpers/strings.dart';
@@ -35,6 +37,69 @@ class _SettingsFirestoreToolsFormFormState
   }
 }
 
+enum OperationType { update, delete }
+
+class StampUpdate {
+  StampUpdate({
+    this.collection = '',
+    this.operation = OperationType.update,
+    this.fieldName = '',
+    this.dataType = '',
+    this.targetValueInput = '',
+  });
+  String collection;
+  OperationType operation;
+  String fieldName;
+  String dataType;
+  String targetValueInput;
+  bool valid = false;
+
+  Map<String, dynamic> toJson() => {
+        'collection': collection,
+        'operation': operation,
+        'fieldName': fieldName,
+        'dataType': dataType,
+        'targetValueInput': targetValueInput,
+      };
+
+  void applyUpdate(StampUpdate settings) {
+    FirebaseFirestore db = FirebaseFirestore.instance;
+
+    String _targetValue = settings.targetValueInput;
+
+    valid = true;
+    db.collection(settings.collection).get().then(
+          (res) => {
+            res.docs.forEach(
+              (snap) {
+                Map<String, dynamic> doc = snap.data();
+
+                switch (settings.operation) {
+                  case OperationType.update:
+                    final data = {settings.fieldName: _targetValue};
+                    db
+                        .collection(collection)
+                        .doc(snap.id)
+                        .set(data, SetOptions(merge: true));
+
+                    debugPrint(
+                        "STAMP - updated ${settings.collection} / ${snap.id}");
+
+                    break;
+                  case OperationType.delete:
+                    break;
+                  default:
+                }
+              },
+            ),
+          },
+          onError: (e) => debugPrint("Error completing: $e"),
+        );
+  }
+
+  void validate() {}
+}
+
 class StampUpdater extends StatelessWidget {
   const StampUpdater({
     Key? key,
@@ -50,9 +115,13 @@ class StampUpdater extends StatelessWidget {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              const Text(
-                '==== The Firestore fucker-upper ====',
-                style: TextStyle(
+              Text(
+                L10n.string(
+                  'firestore_tools_stamp_updater',
+                  placeholder: '==== The Firestore fucker-upper ====',
+                  namespace: 'global',
+                ),
+                style: const TextStyle(
                   fontSize: 24,
                 ),
               ),
@@ -64,10 +133,16 @@ class StampUpdater extends StatelessWidget {
                 children: [
                   TableRow(
                     children: [
-                      const TableCell(
+                      TableCell(
                         child: Padding(
-                          padding: EdgeInsets.only(top: 23, left: 8.0),
-                          child: Text("Collection"),
+                          padding: const EdgeInsets.only(top: 23, left: 8.0),
+                          child: Text(
+                            L10n.string(
+                              'firestore_tools_stamper_collection_label',
+                              placeholder: 'Collection',
+                              namespace: 'global',
+                            ),
+                          ),
                         ),
                       ),
                       TableCell(
@@ -75,38 +150,55 @@ class StampUpdater extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText:
-                                  'enter the collection you want to stamp-update',
+                              hintText: L10n.string(
+                                'firestore_tools_stamper_collection_hint',
+                                placeholder:
+                                    'enter the collection path you want to stamp-update',
+                                namespace: 'global',
+                              ),
                               hintStyle: TextStyle(
-                                  fontSize: 12,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSecondary),
+                                fontSize: 12,
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
+                              ),
                             ),
+                            onChanged: (value) {},
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const TableRow(
+                  TableRow(
                     children: [
                       TableCell(
                         child: Padding(
-                          padding: EdgeInsets.only(top: 14, left: 8.0),
-                          child: Text("Action"),
+                          padding: const EdgeInsets.only(top: 14, left: 8.0),
+                          child: Text(
+                            L10n.string(
+                              'firestore_tools_stamper_operation_label',
+                              placeholder: 'Operation',
+                              namespace: 'global',
+                            ),
+                          ),
                         ),
                       ),
-                      TableCell(
+                      const TableCell(
                         child: OperationSelector(),
                       ),
                     ],
                   ),
                   TableRow(
                     children: [
-                      const TableCell(
+                      TableCell(
                         child: Padding(
-                          padding: EdgeInsets.only(top: 23, left: 8.0),
-                          child: Text("Field name"),
+                          padding: const EdgeInsets.only(top: 23, left: 8.0),
+                          child: Text(
+                            L10n.string(
+                              'firestore_tools_stamper_fieldname_label',
+                              placeholder: 'Field name',
+                              namespace: 'global',
+                            ),
+                          ),
                         ),
                       ),
                       TableCell(
@@ -114,8 +206,12 @@ class StampUpdater extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText:
-                                  'enter the field do you want to stamp-update (or newly add)',
+                              hintText: L10n.string(
+                                'firestore_tools_stamper_fieldname_hint',
+                                placeholder:
+                                    'enter the field do you want to stamp-update (or newly add)',
+                                namespace: 'global',
+                              ),
                               hintStyle: TextStyle(
                                   fontSize: 12,
                                   color: Theme.of(context)
@@ -127,15 +223,21 @@ class StampUpdater extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const TableRow(
+                  TableRow(
                     children: [
                       TableCell(
                         child: Padding(
-                          padding: EdgeInsets.only(top: 23, left: 8.0),
-                          child: Text("Data type"),
+                          padding: const EdgeInsets.only(top: 23, left: 8.0),
+                          child: Text(
+                            L10n.string(
+                              'firestore_tools_stamper_datatype_label',
+                              placeholder: 'Data type',
+                              namespace: 'global',
+                            ),
+                          ),
                         ),
                       ),
-                      TableCell(
+                      const TableCell(
                         child: Padding(
                           padding: EdgeInsets.all(8.0),
                           child: DataTypeSelector(),
@@ -145,10 +247,16 @@ class StampUpdater extends StatelessWidget {
                   ),
                   TableRow(
                     children: [
-                      const TableCell(
+                      TableCell(
                         child: Padding(
-                          padding: EdgeInsets.only(top: 24, left: 8.0),
-                          child: Text("Target value"),
+                          padding: const EdgeInsets.only(top: 24, left: 8.0),
+                          child: Text(
+                            L10n.string(
+                              'firestore_tools_stamper_targetvalue_label',
+                              placeholder: 'Target value',
+                              namespace: 'global',
+                            ),
+                          ),
                         ),
                       ),
                       TableCell(
@@ -156,8 +264,12 @@ class StampUpdater extends StatelessWidget {
                           padding: const EdgeInsets.all(8.0),
                           child: TextField(
                             decoration: InputDecoration(
-                              hintText:
-                                  'enter the value you want to stamp-update to all docs in collection',
+                              hintText: L10n.string(
+                                'firestore_tools_stamper_targetvalue_hint',
+                                placeholder:
+                                    'enter the value you want to stamp-update to all docs in collection',
+                                namespace: 'global',
+                              ),
                               hintStyle: TextStyle(
                                   fontSize: 12,
                                   color: Theme.of(context)
@@ -180,9 +292,15 @@ class StampUpdater extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: OutlinedButton.icon(
                         icon: const Icon(Icons.list, size: 18),
-                        label: const Padding(
-                          padding: EdgeInsets.only(top: 12, bottom: 12),
-                          child: Text('Open collection in FS...'),
+                        label: Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 12),
+                          child: Text(
+                            L10n.string(
+                              'firestore_tools_stamper_firestore_button',
+                              placeholder: 'Open collection in FS...',
+                              namespace: 'global',
+                            ),
+                          ),
                         ),
                         onPressed: () {
                           launchUrl(
@@ -206,9 +324,15 @@ class StampUpdater extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: OutlinedButton.icon(
                         icon: const Icon(Icons.nightlife, size: 18),
-                        label: const Padding(
-                          padding: EdgeInsets.only(top: 12, bottom: 12),
-                          child: Text('Apply values to collection'),
+                        label: Padding(
+                          padding: const EdgeInsets.only(top: 12, bottom: 12),
+                          child: Text(
+                            L10n.string(
+                              'firestore_tools_stamper_apply_button',
+                              placeholder: 'Apply values to collection',
+                              namespace: 'global',
+                            ),
+                          ),
                         ),
                         onPressed: () {
                           forAllInCollection('none');
@@ -229,53 +353,6 @@ class StampUpdater extends StatelessWidget {
       ),
     );
   }
-}
-
-forAllInCollection(String collection) {
-  FirebaseFirestore db = FirebaseFirestore.instance;
-
-  db.collection(collection).get().then(
-        (res) => {
-          res.docs.forEach((snap) {
-            Map<String, dynamic> doc = snap.data();
-            Timestamp _cdTS = doc['createdDate'];
-            Timestamp _edTS = Timestamp((_cdTS.seconds + 7776000), 0);
-            debugPrint(
-                "${snap.id} - created: ${dateTimeTextTS(_cdTS)} ---> expires: ${dateTimeTextTS(_edTS)}");
-
-            final data = {"expirationDate": _edTS};
-            db
-                .collection(collection)
-                .doc(snap.id)
-                .set(data, SetOptions(merge: true));
-          }),
-        },
-        onError: (e) => print("Error completing: $e"),
-      );
-
-  return true;
-}
-
-touchUpdateDate(String collection) {
-  FirebaseFirestore db = FirebaseFirestore.instance;
-
-  db.collection(collection).get().then(
-        (res) => {
-          res.docs.forEach((snap) {
-            Timestamp _updateStamp = Timestamp.now();
-            debugPrint("${snap.id} - updated record");
-
-            final data = {"updatedDate": _updateStamp};
-            db
-                .collection(collection)
-                .doc(snap.id)
-                .set(data, SetOptions(merge: true));
-          }),
-        },
-        onError: (e) => debugPrint("Error completing: $e"),
-      );
-
-  return true;
 }
 
 const List<String> types = <String>[
@@ -320,8 +397,6 @@ class _DataTypeSelectorState extends State<DataTypeSelector> {
     );
   }
 }
-
-enum OperationType { update, delete }
 
 class OperationSelector extends StatefulWidget {
   const OperationSelector({Key? key}) : super(key: key);
@@ -380,4 +455,51 @@ class _OperationSelectorState extends State<OperationSelector> {
       ],
     );
   }
+}
+
+forAllInCollection(String collection) {
+  FirebaseFirestore db = FirebaseFirestore.instance;
+
+  db.collection(collection).get().then(
+        (res) => {
+          res.docs.forEach((snap) {
+            Map<String, dynamic> doc = snap.data();
+            Timestamp _cdTS = doc['createdDate'];
+            Timestamp _edTS = Timestamp((_cdTS.seconds + 7776000), 0);
+            debugPrint(
+                "${snap.id} - created: ${dateTimeTextTS(_cdTS)} ---> expires: ${dateTimeTextTS(_edTS)}");
+
+            final data = {"expirationDate": _edTS};
+            db
+                .collection(collection)
+                .doc(snap.id)
+                .set(data, SetOptions(merge: true));
+          }),
+        },
+        onError: (e) => print("Error completing: $e"),
+      );
+
+  return true;
+}
+
+touchUpdateDate(String collection) {
+  FirebaseFirestore db = FirebaseFirestore.instance;
+
+  db.collection(collection).get().then(
+        (res) => {
+          res.docs.forEach((snap) {
+            Timestamp _updateStamp = Timestamp.now();
+            debugPrint("${snap.id} - updated record");
+
+            final data = {"updatedDate": _updateStamp};
+            db
+                .collection(collection)
+                .doc(snap.id)
+                .set(data, SetOptions(merge: true));
+          }),
+        },
+        onError: (e) => debugPrint("Error completing: $e"),
+      );
+
+  return true;
 }
