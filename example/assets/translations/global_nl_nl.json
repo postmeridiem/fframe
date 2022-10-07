@@ -1,5 +1,11 @@
 {
 	"test": {
 		"translation": "Testlabel uit de dynamisch geladen {locale} file"
+	},
+	"suggestions_tab_active": {
+		"translation": "Actief"
+	},
+	"suggestions_tab_done": {
+		"translation": "Klaar"
 	}
 }
