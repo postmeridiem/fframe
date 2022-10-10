@@ -292,6 +292,30 @@ class StampUpdater extends StatelessWidget {
                       padding: const EdgeInsets.all(8.0),
                       child: OutlinedButton.icon(
                         icon: const Icon(Icons.list, size: 18),
+                        label: const Padding(
+                          padding: EdgeInsets.only(top: 12, bottom: 12),
+                          child: Text(
+                            "PROFILE",
+                          ),
+                        ),
+                        onPressed: () {
+                          FRouter.of(context)
+                              .navigateToRoute(context, route: "profile");
+                        },
+                        style: OutlinedButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 250,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.list, size: 18),
                         label: Padding(
                           padding: const EdgeInsets.only(top: 12, bottom: 12),
                           child: Text(
