@@ -1,0 +1,15 @@
+import 'package:example/screens/user_profile/screen.dart';
+import 'package:fframe/fframe.dart';
+import 'package:flutter/material.dart';
+
+final userProfileNavigationTarget = NavigationTarget(
+  path: "profile",
+  title: "profile",
+  contentPane: const CurrentUserInfo(),
+  // destination: const Destination(
+  //   icon: Icon(Icons.info_outline),
+  //   navigationLabel: Text('Account info'),
+  // ),
+  roles: ['UserAdmin', 'SuperAdmin'],
+  private: true,
+);
