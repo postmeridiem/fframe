@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 final userProfileNavigationTarget = NavigationTarget(
   path: "profile",
   title: "profile",
-  contentPane: const CurrentUserInfo(),
+  contentPane: const CurrentUserProfile(),
   // destination: const Destination(
   //   icon: Icon(Icons.info_outline),
   //   navigationLabel: Text('Account info'),

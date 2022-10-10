@@ -1,14 +1,14 @@
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
-class CurrentUserInfo extends StatefulWidget {
-  const CurrentUserInfo({Key? key}) : super(key: key);
+class CurrentUserProfile extends StatefulWidget {
+  const CurrentUserProfile({Key? key}) : super(key: key);
 
   @override
-  State<CurrentUserInfo> createState() => _CurrentUserInfoState();
+  State<CurrentUserProfile> createState() => _CurrentUserProfileState();
 }
 
-class _CurrentUserInfoState extends State<CurrentUserInfo> {
+class _CurrentUserProfileState extends State<CurrentUserProfile> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -60,6 +60,27 @@ class _CurrentUserInfoState extends State<CurrentUserInfo> {
                 ),
               ],
             ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.list, size: 18),
+                label: const Padding(
+                  padding: EdgeInsets.only(top: 12, bottom: 12),
+                  child: Text(
+                    "FB TOOLS",
+                  ),
+                ),
+                onPressed: () {
+                  FRouter.of(context).navigateToRoute(context,
+                      route: "settings", id: "99-firestore-tools");
+                },
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0),
+                  ),
+                ),
+              ),
+            )
           ],
         );
       }),
