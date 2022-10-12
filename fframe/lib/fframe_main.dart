@@ -36,12 +36,14 @@ class Fframe extends InheritedWidget {
   String? errorText;
   String? waitText;
 
-  Widget showErrorPage({required BuildContext context, required String errorText}) {
+  Widget showErrorPage(
+      {required BuildContext context, required String errorText}) {
     this.errorText = errorText;
     return FRouter.of(context).errorPage(context: context);
   }
 
-  Widget showWaitPage({required BuildContext context, required String waitText}) {
+  Widget showWaitPage(
+      {required BuildContext context, required String waitText}) {
     this.waitText = waitText;
     return FRouter.of(context).errorPage(context: context);
   }
@@ -86,7 +88,8 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<FirebaseApp>(
-      future: Firebase.initializeApp(options: Fframe.of(context)!.firebaseOptions),
+      future:
+          Firebase.initializeApp(options: Fframe.of(context)!.firebaseOptions),
       builder: (BuildContext context, AsyncSnapshot<FirebaseApp> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
@@ -105,10 +108,14 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
           case ConnectionState.done:
             if (snapshot.error != null) {
               return MaterialApp(
-                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                debugShowCheckedModeBanner:
+                    Fframe.of(context)!.debugShowCheckedModeBanner,
                 title: "lalala",
                 home: Scaffold(
-                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                  body: Fframe.of(context)!
+                      .navigationConfig
+                      .errorPage
+                      .contentPane!,
                 ),
               );
             }
@@ -178,16 +185,21 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
           case ConnectionState.active:
             if (snapshot.error != null) {
               return MaterialApp(
-                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                debugShowCheckedModeBanner:
+                    Fframe.of(context)!.debugShowCheckedModeBanner,
                 home: Scaffold(
-                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                  body: Fframe.of(context)!
+                      .navigationConfig
+                      .errorPage
+                      .contentPane!,
                 ),
               );
             }
 
             //Store the user
             if (snapshot.data != null) {
-              Fframe.of(context)!.user = FFrameUser.fromFirebaseUser(firebaseUser: snapshot.data!);
+              Fframe.of(context)!.user =
+                  FFrameUser.fromFirebaseUser(firebaseUser: snapshot.data!);
             } else {
               Fframe.of(context)!.user = null;
             }
@@ -214,7 +226,8 @@ class EmailAuthManager extends StatefulWidget {
   _EmailAuthManagerState createState() => _EmailAuthManagerState();
 }
 
-class _EmailAuthManagerState extends State<EmailAuthManager> with WidgetsBindingObserver {
+class _EmailAuthManagerState extends State<EmailAuthManager>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -222,7 +235,8 @@ class _EmailAuthManagerState extends State<EmailAuthManager> with WidgetsBinding
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("dynamic link research: ${Uri.base} => ${FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())}");
+    debugPrint(
+        "dynamic link research: ${Uri.base} => ${FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())}");
     Uri uri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
 
     if (FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())) {
@@ -233,40 +247,51 @@ class _EmailAuthManagerState extends State<EmailAuthManager> with WidgetsBinding
 
         debugPrint(emailAddress);
         return FutureBuilder<UserCredential>(
-            future: FirebaseAuth.instance.signInWithEmailLink(email: emailAddress, emailLink: Uri.base.toString()),
-            builder: (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
+            future: FirebaseAuth.instance.signInWithEmailLink(
+                email: emailAddress, emailLink: Uri.base.toString()),
+            builder:
+                (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
-                  return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                  return Fframe.of(context)!
+                          .navigationConfig
+                          .waitPage
+                          .contentPane ??
                       const Center(
                         child: CircularProgressIndicator(),
                       );
                 case ConnectionState.waiting:
-                  return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                  return Fframe.of(context)!
+                          .navigationConfig
+                          .waitPage
+                          .contentPane ??
                       const Center(
                         child: CircularProgressIndicator(),
                       );
                 case ConnectionState.active:
-                  return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                  return Fframe.of(context)!
+                          .navigationConfig
+                          .waitPage
+                          .contentPane ??
                       const Center(
                         child: CircularProgressIndicator(),
                       );
                 case ConnectionState.done:
                   if (snapshot.hasError) {
                     debugPrint("Link sign in failed: ${snapshot.error}");
-                    return const FframeBuilder();
+                    return const FframePostLoad();
                   }
 
                   UserCredential? userCredential = snapshot.data;
                   debugPrint("Resulting user: ${userCredential?.user?.email}");
-                  return const FframeBuilder();
+                  return const FframePostLoad();
               }
             });
       } else {
         debugPrint("emailAddress not found in hash");
       }
     }
-    return const FframeBuilder();
+    return const FframePostLoad();
   }
 }
 
@@ -288,33 +313,44 @@ class _FframePostLoadState extends State<FframePostLoad> {
   @override
   Widget build(BuildContext context) {
     if (Fframe.of(context)?.postLoad == null) {
+      debugPrint("Post load: no code found");
       return const FframeBuilder();
-    }
-    return FutureBuilder<void>(
-      future: Fframe.of(context)!.postLoad!(context),
-      builder: (BuildContext context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-          case ConnectionState.active:
-            return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
-                const Center(
-                  child: CircularProgressIndicator(),
+    } else {
+      debugPrint("Post load: code executing");
+      return FutureBuilder<void>(
+        future: Fframe.of(context)!.postLoad!(context),
+        builder: (BuildContext context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              return Fframe.of(context)!
+                      .navigationConfig
+                      .waitPage
+                      .contentPane ??
+                  const Center(
+                    child: CircularProgressIndicator(),
+                  );
+            case ConnectionState.done:
+              if (snapshot.error != null) {
+                return MaterialApp(
+                  debugShowCheckedModeBanner:
+                      Fframe.of(context)!.debugShowCheckedModeBanner,
+                  title: Fframe.of(context)?.title ??
+                      "TODO: Configure the freaking language engine",
+                  home: Scaffold(
+                    body: Fframe.of(context)!
+                        .navigationConfig
+                        .errorPage
+                        .contentPane!,
+                  ),
                 );
-          case ConnectionState.done:
-            if (snapshot.error != null) {
-              return MaterialApp(
-                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-                title: Fframe.of(context)?.title ?? "TODO: Configure the freaking language engine",
-                home: Scaffold(
-                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
-                ),
-              );
-            }
-            return const FframeBuilder();
-        }
-      },
-    );
+              }
+              return const FframeBuilder();
+          }
+        },
+      );
+    }
   }
 }
 

@@ -101,6 +101,9 @@ class MainApp extends StatelessWidget {
         BarButtonDuplicate(),
         BarButtonFeedback(),
       ],
+      postLoad: (context) async {
+        debugPrint("Post load: execution complete");
+      },
     );
   }
 }
