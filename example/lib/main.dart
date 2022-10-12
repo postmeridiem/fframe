@@ -2,7 +2,7 @@ import 'package:example/firebase_options.dart';
 import 'package:example/pages/empty_page.dart';
 import 'package:example/pages/error_page.dart';
 import 'package:example/pages/wait_page.dart';
-import 'package:example/screens/user_info/navigation.dart';
+import 'package:example/screens/user_profile/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 
@@ -33,7 +33,7 @@ class MainApp extends StatelessWidget {
         suggestionNavigationTarget,
         settingNavigationTarget,
         usersNavigationTarget,
-        userInfoNavigationTarget,
+        userProfileNavigationTarget,
       ],
       signInConfig: SignInConfig(signInTarget: signInPageNavigationTarget),
       errorPage: NavigationTarget(
@@ -91,7 +91,8 @@ class MainApp extends StatelessWidget {
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
-          clientId: "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
+          clientId:
+              "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
       debugShowCheckedModeBanner: false,

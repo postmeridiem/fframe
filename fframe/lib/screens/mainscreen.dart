@@ -1,7 +1,8 @@
-import 'package:fframe/constants/constants.dart';
-import 'package:fframe/helpers/l10n.dart';
-import 'package:fframe/providers/state_providers.dart';
 import 'package:flutter/material.dart';
+
+import 'package:fframe/constants/constants.dart';
+import 'package:fframe/providers/state_providers.dart';
+import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/fframe.dart';
 
 import '../helpers/profile_buttons.dart';
@@ -264,24 +265,32 @@ class _ProfileButtonState extends State<ProfileButton> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: ListTile(
-                        mouseCursor: SystemMouseCursors.click,
-                        leading: circleAvatar(
-                          radius: 24,
+                      child: OutlinedButton(
+                        child: ListTile(
+                          mouseCursor: SystemMouseCursors.click,
+                          leading: circleAvatar(
+                            radius: 24,
+                          ),
+                          title: Text(
+                            FirebaseAuth.instance.currentUser!.displayName!,
+                            style: TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary),
+                          ),
+                          subtitle: Text(
+                            L10n.string("header_profilelabel",
+                                placeholder: "Click to open profile...",
+                                namespace: "fframe"),
+                            style: TextStyle(
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
+                                fontSize: 12),
+                          ),
                         ),
-                        title: Text(
-                          FirebaseAuth.instance.currentUser!.displayName!,
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSecondary),
-                        ),
-                        subtitle: Text(
-                          L10n.string("header_profilelabel",
-                              placeholder: "Click to open profile...",
-                              namespace: "fframe"),
-                          style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSecondary,
-                              fontSize: 12),
-                        ),
+                        onPressed: (() {
+                          FRouter.of(context)
+                              .navigateToRoute(context, route: "profile");
+                        }),
                       ),
                     ),
                     Divider(
