@@ -143,6 +143,9 @@ class FRouter extends InheritedWidget {
                       leading: navigationTarget.destination?.icon,
                       title: navigationTarget.destination?.navigationLabel,
                       onTap: () {
+
+
+
                         navigateTo(navigationTarget: navigationTarget);
                         Navigator.pop(context);
                       },
@@ -315,7 +318,7 @@ class FRouter extends InheritedWidget {
                 (NavigationTarget navigationTarget) => NavigationRailDestination(
                   icon: navigationTarget.destination!.icon,
                   selectedIcon: navigationTarget.destination!.selectedIcon,
-                  label: navigationTarget.destination!.navigationLabel,
+                  label: navigationTarget.destination!.navigationLabel, //TODO: parse the label through the l10n first
                   padding: navigationTarget.destination!.padding,
                 ),
               ),

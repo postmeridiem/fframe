@@ -13,6 +13,7 @@ class Fframe extends InheritedWidget {
     this.providerConfigs,
     this.debugShowCheckedModeBanner = true,
     this.globalActions,
+    this.postLoad,
   }) : super(key: key, child: const FFramePreload());
 
   final String title;
@@ -24,6 +25,7 @@ class Fframe extends InheritedWidget {
   final L10nConfig l10nConfig;
   final bool debugShowCheckedModeBanner;
   final List<Widget>? globalActions;
+  final PostLoad? postLoad;
 
   FFrameUser? user;
 
@@ -268,9 +270,56 @@ class _EmailAuthManagerState extends State<EmailAuthManager> with WidgetsBinding
   }
 }
 
+class FframePostLoad extends StatefulWidget {
+  const FframePostLoad({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<FframePostLoad> createState() => _FframePostLoadState();
+}
+
+class _FframePostLoadState extends State<FframePostLoad> {
+  @override
+  initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (Fframe.of(context)?.postLoad == null) {
+      return const FframeBuilder();
+    }
+    return FutureBuilder<void>(
+      future: Fframe.of(context)!.postLoad!(context),
+      builder: (BuildContext context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.waiting:
+          case ConnectionState.active:
+            return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                const Center(
+                  child: CircularProgressIndicator(),
+                );
+          case ConnectionState.done:
+            if (snapshot.error != null) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                title: Fframe.of(context)?.title ?? "TODO: Configure the freaking language engine",
+                home: Scaffold(
+                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                ),
+              );
+            }
+            return const FframeBuilder();
+        }
+      },
+    );
+  }
+}
+
 class FframeBuilder extends StatelessWidget {
   const FframeBuilder({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
@@ -286,3 +335,7 @@ class FframeBuilder extends StatelessWidget {
     );
   }
 }
+
+typedef PostLoad = Function(
+  BuildContext context,
+);
