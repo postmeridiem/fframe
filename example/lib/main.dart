@@ -91,8 +91,7 @@ class MainApp extends StatelessWidget {
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
-          clientId:
-              "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
+          clientId: "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
       debugShowCheckedModeBanner: false,
@@ -103,6 +102,9 @@ class MainApp extends StatelessWidget {
       ],
       postLoad: (context) async {
         debugPrint("Post load: execution complete");
+      },
+      postSignIn: (context) async {
+        debugPrint("Post sign in");
       },
     );
   }
