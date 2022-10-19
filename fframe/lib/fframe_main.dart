@@ -20,6 +20,7 @@ class Fframe extends InheritedWidget {
   }) : super(key: key, child: const FFramePreload());
 
   final String title;
+
   final FirebaseOptions firebaseOptions;
   final List<ProviderConfiguration>? providerConfigs;
   final NavigationConfig navigationConfig;
@@ -61,7 +62,7 @@ class Fframe extends InheritedWidget {
 
   void log(
     String message, {
-    String scope = "global",
+    String scope = "Unspecified",
     LogLevel level = LogLevel.info,
   }) {
     LogLevel logThreshold = this.logThreshold;
