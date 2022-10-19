@@ -11,7 +11,9 @@ class L10n {
 
   L10n._internal();
 
-  factory L10n({required L10nConfig l10nConfig, required Map<String, dynamic> localeData}) {
+  factory L10n(
+      {required L10nConfig l10nConfig,
+      required Map<String, dynamic> localeData}) {
     instance.config = l10nConfig;
     instance.map = localeData;
 
@@ -32,7 +34,8 @@ class L10n {
         // debugPrint("L10N MISSING KEY: Inserted placeholder. Key not found: <$key>.");
       }
     } else {
-      debugPrint("L10N ERROR: Unknown namespace: $namespace.");
+      debugPrint(
+          "L10N ERROR: Unknown namespace: $namespace while looking for <$key>");
     }
     return _output;
   }
@@ -43,7 +46,8 @@ class L10n {
     String namespace = "global",
     required List<L10nReplacer> replacers,
   }) {
-    String _output = string(key, placeholder: placeholder, namespace: namespace);
+    String _output =
+        string(key, placeholder: placeholder, namespace: namespace);
 
     for (var replacer in replacers) {
       _output = _output.replaceAll(replacer.from, replacer.replace);
@@ -147,7 +151,8 @@ class L10nReplacer {
 class L10nReader {
   L10nReader();
 
-  static Future<Map<String, dynamic>> read(BuildContext context, L10nConfig config) async {
+  static Future<Map<String, dynamic>> read(
+      BuildContext context, L10nConfig config) async {
     Map<String, dynamic> _output = {'fframe': {}, 'global': {}};
     List<String> _namespaces = config.namespaces as List<String>;
     String _mode = config.source.mode;
@@ -157,11 +162,15 @@ class L10nReader {
       case 'local_assets':
         {
           for (String _namespace in _namespaces) {
-            String _sourcepath = "assets/translations/${_namespace}_${config.locale.languageCode}_${config.locale.countryCode}.json";
-            debugPrint("L10N: Loading namespace translations from path: <$_sourcepath>.");
+            String _sourcepath =
+                "assets/translations/${_namespace}_${config.locale.languageCode}_${config.locale.countryCode}.json";
+            debugPrint(
+                "L10N: Loading namespace translations from path: <$_sourcepath>.");
             // loading namespace for locale
-            final String response = await DefaultAssetBundle.of(context).loadString(_sourcepath);
-            final Map<String, dynamic> data = json.decode(response) as Map<String, dynamic>;
+            final String response =
+                await DefaultAssetBundle.of(context).loadString(_sourcepath);
+            final Map<String, dynamic> data =
+                json.decode(response) as Map<String, dynamic>;
             _output[_namespace] = data;
           }
         }
