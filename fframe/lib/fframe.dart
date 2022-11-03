@@ -14,6 +14,7 @@ import 'dart:convert';
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/controllers/query_state_controller.dart';
 import 'package:fframe/screens/document_screen/document_search.dart';
+
 import 'package:fframe/services/navigation_service.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -67,6 +68,7 @@ part 'screens/document_screen/document_screen.dart';
 part 'screens/document_screen/document_body.dart';
 part 'screens/document_screen/document_context.dart';
 part 'screens/document_screen/document_list.dart';
+part 'package:fframe/screens/datagrid_screen/datagrid_firestore.dart';
 part 'screens/router_page.dart';
 
 part 'helpers/validator.dart';

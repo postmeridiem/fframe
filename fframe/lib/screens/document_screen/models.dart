@@ -1,6 +1,6 @@
 part of fframe;
 
-class DocumentConfig<T> {
+class DocumentConfig<T> extends ChangeNotifier {
   DocumentConfig({
     required this.formKey,
     required this.collection,
@@ -14,16 +14,21 @@ class DocumentConfig<T> {
     this.query,
     this.searchConfig,
     this.documentList,
+    this.dataGrid,
     this.titleBuilder,
     required this.autoSelectFirst,
     required this.document,
     this.contextCardBuilders,
     this.queryStringIdParam = "id",
     this.embeddedDocument = false,
-  });
+    this.initialViewType = ViewType.none,
+  }) {
+    _viewType = initialViewType;
+  }
 
   final GlobalKey<FormState> formKey;
   final DocumentList<T>? documentList;
+  final DataGridConfig<T>? dataGrid;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
   final String queryStringIdParam;
@@ -40,10 +45,32 @@ class DocumentConfig<T> {
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
   final bool embeddedDocument;
+  final ViewType initialViewType;
 
   late PreloadPageController preloadPageController;
   late TabController tabController;
+  late ViewType _viewType;
+
+  ViewType get currentViewType => _viewType;
+  set currentViewType(ViewType viewType) {
+    if (viewType == ViewType.grid && dataGrid == null) {
+      //Cannot be switched to grid... as there is no grid
+      _viewType = initialViewType;
+      notifyListeners();
+      return;
+    }
+    if (viewType == ViewType.list && documentList == null) {
+      //Cannot be switched to list... as there is no list
+      _viewType = initialViewType;
+      notifyListeners();
+      return;
+    }
+    _viewType = viewType;
+    notifyListeners();
+  }
 }
+
+enum ViewType { none, list, grid }
 
 class Document<T> {
   Document({

@@ -92,8 +92,7 @@ class MainApp extends StatelessWidget {
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
-          clientId:
-              "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
+          clientId: "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
       debugShowCheckedModeBanner: false,
@@ -106,16 +105,11 @@ class MainApp extends StatelessWidget {
       //   debugPrint("example.postLoad: execution complete");
       // },
       postSignIn: (context) async {
-        Fframe.of(context)!
-            .log("execution complete", scope: "exampleApp.postSignIn");
-        Fframe.of(context)!.log("log test info level",
-            scope: "exampleApp.LogTest", level: LogLevel.info);
-        Fframe.of(context)!.log("log test warning level",
-            scope: "exampleApp.LogTest", level: LogLevel.warning);
-        Fframe.of(context)!.log("log test error level",
-            scope: "exampleApp.LogTest", level: LogLevel.error);
-        Fframe.of(context)!.log("log test always level",
-            scope: "exampleApp.LogTest", level: LogLevel.always);
+        Fframe.of(context)!.log("execution complete", scope: "exampleApp.postSignIn");
+        Fframe.of(context)!.log("log test info level", scope: "exampleApp.LogTest", level: LogLevel.info);
+        Fframe.of(context)!.log("log test warning level", scope: "exampleApp.LogTest", level: LogLevel.warning);
+        Fframe.of(context)!.log("log test error level", scope: "exampleApp.LogTest", level: LogLevel.error);
+        Fframe.of(context)!.log("log test always level", scope: "exampleApp.LogTest", level: LogLevel.always);
         Fframe.of(context)!.log("execution complete");
       },
     );
