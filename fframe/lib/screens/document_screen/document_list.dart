@@ -151,33 +151,38 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
                 )
               : null,
           primary: false,
-          body: Column(
+          body: Stack(
             children: [
-              DocumentSearch<T>(),
-              Expanded(
-                child: AnimatedBuilder(
-                    animation: widget.documentScreenConfig.fireStoreQueryState,
-                    builder: (context, child) {
-                      Query<T> query = widget.documentScreenConfig.fireStoreQueryState.currentQuery() as Query<T>;
-                      return FirestoreSeparatedListView<T>(
-                        documentList: widget.documentConfig.documentList!,
-                        documentScreenConfig: widget.documentScreenConfig,
-                        selectionState: widget.documentScreenConfig.selectionState as SelectionState<T>,
-                        // queryBuilderSnapshotState: widget.documentScreenConfig.queryBuilderSnapshotState as QueryBuilderSnapshotState<T>,
-                        seperatorHeight: widget.documentConfig.documentList?.seperatorHeight ?? 1,
-                        controller: widget.scrollController,
-                        query: query,
-                        itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
-                          return DocumentListItem<T>(
-                            queryDocumentSnapshot: queryDocumentSnapshot,
-                            hoverSelect: widget.documentConfig.documentList?.hoverSelect ?? false,
+              Column(
+                children: [
+                  // DocumentSearch<T>(),
+                  Expanded(
+                    child: AnimatedBuilder(
+                        animation: widget.documentScreenConfig.fireStoreQueryState,
+                        builder: (context, child) {
+                          Query<T> query = widget.documentScreenConfig.fireStoreQueryState.currentQuery() as Query<T>;
+                          return FirestoreSeparatedListView<T>(
+                            documentList: widget.documentConfig.documentList!,
+                            documentScreenConfig: widget.documentScreenConfig,
+                            selectionState: widget.documentScreenConfig.selectionState as SelectionState<T>,
+                            // queryBuilderSnapshotState: widget.documentScreenConfig.queryBuilderSnapshotState as QueryBuilderSnapshotState<T>,
+                            seperatorHeight: widget.documentConfig.documentList?.seperatorHeight ?? 1,
+                            controller: widget.scrollController,
+                            query: query,
+                            itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
+                              return DocumentListItem<T>(
+                                queryDocumentSnapshot: queryDocumentSnapshot,
+                                hoverSelect: widget.documentConfig.documentList?.hoverSelect ?? false,
+                              );
+                            },
+                            loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
+                            errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showErrorPage(context: context, errorText: error.toString()),
                           );
-                        },
-                        loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
-                        errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showErrorPage(context: context, errorText: error.toString()),
-                      );
-                    }),
+                        }),
+                  ),
+                ],
               ),
+              if (widget.documentConfig.dataGrid != null) DataGridToggle<T>(),
             ],
           ),
         ),
@@ -279,4 +284,41 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
             });
           },
         );
+}
+
+class DataGridToggle<T> extends StatelessWidget {
+  const DataGridToggle({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+
+    if (documentConfig.currentViewType == ViewType.none) {
+      //Cannot toggle if there are no options to choose from
+      return const IgnorePointer();
+    }
+    return Positioned(
+      right: -4,
+      top: 0,
+      // child: Icon(Icons.keyboard_double_arrow_right_rounded),
+      child: IconButton(
+        onPressed: () {
+          documentConfig.currentViewType = (documentConfig.currentViewType == ViewType.list) ? ViewType.grid : ViewType.list;
+        },
+        padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0, right: 0),
+        icon: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).indicatorColor,
+            borderRadius: const BorderRadius.only(
+              // topRight: Radius.circular(40.0),
+              // bottomRight: Radius.circular(40.0),
+              topLeft: Radius.circular(4.0),
+              bottomLeft: Radius.circular(4.0),
+            ),
+          ),
+          child: (documentConfig.currentViewType == ViewType.list) ? const Icon(Icons.keyboard_double_arrow_right_rounded) : const Icon(Icons.keyboard_double_arrow_left_rounded),
+        ),
+      ),
+    );
+  }
 }

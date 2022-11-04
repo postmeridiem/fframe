@@ -12,6 +12,7 @@ class DocumentScreen<T> extends StatelessWidget {
     required this.fromFirestore,
     required this.toFirestore,
     this.documentList,
+    this.dataGrid,
     this.autoSelectFirst = false,
     this.query,
     this.searchConfig,
@@ -25,6 +26,7 @@ class DocumentScreen<T> extends StatelessWidget {
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final DocumentList<T>? documentList;
+  final DataGridConfig<T>? dataGrid;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
   final TitleBuilder<T>? titleBuilder;
@@ -55,6 +57,13 @@ class DocumentScreen<T> extends StatelessWidget {
       }
       _embeddedDocument = true;
     }
+
+    //Aply data to datagrid, if any
+    if (dataGrid != null) {
+      dataGrid!.toFirestore = toFirestore;
+      dataGrid!.fromFirestore = fromFirestore;
+    }
+
     return Column(
       children: [
         if (documentScreenHeaderBuilder != null) documentScreenHeaderBuilder!(),
@@ -76,6 +85,12 @@ class DocumentScreen<T> extends StatelessWidget {
                 formKey: formKey,
                 collection: collection,
                 documentList: documentList,
+                dataGrid: dataGrid,
+                initialViewType: (documentList != null)
+                    ? ViewType.list
+                    : (dataGrid != null)
+                        ? ViewType.grid
+                        : ViewType.none,
                 autoSelectFirst: autoSelectFirst,
                 queryStringIdParam: _queryStringIdParam ?? queryStringIdParam,
                 createNew: createNew,
@@ -364,7 +379,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     }
   }
 
-  save<T>({required BuildContext context, bool closeAfterSave = true}) async {
+  save<T>({required BuildContext context, bool closeAfterSave = true, T? data}) async {
     if (validate<T>(context: context, moveToTab: true) == -1) {
       DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
       String? docId = selectionState.docId;
@@ -579,28 +594,82 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   }
 }
 
-class DocumentLoader<T> extends ConsumerWidget {
+class DocumentLoader<T> extends ConsumerStatefulWidget {
   const DocumentLoader({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    debugPrint("build DocumentLoader: ${key.toString()}");
+  ConsumerState<ConsumerStatefulWidget> createState() => _DocumentLoaderState<T>();
+}
+
+class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with SingleTickerProviderStateMixin {
+  @override
+  Widget build(BuildContext context) {
+    debugPrint("build DocumentLoader: ${widget.key.toString()}");
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
 
-    return Row(
-      children: [
-        if (documentConfig.documentList != null)
-          DocumentListLoader<T>(
-            key: ValueKey("DocumentListBuilder_${documentConfig.collection}"),
-            ref: ref,
-          ),
-        Expanded(
-          child: ScreenBody<T>(
-            key: ValueKey("ScreenBody_${documentConfig.collection}"),
-          ),
-        ),
-      ],
+    //Switches between view types
+    return AnimatedBuilder(
+      animation: documentConfig,
+      builder: (BuildContext context, Widget? child) {
+        switch (documentConfig.currentViewType) {
+          case ViewType.none:
+            return ScreenBody<T>(
+              key: ValueKey("ScreenBody_${documentConfig.collection}"),
+            );
+          case ViewType.list:
+            return Row(
+              children: [
+                DocumentListLoader<T>(
+                  key: ValueKey("DocumentListBuilder_${documentConfig.collection}"),
+                  ref: ref,
+                ),
+                Expanded(
+                  child: ScreenBody<T>(
+                    key: ValueKey("ScreenBody_${documentConfig.collection}"),
+                  ),
+                ),
+              ],
+            );
+          case ViewType.grid:
+            Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
+            DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+            // if (documentScreenConfig.selectionState != null){}
+
+            return Stack(
+              children: [
+                FirestoreDataGrid<T>(
+                  dataGridConfig: documentConfig.dataGrid!,
+                  query: query,
+                ),
+                if (documentConfig.documentList != null) DataGridToggle<T>(),
+              ],
+            );
+        }
+      },
     );
+
+    // if (documentConfig.currentViewType == ViewType.list) {
+    //   return Row(
+    //     children: [
+    //       if (documentConfig.documentList != null)
+    //         DocumentListLoader<T>(
+    //           key: ValueKey("DocumentListBuilder_${documentConfig.collection}"),
+    //           ref: ref,
+    //         ),
+    //       Expanded(
+    //         child: ScreenBody<T>(
+    //           key: ValueKey("ScreenBody_${documentConfig.collection}"),
+    //         ),
+    //       ),
+    //     ],
+    //   );
+    // } else {
+    //   Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
+    //   return FirestoreDataGrid<T>(
+    //     dataGridConfig: documentConfig.dataGrid!,
+    //     query: query,
+    //   );
+    // }
   }
 }
 
@@ -680,7 +749,6 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
     }
 
     debugPrint("Load the AnimatedSwitcher ");
-    // postLoad(ref: ref, documentScreenConfig: documentScreenConfig);
     return AnimatedSwitcher(
       key: ValueKey("query_${widget.key.toString()}"),
       duration: const Duration(milliseconds: 5),

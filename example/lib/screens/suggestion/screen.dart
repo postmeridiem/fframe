@@ -127,7 +127,6 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           }
         },
         hoverSelect: false,
-
         // headerBuilder: ((context, snapshot) {
         //   return const SizedBox(
         //     height: 40,
@@ -150,6 +149,33 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         // }),
       ),
 
+      dataGrid: DataGridConfig<Suggestion>(
+        dataGridConfigColumns: [
+          DataGridConfigColumn(
+            headerBuilder: (() => const DataColumn(
+                  label: Text("Name"),
+                )),
+            dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
+                  Text(suggestion.name ?? "?"),
+                )),
+          ),
+          DataGridConfigColumn(
+            headerBuilder: (() => const DataColumn(
+                  label: Text("Active"),
+                )),
+            dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
+                  Switch(
+                    value: (suggestion.active ?? false),
+                    onChanged: (bool value) {
+                      suggestion.active = value;
+                      save();
+                      // DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+                    },
+                  ),
+                )),
+          ),
+        ],
+      ),
       // Center part, shows a firestore doc. Tabs possible
       document: _document(context),
       // document: _document(),
@@ -254,67 +280,67 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
   }
 }
 
-class FormCeptionWidget extends StatelessWidget {
-  const FormCeptionWidget({
-    Key? key,
-    required this.suggestion,
-  }) : super(key: key);
+// class FormCeptionWidget extends StatelessWidget {
+//   const FormCeptionWidget({
+//     Key? key,
+//     required this.suggestion,
+//   }) : super(key: key);
 
-  final Suggestion suggestion;
+//   final Suggestion suggestion;
 
-  @override
-  Widget build(BuildContext context) {
-    return DocumentScreen<Suggestion>(
-      collection: "suggestions/${suggestion.id}/subcollectionname",
-      fromFirestore: Suggestion.fromFirestore,
-      toFirestore: (suggestion, options) {
-        return suggestion.toFirestore();
-      },
-      createDocumentId: (suggestion) {
-        return "${suggestion.name}";
-      },
-      createNew: () => Suggestion(),
+//   @override
+//   Widget build(BuildContext context) {
+//     return DocumentScreen<Suggestion>(
+//       collection: "suggestions/${suggestion.id}/subcollectionname",
+//       fromFirestore: Suggestion.fromFirestore,
+//       toFirestore: (suggestion, options) {
+//         return suggestion.toFirestore();
+//       },
+//       createDocumentId: (suggestion) {
+//         return "${suggestion.name}";
+//       },
+//       createNew: () => Suggestion(),
 
-      //Optional title widget
-      titleBuilder: (BuildContext context, Suggestion data) {
-        return Text(
-          data.name ?? "New Suggestion",
-          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
-        );
-      },
+//       //Optional title widget
+//       titleBuilder: (BuildContext context, Suggestion data) {
+//         return Text(
+//           data.name ?? "New Suggestion",
+//           style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+//         );
+//       },
 
-      // Optional, override on the query string param which holds the document id
-      // queryStringIdParam: "formception",
+//       // Optional, override on the query string param which holds the document id
+//       // queryStringIdParam: "formception",
 
-      // Optional Left hand (navigation/document selection pane)
-      documentList: DocumentList(
-        builder: (context, selected, data, user) {
-          return SuggestionListItem(
-            suggestion: data,
-            selected: selected,
-            user: user,
-          );
-        },
-      ),
+//       // Optional Left hand (navigation/document selection pane)
+//       documentList: DocumentList(
+//         builder: (context, selected, data, user) {
+//           return SuggestionListItem(
+//             suggestion: data,
+//             selected: selected,
+//             user: user,
+//           );
+//         },
+//       ),
 
-      // Center part, shows a firestore doc. Tabs possible
-      document: Document<Suggestion>(
-        autoSave: false,
-        documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
-          return [
-            DocumentTab<Suggestion>(tabBuilder: (user) {
-              return const Tab(
-                text: "Suggestion",
-                icon: Icon(
-                  Icons.pest_control,
-                ),
-              );
-            }, childBuilder: (suggestion, readOnly) {
-              return const Text("FormCeption");
-            })
-          ];
-        },
-      ),
-    );
-  }
-}
+//       // Center part, shows a firestore doc. Tabs possible
+//       document: Document<Suggestion>(
+//         autoSave: false,
+//         documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
+//           return [
+//             DocumentTab<Suggestion>(tabBuilder: (user) {
+//               return const Tab(
+//                 text: "Suggestion",
+//                 icon: Icon(
+//                   Icons.pest_control,
+//                 ),
+//               );
+//             }, childBuilder: (suggestion, readOnly) {
+//               return const Text("FormCeption");
+//             })
+//           ];
+//         },
+//       ),
+//     );
+//   }
+// }

@@ -32,14 +32,10 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
 
   @override
   Widget build(BuildContext context) {
-    DocumentScreenConfig documentScreenConfig =
-        DocumentScreenConfig.of(context)!;
-    DocumentConfig<T> documentConfig =
-        documentScreenConfig.documentConfig as DocumentConfig<T>;
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
     SearchConfig<T>? searchConfig = documentConfig.searchConfig;
-    FireStoreQueryState<T> fireStoreQueryState =
-        DocumentScreenConfig.of(context)?.fireStoreQueryState
-            as FireStoreQueryState<T>;
+    FireStoreQueryState<T> fireStoreQueryState = DocumentScreenConfig.of(context)?.fireStoreQueryState as FireStoreQueryState<T>;
 
     if (searchConfig == null) {
       return const IgnorePointer();
@@ -50,8 +46,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
         if (textEditingValue.text == '') {
           return const Iterable.empty();
         }
-        final Iterable<SearchOption> searchOptions =
-            searchConfig.searchOptions.where(
+        final Iterable<SearchOption> searchOptions = searchConfig.searchOptions.where(
           (SearchOption searchOption) {
             return searchOption.caption.toLowerCase().contains(
                   textEditingValue.text.toLowerCase(),
@@ -103,8 +98,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
               switch (searchOption.type) {
                 case SearchOptionType.string:
                   if (searchOption.isSelected) {
-                    TextEditingController chipController =
-                        TextEditingController();
+                    TextEditingController chipController = TextEditingController();
                     chipController.text = searchOption.stringValue;
                     return Padding(
                       padding: const EdgeInsets.all(2.0),
@@ -137,13 +131,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                                     fireStoreQueryState.addQueryComponent(
                                       id: searchOption.field,
                                       queryComponent: (Query<T> query) {
-                                        return query
-                                            .where(searchOption.field,
-                                                isGreaterThanOrEqualTo:
-                                                    fieldValue)
-                                            .where(searchOption.field,
-                                                isLessThanOrEqualTo:
-                                                    fieldValue + '~');
+                                        return query.where(searchOption.field, isGreaterThanOrEqualTo: fieldValue).where(searchOption.field, isLessThanOrEqualTo: fieldValue + '~');
                                       },
                                     );
                                   } else {
@@ -168,8 +156,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                         onDeleted: () {
                           setState(() {
                             searchOption.stringValue = '';
-                            fireStoreQueryState.removeQueryComponent(
-                                id: searchOption.field);
+                            fireStoreQueryState.removeQueryComponent(id: searchOption.field);
                             selectedOptions.remove(searchOption);
                           });
                         },
@@ -231,8 +218,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                                   fireStoreQueryState.addQueryComponent(
                                     id: searchOption.field,
                                     queryComponent: (Query<T> query) {
-                                      return query.where(searchOption.field,
-                                          isEqualTo: selected);
+                                      return query.where(searchOption.field, isEqualTo: selected);
                                     },
                                   );
                                 });
@@ -244,8 +230,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                       deleteIcon: const Icon(Icons.close, size: 10),
                       onDeleted: () {
                         setState(() {
-                          fireStoreQueryState.removeQueryComponent(
-                              id: searchOption.field);
+                          fireStoreQueryState.removeQueryComponent(id: searchOption.field);
                           selectedOptions.remove(searchOption);
                         });
                       },
@@ -357,14 +342,12 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                                 fontSize: 12.0,
                               ),
                               focusNode: focusNode,
-                              initialValue: DateFormat('yyyy-MM-dd')
-                                  .format(searchOption.dateTimeValue),
+                              initialValue: DateFormat('yyyy-MM-dd').format(searchOption.dateTimeValue),
                               onChanged: (String fieldValue) {
                                 fireStoreQueryState.addQueryComponent(
                                   id: searchOption.field,
                                   queryComponent: (Query<T> query) {
-                                    return query.where(searchOption.field,
-                                        isEqualTo: fieldValue);
+                                    return query.where(searchOption.field, isEqualTo: fieldValue);
                                   },
                                 );
                               },
@@ -403,8 +386,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                   focusNode: fieldFocusNode,
                   controller: autocompleteController,
                   decoration: const InputDecoration(
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 2, horizontal: 32),
+                    contentPadding: EdgeInsets.symmetric(vertical: 2, horizontal: 32),
                     // icon: Icon(Icons.search),
                     // suffixIcon: IconButton(
                     //   onPressed: fireStoreQueryState.reset,
@@ -414,16 +396,11 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                   style: const TextStyle(fontWeight: FontWeight.bold),
                   onChanged: (String fieldValue) {
                     if (fieldValue != '') {
-                      if (fieldValue.substring((fieldValue.length - 1)
-                              .clamp(0, fieldValue.length)) ==
-                          ":") {
-                        String _curkey = fieldValue
-                            .substring(0, (fieldValue.length - 1))
-                            .toLowerCase();
+                      if (fieldValue.substring((fieldValue.length - 1).clamp(0, fieldValue.length)) == ":") {
+                        String _curkey = fieldValue.substring(0, (fieldValue.length - 1)).toLowerCase();
                         if (searchConfig.optionMap.containsKey(_curkey)) {
                           setState(() {
-                            SearchOption _searchOption =
-                                searchConfig.optionMap[_curkey] as SearchOption;
+                            SearchOption _searchOption = searchConfig.optionMap[_curkey] as SearchOption;
 
                             fireStoreQueryState.removeQueryComponent(
                               id: 'autocomplete',
@@ -444,11 +421,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                       fireStoreQueryState.addQueryComponent(
                         id: 'autocomplete',
                         queryComponent: (Query<T> query) {
-                          return query
-                              .where(searchConfig.defaultField,
-                                  isGreaterThanOrEqualTo: fieldValue)
-                              .where(searchConfig.defaultField,
-                                  isLessThanOrEqualTo: fieldValue + '~');
+                          return query.where(searchConfig.defaultField, isGreaterThanOrEqualTo: fieldValue).where(searchConfig.defaultField, isLessThanOrEqualTo: fieldValue + '~');
                         },
                       );
                     } else {
