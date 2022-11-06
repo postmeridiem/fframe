@@ -264,7 +264,7 @@ class FFrameDataTableSource<T> extends DataTableSource {
   //final Map<String, Widget> Function() getHeaders;
   final void Function(Object error, StackTrace stackTrace)? Function() getOnError;
 
-  var _selectedRowIds = <String>{};
+  final _selectedRowIds = <String>{};
 
   @override
   int get selectedRowCount => _selectedRowIds.length;

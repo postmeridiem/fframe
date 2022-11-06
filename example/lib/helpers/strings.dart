@@ -1,8 +1,8 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
+import 'package:fframe/fframe.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DateTimeText extends StatelessWidget {
   const DateTimeText({

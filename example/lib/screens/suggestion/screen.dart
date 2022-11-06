@@ -39,6 +39,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         return suggestion;
       },
 
+      viewType: widget.suggestionQueryState == SuggestionQueryStates.active ? ViewType.auto : ViewType.grid,
+
       createNew: () => Suggestion(
         active: true,
         createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",

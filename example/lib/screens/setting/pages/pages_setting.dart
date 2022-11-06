@@ -1,5 +1,6 @@
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:example/models/fframe_page.dart';
@@ -14,7 +15,7 @@ class SettingsPagesForm extends StatefulWidget {
 }
 
 class _SettingsPagesFormState extends State<SettingsPagesForm> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late String currentPageId = '';
   late FframePage curPage;
 
@@ -34,8 +35,7 @@ class _SettingsPagesFormState extends State<SettingsPagesForm> {
             children: [
               FutureBuilder<QuerySnapshot>(
                 future: col.orderBy('name', descending: false).get(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
                     return const Padding(
                       padding: EdgeInsets.all(100.0),
@@ -50,18 +50,14 @@ class _SettingsPagesFormState extends State<SettingsPagesForm> {
                     List<QueryDocumentSnapshot> data = snapshot.data!.docs;
                     List<ListTile> listdata = [];
                     for (int i = 0; i < data.length; i++) {
-                      DocumentSnapshot<Map<String, dynamic>> _listSnap =
-                          data[i] as DocumentSnapshot<Map<String, dynamic>>;
-                      FframePage currentPage = FframePage.fromFirestore(
-                          _listSnap, SnapshotOptions());
+                      DocumentSnapshot<Map<String, dynamic>> listSnap = data[i] as DocumentSnapshot<Map<String, dynamic>>;
+                      FframePage currentPage = FframePage.fromFirestore(listSnap, SnapshotOptions());
                       listdata.add(
                         ListTile(
                           title: Text(currentPage.name as String),
                           leading: Icon(
                             iconMap[currentPage.icon as String],
-                            color: currentPage.icon == 'block'
-                                ? Theme.of(context).disabledColor
-                                : null,
+                            color: currentPage.icon == 'block' ? Theme.of(context).disabledColor : null,
                           ),
                           onTap: () {
                             setState(() {
@@ -84,9 +80,7 @@ class _SettingsPagesFormState extends State<SettingsPagesForm> {
                     );
                   }
 
-                  return const Padding(
-                      padding: EdgeInsets.all(100.0),
-                      child: CircularProgressIndicator());
+                  return const Padding(padding: EdgeInsets.all(100.0), child: CircularProgressIndicator());
                 },
               ),
             ],
@@ -173,8 +167,7 @@ class _CurrentPageEditorState extends State<CurrentPageEditor> {
                 child: Text("created"),
               ),
               Expanded(
-                child: TimestampDateTimeText(
-                    timestamp: widget.currentPage.creationDate as Timestamp),
+                child: TimestampDateTimeText(timestamp: widget.currentPage.creationDate as Timestamp),
               ),
             ],
           ),

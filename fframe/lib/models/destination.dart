@@ -20,3 +20,8 @@ class Destination {
   final String? tabLabel;
   final EdgeInsetsGeometry? padding;
 }
+
+//TODO: AZ Enable this... Breaking change!
+typedef NavigationLabel<T> = Widget Function(
+  BuildContext context,
+);
