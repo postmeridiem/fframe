@@ -158,7 +158,7 @@ class FRouter extends InheritedWidget {
                   children: [
                     ListTile(
                       leading: navigationTarget.destination?.icon,
-                      title: navigationTarget.destination?.navigationLabel,
+                      title: navigationTarget.destination?.navigationLabel(),
                       onTap: () {
                         navigateTo(navigationTarget: navigationTarget);
                         Navigator.pop(context);
@@ -177,7 +177,7 @@ class FRouter extends InheritedWidget {
                                 ),
                             child: ListTile(
                               leading: navigationTab.destination?.icon,
-                              title: navigationTab.destination?.navigationLabel,
+                              title: navigationTab.destination?.navigationLabel(),
                               onTap: () {
                                 navigateTo(navigationTarget: navigationTab);
                                 Navigator.pop(context);
@@ -192,7 +192,7 @@ class FRouter extends InheritedWidget {
           if (!navigationNotifier.isSignedIn && navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination != null)
             ListTile(
               leading: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination?.icon,
-              title: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel,
+              title: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
               onTap: () {
                 navigateTo(navigationTarget: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget);
                 Navigator.pop(context);
@@ -201,7 +201,7 @@ class FRouter extends InheritedWidget {
           if (signOutDestination != null && navigationNotifier.isSignedIn)
             ListTile(
               leading: signOutDestination.icon,
-              title: signOutDestination.navigationLabel,
+              title: signOutDestination.navigationLabel(),
               onTap: () {
                 signOut();
                 Navigator.pop(context);
@@ -254,14 +254,7 @@ class FRouter extends InheritedWidget {
               children: [
                 navigationTab.destination?.icon ?? const IgnorePointer(),
                 (navigationTab.destination?.icon != null && navigationTab.destination?.tabLabel != null) ? const Text(" ") : const IgnorePointer(),
-                Text(navigationTab.destination?.tabLabel ?? ''),
-                // Text(
-                //   L10n.string(
-                //     navigationTab.destination?.tabLabel ?? '',
-                //     placeholder: navigationTab.destination?.tabLabel ?? '',
-                //     namespace: 'global',
-                //   ),
-                // ),
+                Text(navigationTab.destination?.tabLabel!() ?? ''),
               ],
             ),
             // text: navigationTab.destination?.tabLabel ?? '',
@@ -301,7 +294,7 @@ class FRouter extends InheritedWidget {
               children: [
                 navigationTab.destination?.icon ?? const IgnorePointer(),
                 (navigationTab.destination?.icon != null && navigationTab.destination?.tabLabel != null) ? const Text(" ") : const IgnorePointer(),
-                Text(navigationTab.destination?.tabLabel ?? ''),
+                Text(navigationTab.destination?.tabLabel!() ?? ''),
               ],
             ),
             // text: navigationTab.destination?.tabLabel ?? '',
@@ -339,7 +332,7 @@ class FRouter extends InheritedWidget {
                 (NavigationTarget navigationTarget) => NavigationRailDestination(
                   icon: navigationTarget.destination!.icon,
                   selectedIcon: navigationTarget.destination!.selectedIcon,
-                  label: navigationTarget.destination!.navigationLabel, //TODO: parse the label through the l10n first
+                  label: navigationTarget.destination!.navigationLabel(),
                   padding: navigationTarget.destination!.padding,
                 ),
               ),
@@ -347,7 +340,7 @@ class FRouter extends InheritedWidget {
             NavigationRailDestination(
               icon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.icon,
               selectedIcon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
-              label: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel,
+              label: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
               padding: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.padding,
             ),
         ],

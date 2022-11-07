@@ -16,12 +16,10 @@ class Destination {
 
   final Widget icon;
   final Widget selectedIcon;
-  final Widget navigationLabel;
-  final String? tabLabel;
+  final NavigationLabel navigationLabel;
+  final NavigationTabLabel? tabLabel;
   final EdgeInsetsGeometry? padding;
 }
 
-//TODO: AZ Enable this... Breaking change!
-typedef NavigationLabel<T> = Widget Function(
-  BuildContext context,
-);
+typedef NavigationLabel<T> = Widget Function();
+typedef NavigationTabLabel<T> = String Function();

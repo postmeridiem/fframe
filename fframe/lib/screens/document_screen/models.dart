@@ -135,7 +135,7 @@ class DocumentTab<T> {
 class DocumentList<T> {
   const DocumentList({
     required this.builder,
-    this.queryBuilder,
+    // this.queryBuilder,
     this.headerBuilder,
     this.footerBuilder,
     this.hoverSelect = false,
@@ -144,7 +144,7 @@ class DocumentList<T> {
     this.seperatorHeight = 1,
   });
   final DocumentListItemBuilder<T> builder;
-  final Query<T> Function(Query<T> query)? queryBuilder;
+  // final Query<T> Function(Query<T> query)? queryBuilder;
   final DocumentListHeaderBuilder<T>? headerBuilder;
   final DocumentListFooterBuilder<T>? footerBuilder;
   final bool hoverSelect;

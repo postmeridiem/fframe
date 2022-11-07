@@ -106,6 +106,19 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           ),
         ],
       ),
+
+      queryBuilder: (query) {
+        // return query.where("active", isNull: true);
+
+        switch (widget.suggestionQueryState) {
+          case SuggestionQueryStates.active:
+            return query.where("active", isEqualTo: true);
+
+          case SuggestionQueryStates.done:
+            return query.where("active", isEqualTo: false);
+        }
+      },
+
       autoSelectFirst: true,
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
@@ -117,17 +130,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           );
         },
         // showCreateButton: true,
-        queryBuilder: (query) {
-          // return query.where("active", isNull: true);
 
-          switch (widget.suggestionQueryState) {
-            case SuggestionQueryStates.active:
-              return query.where("active", isEqualTo: true);
-
-            case SuggestionQueryStates.done:
-              return query.where("active", isEqualTo: false);
-          }
-        },
         hoverSelect: false,
         // headerBuilder: ((context, snapshot) {
         //   return const SizedBox(

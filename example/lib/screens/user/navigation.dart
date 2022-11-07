@@ -13,12 +13,13 @@ final usersNavigationTarget = NavigationTarget(
       title: "Active",
       path: "active",
       destination: Destination(
-          icon: Icon(
-            Icons.check,
-            color: Colors.green.shade900,
-          ),
-          navigationLabel: const Text("Active"),
-          tabLabel: "Active"),
+        icon: Icon(
+          Icons.check,
+          color: Colors.green.shade900,
+        ),
+        navigationLabel: () => const Text("Active"),
+        tabLabel: () => "Active",
+      ),
     ),
     NavigationTab(
       contentPane: const UsersScreen(
@@ -27,17 +28,18 @@ final usersNavigationTarget = NavigationTarget(
       title: "Inactive",
       path: "inactive",
       destination: Destination(
-          icon: Icon(
-            Icons.close,
-            color: Colors.redAccent.shade700,
-          ),
-          navigationLabel: const Text("Inactive"),
-          tabLabel: "Inactive"),
+        icon: Icon(
+          Icons.close,
+          color: Colors.redAccent.shade700,
+        ),
+        navigationLabel: () => const Text("Inactive"),
+        tabLabel: () => "Inactive",
+      ),
     )
   ],
-  destination: const Destination(
-    icon: Icon(Icons.person),
-    navigationLabel: Text('Users'),
+  destination: Destination(
+    icon: const Icon(Icons.person),
+    navigationLabel: () => const Text('Users'),
   ),
   roles: ["User", 'UserAdmin', 'SuperAdmin'],
   private: true,
