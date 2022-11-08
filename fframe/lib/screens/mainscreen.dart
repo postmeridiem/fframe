@@ -197,14 +197,12 @@ class _ProfileButtonState extends State<ProfileButton> {
               return TextButton(
                 child: circleAvatar(),
                 style: ElevatedButton.styleFrom(
-                  shape: const CircleBorder(),
-                  padding: const EdgeInsets.all(4),
-                  primary: Theme.of(context)
+                  foregroundColor: Theme.of(context)
                       .colorScheme
-                      .primaryContainer, // <-- Button color
-                  onPrimary: Theme.of(context)
+                      .onPrimaryContainer, backgroundColor: Theme.of(context)
                       .colorScheme
-                      .onPrimaryContainer, // <-- Splash color
+                      .primaryContainer, shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(4), // <-- Splash color
                 ),
                 onPressed: () {
                   showUserOverlay();

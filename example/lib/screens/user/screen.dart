@@ -32,12 +32,11 @@ class UsersScreen extends StatelessWidget {
           style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
         );
       },
+      queryBuilder: (query) => query.orderBy("displayName").where("active", isEqualTo: isActive),
       document: _document(),
       documentList: DocumentList(
         hoverSelect: true,
         showCreateButton: false,
-        queryBuilder: (query) =>
-            query.orderBy("displayName").where("active", isEqualTo: isActive),
         builder: (context, selected, data, fFrameUser) {
           return UserListItem(
             user: data,

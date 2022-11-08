@@ -13,6 +13,7 @@ class DocumentScreen<T> extends StatelessWidget {
     required this.toFirestore,
     this.documentList,
     this.dataGrid,
+    this.viewType = ViewType.auto,
     this.autoSelectFirst = false,
     this.query,
     this.searchConfig,
@@ -22,11 +23,14 @@ class DocumentScreen<T> extends StatelessWidget {
     this.queryStringIdParam = "id",
     this.documentScreenHeaderBuilder,
     this.documentScreenFooterBuilder,
+    this.queryBuilder,
   }) : super(key: key);
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final Query<T> Function(Query<T> query)? queryBuilder;
   final DocumentList<T>? documentList;
   final DataGridConfig<T>? dataGrid;
+  final ViewType viewType;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
   final TitleBuilder<T>? titleBuilder;
@@ -78,7 +82,7 @@ class DocumentScreen<T> extends StatelessWidget {
                 collection: collection,
                 fromFirestore: fromFirestore,
                 initialQuery: query,
-                listQuery: documentList?.queryBuilder,
+                listQuery: queryBuilder,
               ),
               selectionState: SelectionState<T>(),
               documentConfig: DocumentConfig<T>(
@@ -86,11 +90,7 @@ class DocumentScreen<T> extends StatelessWidget {
                 collection: collection,
                 documentList: documentList,
                 dataGrid: dataGrid,
-                initialViewType: (documentList != null)
-                    ? ViewType.list
-                    : (dataGrid != null)
-                        ? ViewType.grid
-                        : ViewType.none,
+                initialViewType: viewType,
                 autoSelectFirst: autoSelectFirst,
                 queryStringIdParam: _queryStringIdParam ?? queryStringIdParam,
                 createNew: createNew,
@@ -611,6 +611,8 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with Sing
     return AnimatedBuilder(
       animation: documentConfig,
       builder: (BuildContext context, Widget? child) {
+        if (documentConfig.currentViewType == ViewType.auto) {}
+
         switch (documentConfig.currentViewType) {
           case ViewType.none:
             return ScreenBody<T>(
@@ -632,9 +634,6 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with Sing
             );
           case ViewType.grid:
             Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
-            DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
-            // if (documentScreenConfig.selectionState != null){}
-
             return Stack(
               children: [
                 FirestoreDataGrid<T>(
@@ -644,6 +643,12 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with Sing
                 if (documentConfig.documentList != null) DataGridToggle<T>(),
               ],
             );
+          default:
+            return Fframe.of(context)?.navigationConfig.errorPage.contentPane ??
+                const Icon(
+                  Icons.error,
+                  color: Colors.red,
+                );
         }
       },
     );
@@ -710,8 +715,6 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
             ? ScreenSize.tablet
             : ScreenSize.large;
 
-    debugPrint("build screenBodyState ${widget.key.toString()}");
-    // List<QueryDocumentSnapshot<dynamic>>? queryDocumentSnapshots = ref.watch(queryBuilderStateProvider).queryBuilderSnapshot?.docs;
     QueryState queryState = ref.watch(queryStateProvider);
 
     Widget returnWidget = queryState.queryString.isEmpty

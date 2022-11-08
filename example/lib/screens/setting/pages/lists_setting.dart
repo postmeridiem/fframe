@@ -1,5 +1,6 @@
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:example/models/fframe_list.dart';
@@ -14,7 +15,7 @@ class SettingsListsForm extends StatefulWidget {
 }
 
 class _SettingsListsFormState extends State<SettingsListsForm> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  // final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late String currentListId = '';
   late FframeList curList;
 
@@ -34,8 +35,7 @@ class _SettingsListsFormState extends State<SettingsListsForm> {
             children: [
               FutureBuilder<QuerySnapshot>(
                 future: col.orderBy('name', descending: false).get(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                   if (snapshot.hasError) {
                     return const Padding(
                       padding: EdgeInsets.all(100.0),
@@ -50,18 +50,14 @@ class _SettingsListsFormState extends State<SettingsListsForm> {
                     List<QueryDocumentSnapshot> data = snapshot.data!.docs;
                     List<ListTile> listdata = [];
                     for (int i = 0; i < data.length; i++) {
-                      DocumentSnapshot<Map<String, dynamic>> _listSnap =
-                          data[i] as DocumentSnapshot<Map<String, dynamic>>;
-                      FframeList currentList = FframeList.fromFirestore(
-                          _listSnap, SnapshotOptions());
+                      DocumentSnapshot<Map<String, dynamic>> listSnap = data[i] as DocumentSnapshot<Map<String, dynamic>>;
+                      FframeList currentList = FframeList.fromFirestore(listSnap, SnapshotOptions());
                       listdata.add(
                         ListTile(
                           title: Text(currentList.name as String),
                           leading: Icon(
                             iconMap[currentList.icon as String],
-                            color: currentList.icon == 'block'
-                                ? Theme.of(context).disabledColor
-                                : null,
+                            color: currentList.icon == 'block' ? Theme.of(context).disabledColor : null,
                           ),
                           onTap: () {
                             setState(() {
@@ -84,9 +80,7 @@ class _SettingsListsFormState extends State<SettingsListsForm> {
                     );
                   }
 
-                  return const Padding(
-                      padding: EdgeInsets.all(100.0),
-                      child: CircularProgressIndicator());
+                  return const Padding(padding: EdgeInsets.all(100.0), child: CircularProgressIndicator());
                 },
               ),
             ],
@@ -173,8 +167,7 @@ class _CurrentListEditorState extends State<CurrentListEditor> {
                 child: Text("created"),
               ),
               Expanded(
-                child: TimestampDateTimeText(
-                    timestamp: widget.currentList.creationDate as Timestamp),
+                child: TimestampDateTimeText(timestamp: widget.currentList.creationDate as Timestamp),
               ),
             ],
           ),

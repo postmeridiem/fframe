@@ -5,6 +5,7 @@ class DocumentConfig<T> extends ChangeNotifier {
     required this.formKey,
     required this.collection,
     required this.createNew,
+    required this.initialViewType,
     this.preSave,
     this.postOpen,
     this.postRefresh,
@@ -21,10 +22,7 @@ class DocumentConfig<T> extends ChangeNotifier {
     this.contextCardBuilders,
     this.queryStringIdParam = "id",
     this.embeddedDocument = false,
-    this.initialViewType = ViewType.none,
-  }) {
-    _viewType = initialViewType;
-  }
+  });
 
   final GlobalKey<FormState> formKey;
   final DocumentList<T>? documentList;
@@ -49,28 +47,41 @@ class DocumentConfig<T> extends ChangeNotifier {
 
   late PreloadPageController preloadPageController;
   late TabController tabController;
-  late ViewType _viewType;
+  ViewType? _viewType;
 
-  ViewType get currentViewType => _viewType;
+  List<ViewType> get allowedViewTypes {
+    switch (initialViewType) {
+      case ViewType.auto:
+        List<ViewType> returnValue = [];
+        if (documentList != null) returnValue.add(ViewType.list);
+        if (dataGrid != null) returnValue.add(ViewType.grid);
+        if (returnValue.isEmpty) returnValue.add(ViewType.none);
+        return returnValue;
+      case ViewType.list:
+        return [ViewType.list];
+      case ViewType.grid:
+        return [ViewType.grid];
+      case ViewType.none:
+        return [];
+    }
+  }
+
+  ViewType get currentViewType {
+    if (_viewType == null) {
+      return allowedViewTypes.first;
+    }
+    return _viewType!;
+  }
+
   set currentViewType(ViewType viewType) {
-    if (viewType == ViewType.grid && dataGrid == null) {
-      //Cannot be switched to grid... as there is no grid
-      _viewType = initialViewType;
+    if (allowedViewTypes.contains(viewType)) {
+      _viewType = viewType;
       notifyListeners();
-      return;
     }
-    if (viewType == ViewType.list && documentList == null) {
-      //Cannot be switched to list... as there is no list
-      _viewType = initialViewType;
-      notifyListeners();
-      return;
-    }
-    _viewType = viewType;
-    notifyListeners();
   }
 }
 
-enum ViewType { none, list, grid }
+enum ViewType { auto, list, grid, none }
 
 class Document<T> {
   Document({
@@ -124,7 +135,7 @@ class DocumentTab<T> {
 class DocumentList<T> {
   const DocumentList({
     required this.builder,
-    this.queryBuilder,
+    // this.queryBuilder,
     this.headerBuilder,
     this.footerBuilder,
     this.hoverSelect = false,
@@ -133,7 +144,7 @@ class DocumentList<T> {
     this.seperatorHeight = 1,
   });
   final DocumentListItemBuilder<T> builder;
-  final Query<T> Function(Query<T> query)? queryBuilder;
+  // final Query<T> Function(Query<T> query)? queryBuilder;
   final DocumentListHeaderBuilder<T>? headerBuilder;
   final DocumentListFooterBuilder<T>? footerBuilder;
   final bool hoverSelect;

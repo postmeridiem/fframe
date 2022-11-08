@@ -15,6 +15,7 @@ import 'package:example/screens/signInPage/signin_page.dart';
 import 'package:example/screens/suggestion/suggestion.dart';
 import 'package:example/screens/setting/setting.dart';
 import 'package:example/screens/user/user.dart';
+import 'package:flutterfire_ui/i10n.dart';
 
 import 'helpers/header_buttons.dart';
 
@@ -71,8 +72,11 @@ class MainApp extends StatelessWidget {
 
       // Pass the localizations for flutter and material level
       // widget localizations. Stuff you can't reach otherwise, basically.
-      // TODO: @JS needs to be provided. need to figure out a clean way
-      localizationsDelegates: [],
+      localizationsDelegates: [
+        // ... app-specific localization delegate[s] here
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
 
       // set the source configuration
       source: L10nSource.assets,

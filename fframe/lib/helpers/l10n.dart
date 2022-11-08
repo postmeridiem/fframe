@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 class L10n {
@@ -26,12 +27,15 @@ class L10n {
     String namespace = "global",
   }) {
     String _output = placeholder;
+    // if (key == 'suggestions_tab_active') {
+    //   debugger;
+    // }
     if (L10n.instance.map.containsKey(namespace)) {
       var _namespace = L10n.instance.map[namespace];
       if (_namespace.containsKey(key)) {
         _output = _namespace[key]!['translation'];
       } else {
-        // debugPrint("L10N MISSING KEY: Inserted placeholder. Key not found: <$key>.");
+        debugPrint("L10N MISSING KEY: Inserted placeholder. Key not found: <$key>.");
       }
     } else {
       debugPrint(

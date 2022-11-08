@@ -292,11 +292,18 @@ class DataGridToggle<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+    List<ViewType> allowedViewTypes = documentConfig.allowedViewTypes;
 
-    if (documentConfig.currentViewType == ViewType.none) {
+    if (allowedViewTypes.isEmpty) {
       //Cannot toggle if there are no options to choose from
       return const IgnorePointer();
     }
+
+    if (allowedViewTypes.length == 1 && allowedViewTypes.first == documentConfig.currentViewType) {
+      //Cannot toggle if the current option is the only viable option
+      return const IgnorePointer();
+    }
+
     return Positioned(
       right: -4,
       top: 0,
