@@ -165,7 +165,7 @@ class _FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
 
   @override
   Widget build(BuildContext context) {
-    FFrameDataTableSource fFrameDataTableSource = FFrameDataTableSource<T>(
+    FFrameDataTableSource<T> fFrameDataTableSource = FFrameDataTableSource<T>(
       documentScreenConfig: DocumentScreenConfig.of(context)!,
       getOnError: () => widget.onError,
       selectionEnabled: selectionEnabled,
@@ -175,6 +175,7 @@ class _FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
     return FirestoreQueryBuilder<T>(
       query: _query,
       builder: (context, snapshot, child) {
+        // _query.count().get().then((value) => debugPrint(value.count.toString()));
         fFrameDataTableSource.fromSnapShot(snapshot);
 
         return AnimatedBuilder(
@@ -188,27 +189,34 @@ class _FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
                   onPressed: fFrameDataTableSource.onDeleteSelectedItems,
                 ),
             ];
-            return PaginatedDataTable(
-              source: fFrameDataTableSource,
-              onSelectAll: selectionEnabled ? fFrameDataTableSource.onSelectAll : null,
-              onPageChanged: widget.onPageChanged,
-              showCheckboxColumn: widget.showCheckboxColumn,
-              arrowHeadColor: widget.arrowHeadColor,
-              checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
-              columnSpacing: widget.columnSpacing,
-              dataRowHeight: widget.dataRowHeight,
-              dragStartBehavior: widget.dragStartBehavior,
-              headingRowHeight: widget.headingRowHeight,
-              horizontalMargin: widget.horizontalMargin,
-              rowsPerPage: widget.rowsPerPage,
-              showFirstLastButtons: widget.showFirstLastButtons,
-              sortAscending: widget.sortAscending,
-              sortColumnIndex: widget.sortColumnIndex,
-              header: actions.isEmpty ? null : (widget.header ?? const SizedBox()),
-              actions: actions.isEmpty ? null : actions,
-              // Head label
-              columns: widget.dataGridConfig.dataGridConfigColumns.map((DataGridConfigColumn<T> dataGridConfigColumn) => dataGridConfigColumn.headerBuilder()).toList(),
-            );
+            return LayoutBuilder(builder: (context, constraints) {
+              double headingRowHeight = widget.headingRowHeight;
+              double dataRowHeight = widget.dataRowHeight;
+
+              int rowsPerPage = ((constraints.maxHeight - headingRowHeight - 72) ~/ dataRowHeight);
+              // int rowsPerPage = 5;
+              return PaginatedDataTable(
+                source: fFrameDataTableSource,
+                onSelectAll: selectionEnabled ? fFrameDataTableSource.onSelectAll : null,
+                onPageChanged: widget.onPageChanged,
+                showCheckboxColumn: widget.showCheckboxColumn,
+                arrowHeadColor: widget.arrowHeadColor,
+                checkboxHorizontalMargin: widget.checkboxHorizontalMargin,
+                columnSpacing: widget.columnSpacing,
+                dataRowHeight: dataRowHeight,
+                dragStartBehavior: widget.dragStartBehavior,
+                headingRowHeight: headingRowHeight,
+                horizontalMargin: widget.horizontalMargin,
+                rowsPerPage: rowsPerPage,
+                showFirstLastButtons: widget.showFirstLastButtons,
+                sortAscending: widget.sortAscending,
+                sortColumnIndex: widget.sortColumnIndex,
+                header: actions.isEmpty ? null : (widget.header ?? const SizedBox()),
+                actions: actions.isEmpty ? null : actions,
+                // Head label
+                columns: widget.dataGridConfig.dataGridConfigColumns.map((DataGridConfigColumn<T> dataGridConfigColumn) => dataGridConfigColumn.headerBuilder()).toList(),
+              );
+            });
           },
         );
       },
@@ -277,6 +285,7 @@ class FFrameDataTableSource<T> extends DataTableSource {
     // Emitting an extra item during load or before reaching the end
     // allows the DataTable to show a spinner during load & let the user
     // navigate to next page
+
     if (_previousSnapshot!.isFetching || _previousSnapshot!.hasMore) {
       return _previousSnapshot!.docs.length + rowsPerPage;
     }
@@ -316,7 +325,7 @@ class FFrameDataTableSource<T> extends DataTableSource {
 
   FirestoreQueryBuilderSnapshot<T>? _previousSnapshot;
 
-  void fromSnapShot(FirestoreQueryBuilderSnapshot<T> snapshot) {
+  void fromSnapShot(FirestoreQueryBuilderSnapshot<T>? snapshot) {
     if (snapshot == _previousSnapshot) return;
 
     // Try to preserve the selection status when the snapshot got updated,
