@@ -14,8 +14,9 @@ match /databases/{database}/documents {
         return request["auth"]["token"]["email"].matches(".*@zwaag.net")||
         request["auth"]["token"]["email"].matches(".*@postmeridiem.net")||
         request["auth"]["token"]["email"].matches("dehlak@gmail.com")||
+        request["auth"]["token"]["email"].matches("edwardbrosens@gmail.com")||
         request["auth"]["token"]["email"].matches(".*@imagin.studio")||
-        request["auth"]["token"]["email"].matches(".*@churned.nl")
+        request["auth"]["token"]["email"].matches(".*@churned.nl");
 		}
 
     match /users/{userId}{
