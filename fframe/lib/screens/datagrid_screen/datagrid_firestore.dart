@@ -139,10 +139,10 @@ class FirestoreDataGrid<T> extends StatefulWidget {
 
   final double? checkboxHorizontalMargin;
   @override
-  _FirestoreDataGridState createState() => _FirestoreDataGridState<T>();
+  FirestoreDataGridState createState() => FirestoreDataGridState<T>();
 }
 
-class _FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
+class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
   late Query<T> _query;
 
   bool get selectionEnabled => widget.canDeleteItems;
@@ -224,18 +224,31 @@ class _FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
   }
 }
 
-// /// A data holder class to differentiate setting a property to null from
-// /// not modifying the property at all.
-// class _Edit {
-//   _Edit(this.newValue);
-//   final Object? newValue;
-// }
+class FframeDataRow<T> extends DataRow {
+  const FframeDataRow({
+    key,
+    selected = false,
+    onSelectChanged,
+    onLongPress,
+    this.onTap,
+    color,
+    required List<DataCell> cells,
+  }) : super(
+          key: key,
+          selected: selected,
+          onSelectChanged: onSelectChanged,
+          onLongPress: onLongPress,
+          color: color,
+          cells: cells,
+        );
+
+  final GestureLongPressCallback? onTap;
+}
 
 class FFrameDataTableSource<T> extends DataTableSource {
   FFrameDataTableSource({
     required this.documentScreenConfig,
     required this.dataGridConfig,
-    // required this.getDataCells,
     required this.getOnError,
     required bool selectionEnabled,
     required int rowsPerPage,
@@ -243,13 +256,6 @@ class FFrameDataTableSource<T> extends DataTableSource {
         _rowsPerpage = rowsPerPage;
   final DocumentScreenConfig documentScreenConfig;
   final DataGridConfig<T> dataGridConfig;
-  // final List<DataCell> Function(T data) getDataCells;
-
-  // final void Function(
-  //     QueryDocumentSnapshot<T> snapshot,
-  //     Object? value,
-  //     String propertyName,
-  //     ) onEditItem;
 
   int _rowsPerpage;
   int get rowsPerPage => _rowsPerpage;
@@ -315,10 +321,19 @@ class FFrameDataTableSource<T> extends DataTableSource {
             }
           : null,
       cells: dataGridConfig.dataGridConfigColumns
-          .map((DataGridConfigColumn<T> dataGridConfigColumn) => dataGridConfigColumn.dataCellBuilder(data, () {
-                debugPrint("Save doc ${documentSnapshot.id}");
-                return DatabaseService<T>().updateDocument(collection: documentSnapshot.reference.parent.path, documentId: documentSnapshot.id, data: data, fromFirestore: dataGridConfig.fromFirestore, toFirestore: dataGridConfig.toFirestore);
-              }))
+          .map(
+            (DataGridConfigColumn<T> dataGridConfigColumn) => dataGridConfigColumn.dataCellBuilder(data, () {
+              debugPrint("Save doc ${documentSnapshot.id}");
+              return DatabaseService<T>().updateDocument(
+                collection: documentSnapshot.reference.parent.path,
+                documentId: documentSnapshot.id,
+                data: data,
+                fromFirestore: dataGridConfig.fromFirestore,
+                toFirestore: dataGridConfig.toFirestore,
+              );
+            },
+            ),
+          )
           .toList(),
     );
   }
@@ -362,11 +377,13 @@ class FFrameDataTableSource<T> extends DataTableSource {
 
 class DataGridConfig<T> {
   final List<DataGridConfigColumn<T>> dataGridConfigColumns;
+  final bool showLinks;
   late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   late Map<String, Object?> Function(T, SetOptions?) toFirestore;
 
   DataGridConfig({
     required this.dataGridConfigColumns,
+    this.showLinks = true,
   });
 }
 

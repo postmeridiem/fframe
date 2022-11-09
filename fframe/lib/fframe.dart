@@ -7,6 +7,7 @@ export 'package:firebase_storage/firebase_storage.dart';
 export 'package:flutterfire_ui/firestore.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 export 'package:url_launcher/url_launcher_string.dart';
+export 'package:clipboard/clipboard.dart';
 
 import 'dart:async';
 import 'dart:convert';
