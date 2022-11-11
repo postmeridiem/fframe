@@ -46,5 +46,11 @@
 	},
 	"doclistsearch_equal": {
 		"translation": "equal to"
+	},
+	"iconbutton_document_close": {
+		"translation": "Close document"
+	},
+	"iconbutton_document_save": {
+		"translation": "Save document"
 	}
 }

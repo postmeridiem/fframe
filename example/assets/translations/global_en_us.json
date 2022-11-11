@@ -43,11 +43,5 @@
 	},
 	"firestore_tools_stamper_apply_button": {
 		"translation": "Apply values to collection"
-	},
-	"iconbutton_document_close": {
-		"translation": "Close document"
-	},
-	"iconbutton_document_save": {
-		"translation": "Save document"
 	}
 }
