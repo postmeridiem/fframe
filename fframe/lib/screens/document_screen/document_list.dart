@@ -31,22 +31,22 @@ class DocumentListItem<T> extends ConsumerWidget {
             try {
               return documentListItemBuilder(context, docId == queryDocumentSnapshot.id, queryDocumentSnapshot.data(), Fframe.of(context)!.user);
             } catch (e) {
-              String _error = e.toString();
-              String _path = queryDocumentSnapshot.reference.path;
+              String error = e.toString();
+              String path = queryDocumentSnapshot.reference.path;
               return ListTile(
                 leading: Icon(Icons.warning, color: Theme.of(context).errorColor),
                 subtitle: Text(
                   L10n.interpolated(
                     'errors_dataissue',
-                    placeholder: "Data Issue: $_error in $_path",
+                    placeholder: "Data Issue: $error in $path",
                     replacers: [
                       L10nReplacer(
                         from: "{error}",
-                        replace: _error,
+                        replace: error,
                       ),
                       L10nReplacer(
                         from: "{path}",
-                        replace: _path,
+                        replace: path,
                       ),
                     ],
                   ),
@@ -143,11 +143,11 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
           floatingActionButton: (widget.documentConfig.documentList?.showCreateButton ?? true)
               ? FloatingActionButton(
                   backgroundColor: Theme.of(context).colorScheme.background,
-                  child: const Icon(Icons.add),
                   elevation: 0.2,
                   onPressed: () {
-                    widget.documentScreenConfig.create(context: context);
+                    widget.documentScreenConfig.create<T>(context: context);
                   },
+                  child: const Icon(Icons.add),
                 )
               : null,
           primary: false,
@@ -315,7 +315,7 @@ class DataGridToggle<T> extends StatelessWidget {
         padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0, right: 0),
         icon: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).indicatorColor,
+            color: Theme.of(context).bottomAppBarColor,
             borderRadius: const BorderRadius.only(
               // topRight: Radius.circular(40.0),
               // bottomRight: Radius.circular(40.0),
@@ -323,7 +323,15 @@ class DataGridToggle<T> extends StatelessWidget {
               bottomLeft: Radius.circular(4.0),
             ),
           ),
-          child: (documentConfig.currentViewType == ViewType.list) ? const Icon(Icons.keyboard_double_arrow_right_rounded) : const Icon(Icons.keyboard_double_arrow_left_rounded),
+          child: (documentConfig.currentViewType == ViewType.list)
+              ? Icon(
+                  Icons.keyboard_double_arrow_right_rounded,
+                  color: Theme.of(context).indicatorColor,
+                )
+              : Icon(
+                  Icons.keyboard_double_arrow_left_rounded,
+                  color: Theme.of(context).indicatorColor,
+                ),
         ),
       ),
     );

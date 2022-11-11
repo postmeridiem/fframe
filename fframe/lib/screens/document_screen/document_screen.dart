@@ -52,14 +52,14 @@ class DocumentScreen<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DocumentScreenConfig? parentDocumentScreenConfig = DocumentScreenConfig.of(context);
-    String? _queryStringIdParam;
-    bool? _embeddedDocument;
+    String? queryStringIdParam;
+    bool? embeddedDocument;
     if (parentDocumentScreenConfig != null) {
       debugPrint("This is an embedded instance of the DocumentScreen initalize FormCeption");
       if (queryStringIdParam == parentDocumentScreenConfig.documentConfig.queryStringIdParam) {
-        _queryStringIdParam = "child${toBeginningOfSentenceCase(parentDocumentScreenConfig.documentConfig.queryStringIdParam)}";
+        queryStringIdParam = "child${toBeginningOfSentenceCase(parentDocumentScreenConfig.documentConfig.queryStringIdParam)}";
       }
-      _embeddedDocument = true;
+      embeddedDocument = true;
     }
 
     //Aply data to datagrid, if any
@@ -75,9 +75,6 @@ class DocumentScreen<T> extends StatelessWidget {
           child: Form(
             key: formKey,
             child: DocumentScreenConfig(
-              child: DocumentLoader<T>(
-                key: ValueKey("DocumentLoader_$collection"),
-              ),
               fireStoreQueryState: FireStoreQueryState<T>(
                 collection: collection,
                 fromFirestore: fromFirestore,
@@ -92,7 +89,7 @@ class DocumentScreen<T> extends StatelessWidget {
                 dataGrid: dataGrid,
                 initialViewType: viewType,
                 autoSelectFirst: autoSelectFirst,
-                queryStringIdParam: _queryStringIdParam ?? queryStringIdParam,
+                queryStringIdParam: queryStringIdParam ?? this.queryStringIdParam,
                 createNew: createNew,
                 createDocumentId: createDocumentId,
                 preSave: preSave,
@@ -103,7 +100,10 @@ class DocumentScreen<T> extends StatelessWidget {
                 searchConfig: searchConfig,
                 titleBuilder: titleBuilder as TitleBuilder<T>,
                 contextCardBuilders: contextCardBuilders,
-                embeddedDocument: _embeddedDocument ?? false,
+                embeddedDocument: embeddedDocument ?? false,
+              ),
+              child: DocumentLoader<T>(
+                key: ValueKey("DocumentLoader_$collection"),
               ),
             ),
           ),
@@ -229,15 +229,16 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
               ),
             ))) ==
         true) {
-      DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
+      DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
       SaveState saveResult = await DatabaseService<T>().deleteDocument(
         collection: documentConfig.collection,
         documentId: selectionState.docId!,
-        fromFirestore: _documentConfig.fromFirestore,
-        toFirestore: _documentConfig.toFirestore,
+        fromFirestore: documentConfig.fromFirestore,
+        toFirestore: documentConfig.toFirestore,
       );
       if (saveResult.result == true) {
         //Close the document
+        // if (!context.mounted) return;
         FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
       } else {
         //show the error
@@ -324,8 +325,9 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
   create<T>({required BuildContext context}) {
     //Clear the cache
+
     selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
-    if (documentConfig.document.activeTabs!.length == 1) {
+    if (documentConfig.document.activeTabs != null && documentConfig.document.activeTabs!.length == 1) {
       FRouter.of(context).updateQueryString<T>(queryParameters: {"new": "true"}, resetQueryString: true);
     } else {
       FRouter.of(context).updateQueryString<T>(queryParameters: {"new": "true", "tabIndex": "0"}, resetQueryString: true);
@@ -334,13 +336,13 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
   load<T>({required BuildContext context, required String docId}) async {
     try {
-      DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
+      DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
 
       DocumentSnapshot<T>? documentSnapshot = await DatabaseService<T>().documentSnapshot(
-        collection: _documentConfig.collection,
+        collection: documentConfig.collection,
         documentId: docId,
-        fromFirestore: _documentConfig.fromFirestore,
-        toFirestore: _documentConfig.toFirestore,
+        fromFirestore: documentConfig.fromFirestore,
+        toFirestore: documentConfig.toFirestore,
       );
 
       if (documentSnapshot?.exists ?? false) {
@@ -381,37 +383,37 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
   save<T>({required BuildContext context, bool closeAfterSave = true, T? data}) async {
     if (validate<T>(context: context, moveToTab: true) == -1) {
-      DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
+      DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
       String? docId = selectionState.docId;
       if (docId == null || selectionState.isNew == true) {
-        if (_documentConfig.createDocumentId != null) {
-          docId = _documentConfig.createDocumentId!(selectionState.data!);
+        if (documentConfig.createDocumentId != null) {
+          docId = documentConfig.createDocumentId!(selectionState.data!);
         } else {
           docId = const Uuid().v4();
         }
       }
 
       //optional presave script
-      if (_documentConfig.preSave != null) {
-        selectionState.data = _documentConfig.preSave!(selectionState.data!);
+      if (documentConfig.preSave != null) {
+        selectionState.data = documentConfig.preSave!(selectionState.data!);
       }
 
-      debugPrint("Save item $docId in collection ${_documentConfig.collection}");
+      debugPrint("Save item $docId in collection ${documentConfig.collection}");
 
       SaveState saveResult = selectionState.isNew
           ? await DatabaseService<T>().createDocument(
               collection: documentConfig.collection,
               documentId: docId!,
               data: selectionState.data!,
-              fromFirestore: _documentConfig.fromFirestore,
-              toFirestore: _documentConfig.toFirestore,
+              fromFirestore: documentConfig.fromFirestore,
+              toFirestore: documentConfig.toFirestore,
             )
           : await DatabaseService<T>().updateDocument(
               collection: documentConfig.collection,
               documentId: docId!,
               data: selectionState.data!,
-              fromFirestore: _documentConfig.fromFirestore,
-              toFirestore: _documentConfig.toFirestore,
+              fromFirestore: documentConfig.fromFirestore,
+              toFirestore: documentConfig.toFirestore,
             );
 
       if (saveResult.result) {
@@ -440,9 +442,9 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   }
 
   int validate<T>({required BuildContext context, bool showPopup = false, bool moveToTab = false}) {
-    DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
+    DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
 
-    int invalidTab = _documentConfig.document.activeTabs!
+    int invalidTab = documentConfig.document.activeTabs!
         .map((DocumentTab tab) {
           bool result = tab.formKey.currentState!.validate();
           debugPrint("tab validation: $result");
@@ -466,8 +468,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
         );
       }
     } else {
-      if (_documentConfig.tabController.index != invalidTab || moveToTab) {
-        _documentConfig.tabController.animateTo(invalidTab);
+      if (documentConfig.tabController.index != invalidTab || moveToTab) {
+        documentConfig.tabController.animateTo(invalidTab);
         // _documentConfig.preloadPageController.animateTo(invalidTab, duration: const Duration(microseconds: 250), curve: Curves.easeOutCirc);
       }
     }
@@ -475,8 +477,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   }
 
   List<IconButton>? iconButtons<T>(BuildContext context) {
-    DocumentConfig<T> _documentConfig = documentConfig as DocumentConfig<T>;
-    Document<T> document = _documentConfig.document;
+    DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
+    Document<T> document = documentConfig.document;
     SelectionState<T> selectionState = DocumentScreenConfig.of(context)!.selectionState as SelectionState<T>;
     List<IconButton>? iconButtons = [];
 
@@ -545,7 +547,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
               color: Theme.of(context).colorScheme.onBackground,
             ),
             onPressed: () {
-              toggleReadOnly<T>(context: context);
+              toggleReadOnly(context: context);
             },
           ),
         );
@@ -605,7 +607,7 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with Sing
   @override
   Widget build(BuildContext context) {
     debugPrint("build DocumentLoader: ${widget.key.toString()}");
-    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
 
     //Switches between view types
     return AnimatedBuilder(

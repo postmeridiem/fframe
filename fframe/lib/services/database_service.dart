@@ -1,9 +1,5 @@
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:firebase_auth/firebase_auth.dart';
-
+import '../fframe.dart';
 import '../helpers/l10n.dart';
 
 Map<Function, dynamic> firestore = {

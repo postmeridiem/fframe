@@ -31,14 +31,14 @@ class InitializeL10n extends StatelessWidget {
             );
           case ConnectionState.done:
             if (snapshot.hasData) {
-              Map<String, dynamic> _localeData = snapshot.data as Map<String, dynamic>;
+              Map<String, dynamic> localeData = snapshot.data as Map<String, dynamic>;
               // create the language engine
               debugPrint("L10N: Language engine loaded.");
               return l10Builder(
                 context,
                 L10n(
                   l10nConfig: l10nConfig,
-                  localeData: _localeData,
+                  localeData: localeData,
                 ),
               );
             } else {

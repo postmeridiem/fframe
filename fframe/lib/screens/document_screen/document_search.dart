@@ -131,7 +131,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                                     fireStoreQueryState.addQueryComponent(
                                       id: searchOption.field,
                                       queryComponent: (Query<T> query) {
-                                        return query.where(searchOption.field, isGreaterThanOrEqualTo: fieldValue).where(searchOption.field, isLessThanOrEqualTo: fieldValue + '~');
+                                        return query.where(searchOption.field, isGreaterThanOrEqualTo: fieldValue).where(searchOption.field, isLessThanOrEqualTo: '$fieldValue~');
                                       },
                                     );
                                   } else {
@@ -243,16 +243,16 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                 case SearchOptionType.datetime:
                 case SearchOptionType.date:
                 case SearchOptionType.time:
-                  Icon _selectedOperatorIcon;
+                  Icon selectedOperatorIcon;
                   switch (searchOption.comparisonOperator) {
                     case SearchOptionComparisonOperator.lesser:
-                      _selectedOperatorIcon = const Icon(Icons.chevron_left);
+                      selectedOperatorIcon = const Icon(Icons.chevron_left);
                       break;
                     case SearchOptionComparisonOperator.greater:
-                      _selectedOperatorIcon = const Icon(Icons.chevron_right);
+                      selectedOperatorIcon = const Icon(Icons.chevron_right);
                       break;
                     case SearchOptionComparisonOperator.equal:
-                      _selectedOperatorIcon = const Icon(Icons.drag_handle);
+                      selectedOperatorIcon = const Icon(Icons.drag_handle);
                       break;
                   }
                   return Padding(
@@ -264,7 +264,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                             searchOption.caption,
                             style: const TextStyle(fontSize: 10),
                           ),
-                          _selectedOperatorIcon,
+                          selectedOperatorIcon,
                           // SizedBox(
                           //   child: IconButton(
                           //     onPressed: () {},
@@ -397,18 +397,18 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                   onChanged: (String fieldValue) {
                     if (fieldValue != '') {
                       if (fieldValue.substring((fieldValue.length - 1).clamp(0, fieldValue.length)) == ":") {
-                        String _curkey = fieldValue.substring(0, (fieldValue.length - 1)).toLowerCase();
-                        if (searchConfig.optionMap.containsKey(_curkey)) {
+                        String curkey = fieldValue.substring(0, (fieldValue.length - 1)).toLowerCase();
+                        if (searchConfig.optionMap.containsKey(curkey)) {
                           setState(() {
-                            SearchOption _searchOption = searchConfig.optionMap[_curkey] as SearchOption;
+                            SearchOption searchOption = searchConfig.optionMap[curkey] as SearchOption;
 
                             fireStoreQueryState.removeQueryComponent(
                               id: 'autocomplete',
                             );
                             autocompleteController.text = "";
-                            _searchOption.isSelected = true;
-                            if (!selectedOptions.contains(_searchOption)) {
-                              selectedOptions.add(_searchOption);
+                            searchOption.isSelected = true;
+                            if (!selectedOptions.contains(searchOption)) {
+                              selectedOptions.add(searchOption);
                             }
                             focusNode.requestFocus();
                           });
@@ -421,7 +421,7 @@ class _DocumentSearchState<T> extends State<DocumentSearch> {
                       fireStoreQueryState.addQueryComponent(
                         id: 'autocomplete',
                         queryComponent: (Query<T> query) {
-                          return query.where(searchConfig.defaultField, isGreaterThanOrEqualTo: fieldValue).where(searchConfig.defaultField, isLessThanOrEqualTo: fieldValue + '~');
+                          return query.where(searchConfig.defaultField, isGreaterThanOrEqualTo: fieldValue).where(searchConfig.defaultField, isLessThanOrEqualTo: '$fieldValue~');
                         },
                       );
                     } else {

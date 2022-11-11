@@ -71,7 +71,7 @@ class ReadFromFireStoreByDocumentId<T> extends StatelessWidget {
               return notFoundBuilder!(context);
             }
 
-            return builder(context, snapshot.data!.data()!);
+            return builder(context, snapshot.data!.data() as T);
         }
       },
     );

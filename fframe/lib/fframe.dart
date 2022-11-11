@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages, unused_import
+
 library fframe;
 
 export 'package:firebase_core/firebase_core.dart';
@@ -37,12 +39,9 @@ import 'package:fframe/services/database_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterfire_ui/firestore.dart';
-// ignore: unused_import
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
-// ignore: unused_import
 import 'package:firebase_storage/firebase_storage.dart';
-// ignore: unused_import
 import 'package:url_launcher/url_launcher_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 

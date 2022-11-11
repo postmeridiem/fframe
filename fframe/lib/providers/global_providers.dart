@@ -73,25 +73,25 @@ final userRolesProvider = StreamProvider<List<String>>((ref) {
       if (user != null) {
         IdTokenResult idTokenResult = await user.getIdTokenResult();
 
-        Map<String, dynamic>? _claims = idTokenResult.claims;
+        Map<String, dynamic>? claims = idTokenResult.claims;
 
-        if (_claims != null && _claims.containsKey("roles") == true) {
-          debugPrint("Has roles formatted as ${_claims["roles"].runtimeType}: ${_claims["roles"].toString()}");
-          if ("${_claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
+        if (claims != null && claims.containsKey("roles") == true) {
+          debugPrint("Has roles formatted as ${claims["roles"].runtimeType}: ${claims["roles"].toString()}");
+          if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
             // debugPrint("JSArray mode roles");
 
-            roles = List<String>.from(_claims["roles"]);
-          } else if (List<dynamic> == _claims["roles"].runtimeType || List<String> == _claims["roles"].runtimeType) {
+            roles = List<String>.from(claims["roles"]);
+          } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
             // debugPrint("standard mode roles");
-            // debugPrint("${List<String>.from(_claims["roles"].map((e) => e.toString()).toList())}");
-            roles = List<String>.from(_claims["roles"].map((e) => e.toString()).toList());
+            // debugPrint("${List<String>.from(claims["roles"].map((e) => e.toString()).toList())}");
+            roles = List<String>.from(claims["roles"].map((e) => e.toString()).toList());
           } else {
             // debugPrint("map mode roles");
             //Legacy mode... it's
             //            debugPrint("standard mode roles");a map..
-            Map<String, dynamic>? _rolesMap = Map<String, dynamic>.from(_claims["roles"]);
-            _rolesMap.removeWhere((key, value) => value == false);
-            roles = List<String>.from(_rolesMap.keys);
+            Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
+            rolesMap.removeWhere((key, value) => value == false);
+            roles = List<String>.from(rolesMap.keys);
           }
         }
         roles = roles.map((role) => role.toLowerCase()).toList();

@@ -57,7 +57,7 @@ class DocumentBody<T> extends StatelessWidget {
     String tabIndexKey = documentScreenConfig.documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
     int tabIndex = int.parse(FRouter.of(context).queryStringParam(tabIndexKey) ?? "0");
 
-    documentConfig.document.activeTabs = documentConfig.document.documentTabsBuilder!(context, selectionState.data!, selectionState.readOnly, selectionState.isNew, Fframe.of(context)!.user);
+    documentConfig.document.activeTabs = documentConfig.document.documentTabsBuilder!(context, selectionState.data as T, selectionState.readOnly, selectionState.isNew, Fframe.of(context)!.user);
 
     if (documentConfig.document.activeTabs!.isNotEmpty) {
       return DefaultTabController(
@@ -185,7 +185,7 @@ class DocumentBody<T> extends StatelessWidget {
                                                     ...documentScreenConfig.iconButtons<T>(context)!,
                                                     //Add any extra configured buttons to the list
                                                     if (documentConfig.document.extraActionButtons != null)
-                                                      ...documentConfig.document.extraActionButtons!(context, selectionState.data!, selectionState.readOnly, selectionState.isNew, Fframe.of(context)!.user),
+                                                      ...documentConfig.document.extraActionButtons!(context, selectionState.data as T, selectionState.readOnly, selectionState.isNew, Fframe.of(context)!.user),
                                                   ],
                                                 ),
                                               ),

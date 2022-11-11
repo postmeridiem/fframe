@@ -162,6 +162,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
                 )),
             dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
                   Text(suggestion.name ?? "?"),
+                  onTap: () => debugPrint("onTap ${suggestion.name}"),
+                  placeholder: false,
                 )),
           ),
           DataGridConfigColumn(
@@ -188,12 +190,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
   }
 
   Document<Suggestion> _document(BuildContext context) {
-    // DocumentScreenConfig documentScreenConfig =
-    //     DocumentScreenConfig.of(context)!;
-    // if (documentScreenConfig.isNew) {
-    //   debugPrint("Wow, such new");
-    // }
     return Document<Suggestion>(
+      scrollableHeader: false,
       showCloseButton: true,
       showCopyButton: true,
       showEditToggleButton: true,

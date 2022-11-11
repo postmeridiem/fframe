@@ -12,9 +12,7 @@ class L10n {
 
   L10n._internal();
 
-  factory L10n(
-      {required L10nConfig l10nConfig,
-      required Map<String, dynamic> localeData}) {
+  factory L10n({required L10nConfig l10nConfig, required Map<String, dynamic> localeData}) {
     instance.config = l10nConfig;
     instance.map = localeData;
 
@@ -26,22 +24,21 @@ class L10n {
     required String placeholder,
     String namespace = "global",
   }) {
-    String _output = placeholder;
+    String output = placeholder;
     // if (key == 'suggestions_tab_active') {
     //   debugger;
     // }
     if (L10n.instance.map.containsKey(namespace)) {
-      var _namespace = L10n.instance.map[namespace];
-      if (_namespace.containsKey(key)) {
-        _output = _namespace[key]!['translation'];
+      var selectedNameSpace = L10n.instance.map[namespace];
+      if (selectedNameSpace.containsKey(key)) {
+        output = selectedNameSpace[key]!['translation'];
       } else {
         // debugPrint("L10N MISSING KEY: Inserted placeholder. Key not found: <$key>.");
       }
     } else {
-      debugPrint(
-          "L10N ERROR: Unknown namespace: $namespace while looking for <$key>");
+      debugPrint("L10N ERROR: Unknown namespace: $namespace while looking for <$key>");
     }
-    return _output;
+    return output;
   }
 
   static String interpolated(
@@ -50,14 +47,13 @@ class L10n {
     String namespace = "global",
     required List<L10nReplacer> replacers,
   }) {
-    String _output =
-        string(key, placeholder: placeholder, namespace: namespace);
+    String output = string(key, placeholder: placeholder, namespace: namespace);
 
     for (var replacer in replacers) {
-      _output = _output.replaceAll(replacer.from, replacer.replace);
+      output = output.replaceAll(replacer.from, replacer.replace);
     }
 
-    return _output;
+    return output;
   }
 
   static Locale getLocale() {
@@ -103,9 +99,9 @@ class L10nConfig {
 
 // apply a url parameter (e.g. ?locale=en_US) to the default language
   static Locale urlReader(Locale defaultLoc, {String urlparam = "locale"}) {
-    Locale _output;
-    String _baseUrl = Uri.base.toString();
-    if (!_baseUrl.contains('#')) {
+    Locale output;
+    String baseUrl = Uri.base.toString();
+    if (!baseUrl.contains('#')) {
       // url is not a deeplink, no locale specified
       return defaultLoc;
     }
@@ -113,27 +109,27 @@ class L10nConfig {
     Uri actual = Uri.parse(rawuri[1]);
 
     if (actual.queryParameters[urlparam] != null) {
-      String _locationquery = actual.queryParameters[urlparam] as String;
-      String _language;
-      String _country;
+      String locationquery = actual.queryParameters[urlparam] as String;
+      String language;
+      String country;
 
       // check for full or partial (language only) configurations
       // and then fill the outputs
-      if (_locationquery.contains('_')) {
-        List<String> _localesplit = _locationquery.split("_");
-        _language = _localesplit[0];
-        _country = _localesplit[1];
+      if (locationquery.contains('_')) {
+        List<String> localesplit = locationquery.split("_");
+        language = localesplit[0];
+        country = localesplit[1];
       } else {
-        _language = _locationquery;
-        _country = '';
+        language = locationquery;
+        country = '';
       }
-      _output = Locale(_language, _country);
+      output = Locale(language, country);
     } else {
       // there was no query parameter
-      _output = defaultLoc;
+      output = defaultLoc;
     }
-    debugPrint("Locale set to [$_output]");
-    return _output;
+    debugPrint("Locale set to [$output]");
+    return output;
   }
 }
 
@@ -155,27 +151,22 @@ class L10nReplacer {
 class L10nReader {
   L10nReader();
 
-  static Future<Map<String, dynamic>> read(
-      BuildContext context, L10nConfig config) async {
-    Map<String, dynamic> _output = {'fframe': {}, 'global': {}};
-    List<String> _namespaces = config.namespaces as List<String>;
-    String _mode = config.source.mode;
+  static Future<Map<String, dynamic>> read(BuildContext context, L10nConfig config) async {
+    Map<String, dynamic> output = {'fframe': {}, 'global': {}};
+    List<String> namespaces = config.namespaces as List<String>;
+    String mode = config.source.mode;
 
-    debugPrint("L10N: Translation loader mode: $_mode.");
-    switch (_mode) {
+    debugPrint("L10N: Translation loader mode: $mode.");
+    switch (mode) {
       case 'local_assets':
         {
-          for (String _namespace in _namespaces) {
-            String _sourcepath =
-                "assets/translations/${_namespace}_${config.locale.languageCode}_${config.locale.countryCode}.json";
-            debugPrint(
-                "L10N: Loading namespace translations from path: <$_sourcepath>.");
+          for (String namespace in namespaces) {
+            String sourcepath = "assets/translations/${namespace}_${config.locale.languageCode}_${config.locale.countryCode}.json";
+            debugPrint("L10N: Loading namespace translations from path: <$sourcepath>.");
             // loading namespace for locale
-            final String response =
-                await DefaultAssetBundle.of(context).loadString(_sourcepath);
-            final Map<String, dynamic> data =
-                json.decode(response) as Map<String, dynamic>;
-            _output[_namespace] = data;
+            final String response = await DefaultAssetBundle.of(context).loadString(sourcepath);
+            final Map<String, dynamic> data = json.decode(response) as Map<String, dynamic>;
+            output[namespace] = data;
           }
         }
         break;
@@ -190,6 +181,6 @@ class L10nReader {
         throw ("L10N ERROR: Unconfigured translation source.");
     }
 
-    return _output;
+    return output;
   }
 }

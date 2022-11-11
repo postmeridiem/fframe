@@ -278,10 +278,10 @@ class EmailAuthManager extends StatefulWidget {
   const EmailAuthManager({Key? key}) : super(key: key);
 
   @override
-  _EmailAuthManagerState createState() => _EmailAuthManagerState();
+  EmailAuthManagerState createState() => EmailAuthManagerState();
 }
 
-class _EmailAuthManagerState extends State<EmailAuthManager>
+class EmailAuthManagerState extends State<EmailAuthManager>
     with WidgetsBindingObserver {
   @override
   void initState() {
