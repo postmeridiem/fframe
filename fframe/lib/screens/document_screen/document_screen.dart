@@ -738,9 +738,9 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
       returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
     } else if (documentScreenConfig.selectionState.data == null && documentScreenConfig.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn a new document");
-      documentScreenConfig.selectionState.setState(SelectionState<T>(data: documentScreenConfig.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false));
+      documentScreenConfig.selectionState.setState(SelectionState<T>(data: documentScreenConfig.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false), notify: true);
     } else if (documentScreenConfig.selectionState.data is T && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
-      debugPrint("Spawn new document from cache");
+      debugPrint("Spawn document from cache");
       // return returnWidget;
     } else if (!queryState.queryParameters!.containsKey(documentScreenConfig.documentConfig.queryStringIdParam)) {
       returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
@@ -754,10 +754,9 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
     }
 
     debugPrint("Load the AnimatedSwitcher ");
-    return AnimatedSwitcher(
-      key: ValueKey("query_${widget.key.toString()}"),
-      duration: const Duration(milliseconds: 5),
-      child: returnWidget,
+    return AnimatedBuilder(
+      animation: documentScreenConfig.selectionState,
+      builder: ((context, child) => returnWidget),
     );
   }
 
