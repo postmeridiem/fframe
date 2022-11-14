@@ -1,9 +1,11 @@
+import 'package:fframe/services/navigation_service.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/providers/state_providers.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/fframe.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../helpers/profile_buttons.dart';
 
@@ -245,28 +247,36 @@ class _ProfileButtonState extends State<ProfileButton> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: OutlinedButton(
-                        onPressed: (() {
-                          FRouter.of(context).navigateToRoute(context, route: "profile");
-                        }),
-                        child: ListTile(
-                          mouseCursor: SystemMouseCursors.click,
-                          leading: circleAvatar(
-                            radius: 24,
-                          ),
-                          title: Text(
-                            FirebaseAuth.instance.currentUser!.displayName!,
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
-                          ),
-                          subtitle: Text(
-                            L10n.string("header_profilelabel", placeholder: "Click to open profile...", namespace: "fframe"),
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 12),
-                          ),
-                          onTap: () {
-                            //TODO: Routing to ....
-                            debugPrint("Oops");
-                          },
+                      child: ListTile(
+                        mouseCursor: SystemMouseCursors.click,
+                        leading: circleAvatar(
+                          radius: 24,
                         ),
+                        title: Text(
+                          FirebaseAuth.instance.currentUser!.displayName!,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
+                        ),
+                        subtitle: Text(
+                          L10n.string("header_profilelabel", placeholder: "Click to open profile...", namespace: "fframe"),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 12),
+                        ),
+                        onTap: () {
+                          // FRouter.of(context).navigateToRoute(context, route: "profile");
+                          List<NavigationTarget> navigationTargets = navigationNotifier.navigationConfig.navigationTargets;
+                          NavigationTarget profilePageTarget = navigationTargets.firstWhere(
+                            (NavigationTarget navigationTarget) {
+                              return navigationTarget.profilePage == true;
+                            },
+                            orElse: () {
+                              return navigationNotifier.filteredNavigationConfig.errorPage;
+                            },
+                          );
+
+                          navigationNotifier.processRouteInformation(
+                            targetState: TargetState(navigationTarget: profilePageTarget),
+                          );
+                          // FRouter.of(context).navigateTo(navigationTarget: profilePageTarget);
+                        },
                       ),
                     ),
                     Divider(
@@ -276,8 +286,8 @@ class _ProfileButtonState extends State<ProfileButton> {
                       flex: 1,
                       child: Column(
                         children: const [
-                          ThemeDropdown(),
-                          LocaleDropdown(),
+                          // ThemeDropdown(),
+                          // LocaleDropdown(),
                         ],
                       ),
                     ),
