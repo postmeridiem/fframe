@@ -40,7 +40,7 @@ class TargetState {
       navigationTarget: navigationNotifier.filteredNavigationConfig.navigationTargets.firstWhere(
         (NavigationTarget navigationTarget) => navigationTarget.path == uri.pathSegments.first,
         orElse: () {
-          NavigationTarget navigationTarget = navigationNotifier.navigationConfig.navigationTargets.firstWhere(
+          NavigationTarget navigationTarget = navigationNotifier.filteredNavigationConfig.navigationTargets.firstWhere(
             (NavigationTarget navigationTarget) => navigationTarget.path == uri.pathSegments.first && navigationTarget.private == true && navigationNotifier.isSignedIn != true,
             orElse: () {
               debugPrint("No route found to ${uri.pathSegments.first}. Please update the navigation config.");

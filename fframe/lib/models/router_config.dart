@@ -2,7 +2,7 @@ part of fframe;
 
 class FRouterConfig {
   late NavigationConfig navigationConfig;
-  // late NavigationConfig appliedNavigationConfig;
+  late NavigationConfig filteredNavigationConfig;
   late Widget mainScreen;
   late RouterBuilder routerBuilder;
 

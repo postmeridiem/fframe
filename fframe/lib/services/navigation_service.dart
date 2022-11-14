@@ -47,7 +47,7 @@ class NavigationNotifier extends ChangeNotifier {
   authChangeListener(User? user) async {
     if (user != null) {
       try {
-        IdTokenResult idTokenResult = await user.getIdTokenResult();
+        IdTokenResult idTokenResult = await user.getIdTokenResult(true);
         List<String>? roles = [];
 
         Map<String, dynamic>? claims = idTokenResult.claims;
@@ -145,24 +145,14 @@ class NavigationNotifier extends ChangeNotifier {
 
   _filterNavigationRoutes() {
     filteredNavigationConfig = NavigationConfig.clone(navigationConfig);
+    FRouterConfig.instance.filteredNavigationConfig = filteredNavigationConfig;
     if (_isSignedIn ?? false) {
       //Check routes for roles
       filteredNavigationConfig.navigationTargets.removeWhere(
         (NavigationTarget navigationTarget) {
-          //Check tabs first(if any)
-          if (navigationTarget.navigationTabs != null) {
-            List<NavigationTab> navigationTabs = _filterTabRoutes(navigationTarget.navigationTabs!);
-            return navigationTabs.isEmpty;
-          }
-
           //Remove all routes which are not private
           if (navigationTarget.private == false) {
             return true;
-          }
-
-          //If the target does not require roles. Return false
-          if (navigationTarget.roles == null) {
-            return false;
           }
 
           //If the user does not have roles. return true
@@ -170,11 +160,46 @@ class NavigationNotifier extends ChangeNotifier {
             return true;
           }
 
-          //Check if the intersection contains a value. If so return false
-          Set<String> userRoles = _roles!.map((role) => role.toLowerCase()).toSet();
-          Set<String> targetRoles = navigationTarget.roles!.map((role) => role.toLowerCase()).toSet();
+          //Role comparison
+          Set<String> userRolesSet = _roles!.map((role) => role.toLowerCase()).toSet();
+          List<String> targetRoles = navigationTarget.roles ?? [];
 
-          Set<String> interSection = userRoles.intersection(targetRoles);
+          //Check tabs first(if any)
+          if (navigationTarget.navigationTabs != null) {
+            //Get all roles allowed to see this tab.
+            navigationTarget.navigationTabs!.where((NavigationTab navigationTab) => navigationTab.roles != null).forEach((NavigationTab navigationTab) {
+              targetRoles.addAll(navigationTab.roles!);
+            });
+
+            navigationTarget.navigationTabs!.removeWhere((NavigationTab navigationTab) {
+              //If the tab is not private, remove it
+              if (navigationTab.private == false) {
+                return true;
+              }
+              //If the tab has no role limitations, allow it
+              if (navigationTab.roles == null) {
+                return false;
+              }
+
+              //Check if the intersection contains a value. If so return false
+              Set<String> targetRolesSet = navigationTab.roles!.map((role) => role.toLowerCase()).toSet();
+              Set<String> interSection = userRolesSet.intersection(targetRolesSet);
+              debugPrint("${navigationTarget.title}/${navigationTab.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} router: ${targetRolesSet.toString()})");
+              return interSection.isEmpty;
+            });
+          }
+
+          if (targetRoles.isEmpty) {
+            //No role based limitations apply
+            debugPrint("${navigationTarget.title} => allow");
+            return false;
+          }
+
+          //Check if the intersection contains a value. If so return false
+          Set<String> targetRolesSet = targetRoles.map((role) => role.toLowerCase()).toSet();
+
+          Set<String> interSection = userRolesSet.intersection(targetRolesSet);
+          debugPrint("${navigationTarget.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} router: ${targetRolesSet.toString()})");
           return interSection.isEmpty;
         },
       );
@@ -194,12 +219,12 @@ class NavigationNotifier extends ChangeNotifier {
   List<NavigationTab> _filterTabRoutes(List<NavigationTab> navigationTabs) {
     if (_isSignedIn ?? false) {
       navigationTabs.removeWhere((NavigationTab navigationTab) {
-        //Sign  ed in. Keep private routes
+        //Signed in. Keep private routes
         if (navigationTab.private == false) {
           return true;
         }
 
-        //If the target does not require roles. Return false
+        //If the target does not require roles. Return true
         if (navigationTab.roles == null) {
           return false;
         }

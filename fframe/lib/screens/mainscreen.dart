@@ -262,6 +262,10 @@ class _ProfileButtonState extends State<ProfileButton> {
                             L10n.string("header_profilelabel", placeholder: "Click to open profile...", namespace: "fframe"),
                             style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 12),
                           ),
+                          onTap: () {
+                            //TODO: Routing to ....
+                            debugPrint("Oops");
+                          },
                         ),
                       ),
                     ),
