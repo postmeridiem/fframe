@@ -256,10 +256,10 @@ class _ProfileButtonState extends State<ProfileButton> {
                           FirebaseAuth.instance.currentUser!.displayName!,
                           style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
                         ),
-                        subtitle: Text(
-                          L10n.string("header_profilelabel", placeholder: "Click to open profile...", namespace: "fframe"),
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 12),
-                        ),
+                        // subtitle: Text(
+                        //   L10n.string("header_profilelabel", placeholder: "Click to open profile...", namespace: "fframe"),
+                        //   style: TextStyle(color: Theme.of(context).colorScheme.onSecondary, fontSize: 12),
+                        // ),
                         onTap: () {
                           // FRouter.of(context).navigateToRoute(context, route: "profile");
                           List<NavigationTarget> navigationTargets = navigationNotifier.navigationConfig.navigationTargets;
@@ -275,6 +275,7 @@ class _ProfileButtonState extends State<ProfileButton> {
                           navigationNotifier.processRouteInformation(
                             targetState: TargetState(navigationTarget: profilePageTarget),
                           );
+                          overlayEntry.remove();
                           // FRouter.of(context).navigateTo(navigationTarget: profilePageTarget);
                         },
                       ),
