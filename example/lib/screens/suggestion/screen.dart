@@ -107,7 +107,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         ],
       ),
 
-      queryBuilder: (query) {
+      query: (query) {
         // return query.where("active", isNull: true);
 
         switch (widget.suggestionQueryState) {
@@ -122,6 +122,12 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       autoSelectFirst: true,
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
+        headerBuilder: (context, documentCount) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text("Listing $documentCount items"),
+          );
+        },
         builder: (context, selected, data, user) {
           return SuggestionListItem(
             suggestion: data,

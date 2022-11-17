@@ -38,6 +38,25 @@ class DatabaseService<T> {
     return query;
   }
 
+  Future<int> queryCount({
+    required String collection,
+    required T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore,
+    Query<T> Function(Query<T> query)? queryBuilder,
+  }) async {
+    Query<T> query = FirebaseFirestore.instance.collection(collection).withConverter(
+          fromFirestore: fromFirestore,
+          toFirestore: (T, _) => {},
+        );
+
+    if (queryBuilder != null) {
+      query = queryBuilder(query);
+    }
+
+    //Count the documents;
+    AggregateQuerySnapshot aggregateQuerySnapshot = await query.count().get();
+    return aggregateQuerySnapshot.count;
+  }
+
   Stream<DocumentSnapshot<T>>? documentStream({
     required String collection,
     required String documentId,

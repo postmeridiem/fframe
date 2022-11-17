@@ -29,12 +29,12 @@ typedef DocumentListItemBuilder<T> = Widget Function(
 
 typedef DocumentListHeaderBuilder<T> = Widget Function(
   BuildContext context,
-  FirestoreQueryBuilderSnapshot<T> snapshot,
+  int documentCount,
 );
 
 typedef DocumentListFooterBuilder<T> = Widget Function(
   BuildContext context,
-  FirestoreQueryBuilderSnapshot<T> snapshot,
+  int documentCount,
 );
 
 typedef DocumentStream<T> = Stream<DocumentSnapshot> Function(

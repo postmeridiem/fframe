@@ -155,31 +155,38 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
             children: [
               Column(
                 children: [
-                  // DocumentSearch<T>(),
+                  GetDocumentCount<T>(documentConfig: widget.documentConfig, headerType: HeaderType.header),
                   Expanded(
                     child: AnimatedBuilder(
                         animation: widget.documentScreenConfig.fireStoreQueryState,
                         builder: (context, child) {
                           Query<T> query = widget.documentScreenConfig.fireStoreQueryState.currentQuery() as Query<T>;
-                          return FirestoreSeparatedListView<T>(
-                            documentList: widget.documentConfig.documentList!,
-                            documentScreenConfig: widget.documentScreenConfig,
-                            selectionState: widget.documentScreenConfig.selectionState as SelectionState<T>,
-                            // queryBuilderSnapshotState: widget.documentScreenConfig.queryBuilderSnapshotState as QueryBuilderSnapshotState<T>,
-                            seperatorHeight: widget.documentConfig.documentList?.seperatorHeight ?? 1,
-                            controller: widget.scrollController,
-                            query: query,
-                            itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
-                              return DocumentListItem<T>(
-                                queryDocumentSnapshot: queryDocumentSnapshot,
-                                hoverSelect: widget.documentConfig.documentList?.hoverSelect ?? false,
-                              );
-                            },
-                            loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
-                            errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showErrorPage(context: context, errorText: error.toString()),
+                          return Column(
+                            children: [
+                              Expanded(
+                                child: FirestoreSeparatedListView<T>(
+                                  documentList: widget.documentConfig.documentList!,
+                                  documentScreenConfig: widget.documentScreenConfig,
+                                  selectionState: widget.documentScreenConfig.selectionState as SelectionState<T>,
+                                  // queryBuilderSnapshotState: widget.documentScreenConfig.queryBuilderSnapshotState as QueryBuilderSnapshotState<T>,
+                                  seperatorHeight: widget.documentConfig.documentList?.seperatorHeight ?? 1,
+                                  controller: widget.scrollController,
+                                  query: query,
+                                  itemBuilder: (context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
+                                    return DocumentListItem<T>(
+                                      queryDocumentSnapshot: queryDocumentSnapshot,
+                                      hoverSelect: widget.documentConfig.documentList?.hoverSelect ?? false,
+                                    );
+                                  },
+                                  loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
+                                  errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showErrorPage(context: context, errorText: error.toString()),
+                                ),
+                              ),
+                            ],
                           );
                         }),
                   ),
+                  GetDocumentCount<T>(documentConfig: widget.documentConfig, headerType: HeaderType.footer),
                 ],
               ),
               if (widget.documentConfig.dataGrid != null) DataGridToggle<T>(),
@@ -187,6 +194,51 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class GetDocumentCount<T> extends StatelessWidget {
+  const GetDocumentCount({
+    Key? key,
+    required this.headerType,
+    required this.documentConfig,
+  }) : super(key: key);
+  final HeaderType headerType;
+  final DocumentConfig<T> documentConfig;
+
+  @override
+  Widget build(BuildContext context) {
+    switch (headerType) {
+      case HeaderType.header:
+        if (documentConfig.documentList?.headerBuilder == null) return const IgnorePointer();
+        break;
+      case HeaderType.footer:
+        if (documentConfig.documentList?.footerBuilder == null) return const IgnorePointer();
+        break;
+    }
+
+    return FutureBuilder<int>(
+      future: DatabaseService<T>().queryCount(
+        collection: documentConfig.collection,
+        fromFirestore: documentConfig.fromFirestore,
+        queryBuilder: documentConfig.query,
+      ),
+      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+        if (snapshot.hasError) {
+          debugPrint(snapshot.error.toString());
+          return const IgnorePointer();
+        }
+        if (!snapshot.hasData) {
+          return const IgnorePointer();
+        }
+        switch (headerType) {
+          case HeaderType.header:
+            return documentConfig.documentList!.headerBuilder!(context, snapshot.data!);
+          case HeaderType.footer:
+            return documentConfig.documentList!.footerBuilder!(context, snapshot.data!);
+        }
+      },
     );
   }
 }
@@ -244,42 +296,34 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
             }
 
             return Consumer(builder: (context, ref, child) {
-              return Column(
-                children: [
-                  if (documentList.headerBuilder != null) documentList.headerBuilder!(context, snapshot),
-                  Expanded(
-                    child: ListView.separated(
-                      itemCount: snapshot.docs.length,
-                      itemBuilder: (context, index) {
-                        final isLastItem = index + 1 == snapshot.docs.length;
-                        if (isLastItem && snapshot.hasMore) snapshot.fetchMore();
+              return ListView.separated(
+                itemCount: snapshot.docs.length,
+                itemBuilder: (context, index) {
+                  final isLastItem = index + 1 == snapshot.docs.length;
+                  if (isLastItem && snapshot.hasMore) snapshot.fetchMore();
 
-                        final doc = snapshot.docs[index];
-                        return itemBuilder(context, doc);
-                      },
-                      scrollDirection: scrollDirection,
-                      reverse: reverse,
-                      controller: controller,
-                      primary: primary,
-                      physics: physics,
-                      separatorBuilder: (BuildContext context, int index) => documentList.showSeparator ? Divider(height: seperatorHeight, color: Theme.of(context).dividerColor) : const IgnorePointer(),
-                      shrinkWrap: shrinkWrap,
-                      padding: padding,
-                      // itemExtent: itemExtent,
-                      // prototypeItem: prototypeItem,
-                      addAutomaticKeepAlives: addAutomaticKeepAlives,
-                      addRepaintBoundaries: addRepaintBoundaries,
-                      addSemanticIndexes: addSemanticIndexes,
-                      cacheExtent: cacheExtent,
-                      // semanticChildCount: semanticChildCount,
-                      dragStartBehavior: dragStartBehavior,
-                      keyboardDismissBehavior: keyboardDismissBehavior,
-                      restorationId: restorationId,
-                      clipBehavior: clipBehavior,
-                    ),
-                  ),
-                  if (documentList.footerBuilder != null) documentList.footerBuilder!(context, snapshot),
-                ],
+                  final doc = snapshot.docs[index];
+                  return itemBuilder(context, doc);
+                },
+                scrollDirection: scrollDirection,
+                reverse: reverse,
+                controller: controller,
+                primary: primary,
+                physics: physics,
+                separatorBuilder: (BuildContext context, int index) => documentList.showSeparator ? Divider(height: seperatorHeight, color: Theme.of(context).dividerColor) : const IgnorePointer(),
+                shrinkWrap: shrinkWrap,
+                padding: padding,
+                // itemExtent: itemExtent,
+                // prototypeItem: prototypeItem,
+                addAutomaticKeepAlives: addAutomaticKeepAlives,
+                addRepaintBoundaries: addRepaintBoundaries,
+                addSemanticIndexes: addSemanticIndexes,
+                cacheExtent: cacheExtent,
+                // semanticChildCount: semanticChildCount,
+                dragStartBehavior: dragStartBehavior,
+                keyboardDismissBehavior: keyboardDismissBehavior,
+                restorationId: restorationId,
+                clipBehavior: clipBehavior,
               );
             });
           },
