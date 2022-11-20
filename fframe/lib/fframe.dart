@@ -48,6 +48,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:uuid/uuid.dart';
+import 'package:shimmer/shimmer.dart';
 
 part 'fframe_main.dart';
 part 'frouter/frouter.dart';

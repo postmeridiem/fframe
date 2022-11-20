@@ -78,23 +78,24 @@ final userRolesProvider = StreamProvider<List<String>>((ref) {
         if (claims != null && claims.containsKey("roles") == true) {
           debugPrint("Has roles formatted as ${claims["roles"].runtimeType}: ${claims["roles"].toString()}");
           if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
-            // debugPrint("JSArray mode roles");
+            debugPrint("JSArray mode roles");
 
             roles = List<String>.from(claims["roles"]);
           } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
-            // debugPrint("standard mode roles");
-            // debugPrint("${List<String>.from(claims["roles"].map((e) => e.toString()).toList())}");
+            debugPrint("standard mode roles");
+            debugPrint("${List<String>.from(claims["roles"].map((e) => e.toString()).toList())}");
             roles = List<String>.from(claims["roles"].map((e) => e.toString()).toList());
           } else {
-            // debugPrint("map mode roles");
+            debugPrint("map mode roles");
             //Legacy mode... it's
-            //            debugPrint("standard mode roles");a map..
+            debugPrint("standard mode roles");
             Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
             rolesMap.removeWhere((key, value) => value == false);
             roles = List<String>.from(rolesMap.keys);
           }
+
+          roles = roles.map((role) => role.toLowerCase()).toList();
         }
-        roles = roles.map((role) => role.toLowerCase()).toList();
         streamController.add(roles);
       }
     }),
