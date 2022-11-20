@@ -48,8 +48,8 @@ class _Tab03State extends State<Tab03> {
               documentId: Fframe.of(context)!.user!.uid!,
               fromFirestore: AppUser.fromFirestore,
               toFirestore: (user, options) => user.toFirestore(),
-              builder: (BuildContext context, AppUser appUser) {
-                return Text(appUser.displayName ?? "?");
+              builder: (BuildContext context, FirestoreDocument<AppUser> appUserDocument) {
+                return Text(appUserDocument.data!.displayName ?? "?");
               },
             ),
           ),

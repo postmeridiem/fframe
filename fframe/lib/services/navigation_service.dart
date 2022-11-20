@@ -132,16 +132,16 @@ class NavigationNotifier extends ChangeNotifier {
     return [];
   }
 
-  List<NavigationTab> get navigationSubTabs {
-    if (hasSubTabs) {
-      NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
-      if ((currentTab.parentTarget is NavigationTab)) {
-        return currentTab.parentTarget.navigationTabs!;
-      }
-      return currentTab.navigationTabs!;
-    }
-    return [];
-  }
+  // List<NavigationTab> get navigationSubTabs {
+  //   if (hasSubTabs) {
+  //     NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
+  //     if ((currentTab.parentTarget is NavigationTab)) {
+  //       return currentTab.parentTarget.navigationTabs!;
+  //     }
+  //     return currentTab.navigationTabs!;
+  //   }
+  //   return [];
+  // }
 
   _filterNavigationRoutes() {
     filteredNavigationConfig = NavigationConfig.clone(navigationConfig);
@@ -253,21 +253,18 @@ class NavigationNotifier extends ChangeNotifier {
 
   parseRouteInformation({required Uri uri}) {
     debugPrint("*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--");
-    debugPrint("FRouter.parseRouteInformation: $uri ${uri.userInfo}");
+    debugPrint("FRouter.parseRouteInformation: $uri for ${uri.userInfo}");
 
     TargetState? targetState = TargetState.fromUri(uri);
     QueryState? queryState = QueryState.fromUri(uri);
 
     if (uri.path != "/") {
-      debugPrint("NavigationNotifier.parseRouteInformation => Store initial link for later use");
+      debugPrint("NavigationNotifier.parseRouteInformation => Store initial link for later use: ${targetState.navigationTarget.title} ${queryState.queryString}");
       nextState.add(NextState(targetState: targetState, queryState: queryState));
     }
 
-    debugPrint("FRouter.parseRouteInformation: ${targetState.toString()} :: ${queryState.toString()}");
+    debugPrint("FRouter.parseRouteInformation: ${targetState.navigationTarget.path} :: ${queryState.toString()}");
 
-    if (_targetState == null && _queryState == null) {
-      debugPrint("NavigationNotifier.parseRouteInformation => Initial load, set defaults");
-    }
     processRouteInformation(targetState: targetState, queryState: queryState);
   }
 
@@ -281,9 +278,10 @@ class NavigationNotifier extends ChangeNotifier {
   Uri composeUri() {
     String pathComponent = (_targetState == null) ? _uri?.path ?? "/" : _targetState!.navigationTarget.path;
     String queryComponent = (_queryState == null) ? _uri?.query ?? "" : _queryState!.queryString;
-
+    Uri uri = Uri.parse("/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}".replaceAll("//", "/"));
     //Trigger the setter and te external method with it;
-    return Uri.parse("/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}".replaceAll("//", "/"));
+    debugPrint("compose URI: ${uri.toString()}");
+    return uri;
   }
 
   String restoreRouteInformation() {
@@ -298,7 +296,7 @@ class NavigationNotifier extends ChangeNotifier {
     debugPrint("NavigationService.setUri: ${uri.toString()} was: $_uri");
 
     if (_uri == uri) {
-      debugPrint("Uri unchanged, do nothing");
+      return;
     }
 
     if (_uri == null) {

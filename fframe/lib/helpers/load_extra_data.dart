@@ -71,7 +71,14 @@ class ReadFromFireStoreByDocumentId<T> extends StatelessWidget {
               return notFoundBuilder!(context);
             }
 
-            return builder(context, snapshot.data!.data() as T);
+            return builder(
+                context,
+                FirestoreDocument<T>(
+                  data: snapshot.data!.data(),
+                  documentReference: snapshot.data!.reference,
+                  fromFirestore: fromFirestore,
+                  toFirestore: toFirestore,
+                ));
         }
       },
     );
@@ -156,7 +163,16 @@ class QueryFromFireStore<T> extends StatelessWidget {
 
             return builder(
               context,
-              snapshot.data!.docs.map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(queryDocument: queryDocument, fromFirestore: fromFirestore, toFirestore: toFirestore)).toList(),
+              snapshot.data!.docs
+                  .map(
+                    (QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
+                      data: queryDocument.data(),
+                      documentReference: queryDocument.reference,
+                      fromFirestore: fromFirestore,
+                      toFirestore: toFirestore,
+                    ),
+                  )
+                  .toList(),
             );
         }
       },
@@ -242,7 +258,14 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
 
             return builder(
               context,
-              snapshot.data!.docs.map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(queryDocument: queryDocument, fromFirestore: fromFirestore, toFirestore: toFirestore)).toList(),
+              snapshot.data!.docs
+                  .map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
+                        data: queryDocument.data(),
+                        documentReference: queryDocument.reference,
+                        fromFirestore: fromFirestore,
+                        toFirestore: toFirestore,
+                      ))
+                  .toList(),
             );
         }
       },
@@ -252,27 +275,28 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
 
 class FirestoreDocument<T> {
   FirestoreDocument({
+    required this.data,
     required this.fromFirestore,
     required this.toFirestore,
-    required this.queryDocument,
+    required this.documentReference,
   });
 
-  final QueryDocumentSnapshot<T> queryDocument;
+  final T? data;
+  final DocumentReference<T> documentReference;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
 
-  T get data => queryDocument.data();
+  // T get data => data;
 
-  Future<SaveState> save(T newData) async {
-    debugPrint("Save document ${queryDocument.reference.parent.path} :: ${queryDocument.id}");
-    return DatabaseService<T>().updateDocument(collection: queryDocument.reference.parent.path, documentId: queryDocument.id, data: newData, fromFirestore: fromFirestore, toFirestore: toFirestore);
-    // return queryDocument.reference.set(queryDocument.data(), SetOptions(merge: true));
+  Future<SaveState> update(T newData) async {
+    debugPrint("Save document ${documentReference.parent.path} :: ${documentReference.id}");
+    return DatabaseService<T>().updateDocument(collection: documentReference.parent.path, documentId: documentReference.id, data: newData, fromFirestore: fromFirestore, toFirestore: toFirestore);
   }
 }
 
 typedef ResultBuilder<T> = Widget Function(
   BuildContext context,
-  T data,
+  FirestoreDocument<T> data,
 );
 
 typedef ResultsBuilder<T> = Widget Function(

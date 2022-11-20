@@ -19,7 +19,7 @@ class TargetState {
     if (uri.pathSegments.isEmpty) {
       //This either routes to a / route or to the default route.
       return TargetState(
-        navigationTarget: navigationNotifier.filteredNavigationConfig.navigationTargets.firstWhere(
+        navigationTarget: navigationNotifier.navigationConfig.navigationTargets.firstWhere(
           (NavigationTarget navigationTarget) => navigationTarget.path == "/",
           orElse: () => TargetState.defaultRoute().navigationTarget,
         ),
@@ -27,56 +27,56 @@ class TargetState {
     }
 
     //Check if this is a login path
-    if (navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.path == uri.pathSegments.first) {
-      return TargetState(navigationTarget: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget);
+    if (navigationNotifier.navigationConfig.signInConfig.signInTarget.path == uri.pathSegments.first) {
+      return TargetState(navigationTarget: navigationNotifier.navigationConfig.signInConfig.signInTarget);
     }
     //Check if this is an invite path
-    if (navigationNotifier.filteredNavigationConfig.signInConfig.invitionTarget?.path == uri.pathSegments.first) {
-      return TargetState(navigationTarget: navigationNotifier.filteredNavigationConfig.signInConfig.invitionTarget!);
+    if (navigationNotifier.navigationConfig.signInConfig.invitionTarget?.path == uri.pathSegments.first) {
+      return TargetState(navigationTarget: navigationNotifier.navigationConfig.signInConfig.invitionTarget!);
     }
 
-    //Check if this is part of the config
-    TargetState targetState = TargetState(
-      navigationTarget: navigationNotifier.filteredNavigationConfig.navigationTargets.firstWhere(
-        (NavigationTarget navigationTarget) => navigationTarget.path == uri.pathSegments.first,
-        orElse: () {
-          NavigationTarget navigationTarget = navigationNotifier.filteredNavigationConfig.navigationTargets.firstWhere(
-            (NavigationTarget navigationTarget) => navigationTarget.path == uri.pathSegments.first && navigationTarget.private == true && navigationNotifier.isSignedIn != true,
-            orElse: () {
-              debugPrint("No route found to ${uri.pathSegments.first}. Please update the navigation config.");
-              return navigationNotifier.filteredNavigationConfig.errorPage;
-            },
-          );
+    //Default to an error path
 
-          return navigationTarget;
-        },
-      ),
-    );
-
-    if (uri.pathSegments.length > 1) {
-      debugPrint("Search for subroutes. If not found..... error page");
-      if (targetState.navigationTarget.navigationTabs == null || targetState.navigationTarget.navigationTabs!.isEmpty) {
-        return TargetState(navigationTarget: navigationNotifier.filteredNavigationConfig.errorPage);
+    TargetState targetState = TargetState(navigationTarget: navigationNotifier.navigationConfig.errorPage);
+    try {
+      if (navigationNotifier.navigationConfig.navigationTargets.isEmpty) {
+        debugPrint("No routes have been defined");
+        return targetState;
       }
 
-      String searchPath = "${targetState.navigationTarget.path}/${uri.pathSegments.last}";
+      bool isValidPath = navigationNotifier.navigationConfig.navigationTargets.any((NavigationTarget navigationTarget) => navigationTarget.path == uri.pathSegments.first);
+      if (isValidPath) {
+        NavigationTarget navigationTarget = navigationNotifier.navigationConfig.navigationTargets.firstWhere((NavigationTarget navigationTarget) {
+          debugPrint("${navigationTarget.path} == ${uri.pathSegments.first}");
+          return navigationTarget.path == uri.pathSegments.first;
+        });
 
-      // try {
-      NavigationTab navigationTab = targetState.navigationTarget.navigationTabs!.firstWhere(
-        (NavigationTarget navigationTarget) => navigationTarget.path == searchPath,
-        orElse: () {
-          return navigationNotifier.filteredNavigationConfig.errorPage as NavigationTab;
-        },
-      );
-      targetState = TargetState(navigationTarget: navigationTab);
-      // } catch (e) {
-      //   TargetState(navigationTarget: navigationNotifier.filteredNavigationConfig.errorPage);
-      // }
-    } else if (targetState.navigationTarget.navigationTabs != null) {
-      //Cannot route to a path which has tabs. Mandatory apply the first tab
-      targetState = TargetState(navigationTarget: targetState.navigationTarget.navigationTabs!.first);
+        if (navigationTarget.navigationTabs != null && navigationTarget.navigationTabs!.isNotEmpty && uri.pathSegments.length > 1) {
+          debugPrint("Search for subroutes, get the corresponding tab config.");
+          String searchPath = "${navigationTarget.path}/${uri.pathSegments.last}";
+
+          NavigationTab navigationTab = navigationTarget.navigationTabs!.firstWhere(
+            (NavigationTarget navigationTarget) => navigationTarget.path == searchPath,
+            orElse: () {
+              return navigationNotifier.navigationConfig.errorPage as NavigationTab;
+            },
+          );
+          //Assign the selected tab to the targetState
+          targetState = TargetState(navigationTarget: navigationTab);
+        } else if (targetState.navigationTarget.navigationTabs != null && navigationTarget.navigationTabs!.isNotEmpty) {
+          //Cannot route to a path which has tabs apply the first tab
+          targetState = TargetState(navigationTarget: targetState.navigationTarget.navigationTabs!.first);
+        } else if (targetState.navigationTarget.contentPane != null) {
+          //Assign the root target to the stargetState
+          targetState = TargetState(navigationTarget: navigationTarget);
+        } else {
+          debugPrint("Warning: subtab requested, but configuration does not match.");
+        }
+      }
+    } catch (e) {
+      debugPrint("Routing to ${uri.toString()} failed: ${e.toString()}");
     }
-
+    debugPrint("Routing to ${targetState.navigationTarget.path}");
     return targetState;
   }
 

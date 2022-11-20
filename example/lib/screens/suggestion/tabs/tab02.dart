@@ -48,7 +48,7 @@ class Tab02 extends StatelessWidget {
                 return Column(
                     children: firestoreDocuments
                         .map(
-                          (FirestoreDocument<AppUser> firestoreDocument) => Text(firestoreDocument.data.displayName ?? "?"),
+                          (FirestoreDocument<AppUser> firestoreDocument) => Text(firestoreDocument.data!.displayName ?? "?"),
                         )
                         .toList());
               },

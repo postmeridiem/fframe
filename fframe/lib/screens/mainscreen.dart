@@ -5,9 +5,9 @@ import 'package:fframe/constants/constants.dart';
 import 'package:fframe/providers/state_providers.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/fframe.dart';
-import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
-import '../helpers/profile_buttons.dart';
+// import '../helpers/profile_buttons.dart';
 
 class MainScreen extends StatefulWidget {
   final String appTitle;
@@ -25,7 +25,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   late TabController _tabController;
-  late TabController _subTabController;
+  // late TabController _subTabController;
   // late OverlayState overlayState;
   // late OverlayEntry overlayEntry;
 
@@ -51,17 +51,17 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       );
     }
 
-    if (FRouter.of(context).hasSubTabs) {
-      _subTabController = TabController(
-        initialIndex: FRouter.of(context).currentSubTab,
-        vsync: this,
-        length: FRouter.of(context).subTabLength,
-      );
+    // if (FRouter.of(context).hasSubTabs) {
+    //   _subTabController = TabController(
+    //     initialIndex: FRouter.of(context).currentSubTab,
+    //     vsync: this,
+    //     length: FRouter.of(context).subTabLength,
+    //   );
 
-      _subTabController.addListener(
-        () => FRouter.of(context).tabSwitch(tabController: _subTabController),
-      );
-    }
+    //   _subTabController.addListener(
+    //     () => FRouter.of(context).tabSwitch(tabController: _subTabController),
+    //   );
+    // }
 
     return Scaffold(
       key: _scaffoldKey,
@@ -119,14 +119,14 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 primary: false,
                 appBar: AppBar(
                   toolbarHeight: 0,
-                  bottom: FRouter.of(context).hasSubTabs
-                      ? TabBar(
-                          labelColor: Theme.of(context).colorScheme.onPrimaryContainer,
-                          unselectedLabelColor: Theme.of(context).colorScheme.onPrimaryContainer,
-                          controller: _subTabController,
-                          tabs: FRouter.of(context).subTabBar(context),
-                        )
-                      : null,
+                  // bottom: FRouter.of(context).hasSubTabs
+                  //     ? TabBar(
+                  //         labelColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                  //         unselectedLabelColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                  //         controller: _subTabController,
+                  //         tabs: FRouter.of(context).subTabBar(context),
+                  //       )
+                  //     : null,
                 ),
                 body: Consumer(
                   builder: (context, ref, child) {

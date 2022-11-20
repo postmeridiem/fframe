@@ -77,7 +77,6 @@ class FRouter extends InheritedWidget {
     debugPrint(newQueryState.toString());
 
     navigationNotifier.processRouteInformation(queryState: newQueryState);
-    // navigationNotifier.uri = Uri.parse("${navigationNotifier.uri!.path}?${queryParameters.entries.map((queryStringEntry) => "${queryStringEntry.key}=${queryStringEntry.value}").join("&")}");
   }
 
   //Get a value from the QueryString
@@ -263,45 +262,45 @@ class FRouter extends InheritedWidget {
         .toList();
   }
 
-  bool get hasSubTabs {
-    return navigationNotifier.hasSubTabs;
-  }
+  // bool get hasSubTabs {
+  //   return navigationNotifier.hasSubTabs;
+  // }
 
-  int get subTabLength {
-    return navigationNotifier.navigationSubTabs.length;
-  }
+  // int get subTabLength {
+  //   return navigationNotifier.navigationSubTabs.length;
+  // }
 
-  int get currentSubTab {
-    int index = navigationNotifier.navigationSubTabs.indexWhere(
-      (NavigationTab navigationTab) {
-        debugPrint("currentSubTab: ${navigationTab.path} == ${navigationNotifier.currentTarget.navigationTarget.path}");
-        return navigationTab.path == navigationNotifier.currentTarget.navigationTarget.path;
-      },
-    );
-    return index == -1 ? 0 : index;
-  }
+  // int get currentSubTab {
+  //   int index = navigationNotifier.navigationSubTabs.indexWhere(
+  //     (NavigationTab navigationTab) {
+  //       debugPrint("currentSubTab: ${navigationTab.path} == ${navigationNotifier.currentTarget.navigationTarget.path}");
+  //       return navigationTab.path == navigationNotifier.currentTarget.navigationTarget.path;
+  //     },
+  //   );
+  //   return index == -1 ? 0 : index;
+  // }
 
-  List<Tab> subTabBar(BuildContext context) {
-    return navigationNotifier.navigationSubTabs
-        .where(
-          ((NavigationTab navigationTab) => navigationTab.destination != null),
-        )
-        .map(
-          (NavigationTab navigationTab) => Tab(
-            icon: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                navigationTab.destination?.icon ?? const IgnorePointer(),
-                (navigationTab.destination?.icon != null && navigationTab.destination?.tabLabel != null) ? const Text(" ") : const IgnorePointer(),
-                Text(navigationTab.destination?.tabLabel!() ?? ''),
-              ],
-            ),
-            // text: navigationTab.destination?.tabLabel ?? '',
-          ),
-        )
-        .toList();
-  }
+  // List<Tab> subTabBar(BuildContext context) {
+  //   return navigationNotifier.navigationSubTabs
+  //       .where(
+  //         ((NavigationTab navigationTab) => navigationTab.destination != null),
+  //       )
+  //       .map(
+  //         (NavigationTab navigationTab) => Tab(
+  //           icon: Row(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             crossAxisAlignment: CrossAxisAlignment.center,
+  //             children: [
+  //               navigationTab.destination?.icon ?? const IgnorePointer(),
+  //               (navigationTab.destination?.icon != null && navigationTab.destination?.tabLabel != null) ? const Text(" ") : const IgnorePointer(),
+  //               Text(navigationTab.destination?.tabLabel!() ?? ''),
+  //             ],
+  //           ),
+  //           // text: navigationTab.destination?.tabLabel ?? '',
+  //         ),
+  //       )
+  //       .toList();
+  // }
 
   Widget navigationRail() {
     if (navigationNotifier.filteredNavigationConfig.navigationTargets.length >= 2) {

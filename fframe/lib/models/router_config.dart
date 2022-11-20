@@ -23,13 +23,13 @@ class FRouterConfig {
             navigationTab.parentTarget = navigationTarget;
             navigationTab.path = "${navigationTab.parentTarget.path}/${navigationTab.path}";
 
-            if (navigationTab.navigationTabs != null && navigationTab.navigationTabs!.isNotEmpty) {
-              debugPrint("Process the subtabs");
-              for (NavigationTab navigationSubTab in navigationTab.navigationTabs!) {
-                navigationSubTab.parentTarget = navigationTab;
-                navigationSubTab.path = "/${navigationTab.path}/${navigationSubTab.path}";
-              }
-            }
+            // if (navigationTab.navigationTabs != null && navigationTab.navigationTabs!.isNotEmpty) {
+            //   debugPrint("Process the subtabs");
+            //   for (NavigationTab navigationSubTab in navigationTab.navigationTabs!) {
+            //     navigationSubTab.parentTarget = navigationTab;
+            //     navigationSubTab.path = "/${navigationTab.path}/${navigationSubTab.path}";
+            //   }
+            // }
           }
         }
       }),

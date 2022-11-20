@@ -690,7 +690,7 @@ class ScreenBody<T> extends ConsumerStatefulWidget {
 class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
   QueryDocumentSnapshot<dynamic>? firstDoc;
   bool building = true;
-
+  late QueryState queryState;
   @override
   void initState() {
     super.initState();
@@ -704,12 +704,9 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
       debugPrint("First doc");
     }
 
-    if (documentScreenConfig.documentConfig.autoSelectFirst) {
-      debugPrint("autoSelectFirst");
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        postLoad(documentScreenConfig: documentScreenConfig);
-      });
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      postOpen(documentScreenConfig: documentScreenConfig);
+    });
 
     ScreenSize screenSize = (MediaQuery.of(context).size.width <= 599)
         ? ScreenSize.phone
@@ -717,7 +714,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
             ? ScreenSize.tablet
             : ScreenSize.large;
 
-    QueryState queryState = ref.watch(queryStateProvider);
+    queryState = ref.watch(queryStateProvider);
 
     Widget returnWidget = queryState.queryString.isEmpty
         ? (screenSize == ScreenSize.phone)
@@ -729,11 +726,19 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
 
     //Handle document loads...
 
-    // debugPrint("Read ${queryDocumentSnapshots?.length} docs from provider");
+    // // debugPrint("Read ${queryDocumentSnapshots?.length} docs from provider");
     if (queryState.queryParameters == null && documentScreenConfig.documentConfig.autoSelectFirst) {
-      returnWidget = AutoFirstDocumentLoader<T>(
-        documentConfig: DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>,
-      );
+      documentScreenConfig.selectionState.addListener(() {
+        documentScreenConfig.selectionState.removeListener(() {});
+        setState(() {});
+        FRouter.of(context).updateQueryString(queryParameters: {
+          documentScreenConfig.documentConfig.queryStringIdParam: documentScreenConfig.selectionState.docId!,
+        });
+        returnWidget = DocumentBodyLoader<T>(
+          key: ValueKey(queryState.queryString),
+        );
+      });
+      returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading document");
     } else if (queryState.queryParameters == null) {
       returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
     } else if (documentScreenConfig.selectionState.data == null && documentScreenConfig.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
@@ -755,13 +760,15 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
 
     debugPrint("Load the AnimatedSwitcher ");
     return AnimatedBuilder(
-      animation: documentScreenConfig.selectionState,
+      animation: documentScreenConfig.selectionState as SelectionState<T>,
       builder: ((context, child) => returnWidget),
     );
   }
 
-  postLoad({required DocumentScreenConfig documentScreenConfig}) async {
-    debugPrint("PostLoad");
+  postOpen({required DocumentScreenConfig documentScreenConfig}) async {
+    if (documentScreenConfig.documentConfig.postOpen != null) {
+      documentScreenConfig.documentConfig.postOpen!.call(documentScreenConfig.selectionState.data);
+    }
   }
 }
 

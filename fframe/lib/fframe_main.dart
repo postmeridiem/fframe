@@ -197,20 +197,20 @@ class _FframeL10nLoaderState extends State<FframeL10nLoader> {
               );
         }
 
-        return const FrouterLoader();
+        return const FRouterLoader();
       },
     );
   }
 }
 
-class FrouterLoader extends ConsumerStatefulWidget {
-  const FrouterLoader({Key? key}) : super(key: key);
+class FRouterLoader extends ConsumerStatefulWidget {
+  const FRouterLoader({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _FrouterLoaderState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _FRouterLoaderState();
 }
 
-class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
+class _FRouterLoaderState extends ConsumerState<FRouterLoader> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
@@ -242,7 +242,7 @@ class _FrouterLoaderState extends ConsumerState<FrouterLoader> {
               Fframe.of(context)!.user = null;
             }
 
-            return FRouterLoader(
+            return FRouterInit(
                 mainScreen: MainScreen(
                   appTitle: Fframe.of(context)!.title,
                   l10nConfig: Fframe.of(context)!.l10nConfig,

@@ -10,6 +10,7 @@ export 'package:flutterfire_ui/firestore.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
 export 'package:url_launcher/url_launcher_string.dart';
 export 'package:clipboard/clipboard.dart';
+export 'package:shimmer/shimmer.dart';
 
 import 'dart:async';
 import 'dart:convert';

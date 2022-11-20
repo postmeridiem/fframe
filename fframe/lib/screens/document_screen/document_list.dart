@@ -295,6 +295,8 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
               );
             }
 
+            bool autoSelectFirst = documentScreenConfig.documentConfig.autoSelectFirst;
+
             return Consumer(builder: (context, ref, child) {
               return ListView.separated(
                 itemCount: snapshot.docs.length,
@@ -302,8 +304,18 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
                   final isLastItem = index + 1 == snapshot.docs.length;
                   if (isLastItem && snapshot.hasMore) snapshot.fetchMore();
 
-                  final doc = snapshot.docs[index];
-                  return itemBuilder(context, doc);
+                  final queryDocumentSnapshot = snapshot.docs[index];
+                  if (autoSelectFirst && index == 0) {
+                    documentScreenConfig.load<T>(context: context, docId: queryDocumentSnapshot.id);
+
+                    // debugPrint("Set selectionState to ${queryDocumentSnapshot.id}");
+                    // DocumentScreenConfig.of(context)!.selectionState.setState(SelectionState<T>(
+                    //       data: queryDocumentSnapshot.data(),
+                    //       docId: queryDocumentSnapshot.id,
+                    //       isNew: false,
+                    //     ));
+                  }
+                  return itemBuilder(context, queryDocumentSnapshot);
                 },
                 scrollDirection: scrollDirection,
                 reverse: reverse,
