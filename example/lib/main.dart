@@ -2,7 +2,6 @@ import 'package:example/firebase_options.dart';
 import 'package:example/pages/empty_page.dart';
 import 'package:example/pages/error_page.dart';
 import 'package:example/pages/wait_page.dart';
-import 'package:example/screens/user_profile/navigation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 
@@ -15,6 +14,7 @@ import 'package:example/screens/signInPage/signin_page.dart';
 import 'package:example/screens/suggestion/suggestion.dart';
 import 'package:example/screens/setting/setting.dart';
 import 'package:example/screens/user/user.dart';
+import 'package:example/screens/user_profile/user_profile.dart';
 import 'package:flutterfire_ui/i10n.dart';
 
 import 'helpers/header_buttons.dart';
@@ -96,7 +96,8 @@ class MainApp extends StatelessWidget {
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
-          clientId: "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
+          clientId:
+              "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
       debugShowCheckedModeBanner: false,
@@ -109,11 +110,16 @@ class MainApp extends StatelessWidget {
       //   debugPrint("example.postLoad: execution complete");
       // },
       postSignIn: (context) async {
-        Fframe.of(context)!.log("execution complete", scope: "exampleApp.postSignIn");
-        Fframe.of(context)!.log("log test info level", scope: "exampleApp.LogTest", level: LogLevel.info);
-        Fframe.of(context)!.log("log test warning level", scope: "exampleApp.LogTest", level: LogLevel.warning);
-        Fframe.of(context)!.log("log test error level", scope: "exampleApp.LogTest", level: LogLevel.error);
-        Fframe.of(context)!.log("log test always level", scope: "exampleApp.LogTest", level: LogLevel.always);
+        Fframe.of(context)!
+            .log("execution complete", scope: "exampleApp.postSignIn");
+        Fframe.of(context)!.log("log test info level",
+            scope: "exampleApp.LogTest", level: LogLevel.info);
+        Fframe.of(context)!.log("log test warning level",
+            scope: "exampleApp.LogTest", level: LogLevel.warning);
+        Fframe.of(context)!.log("log test error level",
+            scope: "exampleApp.LogTest", level: LogLevel.error);
+        Fframe.of(context)!.log("log test always level",
+            scope: "exampleApp.LogTest", level: LogLevel.always);
         Fframe.of(context)!.log("execution complete");
       },
     );
