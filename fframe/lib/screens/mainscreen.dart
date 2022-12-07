@@ -100,7 +100,15 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       ),
       body: Row(
         children: [
-          if (screenSize == ScreenSize.large) FRouter.of(context).navigationRail(),
+          if (screenSize == ScreenSize.large) Container(
+            alignment: Alignment.topCenter,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: IntrinsicHeight(
+                child: FRouter.of(context).navigationRail(),
+              ),
+            ),
+          ),
           Expanded(
             child: Scaffold(
               primary: false,
