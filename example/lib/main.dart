@@ -1,14 +1,13 @@
-import 'package:example/firebase_options.dart';
-import 'package:example/pages/empty_page.dart';
-import 'package:example/pages/error_page.dart';
-import 'package:example/pages/wait_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 
 import 'package:fframe/fframe.dart';
-import 'package:fframe/helpers/l10n.dart';
-
 import 'package:example/themes/themes.dart';
+import 'package:fframe/helpers/l10n.dart';
+import 'package:example/firebase_options.dart';
+import 'package:example/pages/empty_page.dart';
+import 'package:example/pages/error_page.dart';
+import 'package:example/pages/wait_page.dart';
 
 import 'package:example/screens/signInPage/signin_page.dart';
 import 'package:example/screens/suggestion/suggestion.dart';
