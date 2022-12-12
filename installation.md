@@ -1,0 +1,14 @@
+- clone the example dir from the project
+- adjust pubspec.yaml namespace and version
+- find replace example/ with yournamespace/ in lib dir
+- create an empty firestore project
+- make sure you have google login enabled as option in in firestore. this is used for your admin account
+- use the firebase [add app] to connect flutter app instructions to set up credentials
+- create a firebase hosting setup to deploy your app to
+- in the google cloud console, search for OAuth and set up your OAuth consent screen (set to internal to get started quickly)
+- in the same page left go to [Credentials]
+- in the [Browser key (auto created by Firebase)] record, switch restrictions to http referrers and add your localhost:[yourport], and any other urls you want to use this app on
+- create fframe/ collection with (TODO: fixture script)
+- remove the suggestions route (main.js, uncomment) or run the (TODO: fixture script) to add suggestions to your app
+- run your app and use the Login button. This will create a firebase authentication record for your Google profile. This is the first created profile, so it should have been auto created with SuperUser role (allowing role management on accounts)
+- 
