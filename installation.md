@@ -9,6 +9,7 @@
 - in the same page left go to [Credentials]
 - in the [Browser key (auto created by Firebase)] record, switch restrictions to http referrers and add your localhost:[yourport], and any other urls you want to use this app on
 - create fframe/ collection with (TODO: fixture script)
+- create users/ collection with (TODO: fixture script). (or just create an empty document. what matters is that the users collection exists
 - remove the suggestions route (main.js, uncomment) or run the (TODO: fixture script) to add suggestions to your app
 - run your app and use the Login button. This will create a firebase authentication record for your Google profile. This is the first created profile, so it should have been auto created with SuperUser role (allowing role management on accounts)
 - 
