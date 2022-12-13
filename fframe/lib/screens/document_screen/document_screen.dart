@@ -263,58 +263,58 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
     return;
     //TODO: reenable warning;
-    if (await (confirmationDialog(
-            context: context,
-            cancelText: L10n.string(
-              "iconbutton_document_close_cancel",
-              placeholder: "Cancel",
-            ),
-            continueText: L10n.string(
-              "iconbutton_document_close_continue",
-              placeholder: "Continue",
-            ),
-            titleText: L10n.string(
-              "iconbutton_document_close_title",
-              placeholder: "Close this document",
-            ),
-            child: SizedBox(
-              height: 100.0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.question_mark,
-                      color: Colors.yellowAccent.shade200,
-                    ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        L10n.string(
-                          "iconbutton_document_close1",
-                          placeholder: "Close this document?",
-                        ),
-                      ),
-                      Text(
-                        L10n.string(
-                          "iconbutton_document_close2",
-                          placeholder: "Any changes made to the document will be lost.",
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ))) ==
-        true) {
-      selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
-      FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
-    }
+    // if (await (confirmationDialog(
+    //         context: context,
+    //         cancelText: L10n.string(
+    //           "iconbutton_document_close_cancel",
+    //           placeholder: "Cancel",
+    //         ),
+    //         continueText: L10n.string(
+    //           "iconbutton_document_close_continue",
+    //           placeholder: "Continue",
+    //         ),
+    //         titleText: L10n.string(
+    //           "iconbutton_document_close_title",
+    //           placeholder: "Close this document",
+    //         ),
+    //         child: SizedBox(
+    //           height: 100.0,
+    //           child: Row(
+    //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //             crossAxisAlignment: CrossAxisAlignment.center,
+    //             children: [
+    //               Padding(
+    //                 padding: const EdgeInsets.all(8.0),
+    //                 child: Icon(
+    //                   Icons.question_mark,
+    //                   color: Colors.yellowAccent.shade200,
+    //                 ),
+    //               ),
+    //               Column(
+    //                 mainAxisAlignment: MainAxisAlignment.center,
+    //                 crossAxisAlignment: CrossAxisAlignment.start,
+    //                 children: [
+    //                   Text(
+    //                     L10n.string(
+    //                       "iconbutton_document_close1",
+    //                       placeholder: "Close this document?",
+    //                     ),
+    //                   ),
+    //                   Text(
+    //                     L10n.string(
+    //                       "iconbutton_document_close2",
+    //                       placeholder: "Any changes made to the document will be lost.",
+    //                     ),
+    //                   ),
+    //                 ],
+    //               ),
+    //             ],
+    //           ),
+    //         ))) ==
+    //     true) {
+    //   selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
+    //   FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
+    // }
   }
 
   // ignore: unused_element
