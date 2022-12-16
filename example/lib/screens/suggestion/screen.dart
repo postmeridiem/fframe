@@ -128,7 +128,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         footerBuilder: (context, documentCount) {
           return Column(
             children: [
-              const Divider(),
+              Divider(
+                color: Theme.of(context).colorScheme.primary,
+                thickness: 1,
+              ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Text("Listing $documentCount items"),
