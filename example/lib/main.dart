@@ -90,6 +90,7 @@ class MainApp extends StatelessWidget {
       navigationConfig: navigationConfig,
       lightMode: appLightTheme,
       darkMode: appDarkTheme,
+      themeMode: ThemeMode.system,
       l10nConfig: l10nConfig,
       logThreshold: LogLevel.info,
       providerConfigs: const [

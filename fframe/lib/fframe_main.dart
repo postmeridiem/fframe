@@ -10,6 +10,7 @@ class Fframe extends InheritedWidget {
     required this.darkMode,
     required this.lightMode,
     required this.l10nConfig,
+    this.themeMode = ThemeMode.system,
     this.providerConfigs,
     this.debugShowCheckedModeBanner = true,
     this.logThreshold = LogLevel.warning,
@@ -26,6 +27,7 @@ class Fframe extends InheritedWidget {
   final NavigationConfig navigationConfig;
   final ThemeData darkMode;
   final ThemeData lightMode;
+  final ThemeMode themeMode;
   final L10nConfig l10nConfig;
   final bool debugShowCheckedModeBanner;
   final List<Widget>? globalActions;
@@ -43,12 +45,14 @@ class Fframe extends InheritedWidget {
   String? errorText;
   String? waitText;
 
-  Widget showErrorPage({required BuildContext context, required String errorText}) {
+  Widget showErrorPage(
+      {required BuildContext context, required String errorText}) {
     this.errorText = errorText;
     return FRouter.of(context).errorPage(context: context);
   }
 
-  Widget showWaitPage({required BuildContext context, required String waitText}) {
+  Widget showWaitPage(
+      {required BuildContext context, required String waitText}) {
     this.waitText = waitText;
     return FRouter.of(context).waitPage(context: context);
   }
@@ -66,13 +70,18 @@ class Fframe extends InheritedWidget {
     LogLevel logThreshold = this.logThreshold;
     switch (logThreshold) {
       case LogLevel.info:
-        if (level == LogLevel.info || level == LogLevel.warning || level == LogLevel.error || level == LogLevel.always) {
+        if (level == LogLevel.info ||
+            level == LogLevel.warning ||
+            level == LogLevel.error ||
+            level == LogLevel.always) {
           // show all log prints
           debugPrint("$scope: $message");
         }
         break;
       case LogLevel.warning:
-        if (level == LogLevel.warning || level == LogLevel.error || level == LogLevel.always) {
+        if (level == LogLevel.warning ||
+            level == LogLevel.error ||
+            level == LogLevel.always) {
           // show all log prints with level warning or error
           debugPrint("$scope: $message");
         }
@@ -136,7 +145,8 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<FirebaseApp>(
-      future: Firebase.initializeApp(options: Fframe.of(context)!.firebaseOptions),
+      future:
+          Firebase.initializeApp(options: Fframe.of(context)!.firebaseOptions),
       builder: (BuildContext context, AsyncSnapshot<FirebaseApp> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
@@ -155,10 +165,14 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
           case ConnectionState.done:
             if (snapshot.error != null) {
               return MaterialApp(
-                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                debugShowCheckedModeBanner:
+                    Fframe.of(context)!.debugShowCheckedModeBanner,
                 title: Fframe.of(context)?.title ?? "",
                 home: Scaffold(
-                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                  body: Fframe.of(context)!
+                      .navigationConfig
+                      .errorPage
+                      .contentPane!,
                 ),
               );
             }
@@ -228,16 +242,21 @@ class _FRouterLoaderState extends ConsumerState<FRouterLoader> {
           case ConnectionState.active:
             if (snapshot.error != null) {
               return MaterialApp(
-                debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                debugShowCheckedModeBanner:
+                    Fframe.of(context)!.debugShowCheckedModeBanner,
                 home: Scaffold(
-                  body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                  body: Fframe.of(context)!
+                      .navigationConfig
+                      .errorPage
+                      .contentPane!,
                 ),
               );
             }
 
             //Store the user
             if (snapshot.data != null) {
-              Fframe.of(context)!.user = FFrameUser.fromFirebaseUser(firebaseUser: snapshot.data!);
+              Fframe.of(context)!.user =
+                  FFrameUser.fromFirebaseUser(firebaseUser: snapshot.data!);
             } else {
               Fframe.of(context)!.user = null;
             }
@@ -264,7 +283,8 @@ class EmailAuthManager extends StatefulWidget {
   EmailAuthManagerState createState() => EmailAuthManagerState();
 }
 
-class EmailAuthManagerState extends State<EmailAuthManager> with WidgetsBindingObserver {
+class EmailAuthManagerState extends State<EmailAuthManager>
+    with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
@@ -272,7 +292,8 @@ class EmailAuthManagerState extends State<EmailAuthManager> with WidgetsBindingO
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("dynamic link research: ${Uri.base} => ${FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())}");
+    debugPrint(
+        "dynamic link research: ${Uri.base} => ${FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())}");
     Uri uri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
 
     if (FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())) {
@@ -283,32 +304,45 @@ class EmailAuthManagerState extends State<EmailAuthManager> with WidgetsBindingO
 
         debugPrint(emailAddress);
         return FutureBuilder<UserCredential>(
-            future: FirebaseAuth.instance.signInWithEmailLink(email: emailAddress, emailLink: Uri.base.toString()),
-            builder: (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
+            future: FirebaseAuth.instance.signInWithEmailLink(
+                email: emailAddress, emailLink: Uri.base.toString()),
+            builder:
+                (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
-                  return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                  return Fframe.of(context)!
+                          .navigationConfig
+                          .waitPage
+                          .contentPane ??
                       const Center(
                         child: CircularProgressIndicator(),
                       );
                 case ConnectionState.waiting:
-                  return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                  return Fframe.of(context)!
+                          .navigationConfig
+                          .waitPage
+                          .contentPane ??
                       const Center(
                         child: CircularProgressIndicator(),
                       );
                 case ConnectionState.active:
-                  return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                  return Fframe.of(context)!
+                          .navigationConfig
+                          .waitPage
+                          .contentPane ??
                       const Center(
                         child: CircularProgressIndicator(),
                       );
                 case ConnectionState.done:
                   if (snapshot.hasError) {
-                    debugPrint("Fframe/emailAuthManager: Link sign in failed: ${snapshot.error}");
+                    debugPrint(
+                        "Fframe/emailAuthManager: Link sign in failed: ${snapshot.error}");
                     return const FframePostLoad();
                   }
 
                   UserCredential? userCredential = snapshot.data;
-                  debugPrint("Fframe/emailAuthManager: Resulting user: ${userCredential?.user?.email}");
+                  debugPrint(
+                      "Fframe/emailAuthManager: Resulting user: ${userCredential?.user?.email}");
                   return const FframePostLoad();
               }
             });
@@ -339,7 +373,8 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
 
   @override
   Widget build(BuildContext context) {
-    if (Fframe.of(context)?.postSignIn == null && Fframe.of(context)?.postSignOut == null) {
+    if (Fframe.of(context)?.postSignIn == null &&
+        Fframe.of(context)?.postSignOut == null) {
       debugPrint("Fframe.postSignIn/Out: no code provided");
       return const FframePostLoad();
     } else {
@@ -358,16 +393,23 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
                     case ConnectionState.none:
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                      return Fframe.of(context)!
+                              .navigationConfig
+                              .waitPage
+                              .contentPane ??
                           const Center(
                             child: CircularProgressIndicator(),
                           );
                     case ConnectionState.done:
                       if (snapshot.error != null) {
                         return MaterialApp(
-                          debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                          debugShowCheckedModeBanner:
+                              Fframe.of(context)!.debugShowCheckedModeBanner,
                           home: Scaffold(
-                            body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                            body: Fframe.of(context)!
+                                .navigationConfig
+                                .errorPage
+                                .contentPane!,
                           ),
                         );
                       }
@@ -389,16 +431,23 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
                     case ConnectionState.none:
                     case ConnectionState.waiting:
                     case ConnectionState.active:
-                      return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+                      return Fframe.of(context)!
+                              .navigationConfig
+                              .waitPage
+                              .contentPane ??
                           const Center(
                             child: CircularProgressIndicator(),
                           );
                     case ConnectionState.done:
                       if (snapshot.error != null) {
                         return MaterialApp(
-                          debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                          debugShowCheckedModeBanner:
+                              Fframe.of(context)!.debugShowCheckedModeBanner,
                           home: Scaffold(
-                            body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                            body: Fframe.of(context)!
+                                .navigationConfig
+                                .errorPage
+                                .contentPane!,
                           ),
                         );
                       }
@@ -445,16 +494,23 @@ class _FframePostLoadState extends State<FframePostLoad> {
             case ConnectionState.none:
             case ConnectionState.waiting:
             case ConnectionState.active:
-              return Fframe.of(context)!.navigationConfig.waitPage.contentPane ??
+              return Fframe.of(context)!
+                      .navigationConfig
+                      .waitPage
+                      .contentPane ??
                   const Center(
                     child: CircularProgressIndicator(),
                   );
             case ConnectionState.done:
               if (snapshot.error != null) {
                 return MaterialApp(
-                  debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                  debugShowCheckedModeBanner:
+                      Fframe.of(context)!.debugShowCheckedModeBanner,
                   home: Scaffold(
-                    body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+                    body: Fframe.of(context)!
+                        .navigationConfig
+                        .errorPage
+                        .contentPane!,
                   ),
                 );
               }
@@ -477,9 +533,10 @@ class FframeBuilder extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: Fframe.of(context)!.lightMode,
       darkTheme: Fframe.of(context)!.darkMode,
-      themeMode: ThemeMode.system,
+      themeMode: Fframe.of(context)!.themeMode,
       locale: L10n.getLocale(),
       title: Fframe.of(context)!.title,
+      color: Theme.of(context).colorScheme.surface,
     );
   }
 }
