@@ -102,6 +102,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         children: [
           if (screenSize == ScreenSize.large) Container(
             alignment: Alignment.topCenter,
+            color: Theme.of(context).colorScheme.primaryContainer,
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: IntrinsicHeight(
