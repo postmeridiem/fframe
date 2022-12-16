@@ -70,17 +70,18 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         elevation: 2,
         automaticallyImplyLeading: false,
         title: Text(Fframe.of(context)?.title ?? ""),
-        leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
-            ? IconButton(
-                onPressed: () {
-                  if (_scaffoldKey.currentState!.isDrawerOpen) {
-                    _scaffoldKey.currentState!.closeDrawer();
-                  } else {
-                    _scaffoldKey.currentState!.openDrawer();
-                  }
-                },
-                icon: const Icon(Icons.menu))
-            : const IgnorePointer(),
+        leading:
+            (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
+                ? IconButton(
+                    onPressed: () {
+                      if (_scaffoldKey.currentState!.isDrawerOpen) {
+                        _scaffoldKey.currentState!.closeDrawer();
+                      } else {
+                        _scaffoldKey.currentState!.openDrawer();
+                      }
+                    },
+                    icon: const Icon(Icons.menu))
+                : const IgnorePointer(),
         actions: [
           ...?Fframe.of(context)?.globalActions,
           const ProfileButton(),
@@ -94,22 +95,24 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           ),
           child: Text(
             widget.appTitle,
-            style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onPrimaryContainer),
           ),
         ),
       ),
       body: Row(
         children: [
-          if (screenSize == ScreenSize.large) Container(
-            alignment: Alignment.topCenter,
-            color: Theme.of(context).colorScheme.primaryContainer,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: IntrinsicHeight(
-                child: FRouter.of(context).navigationRail(),
+          if (screenSize == ScreenSize.large)
+            Container(
+              alignment: Alignment.topCenter,
+              color: Theme.of(context).colorScheme.tertiary,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: IntrinsicHeight(
+                  child: FRouter.of(context).navigationRail(),
+                ),
               ),
             ),
-          ),
           Expanded(
             child: Scaffold(
               primary: false,
@@ -117,8 +120,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 toolbarHeight: 0,
                 bottom: FRouter.of(context).hasTabs
                     ? TabBar(
-                        labelColor: Theme.of(context).colorScheme.onPrimaryContainer,
-                        unselectedLabelColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                        labelColor:
+                            Theme.of(context).colorScheme.onPrimaryContainer,
+                        unselectedLabelColor:
+                            Theme.of(context).colorScheme.onPrimaryContainer,
                         controller: _tabController,
                         tabs: FRouter.of(context).tabBar(context),
                       )
@@ -143,7 +148,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     return AnimatedSwitcher(
                       duration: const Duration(milliseconds: 250),
                       child: Container(
-                        key: ValueKey("navTarget_${targetState.navigationTarget.title}"),
+                        key: ValueKey(
+                            "navTarget_${targetState.navigationTarget.title}"),
                         child: targetState.navigationTarget.contentPane,
                       ),
                     );
@@ -192,13 +198,18 @@ class _ProfileButtonState extends State<ProfileButton> {
             return const IgnorePointer();
           case ConnectionState.active:
             if (snapshot.hasError) {
-              return Icon(Icons.error, color: Theme.of(context).colorScheme.error);
+              return Icon(Icons.error,
+                  color: Theme.of(context).colorScheme.error);
             }
 
             if (snapshot.hasData) {
               return TextButton(
                 style: ElevatedButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer, backgroundColor: Theme.of(context).colorScheme.primaryContainer, shape: const CircleBorder(),
+                  foregroundColor:
+                      Theme.of(context).colorScheme.onPrimaryContainer,
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primaryContainer,
+                  shape: const CircleBorder(),
                   padding: const EdgeInsets.all(4), // <-- Splash color
                 ),
                 onPressed: () {
@@ -215,11 +226,16 @@ class _ProfileButtonState extends State<ProfileButton> {
 
   CircleAvatar circleAvatar({double? radius}) {
     User user = FirebaseAuth.instance.currentUser!;
-    List<String>? avatarText = user.displayName?.split(' ').map((part) => part.trim().substring(0, 1)).toList();
+    List<String>? avatarText = user.displayName
+        ?.split(' ')
+        .map((part) => part.trim().substring(0, 1))
+        .toList();
     return CircleAvatar(
       radius: radius ?? 12.0,
-      backgroundImage: (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
-      backgroundColor: (user.photoURL == null) ? Colors.amber : Colors.transparent,
+      backgroundImage:
+          (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
+      backgroundColor:
+          (user.photoURL == null) ? Colors.amber : Colors.transparent,
       child: (user.photoURL == null && avatarText != null)
           ? Text(
               "${avatarText.first}${avatarText.last}",
@@ -263,7 +279,8 @@ class _ProfileButtonState extends State<ProfileButton> {
                         ),
                         title: Text(
                           FirebaseAuth.instance.currentUser!.displayName!,
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSecondary),
                         ),
                         // subtitle: Text(
                         //   L10n.string("header_profilelabel", placeholder: "Click to open profile...", namespace: "fframe"),
@@ -271,18 +288,23 @@ class _ProfileButtonState extends State<ProfileButton> {
                         // ),
                         onTap: () {
                           // FRouter.of(context).navigateToRoute(context, route: "profile");
-                          List<NavigationTarget> navigationTargets = navigationNotifier.navigationConfig.navigationTargets;
-                          NavigationTarget profilePageTarget = navigationTargets.firstWhere(
+                          List<NavigationTarget> navigationTargets =
+                              navigationNotifier
+                                  .navigationConfig.navigationTargets;
+                          NavigationTarget profilePageTarget =
+                              navigationTargets.firstWhere(
                             (NavigationTarget navigationTarget) {
                               return navigationTarget.profilePage == true;
                             },
                             orElse: () {
-                              return navigationNotifier.filteredNavigationConfig.errorPage;
+                              return navigationNotifier
+                                  .filteredNavigationConfig.errorPage;
                             },
                           );
 
                           navigationNotifier.processRouteInformation(
-                            targetState: TargetState(navigationTarget: profilePageTarget),
+                            targetState: TargetState(
+                                navigationTarget: profilePageTarget),
                           );
                           overlayEntry.remove();
                           // FRouter.of(context).navigateTo(navigationTarget: profilePageTarget);
@@ -305,7 +327,8 @@ class _ProfileButtonState extends State<ProfileButton> {
                       color: Theme.of(context).colorScheme.onSecondary,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 16),
+                      padding: const EdgeInsets.only(
+                          left: 8, right: 8, top: 8, bottom: 16),
                       child: TextButton.icon(
                         onPressed: () async {
                           setState(() {
@@ -314,10 +337,17 @@ class _ProfileButtonState extends State<ProfileButton> {
                           await FirebaseAuth.instance.signOut();
                           overlayEntry.remove();
                         },
-                        icon: isSigningOut ? const CircularProgressIndicator() : Icon(Icons.logout, size: 24.0, color: Theme.of(context).colorScheme.onSecondary),
+                        icon: isSigningOut
+                            ? const CircularProgressIndicator()
+                            : Icon(Icons.logout,
+                                size: 24.0,
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary),
                         label: Text(
-                          L10n.string("header_signout", placeholder: "Sign out...", namespace: "fframe"),
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
+                          L10n.string("header_signout",
+                              placeholder: "Sign out...", namespace: "fframe"),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSecondary),
                         ),
                       ),
                     ),
