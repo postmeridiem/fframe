@@ -27,7 +27,7 @@ class Fframe extends InheritedWidget {
   final NavigationConfig navigationConfig;
   final ThemeData darkMode;
   final ThemeData lightMode;
-  final ThemeMode themeMode;
+  late ThemeMode themeMode;
   final L10nConfig l10nConfig;
   final bool debugShowCheckedModeBanner;
   final List<Widget>? globalActions;
@@ -55,6 +55,10 @@ class Fframe extends InheritedWidget {
       {required BuildContext context, required String waitText}) {
     this.waitText = waitText;
     return FRouter.of(context).waitPage(context: context);
+  }
+
+  void setThemeMode({required ThemeMode newThemeMode}) {
+    themeMode = newThemeMode;
   }
 
   @override

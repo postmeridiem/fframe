@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fframe/fframe.dart';
 import 'package:example/helpers/prompts.dart';
 import 'package:fframe/helpers/l10n.dart';
 
@@ -43,7 +44,16 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
               },
               child: const Text("This is the placeholder and text at dev time"),
             ),
-            const Text('General settings - dunno probably will get culled in the end'),
+            OutlinedButton(
+              onPressed: () {
+                promptOK(context, "let there be lightman", label);
+                Fframe.of(context)!.setThemeMode(newThemeMode: ThemeMode.light);
+                // App.l10nConfig.locale = const Locale('nl','');
+              },
+              child: const Text("let there be lightman"),
+            ),
+            const Text(
+                'General settings - dunno probably will get culled in the end'),
           ],
         ),
       ),
