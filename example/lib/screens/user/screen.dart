@@ -11,9 +11,7 @@ import 'package:example/models/appuser.dart';
 class UsersScreen extends StatelessWidget {
   const UsersScreen({
     Key? key,
-    required this.isActive,
   }) : super(key: key);
-  final bool isActive;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +30,7 @@ class UsersScreen extends StatelessWidget {
           style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
         );
       },
-      queryBuilder: (query) => query.orderBy("displayName").where("active", isEqualTo: isActive),
+      queryBuilder: (query) => query.orderBy("displayName"),
       document: _document(),
       documentList: DocumentList(
         hoverSelect: true,
