@@ -39,11 +39,14 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         return suggestion;
       },
 
-      viewType: widget.suggestionQueryState == SuggestionQueryStates.active ? ViewType.auto : ViewType.grid,
+      viewType: widget.suggestionQueryState == SuggestionQueryStates.active
+          ? ViewType.auto
+          : ViewType.grid,
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
+            "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -79,33 +82,33 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       // Optional, override on the query string param which holds the document id
       // queryStringIdParam: "docId",
 
-      searchConfig: SearchConfig(
-        defaultField: "name",
-        searchOptions: [
-          SearchOption(
-            caption: "Name",
-            field: "name",
-            type: SearchOptionType.string,
-            sort: SearchOptionSortOrder.asc,
-          ),
-          SearchOption(
-            caption: "Author",
-            field: "createdBy",
-            type: SearchOptionType.string,
-          ),
-          SearchOption(
-            caption: "Creation date",
-            field: "creationDate",
-            type: SearchOptionType.datetime,
-            comparisonOperator: SearchOptionComparisonOperator.greater,
-          ),
-          SearchOption(
-            caption: "Active",
-            field: "active",
-            type: SearchOptionType.boolean,
-          ),
-        ],
-      ),
+      // searchConfig: SearchConfig(
+      //   defaultField: "name",
+      //   searchOptions: [
+      //     SearchOption(
+      //       caption: "Name",
+      //       field: "name",
+      //       type: SearchOptionType.string,
+      //       sort: SearchOptionSortOrder.asc,
+      //     ),
+      //     SearchOption(
+      //       caption: "Author",
+      //       field: "createdBy",
+      //       type: SearchOptionType.string,
+      //     ),
+      //     SearchOption(
+      //       caption: "Creation date",
+      //       field: "creationDate",
+      //       type: SearchOptionType.datetime,
+      //       comparisonOperator: SearchOptionComparisonOperator.greater,
+      //     ),
+      //     SearchOption(
+      //       caption: "Active",
+      //       field: "active",
+      //       type: SearchOptionType.boolean,
+      //     ),
+      //   ],
+      // ),
 
       query: (query) {
         // return query.where("active", isNull: true);
@@ -122,10 +125,15 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       autoSelectFirst: true,
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
-        headerBuilder: (context, documentCount) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("Listing $documentCount items"),
+        footerBuilder: (context, documentCount) {
+          return Column(
+            children: [
+              const Divider(),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text("Listing $documentCount items"),
+              ),
+            ],
           );
         },
         builder: (context, selected, data, user) {
@@ -166,7 +174,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             headerBuilder: (() => const DataColumn(
                   label: Text("Name"),
                 )),
-            dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
+            dataCellBuilder: ((Suggestion suggestion, Function save) =>
+                DataCell(
                   Text(suggestion.name ?? "?"),
                   onTap: () => debugPrint("onTap ${suggestion.name}"),
                   placeholder: false,
@@ -176,7 +185,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             headerBuilder: (() => const DataColumn(
                   label: Text("Active"),
                 )),
-            dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
+            dataCellBuilder: ((Suggestion suggestion, Function save) =>
+                DataCell(
                   Switch(
                     value: (suggestion.active ?? false),
                     onChanged: (bool value) {
@@ -211,7 +221,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             TextButton.icon(
               onPressed: () {
                 suggestion.active = true;
-                DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+                DocumentScreenConfig.of(context)!
+                    .save<Suggestion>(context: context, closeAfterSave: false);
               },
               icon: const Icon(Icons.check, color: Colors.redAccent),
               label: const Text("Mark as Active"),
@@ -220,14 +231,16 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             TextButton.icon(
               onPressed: () {
                 suggestion.active = false;
-                DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+                DocumentScreenConfig.of(context)!
+                    .save<Suggestion>(context: context, closeAfterSave: false);
               },
               icon: const Icon(Icons.close, color: Colors.greenAccent),
               label: const Text("Mark as Done"),
             ),
         ];
       },
-      documentTabsBuilder: (context, suggestion, isReadOnly, isNew, fFrameUser) {
+      documentTabsBuilder:
+          (context, suggestion, isReadOnly, isNew, fFrameUser) {
         return [
           DocumentTab<Suggestion>(
             tabBuilder: (user) {
