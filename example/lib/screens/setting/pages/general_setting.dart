@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
+
+import 'package:example/themes/themes.dart';
+
 import 'package:example/helpers/prompts.dart';
 import 'package:fframe/helpers/l10n.dart';
+import 'package:fframe/helpers/fframe_prefs.dart';
 
 class SettingsGeneralForm extends StatefulWidget {
   const SettingsGeneralForm({Key? key}) : super(key: key);
@@ -21,6 +25,10 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
       L10nReplacer(from: "{locale}", replace: 'replaceworks'),
       L10nReplacer(from: "global", replace: 'KAZAN'),
     ];
+    // Settings.getString();
+
+    String label2 =
+        L10n.string("translationkey", placeholder: "als ie er niet is");
 
     String label = L10n.interpolated(
       'test',
@@ -46,11 +54,38 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
             ),
             OutlinedButton(
               onPressed: () {
-                promptOK(context, "let there be lightman", label);
-                Fframe.of(context)!.setThemeMode(newThemeMode: ThemeMode.light);
-                // App.l10nConfig.locale = const Locale('nl','');
+                FframePrefs.setThemeMode(themeMode: ThemeMode.light);
               },
-              child: const Text("let there be lightman"),
+              child: const Text("make it light"),
+            ),
+            OutlinedButton(
+              onPressed: () {
+                FframePrefs.setThemeMode(themeMode: ThemeMode.dark);
+              },
+              child: const Text("make it dark"),
+            ),
+            OutlinedButton(
+              onPressed: () {
+                FframePrefs.setThemeMode(themeMode: ThemeMode.system);
+              },
+              child: const Text("make it system"),
+            ),
+            OutlinedButton(
+              onPressed: () {
+                switch (FframePrefs.getThemeMode()) {
+                  case ThemeMode.dark:
+                    promptOK(context, "dark", "dark");
+                    break;
+                  case ThemeMode.light:
+                    promptOK(context, "light", "light");
+                    break;
+                  case ThemeMode.system:
+                    promptOK(context, "system", "system");
+                    break;
+                  default:
+                }
+              },
+              child: const Text("what is in it?"),
             ),
             const Text(
                 'General settings - dunno probably will get culled in the end'),
