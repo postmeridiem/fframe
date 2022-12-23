@@ -13,21 +13,22 @@ class FframePrefs {
     return instance;
   }
 
-  static ThemeMode getThemeMode() {
-    String result = getString(key: "themeMode", fallback: "system") as String;
-    ThemeMode mode;
-    switch (result) {
-      case 'dark':
-        mode = ThemeMode.dark;
-        break;
-      case 'light':
-        mode = ThemeMode.light;
-        break;
-      case 'system':
-      default:
-        mode = ThemeMode.system;
-    }
-    return mode;
+  static Future<ThemeMode> getThemeMode() async {
+    return await getString(key: "themeMode", fallback: "system").then((value) {
+      ThemeMode mode;
+      switch (value) {
+        case 'dark':
+          mode = ThemeMode.dark;
+          break;
+        case 'light':
+          mode = ThemeMode.light;
+          break;
+        case 'system':
+        default:
+          mode = ThemeMode.system;
+      }
+      return mode;
+    });
   }
 
   static void setThemeMode({required ThemeMode themeMode}) {
