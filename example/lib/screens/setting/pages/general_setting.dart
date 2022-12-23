@@ -72,18 +72,24 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
             ),
             OutlinedButton(
               onPressed: () {
-                switch (FframePrefs.getThemeMode()) {
-                  case ThemeMode.dark:
-                    promptOK(context, "dark", "dark");
-                    break;
-                  case ThemeMode.light:
-                    promptOK(context, "light", "light");
-                    break;
-                  case ThemeMode.system:
-                    promptOK(context, "system", "system");
-                    break;
-                  default:
-                }
+
+                FframePrefs
+                    .getThemeMode()
+                    .then((value) {
+                        switch (value) {
+                          case ThemeMode.dark:
+                            promptOK(context, "dark", "dark");
+                            break;
+                          case ThemeMode.light:
+                            promptOK(context, "light", "light");
+                            break;
+                          case ThemeMode.system:
+                            promptOK(context, "system", "system");
+                            break;
+                          default:
+                            promptOK(context, "dunno", "dunno");
+                        }
+                    });
               },
               child: const Text("what is in it?"),
             ),
