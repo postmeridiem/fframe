@@ -193,8 +193,7 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
               double headingRowHeight = widget.headingRowHeight;
               double dataRowHeight = widget.dataRowHeight;
 
-              int rowsPerPage = ((constraints.maxHeight - headingRowHeight - 72) ~/ dataRowHeight);
-              // int rowsPerPage = 5;
+              int rowsPerPage = widget.rowsPerPage < 0 ? ((constraints.maxHeight - headingRowHeight - 72) ~/ dataRowHeight): widget.rowsPerPage;
               return PaginatedDataTable(
                 source: fFrameDataTableSource,
                 onSelectAll: selectionEnabled ? fFrameDataTableSource.onSelectAll : null,
@@ -380,10 +379,12 @@ class DataGridConfig<T> {
   final bool showLinks;
   late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   late Map<String, Object?> Function(T, SetOptions?) toFirestore;
+  final int rowsPerPage;
 
   DataGridConfig({
     required this.dataGridConfigColumns,
     this.showLinks = true,
+    this.rowsPerPage = -1
   });
 }
 

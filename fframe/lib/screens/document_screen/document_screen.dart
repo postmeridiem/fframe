@@ -23,7 +23,7 @@ class DocumentScreen<T> extends StatelessWidget {
     this.queryStringIdParam = "id",
     this.documentScreenHeaderBuilder,
     this.documentScreenFooterBuilder,
-    this.queryBuilder,
+    this.queryBuilder
   }) : super(key: key);
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -597,7 +597,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 }
 
 class DocumentLoader<T> extends ConsumerStatefulWidget {
-  const DocumentLoader({Key? key}) : super(key: key);
+  final int rowsPerPage;
+  const DocumentLoader({Key? key, this.rowsPerPage = -1}) : super(key: key);
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _DocumentLoaderState<T>();
@@ -641,6 +642,7 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with Sing
                 FirestoreDataGrid<T>(
                   dataGridConfig: documentConfig.dataGrid!,
                   query: query,
+                  rowsPerPage: documentConfig.dataGrid!.rowsPerPage,
                 ),
                 if (documentConfig.documentList != null) DataGridToggle<T>(),
               ],
