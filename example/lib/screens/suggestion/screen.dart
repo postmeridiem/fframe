@@ -172,6 +172,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
       dataGrid: DataGridConfig<Suggestion>(
         // rowsPerPage: 3,
+        // rowHeight: 200,
         dataGridConfigColumns: [
           DataGridConfigColumn(
             headerBuilder: (() => const DataColumn(
