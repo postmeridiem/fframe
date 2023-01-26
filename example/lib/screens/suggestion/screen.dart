@@ -112,7 +112,6 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
       query: (query) {
         // return query.where("active", isNull: true);
-
         switch (widget.suggestionQueryState) {
           case SuggestionQueryStates.active:
             return query.where("active", isEqualTo: true);
@@ -172,6 +171,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       ),
 
       dataGrid: DataGridConfig<Suggestion>(
+        // rowsPerPage: 3,
         dataGridConfigColumns: [
           DataGridConfigColumn(
             headerBuilder: (() => const DataColumn(
