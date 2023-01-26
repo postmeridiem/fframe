@@ -380,11 +380,13 @@ class DataGridConfig<T> {
   late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   late Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final int rowsPerPage;
+  final double rowHeight;
 
   DataGridConfig({
     required this.dataGridConfigColumns,
     this.showLinks = true,
-    this.rowsPerPage = -1
+    this.rowsPerPage = -1,
+    this.rowHeight = kMinInteractiveDimension
   });
 }
 

@@ -643,6 +643,7 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with Sing
                   dataGridConfig: documentConfig.dataGrid!,
                   query: query,
                   rowsPerPage: documentConfig.dataGrid!.rowsPerPage,
+                  dataRowHeight: documentConfig.dataGrid!.rowHeight,
                 ),
                 if (documentConfig.documentList != null) DataGridToggle<T>(),
               ],
