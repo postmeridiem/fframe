@@ -14,6 +14,7 @@ import 'package:example/screens/suggestion/suggestion.dart';
 import 'package:example/screens/setting/setting.dart';
 import 'package:example/screens/user/user.dart';
 import 'package:example/screens/user_profile/user_profile.dart';
+import 'package:example/screens/user_list/user_list.dart';
 import 'package:flutterfire_ui/i10n.dart';
 
 import 'helpers/header_buttons.dart';
@@ -33,6 +34,7 @@ class MainApp extends StatelessWidget {
         suggestionNavigationTarget,
         settingNavigationTarget,
         usersNavigationTarget,
+        userListNavigationTarget,
         userProfileNavigationTarget,
       ],
       signInConfig: SignInConfig(signInTarget: signInPageNavigationTarget),
