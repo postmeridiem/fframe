@@ -1,6 +1,9 @@
 import 'package:fframe/extensions/query.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
+import 'package:fframe/components/advanced_data_table/advanced_data_table.dart';
+import 'package:horizontal_data_table/horizontal_data_table.dart';
+import 'user_data.dart';
 
 import 'package:example/models/appuser.dart';
 
@@ -14,75 +17,421 @@ class UserListScreen extends StatefulWidget {
 class _UserListScreenState extends State<UserListScreen> {
   bool isAscending = false;
 
+  TUser user = TUser();
+
   @override
   Widget build(BuildContext context) {
-    return DocumentScreen<AppUser>(
-      // formKey: GlobalKey<FormState>(),
-      collection: "users",
-      fromFirestore: AppUser.fromFirestore,
-      toFirestore: (user, options) => user.toFirestore(),
-      createNew: () => AppUser(),
-      // query: (Query<AppUser> query) {
-      //   return query.orderBy("lastName");
-      // },
-      titleBuilder: (context, data) {
-        return Text(
-          data.displayName ?? "New User",
-          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
-        );
-      },
-      // documentList: DocumentList<AppUser>(
-      //   showCreateButton: false,
-      //   seperatorHeight: 5,
-      //   headerBuilder: (BuildContext headerBuildContext, int documentCount) {
-      //     return Text("Header $documentCount docs");
-      //   },
-      //   builder: (BuildContext context,bool selected, data, FFrameUser? user) {
-      //     return Text(data.displayName!);
-      //   }
-      // ),
-      queryBuilder: (query) => query.orderBy("displayName").startsWith("displayName", "Arno"),
-      document: _document(),
-      dataGrid: DataGridConfig<AppUser>(
-        // rowHeight: 300,
-        rowsPerPage: 4,
-        dataGridConfigColumns: [
-          DataGridConfigColumn(
-            headerBuilder: () => DataColumn(
-                label: Text("Image ${isAscending ? "up" : "down"}"),
-                tooltip: "Je moeder",
-                onSort: (int columnIndex, bool ascending) {
-                  setState(() {
-                    isAscending = ascending;
-                  });
-                }),
-            dataCellBuilder: (AppUser appUser, save) {
-              return DataCell(SizedBox(
-                width: 200,
-                height: 150,
-                child: Padding(
-                  padding: const EdgeInsets.all(5),
-                  child: Container(
-                    alignment: Alignment.center,
-                    color: Colors.amberAccent,
-                    child: Text("${appUser.displayName}",
-                        style: const TextStyle(color: Colors.black)),
-                  ),
-                ),
-              ));
-            },
-          )
+    
+    
+    return AdvancedDataTable<AppUser>(
+        headerSticky: true,
+        columnWidths: const [100, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
+        headerWidgets: [
+          Text("index"),
+          Text("name"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
+          Text("email"),
         ],
-      ),
+        footerWidgets: [Text("index"), Text("name"), Text("email")],
+        data: [
+          AppUser(uid: '123', displayName: 'Je moeder', active: true, customClaims: null, creationDate: null, email: 'a@a.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+          AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
+        ],
+        cellsForRowAtIndex: <int, AppUser>(index, user) => [
+          Text("${user.uid}"),
+          Text("${user.displayName}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          Text("${user.email}"),
+          // Text("$index  ${user!.uid}"),
+          // Text("$index  ${user!.email}"),
+        ]
+    );
+    
+    
+    
+    user.initData(100);
+    return HorizontalDataTable(
+        leftHandSideColumnWidth: 200,
+        rightHandSideColumnWidth: 31*200,
+        isFixedHeader: true,
+        headerWidgets: _getTitleWidget(),
+        isFixedFooter: true,
+        footerWidgets: _getTitleWidget(),
+        leftSideItemBuilder: _generateFirstColumnRow,
+        rightSideItemBuilder: _generateRightHandSideColumnRow,
+        itemCount: user.userInfo.length,
+        rowSeparatorWidget: const Divider(
+          color: Colors.black38,
+          height: 1.0,
+          thickness: 0.0,
+        ),
+        leftHandSideColBackgroundColor: Theme.of(context).colorScheme.onPrimary,
+        rightHandSideColBackgroundColor: Theme.of(context).colorScheme.onPrimary,
     );
   }
 
-  Document<AppUser> _document() {
-    return Document<AppUser>(
-      autoSave: false,
-      documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
-        return [];
-      },
+
+  List<Widget> _getTitleWidget() {
+    return [
+      _getTitleItemWidget('Column1', 200),
+      _getTitleItemWidget('Column2', 200),
+      _getTitleItemWidget('Column3', 200),
+      _getTitleItemWidget('Column4', 200),
+      _getTitleItemWidget('Column5', 200),
+      _getTitleItemWidget('Column6', 200),
+      _getTitleItemWidget('Column7', 200),
+      _getTitleItemWidget('Column8', 200),
+      _getTitleItemWidget('Column9', 200),
+      _getTitleItemWidget('Column10', 200),
+      _getTitleItemWidget('Column11', 200),
+      _getTitleItemWidget('Column12', 200),
+      _getTitleItemWidget('Column13', 200),
+      _getTitleItemWidget('Column14', 200),
+      _getTitleItemWidget('Column15', 200),
+      _getTitleItemWidget('Column16', 200),
+      _getTitleItemWidget('Column17', 200),
+      _getTitleItemWidget('Column18', 200),
+      _getTitleItemWidget('Column19', 200),
+      _getTitleItemWidget('Column20', 200),
+      _getTitleItemWidget('Column21', 200),
+      _getTitleItemWidget('Column22', 200),
+      _getTitleItemWidget('Column23', 200),
+      _getTitleItemWidget('Column24', 200),
+      _getTitleItemWidget('Column25', 200),
+      _getTitleItemWidget('Column26', 200),
+      _getTitleItemWidget('Column27', 200),
+      _getTitleItemWidget('Column28', 200),
+      _getTitleItemWidget('Column29', 200),
+      _getTitleItemWidget('Column30', 200),
+      _getTitleItemWidget('Column31', 200),
+      _getTitleItemWidget('Column32', 200),
+    ];
+  }
+
+  Widget _getTitleItemWidget(String label, double width) {
+    return Container(
+      width: width,
+      height: 56,
+      padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+      alignment: Alignment.centerLeft,
+      child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
     );
   }
+
+  Widget _generateFirstColumnRow(BuildContext context, int index) {
+    return Container(
+      width: 200,
+      height: 52,
+      padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+      alignment: Alignment.centerLeft,
+      child: Text("Cell1"), // user.userInfo[index].name
+    );
+  }
+
+  Widget _generateRightHandSideColumnRow(BuildContext context, int index) {
+    return Row(
+      children: <Widget>[
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text("Cell2"),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell3'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell4'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell5'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell6'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell7'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell8'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell9'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell10'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell11'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell12'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell13'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell14'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell15'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell16'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell17'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell18'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell19'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell20'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell21'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell22'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell23'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell24'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell25'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell26'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell27'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell28'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell29'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell30'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell31'),
+        ),
+        Container(
+          width: 200,
+          height: 52,
+          padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
+          alignment: Alignment.centerLeft,
+          child: Text('Cell32'),
+        ),
+      ],
+    );
+  }
+
+
 }
