@@ -1,30 +1,30 @@
 part of fframe;
 
 class DocumentScreen<T> extends StatelessWidget {
-  DocumentScreen({
-    Key? key,
-    required this.collection,
-    required this.createNew,
-    this.preSave,
-    this.postOpen,
-    this.postRefresh,
-    this.createDocumentId,
-    required this.fromFirestore,
-    required this.toFirestore,
-    this.documentList,
-    this.dataGrid,
-    this.viewType = ViewType.auto,
-    this.autoSelectFirst = false,
-    this.query,
-    this.searchConfig,
-    this.titleBuilder,
-    required this.document,
-    this.contextCardBuilders,
-    this.queryStringIdParam = "id",
-    this.documentScreenHeaderBuilder,
-    this.documentScreenFooterBuilder,
-    this.queryBuilder
-  }) : super(key: key);
+  DocumentScreen(
+      {Key? key,
+      required this.collection,
+      required this.createNew,
+      this.preSave,
+      this.postOpen,
+      this.postRefresh,
+      this.createDocumentId,
+      required this.fromFirestore,
+      required this.toFirestore,
+      this.documentList,
+      this.dataGrid,
+      this.viewType = ViewType.auto,
+      this.autoSelectFirst = false,
+      this.query,
+      this.searchConfig,
+      this.titleBuilder,
+      required this.document,
+      this.contextCardBuilders,
+      this.queryStringIdParam = "id",
+      this.documentScreenHeaderBuilder,
+      this.documentScreenFooterBuilder,
+      this.queryBuilder})
+      : super(key: key);
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final Query<T> Function(Query<T> query)? queryBuilder;
@@ -37,7 +37,8 @@ class DocumentScreen<T> extends StatelessWidget {
   final Document<T> document;
   final String queryStringIdParam;
   final String collection;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
+      fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final T Function() createNew;
   final T Function(T)? preSave;
@@ -51,13 +52,17 @@ class DocumentScreen<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DocumentScreenConfig? parentDocumentScreenConfig = DocumentScreenConfig.of(context);
+    DocumentScreenConfig? parentDocumentScreenConfig =
+        DocumentScreenConfig.of(context);
     String? queryStringIdParam;
     bool? embeddedDocument;
     if (parentDocumentScreenConfig != null) {
-      debugPrint("This is an embedded instance of the DocumentScreen initalize FormCeption");
-      if (queryStringIdParam == parentDocumentScreenConfig.documentConfig.queryStringIdParam) {
-        queryStringIdParam = "child${toBeginningOfSentenceCase(parentDocumentScreenConfig.documentConfig.queryStringIdParam)}";
+      debugPrint(
+          "This is an embedded instance of the DocumentScreen initalize FormCeption");
+      if (queryStringIdParam ==
+          parentDocumentScreenConfig.documentConfig.queryStringIdParam) {
+        queryStringIdParam =
+            "child${toBeginningOfSentenceCase(parentDocumentScreenConfig.documentConfig.queryStringIdParam)}";
       }
       embeddedDocument = true;
     }
@@ -89,7 +94,8 @@ class DocumentScreen<T> extends StatelessWidget {
                 dataGrid: dataGrid,
                 initialViewType: viewType,
                 autoSelectFirst: autoSelectFirst,
-                queryStringIdParam: queryStringIdParam ?? this.queryStringIdParam,
+                queryStringIdParam:
+                    queryStringIdParam ?? this.queryStringIdParam,
                 createNew: createNew,
                 createDocumentId: createDocumentId,
                 preSave: preSave,
@@ -137,7 +143,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   }
 
   @override
-  bool updateShouldNotifyDependent(DocumentScreenConfig oldWidget, Set<DocumentScreenConfig> dependencies) {
+  bool updateShouldNotifyDependent(
+      DocumentScreenConfig oldWidget, Set<DocumentScreenConfig> dependencies) {
     return true;
   }
 
@@ -164,19 +171,33 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
   bool get isNew => selectionState.isNew;
 
-  selectDocument<T>(BuildContext context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
+  selectDocument<T>(
+      BuildContext context, QueryDocumentSnapshot<T> queryDocumentSnapshot) {
     bool embeddedDocument = documentConfig.embeddedDocument;
     String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
-    selectionState.setState(SelectionState<T>(docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
-    if (documentConfig.document.activeTabs == null || documentConfig.document.activeTabs!.length == 1) {
-      FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id}, resetQueryString: !embeddedDocument);
+    selectionState.setState(SelectionState<T>(
+        docId: queryDocumentSnapshot.id, data: queryDocumentSnapshot.data()));
+    if (documentConfig.document.activeTabs == null ||
+        documentConfig.document.activeTabs!.length == 1) {
+      FRouter.of(context).updateQueryString<T>(queryParameters: {
+        documentConfig.queryStringIdParam: queryDocumentSnapshot.id
+      }, resetQueryString: !embeddedDocument);
     } else {
-      FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: queryDocumentSnapshot.id, tabIndexKey: "0"}, resetQueryString: !embeddedDocument);
+      FRouter.of(context).updateQueryString<T>(queryParameters: {
+        documentConfig.queryStringIdParam: queryDocumentSnapshot.id,
+        tabIndexKey: "0"
+      }, resetQueryString: !embeddedDocument);
     }
   }
 
   toggleReadOnly<T>({required BuildContext context}) {
-    selectionState.setState(SelectionState<T>(data: selectionState.data!, docId: selectionState.docId, isNew: false, readOnly: !selectionState.readOnly), notify: true);
+    selectionState.setState(
+        SelectionState<T>(
+            data: selectionState.data!,
+            docId: selectionState.docId,
+            isNew: false,
+            readOnly: !selectionState.readOnly),
+        notify: true);
   }
 
   delete<T>({required BuildContext context}) async {
@@ -185,14 +206,17 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
             cancelText: L10n.string(
               "iconbutton_document_delete_cancel",
               placeholder: "Cancel",
+              namespace: 'fframe',
             ),
             continueText: L10n.string(
               "iconbutton_document_delete_continue",
               placeholder: "Continue",
+              namespace: 'fframe',
             ),
             titleText: L10n.string(
               "iconbutton_document_delete_title",
               placeholder: "Delete this document",
+              namespace: 'fframe',
             ),
             child: SizedBox(
               height: 100.0,
@@ -215,12 +239,14 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
                         L10n.string(
                           "iconbutton_document_delete1",
                           placeholder: "Delete this document?",
+                          namespace: 'fframe',
                         ),
                       ),
                       Text(
                         L10n.string(
                           "iconbutton_document_delete2",
                           placeholder: "This operation cannot be undone.",
+                          namespace: 'fframe',
                         ),
                       ),
                     ],
@@ -229,7 +255,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
               ),
             ))) ==
         true) {
-      DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
+      DocumentConfig<T> documentConfig =
+          this.documentConfig as DocumentConfig<T>;
       SaveState saveResult = await DatabaseService<T>().deleteDocument(
         collection: documentConfig.collection,
         documentId: selectionState.docId!,
@@ -239,7 +266,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
       if (saveResult.result == true) {
         //Close the document
         // if (!context.mounted) return;
-        FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
+        FRouter.of(context)
+            .updateQueryString(queryParameters: {}, resetQueryString: true);
       } else {
         //show the error
         snackbar(
@@ -256,11 +284,14 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
   close<T>({required BuildContext context, bool skipWarning = false}) async {
     if (selectionState.readOnly == true || skipWarning == true) {
-      selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
-      FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
+      selectionState.setState(SelectionState<T>(
+          data: null, docId: null, isNew: false, readOnly: false));
+      FRouter.of(context)
+          .updateQueryString(queryParameters: {}, resetQueryString: true);
       return;
     }
-    FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
+    FRouter.of(context)
+        .updateQueryString(queryParameters: {}, resetQueryString: true);
     return;
     //TODO: reenable warning;
     // if (await (confirmationDialog(
@@ -319,26 +350,39 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
   // ignore: unused_element
   copy<T>({required BuildContext context}) {
-    selectionState.setState(SelectionState<T>(data: selectionState.data!, docId: "copy", isNew: true, readOnly: false));
-    FRouter.of(context).updateQueryString(queryParameters: {documentConfig.queryStringIdParam: selectionState.docId!}, resetQueryString: selectionState.isNew);
+    selectionState.setState(SelectionState<T>(
+        data: selectionState.data!,
+        docId: "copy",
+        isNew: true,
+        readOnly: false));
+    FRouter.of(context).updateQueryString(queryParameters: {
+      documentConfig.queryStringIdParam: selectionState.docId!
+    }, resetQueryString: selectionState.isNew);
   }
 
   create<T>({required BuildContext context}) {
     //Clear the cache
 
-    selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
-    if (documentConfig.document.activeTabs != null && documentConfig.document.activeTabs!.length == 1) {
-      FRouter.of(context).updateQueryString<T>(queryParameters: {"new": "true"}, resetQueryString: true);
+    selectionState.setState(SelectionState<T>(
+        data: null, docId: null, isNew: false, readOnly: false));
+    if (documentConfig.document.activeTabs != null &&
+        documentConfig.document.activeTabs!.length == 1) {
+      FRouter.of(context).updateQueryString<T>(
+          queryParameters: {"new": "true"}, resetQueryString: true);
     } else {
-      FRouter.of(context).updateQueryString<T>(queryParameters: {"new": "true", "tabIndex": "0"}, resetQueryString: true);
+      FRouter.of(context).updateQueryString<T>(
+          queryParameters: {"new": "true", "tabIndex": "0"},
+          resetQueryString: true);
     }
   }
 
   load<T>({required BuildContext context, required String docId}) async {
     try {
-      DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
+      DocumentConfig<T> documentConfig =
+          this.documentConfig as DocumentConfig<T>;
 
-      DocumentSnapshot<T>? documentSnapshot = await DatabaseService<T>().documentSnapshot(
+      DocumentSnapshot<T>? documentSnapshot =
+          await DatabaseService<T>().documentSnapshot(
         collection: documentConfig.collection,
         documentId: docId,
         fromFirestore: documentConfig.fromFirestore,
@@ -372,7 +416,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     } catch (e) {
       snackbar(
         context: context,
-        text: "Referenced document could not be loaded: $docId \n ${e.toString()}",
+        text:
+            "Referenced document could not be loaded: $docId \n ${e.toString()}",
         icon: Icon(
           Icons.error,
           color: Theme.of(context).errorColor,
@@ -381,9 +426,13 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     }
   }
 
-  save<T>({required BuildContext context, bool closeAfterSave = true, T? data}) async {
+  save<T>(
+      {required BuildContext context,
+      bool closeAfterSave = true,
+      T? data}) async {
     if (validate<T>(context: context, moveToTab: true) == -1) {
-      DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
+      DocumentConfig<T> documentConfig =
+          this.documentConfig as DocumentConfig<T>;
       String? docId = selectionState.docId;
       if (docId == null || selectionState.isNew == true) {
         if (documentConfig.createDocumentId != null) {
@@ -441,7 +490,10 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     }
   }
 
-  int validate<T>({required BuildContext context, bool showPopup = false, bool moveToTab = false}) {
+  int validate<T>(
+      {required BuildContext context,
+      bool showPopup = false,
+      bool moveToTab = false}) {
     DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
 
     int invalidTab = documentConfig.document.activeTabs!
@@ -479,7 +531,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   List<IconButton>? iconButtons<T>(BuildContext context) {
     DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
     Document<T> document = documentConfig.document;
-    SelectionState<T> selectionState = DocumentScreenConfig.of(context)!.selectionState as SelectionState<T>;
+    SelectionState<T> selectionState =
+        DocumentScreenConfig.of(context)!.selectionState as SelectionState<T>;
     List<IconButton>? iconButtons = [];
 
     if (document.showCloseButton) {
@@ -488,6 +541,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
           tooltip: L10n.string(
             "iconbutton_document_close",
             placeholder: "Close this document",
+            namespace: 'fframe',
           ),
           icon: Icon(
             Icons.close,
@@ -507,6 +561,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
             tooltip: L10n.string(
               "iconbutton_document_delete",
               placeholder: "Delete this document",
+              namespace: 'fframe',
             ),
             icon: Icon(
               Icons.delete_forever,
@@ -524,6 +579,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
             tooltip: L10n.string(
               "iconbutton_document_copy",
               placeholder: "Copy this document",
+              namespace: 'fframe',
             ),
             icon: Icon(
               Icons.copy_outlined,
@@ -541,6 +597,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
             tooltip: L10n.string(
               "iconbutton_document_edit",
               placeholder: "Edit this document",
+              namespace: 'fframe',
             ),
             icon: Icon(
               Icons.edit,
@@ -561,6 +618,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
             tooltip: L10n.string(
               "iconbutton_document_validate",
               placeholder: "Validate this document",
+              namespace: 'fframe',
             ),
             icon: Icon(
               Icons.check,
@@ -579,6 +637,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
             tooltip: L10n.string(
               "iconbutton_document_save",
               placeholder: "Save this document",
+              namespace: 'fframe',
             ),
             icon: Icon(
               Icons.save,
@@ -601,14 +660,17 @@ class DocumentLoader<T> extends ConsumerStatefulWidget {
   const DocumentLoader({Key? key, this.rowsPerPage = -1}) : super(key: key);
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _DocumentLoaderState<T>();
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _DocumentLoaderState<T>();
 }
 
-class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with SingleTickerProviderStateMixin {
+class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>>
+    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     debugPrint("build DocumentLoader: ${widget.key.toString()}");
-    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
+    DocumentConfig<T> documentConfig =
+        DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
 
     //Switches between view types
     return AnimatedBuilder(
@@ -625,7 +687,8 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with Sing
             return Row(
               children: [
                 DocumentListLoader<T>(
-                  key: ValueKey("DocumentListBuilder_${documentConfig.collection}"),
+                  key: ValueKey(
+                      "DocumentListBuilder_${documentConfig.collection}"),
                   ref: ref,
                 ),
                 Expanded(
@@ -636,7 +699,9 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with Sing
               ],
             );
           case ViewType.grid:
-            Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
+            Query<T> query = DocumentScreenConfig.of(context)!
+                .fireStoreQueryState
+                .currentQuery() as Query<T>;
             return Stack(
               children: [
                 FirestoreDataGrid<T>(
@@ -702,7 +767,8 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
   @override
   Widget build(BuildContext context) {
     debugPrint("build _ScreenBodyState");
-    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentScreenConfig documentScreenConfig =
+        DocumentScreenConfig.of(context)!;
     if (firstDoc != null) {
       debugPrint("First doc");
     }
@@ -730,35 +796,62 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
     //Handle document loads...
 
     // // debugPrint("Read ${queryDocumentSnapshots?.length} docs from provider");
-    if (queryState.queryParameters == null && documentScreenConfig.documentConfig.autoSelectFirst) {
+    if (queryState.queryParameters == null &&
+        documentScreenConfig.documentConfig.autoSelectFirst) {
       documentScreenConfig.selectionState.addListener(() {
         documentScreenConfig.selectionState.removeListener(() {});
         setState(() {});
         FRouter.of(context).updateQueryString(queryParameters: {
-          documentScreenConfig.documentConfig.queryStringIdParam: documentScreenConfig.selectionState.docId!,
+          documentScreenConfig.documentConfig.queryStringIdParam:
+              documentScreenConfig.selectionState.docId!,
         });
         returnWidget = DocumentBodyLoader<T>(
           key: ValueKey(queryState.queryString),
         );
       });
-      returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading document");
+      returnWidget = FRouter.of(context)
+          .waitPage(context: context, text: "Loading document");
     } else if (queryState.queryParameters == null) {
-      returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
-    } else if (documentScreenConfig.selectionState.data == null && documentScreenConfig.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
+      returnWidget = (screenSize == ScreenSize.phone)
+          ? const IgnorePointer()
+          : FRouter.of(context).emptyPage();
+    } else if (documentScreenConfig.selectionState.data == null &&
+        documentScreenConfig.selectionState.isNew == false &&
+        queryState.queryParameters!.containsKey("new") &&
+        queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn a new document");
-      documentScreenConfig.selectionState.setState(SelectionState<T>(data: documentScreenConfig.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false), notify: true);
-    } else if (documentScreenConfig.selectionState.data is T && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
+      documentScreenConfig.selectionState.setState(
+          SelectionState<T>(
+              data: documentScreenConfig.documentConfig.createNew(),
+              docId: "new",
+              isNew: true,
+              readOnly: false),
+          notify: true);
+    } else if (documentScreenConfig.selectionState.data is T &&
+        queryState.queryParameters!.containsKey("new") &&
+        queryState.queryParameters!["new"] == "true") {
       debugPrint("Spawn document from cache");
       // return returnWidget;
-    } else if (!queryState.queryParameters!.containsKey(documentScreenConfig.documentConfig.queryStringIdParam)) {
-      returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
-    } else if (((documentScreenConfig.selectionState.docId != queryState.queryParameters?[documentScreenConfig.documentConfig.queryStringIdParam]) || (documentScreenConfig.selectionState.data == null && queryState.queryParameters != null))) {
+    } else if (!queryState.queryParameters!
+        .containsKey(documentScreenConfig.documentConfig.queryStringIdParam)) {
+      returnWidget = (screenSize == ScreenSize.phone)
+          ? const IgnorePointer()
+          : FRouter.of(context).emptyPage();
+    } else if (((documentScreenConfig.selectionState.docId !=
+            queryState.queryParameters?[
+                documentScreenConfig.documentConfig.queryStringIdParam]) ||
+        (documentScreenConfig.selectionState.data == null &&
+            queryState.queryParameters != null))) {
       documentScreenConfig.selectionState.addListener(() {
         documentScreenConfig.selectionState.removeListener(() {});
         setState(() {});
       });
-      documentScreenConfig.load<T>(context: context, docId: queryState.queryParameters![documentScreenConfig.documentConfig.queryStringIdParam]!);
-      returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading document");
+      documentScreenConfig.load<T>(
+          context: context,
+          docId: queryState.queryParameters![
+              documentScreenConfig.documentConfig.queryStringIdParam]!);
+      returnWidget = FRouter.of(context)
+          .waitPage(context: context, text: "Loading document");
     }
 
     debugPrint("Load the AnimatedSwitcher ");
@@ -770,7 +863,8 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
 
   postOpen({required DocumentScreenConfig documentScreenConfig}) async {
     if (documentScreenConfig.documentConfig.postOpen != null) {
-      documentScreenConfig.documentConfig.postOpen!.call(documentScreenConfig.selectionState.data);
+      documentScreenConfig.documentConfig.postOpen!
+          .call(documentScreenConfig.selectionState.data);
     }
   }
 }
@@ -781,29 +875,41 @@ class AutoFirstDocumentLoader<T> extends StatefulWidget {
     required this.documentConfig,
   }) : super(key: key);
 
-  final DocumentConfig<T> documentConfig; // = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+  final DocumentConfig<T>
+      documentConfig; // = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
 
   @override
-  State<AutoFirstDocumentLoader> createState() => _AutoFirstDocumentLoaderState<T>();
+  State<AutoFirstDocumentLoader> createState() =>
+      _AutoFirstDocumentLoaderState<T>();
 }
 
-class _AutoFirstDocumentLoaderState<T> extends State<AutoFirstDocumentLoader<T>> {
+class _AutoFirstDocumentLoaderState<T>
+    extends State<AutoFirstDocumentLoader<T>> {
   @override
   Widget build(BuildContext context) {
-    Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
+    Query<T> query = DocumentScreenConfig.of(context)!
+        .fireStoreQueryState
+        .currentQuery() as Query<T>;
     return StreamBuilder<QuerySnapshot<T>>(
       stream: query.snapshots(),
       initialData: null,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> querySnapshot) {
+      builder: (BuildContext context,
+          AsyncSnapshot<QuerySnapshot<T>> querySnapshot) {
         switch (querySnapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
           case ConnectionState.done:
-            return FRouter.of(context).waitPage(context: context, text: "Loading first document");
+            return FRouter.of(context)
+                .waitPage(context: context, text: "Loading first document");
           case ConnectionState.active:
-            if (querySnapshot.hasData && querySnapshot.data != null && querySnapshot.data!.docs.isNotEmpty) {
-              QueryDocumentSnapshot<T> queryDocumentSnapshot = querySnapshot.data!.docs.first;
-              SelectionState<T> selectionState = DocumentScreenConfig.of(context)!.selectionState as SelectionState<T>;
+            if (querySnapshot.hasData &&
+                querySnapshot.data != null &&
+                querySnapshot.data!.docs.isNotEmpty) {
+              QueryDocumentSnapshot<T> queryDocumentSnapshot =
+                  querySnapshot.data!.docs.first;
+              SelectionState<T> selectionState =
+                  DocumentScreenConfig.of(context)!.selectionState
+                      as SelectionState<T>;
               selectionState.setState(SelectionState<T>(
                 data: queryDocumentSnapshot.data(),
                 docId: queryDocumentSnapshot.id,
