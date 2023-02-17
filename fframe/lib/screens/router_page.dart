@@ -65,6 +65,19 @@ class FRouter extends InheritedWidget {
     navigationNotifier.processRouteInformation(targetState: targetState, queryState: newQueryState);
   }
 
+  navigateToRouteFromNavigationTargets<T>(List<NavigationTarget> navigationTargets, {required String route, String id = ''}) {
+    bool idMode = id == '' ? false : true;
+    debugPrint("FRouter: navigateToRoute: $route ${idMode ? "into id: $id" : ""}");
+    Map<String, String> queryParameters = idMode ? {"id": id} : {};
+
+    NavigationTarget navigationTarget = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == route);
+
+    QueryState newQueryState = QueryState(queryParameters: queryParameters);
+
+    TargetState targetState = TargetState.processRouteRequest(navigationTarget: navigationTarget);
+    navigationNotifier.processRouteInformation(targetState: targetState, queryState: newQueryState);
+  }
+
   ///Only QS (persist path and existing QS values)
   ///FRouter.of(context).updateQueryString(queryString: {"id": "cow"});
   ///Only QS (replace path and existing QS values)
