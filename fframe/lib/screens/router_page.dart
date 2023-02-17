@@ -69,8 +69,9 @@ class FRouter extends InheritedWidget {
     bool idMode = id == '' ? false : true;
     debugPrint("FRouter: navigateToRoute: $route ${idMode ? "into id: $id" : ""}");
     Map<String, String> queryParameters = idMode ? {"id": id} : {};
+    List<String> routeSegments = route.split('/');
 
-    NavigationTarget navigationTarget = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == route);
+    NavigationTarget navigationTarget = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == routeSegments.last);
 
     QueryState newQueryState = QueryState(queryParameters: queryParameters);
 
