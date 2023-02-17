@@ -70,15 +70,18 @@ class FRouter extends InheritedWidget {
     debugPrint("FRouter: navigateToRoute: $route ${idMode ? "into id: $id" : ""}");
     Map<String, String> queryParameters = idMode ? {"id": id} : {};
     List<String> routeSegments = route.split('/');
+    String selector = routeSegments[0];
     NavigationTarget? target;
 
     routeSegments.asMap().forEach((index, segment) {
       if (index == 0) {
-        target = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == segment);
+        target = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == selector);
       } else {
-        target = target!.navigationTabs!.firstWhere((NavigationTab tab) => tab.path == segment);
+        selector += "/$segment/$segment";
+        target = target!.navigationTabs!.firstWhere((NavigationTab tab) => tab.path == selector);
       }
     });
+
 
     //NavigationTarget navigationTarget = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == routeSegments.last);
 
