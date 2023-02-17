@@ -73,15 +73,16 @@ class FRouter extends InheritedWidget {
     String selector = routeSegments[0];
     NavigationTarget? target;
 
-    routeSegments.asMap().forEach((index, segment) {
-      if (index == 0) {
+    for(int i = 0; i < routeSegments.length; i++) {
+
+      if (i == 0) {
         target = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == selector);
       } else {
+        String segment = routeSegments[i];
         selector += "/$segment/$segment";
         target = target!.navigationTabs!.firstWhere((NavigationTab tab) => tab.path == selector);
       }
-    });
-
+    }
 
     //NavigationTarget navigationTarget = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == routeSegments.last);
 
