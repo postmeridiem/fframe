@@ -79,7 +79,7 @@ class FRouter extends InheritedWidget {
         target = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == selector);
       } else {
         String segment = routeSegments[i];
-        selector += "/$segment/$segment";
+        selector += "/${routeSegments[i-1]}/$segment";
         target = target!.navigationTabs!.firstWhere((NavigationTab tab) => tab.path == selector);
       }
     }
