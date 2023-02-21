@@ -80,14 +80,6 @@ class _SettingScreenState extends State<SettingScreen> {
                   }
                 case "99-firestore-tools":
                   {
-                    // debugPrint(fFrameUser!.displayName);
-                    // debugPrint("LALALALALALA");
-                    // debugPrint("${fFrameUser!.roles}");
-                    // if (fFrameUser!.roles!.contains('developer')) {
-                    //   return const SettingsFirestoreToolsForm();
-                    // } else {
-                    //   return Text("not authorized");
-                    // }
                     return const SettingsFirestoreToolsForm();
                   }
                 default:

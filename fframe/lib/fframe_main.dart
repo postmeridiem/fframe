@@ -13,7 +13,7 @@ class Fframe extends InheritedWidget {
     this.themeMode = ThemeMode.system,
     this.providerConfigs,
     this.debugShowCheckedModeBanner = true,
-    this.logThreshold = LogLevel.warning,
+    this.logThreshold = LogLevel.dev,
     this.globalActions,
     this.postLoad,
     this.postSignIn,
@@ -69,35 +69,26 @@ class Fframe extends InheritedWidget {
   void log(
     String message, {
     String scope = "Unspecified",
-    LogLevel level = LogLevel.info,
+    LogLevel level = LogLevel.dev,
   }) {
     LogLevel logThreshold = this.logThreshold;
     switch (logThreshold) {
-      case LogLevel.info:
-        if (level == LogLevel.info ||
-            level == LogLevel.warning ||
-            level == LogLevel.error ||
-            level == LogLevel.always) {
+      case LogLevel.fframe:
+        if (level == LogLevel.fframe ||
+            level == LogLevel.dev ||
+            level == LogLevel.prod) {
           // show all log prints
           debugPrint("$scope: $message");
         }
         break;
-      case LogLevel.warning:
-        if (level == LogLevel.warning ||
-            level == LogLevel.error ||
-            level == LogLevel.always) {
+      case LogLevel.dev:
+        if (level == LogLevel.dev || level == LogLevel.prod) {
           // show all log prints with level warning or error
           debugPrint("$scope: $message");
         }
         break;
-      case LogLevel.error:
-        if (level == LogLevel.error || level == LogLevel.always) {
-          // show all log prints with level error
-          debugPrint("$scope: $message");
-        }
-        break;
-      case LogLevel.never:
-        if (level == LogLevel.always) {
+      case LogLevel.prod:
+        if (level == LogLevel.prod) {
           // show all log prints with level error
           debugPrint("$scope: $message");
         }
@@ -108,11 +99,9 @@ class Fframe extends InheritedWidget {
 }
 
 enum LogLevel {
-  info,
-  warning,
-  error,
-  always,
-  never,
+  fframe,
+  dev,
+  prod,
 }
 
 class FFramePreload extends StatelessWidget {

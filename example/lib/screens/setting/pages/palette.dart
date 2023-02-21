@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fframe/fframe.dart';
 
 class PaletteForm extends StatefulWidget {
   const PaletteForm({Key? key}) : super(key: key);
@@ -12,7 +13,8 @@ class _PaletteFormFormState extends State<PaletteForm> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("presenting palette");
+    Fframe.of(context)!
+        .log("presenting PaletteForm", scope: "exampleApp.Settings");
     return Form(
       key: _formKey,
       child: Padding(
@@ -255,7 +257,9 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurfaceVariant,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
@@ -286,7 +290,9 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
@@ -317,7 +323,9 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimaryContainer,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
@@ -379,7 +387,9 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onErrorContainer,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onErrorContainer,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),

@@ -19,7 +19,8 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("presenting SettingsGeneralForm");
+    Fframe.of(context)!
+        .log("presenting SettingsGeneralForm", scope: "exampleApp.Settings");
 
     List<L10nReplacer> replacers = [
       L10nReplacer(from: "{locale}", replace: 'replaceworks'),
@@ -72,24 +73,21 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
             ),
             OutlinedButton(
               onPressed: () {
-
-                FframePrefs
-                    .getThemeMode()
-                    .then((value) {
-                        switch (value) {
-                          case ThemeMode.dark:
-                            promptOK(context, "dark", "dark");
-                            break;
-                          case ThemeMode.light:
-                            promptOK(context, "light", "light");
-                            break;
-                          case ThemeMode.system:
-                            promptOK(context, "system", "system");
-                            break;
-                          default:
-                            promptOK(context, "dunno", "dunno");
-                        }
-                    });
+                FframePrefs.getThemeMode().then((value) {
+                  switch (value) {
+                    case ThemeMode.dark:
+                      promptOK(context, "dark", "dark");
+                      break;
+                    case ThemeMode.light:
+                      promptOK(context, "light", "light");
+                      break;
+                    case ThemeMode.system:
+                      promptOK(context, "system", "system");
+                      break;
+                    default:
+                      promptOK(context, "dunno", "dunno");
+                  }
+                });
               },
               child: const Text("what is in it?"),
             ),

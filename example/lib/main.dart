@@ -94,7 +94,7 @@ class MainApp extends StatelessWidget {
       darkMode: appDarkTheme,
       themeMode: ThemeMode.system,
       l10nConfig: l10nConfig,
-      logThreshold: LogLevel.info,
+      logThreshold: LogLevel.dev,
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
@@ -109,20 +109,18 @@ class MainApp extends StatelessWidget {
         BarButtonFeedback(),
       ],
       // postLoad: (context) async {
-      //   debugPrint("example.postLoad: execution complete");
+      //   Fframe.of(context)!s
+      //       .log("execution complete", scope: "exampleApp.postLoad");
       // },
       postSignIn: (context) async {
         Fframe.of(context)!
             .log("execution complete", scope: "exampleApp.postSignIn");
-        Fframe.of(context)!.log("log test info level",
-            scope: "exampleApp.LogTest", level: LogLevel.info);
-        Fframe.of(context)!.log("log test warning level",
-            scope: "exampleApp.LogTest", level: LogLevel.warning);
-        Fframe.of(context)!.log("log test error level",
-            scope: "exampleApp.LogTest", level: LogLevel.error);
-        Fframe.of(context)!.log("log test always level",
-            scope: "exampleApp.LogTest", level: LogLevel.always);
-        Fframe.of(context)!.log("execution complete");
+        Fframe.of(context)!.log("log test fframe level",
+            scope: "exampleApp.postSignIn", level: LogLevel.fframe);
+        Fframe.of(context)!.log("log test dev level",
+            scope: "exampleApp.postSignIn", level: LogLevel.dev);
+        Fframe.of(context)!.log("log test prod level",
+            scope: "exampleApp.postSignIn", level: LogLevel.prod);
       },
     );
   }

@@ -181,7 +181,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             dataCellBuilder: ((Suggestion suggestion, Function save) =>
                 DataCell(
                   Text(suggestion.name ?? "?"),
-                  onTap: () => debugPrint("onTap ${suggestion.name}"),
+                  onTap: () => Fframe.of(context)!.log(
+                      "onTap ${suggestion.name}",
+                      scope: "exampleApp.Suggestions",
+                      level: LogLevel.dev),
                   placeholder: false,
                 )),
           ),

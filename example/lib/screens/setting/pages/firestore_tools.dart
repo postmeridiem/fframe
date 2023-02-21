@@ -10,15 +10,18 @@ class SettingsFirestoreToolsForm extends StatefulWidget {
   const SettingsFirestoreToolsForm({Key? key}) : super(key: key);
 
   @override
-  State<SettingsFirestoreToolsForm> createState() => _SettingsFirestoreToolsFormFormState();
+  State<SettingsFirestoreToolsForm> createState() =>
+      _SettingsFirestoreToolsFormFormState();
 }
 
-class _SettingsFirestoreToolsFormFormState extends State<SettingsFirestoreToolsForm> {
+class _SettingsFirestoreToolsFormFormState
+    extends State<SettingsFirestoreToolsForm> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("presenting Firestore Tools");
+    Fframe.of(context)!
+        .log("Presenting Firestore Tool", scope: "exampleApp.FirestoreToosl");
 
     return Form(
       key: _formKey,
@@ -75,9 +78,10 @@ class StampUpdate {
                 switch (settings.operation) {
                   case OperationType.update:
                     final data = {settings.fieldName: targetValue};
-                    db.collection(collection).doc(snap.id).set(data, SetOptions(merge: true));
-
-                    debugPrint("STAMP - updated ${settings.collection} / ${snap.id}");
+                    db
+                        .collection(collection)
+                        .doc(snap.id)
+                        .set(data, SetOptions(merge: true));
 
                     break;
                   case OperationType.delete:
@@ -146,12 +150,14 @@ class StampUpdater extends StatelessWidget {
                             decoration: InputDecoration(
                               hintText: L10n.string(
                                 'firestore_tools_stamper_collection_hint',
-                                placeholder: 'enter the collection path you want to stamp-update',
+                                placeholder:
+                                    'enter the collection path you want to stamp-update',
                                 namespace: 'global',
                               ),
                               hintStyle: TextStyle(
                                 fontSize: 12,
-                                color: Theme.of(context).colorScheme.onSecondary,
+                                color:
+                                    Theme.of(context).colorScheme.onSecondary,
                               ),
                             ),
                             onChanged: (value) {},
@@ -200,10 +206,15 @@ class StampUpdater extends StatelessWidget {
                             decoration: InputDecoration(
                               hintText: L10n.string(
                                 'firestore_tools_stamper_fieldname_hint',
-                                placeholder: 'enter the field do you want to stamp-update (or newly add)',
+                                placeholder:
+                                    'enter the field do you want to stamp-update (or newly add)',
                                 namespace: 'global',
                               ),
-                              hintStyle: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSecondary),
+                              hintStyle: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary),
                             ),
                           ),
                         ),
@@ -253,10 +264,15 @@ class StampUpdater extends StatelessWidget {
                             decoration: InputDecoration(
                               hintText: L10n.string(
                                 'firestore_tools_stamper_targetvalue_hint',
-                                placeholder: 'enter the value you want to stamp-update to all docs in collection',
+                                placeholder:
+                                    'enter the value you want to stamp-update to all docs in collection',
                                 namespace: 'global',
                               ),
-                              hintStyle: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSecondary),
+                              hintStyle: TextStyle(
+                                  fontSize: 12,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSecondary),
                             ),
                           ),
                         ),
@@ -281,7 +297,8 @@ class StampUpdater extends StatelessWidget {
                           ),
                         ),
                         onPressed: () {
-                          FRouter.of(context).navigateToRoute(context, route: "profile");
+                          FRouter.of(context)
+                              .navigateToRoute(context, route: "profile");
                         },
                         style: OutlinedButton.styleFrom(
                           shape: RoundedRectangleBorder(
@@ -360,7 +377,13 @@ class StampUpdater extends StatelessWidget {
   }
 }
 
-const List<String> types = <String>['string', 'number', 'boolean', 'timestamp', 'null'];
+const List<String> types = <String>[
+  'string',
+  'number',
+  'boolean',
+  'timestamp',
+  'null'
+];
 
 class DataTypeSelector extends StatefulWidget {
   const DataTypeSelector({Key? key}) : super(key: key);
@@ -465,10 +488,12 @@ forAllInCollection(String collection) {
             Map<String, dynamic> doc = snap.data();
             Timestamp cdTS = doc['createdDate'];
             Timestamp edTS = Timestamp((cdTS.seconds + 7776000), 0);
-            debugPrint("${snap.id} - created: ${dateTimeTextTS(cdTS)} ---> expires: ${dateTimeTextTS(edTS)}");
 
             final data = {"expirationDate": edTS};
-            db.collection(collection).doc(snap.id).set(data, SetOptions(merge: true));
+            db
+                .collection(collection)
+                .doc(snap.id)
+                .set(data, SetOptions(merge: true));
           }),
         },
         onError: (e) => debugPrint("Error completing: $e"),
@@ -484,10 +509,12 @@ touchUpdateDate(String collection) {
         (res) => {
           res.docs.map((snap) {
             Timestamp updateStamp = Timestamp.now();
-            debugPrint("${snap.id} - updated record");
 
             final data = {"updatedDate": updateStamp};
-            db.collection(collection).doc(snap.id).set(data, SetOptions(merge: true));
+            db
+                .collection(collection)
+                .doc(snap.id)
+                .set(data, SetOptions(merge: true));
           }),
         },
         onError: (e) => debugPrint("Error completing: $e"),

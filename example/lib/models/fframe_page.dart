@@ -54,7 +54,6 @@ class FframePage extends ChangeNotifier {
 
     final Map<String, Timestamp> changeHistory = {updatedBy: Timestamp.now()};
 
-    debugPrint("writing <Setting>");
     return {
       "active": active,
       "public": public,

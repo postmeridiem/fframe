@@ -73,7 +73,6 @@ class FframeList extends ChangeNotifier {
 
     final Map<String, Timestamp> changeHistory = {updatedBy: Timestamp.now()};
 
-    debugPrint("writing <Setting>");
     return {
       "name": name,
       "type": type,

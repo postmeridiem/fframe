@@ -46,7 +46,9 @@ class Setting extends ChangeNotifier {
       name: json['name']! as String,
       active: json['active'] == null ? true : json['active'] as bool,
       icon: json['icon'] == null ? 'question_mark' : json['icon'] as String,
-      creationDate: json['creationDate'] != null ? json['creationDate'] as Timestamp : null,
+      creationDate: json['creationDate'] != null
+          ? json['creationDate'] as Timestamp
+          : null,
       createdBy: json['createdBy'] != null ? json['createdBy'] as String : null,
     );
 
@@ -61,17 +63,19 @@ class Setting extends ChangeNotifier {
   String? createdBy;
 
   Map<String, Object?> toFirestore() {
-    String updatedBy = FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous";
+    String updatedBy =
+        FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous";
 
     final Map<String, Timestamp> changeHistory = {updatedBy: Timestamp.now()};
 
-    debugPrint("writing <Setting>");
     return {
       "active": active,
       "name": name,
       "icon": icon,
       "creationDate": creationDate ?? Timestamp.now(),
-      "createdBy": createdBy ?? FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous",
+      "createdBy": createdBy ??
+          FirebaseAuth.instance.currentUser?.displayName ??
+          "Anonymous",
       "changeHistory": FieldValue.arrayUnion([changeHistory]),
     };
   }

@@ -24,14 +24,18 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Load the sign in page");
+    Fframe.of(context)!.log("Presenting SignIn page",
+        scope: "exampleApp.SignIn", level: LogLevel.prod);
 
     // List<ProviderConfiguration>? providerConfigs = Fframe.of(context)?.providerConfigs;
-    List<ProviderConfiguration>? providerConfigurations = Fframe.of(context)?.providerConfigs?.where((ProviderConfiguration providerConfiguration) {
+    List<ProviderConfiguration>? providerConfigurations = Fframe.of(context)
+        ?.providerConfigs
+        ?.where((ProviderConfiguration providerConfiguration) {
       return providerConfiguration.providerId == "google.com";
     }).toList();
     if (providerConfigurations != null && providerConfigurations.isNotEmpty) {
-      GoogleProviderConfiguration providerConfiguration = providerConfigurations.first as GoogleProviderConfiguration;
+      GoogleProviderConfiguration providerConfiguration =
+          providerConfigurations.first as GoogleProviderConfiguration;
       webClientId = providerConfiguration.clientId;
     }
 
@@ -42,7 +46,10 @@ class _SignInPageState extends State<SignInPage> {
       //Sign out from Google when signed out from Firebase
       FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
-          debugPrint("User signed out. Sign out from Google as well.");
+          Fframe.of(context)!.log(
+              "User signed out. Sign out from Google as well.",
+              scope: "exampleApp.SignIn",
+              level: LogLevel.prod);
           silentSignOut();
         }
       });
@@ -69,14 +76,19 @@ class _SignInPageState extends State<SignInPage> {
               child: CircularProgressIndicator(),
             ),
           ),
-          crossFadeState: isSigningIn ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          crossFadeState: isSigningIn
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
           duration: const Duration(milliseconds: 200),
         ),
       );
     }
 
-    if (Fframe.of(context)?.providerConfigs == null || (Fframe.of(context)?.providerConfigs != null && Fframe.of(context)!.providerConfigs!.isEmpty)) {
-      Fframe.of(context)!.showErrorPage(context: context, errorText: "Missign auth provider configuration");
+    if (Fframe.of(context)?.providerConfigs == null ||
+        (Fframe.of(context)?.providerConfigs != null &&
+            Fframe.of(context)!.providerConfigs!.isEmpty)) {
+      Fframe.of(context)!.showErrorPage(
+          context: context, errorText: "Missign auth provider configuration");
     }
 
     return SignInScreen(
@@ -137,7 +149,8 @@ class _SignInPageState extends State<SignInPage> {
     ).signIn();
 
     // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
 
     // Create a new credential
     final credential = GoogleAuthProvider.credential(
