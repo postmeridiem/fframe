@@ -175,7 +175,6 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
     return FirestoreQueryBuilder<T>(
       query: _query,
       builder: (context, snapshot, child) {
-        // _query.count().get().then((value) => debugPrint(value.count.toString()));
         fFrameDataTableSource.fromSnapShot(snapshot);
 
         return AnimatedBuilder(
@@ -183,7 +182,8 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
           builder: (context, child) {
             final actions = [
               ...?widget.actions,
-              if (widget.canDeleteItems && fFrameDataTableSource._selectedRowIds.isNotEmpty)
+              if (widget.canDeleteItems &&
+                  fFrameDataTableSource._selectedRowIds.isNotEmpty)
                 IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: fFrameDataTableSource.onDeleteSelectedItems,
@@ -193,10 +193,14 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
               double headingRowHeight = widget.headingRowHeight;
               double dataRowHeight = widget.dataRowHeight;
 
-              int rowsPerPage = widget.rowsPerPage < 0 ? ((constraints.maxHeight - headingRowHeight - 72) ~/ dataRowHeight): widget.rowsPerPage;
+              int rowsPerPage = widget.rowsPerPage < 0
+                  ? ((constraints.maxHeight - headingRowHeight - 72) ~/
+                      dataRowHeight)
+                  : widget.rowsPerPage;
               return PaginatedDataTable(
                 source: fFrameDataTableSource,
-                onSelectAll: selectionEnabled ? fFrameDataTableSource.onSelectAll : null,
+                onSelectAll:
+                    selectionEnabled ? fFrameDataTableSource.onSelectAll : null,
                 onPageChanged: widget.onPageChanged,
                 showCheckboxColumn: widget.showCheckboxColumn,
                 arrowHeadColor: widget.arrowHeadColor,
@@ -210,10 +214,15 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
                 showFirstLastButtons: widget.showFirstLastButtons,
                 sortAscending: widget.sortAscending,
                 sortColumnIndex: widget.sortColumnIndex,
-                header: actions.isEmpty ? null : (widget.header ?? const SizedBox()),
+                header: actions.isEmpty
+                    ? null
+                    : (widget.header ?? const SizedBox()),
                 actions: actions.isEmpty ? null : actions,
                 // Head label
-                columns: widget.dataGridConfig.dataGridConfigColumns.map((DataGridConfigColumn<T> dataGridConfigColumn) => dataGridConfigColumn.headerBuilder()).toList(),
+                columns: widget.dataGridConfig.dataGridConfigColumns
+                    .map((DataGridConfigColumn<T> dataGridConfigColumn) =>
+                        dataGridConfigColumn.headerBuilder())
+                    .toList(),
               );
             });
           },
@@ -275,7 +284,8 @@ class FFrameDataTableSource<T> extends DataTableSource {
   }
 
   //final Map<String, Widget> Function() getHeaders;
-  final void Function(Object error, StackTrace stackTrace)? Function() getOnError;
+  final void Function(Object error, StackTrace stackTrace)? Function()
+      getOnError;
 
   final _selectedRowIds = <String>{};
 
@@ -283,7 +293,8 @@ class FFrameDataTableSource<T> extends DataTableSource {
   int get selectedRowCount => _selectedRowIds.length;
 
   @override
-  bool get isRowCountApproximate => _previousSnapshot!.isFetching || _previousSnapshot!.hasMore;
+  bool get isRowCountApproximate =>
+      _previousSnapshot!.isFetching || _previousSnapshot!.hasMore;
 
   @override
   int get rowCount {
@@ -305,7 +316,8 @@ class FFrameDataTableSource<T> extends DataTableSource {
     }
     if (index >= _previousSnapshot!.docs.length) return null;
 
-    final QueryDocumentSnapshot<T> documentSnapshot = _previousSnapshot!.docs[index];
+    final QueryDocumentSnapshot<T> documentSnapshot =
+        _previousSnapshot!.docs[index];
     final T data = documentSnapshot.data();
 
     return DataRow(
@@ -314,23 +326,26 @@ class FFrameDataTableSource<T> extends DataTableSource {
           ? (selected) {
               if (selected == null) return;
 
-              if ((selected && _selectedRowIds.add(documentSnapshot.id)) || (!selected && _selectedRowIds.remove(documentSnapshot.id))) {
+              if ((selected && _selectedRowIds.add(documentSnapshot.id)) ||
+                  (!selected && _selectedRowIds.remove(documentSnapshot.id))) {
                 notifyListeners();
               }
             }
           : null,
       cells: dataGridConfig.dataGridConfigColumns
           .map(
-            (DataGridConfigColumn<T> dataGridConfigColumn) => dataGridConfigColumn.dataCellBuilder(data, () {
-              debugPrint("Save doc ${documentSnapshot.id}");
-              return DatabaseService<T>().updateDocument(
-                collection: documentSnapshot.reference.parent.path,
-                documentId: documentSnapshot.id,
-                data: data,
-                fromFirestore: dataGridConfig.fromFirestore,
-                toFirestore: dataGridConfig.toFirestore,
-              );
-            },
+            (DataGridConfigColumn<T> dataGridConfigColumn) =>
+                dataGridConfigColumn.dataCellBuilder(
+              data,
+              () {
+                return DatabaseService<T>().updateDocument(
+                  collection: documentSnapshot.reference.parent.path,
+                  documentId: documentSnapshot.id,
+                  data: data,
+                  fromFirestore: dataGridConfig.fromFirestore,
+                  toFirestore: dataGridConfig.toFirestore,
+                );
+              },
             ),
           )
           .toList(),
@@ -344,7 +359,9 @@ class FFrameDataTableSource<T> extends DataTableSource {
 
     // Try to preserve the selection status when the snapshot got updated,
     // such as when more content got loaded.
-    final wereAllItemsSelected = _previousSnapshot?.docs.length == _selectedRowIds.length && _previousSnapshot!.docs.isNotEmpty;
+    final wereAllItemsSelected =
+        _previousSnapshot?.docs.length == _selectedRowIds.length &&
+            _previousSnapshot!.docs.isNotEmpty;
 
     _previousSnapshot = snapshot;
     if (wereAllItemsSelected) onSelectAll(true);
@@ -377,17 +394,17 @@ class FFrameDataTableSource<T> extends DataTableSource {
 class DataGridConfig<T> {
   final List<DataGridConfigColumn<T>> dataGridConfigColumns;
   final bool showLinks;
-  late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
+      fromFirestore;
   late Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final int rowsPerPage;
   final double rowHeight;
 
-  DataGridConfig({
-    required this.dataGridConfigColumns,
-    this.showLinks = true,
-    this.rowsPerPage = -1,
-    this.rowHeight = kMinInteractiveDimension
-  });
+  DataGridConfig(
+      {required this.dataGridConfigColumns,
+      this.showLinks = true,
+      this.rowsPerPage = -1,
+      this.rowHeight = kMinInteractiveDimension});
 }
 
 class DataGridConfigColumn<T> {

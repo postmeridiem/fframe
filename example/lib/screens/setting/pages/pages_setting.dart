@@ -22,7 +22,7 @@ class _SettingsPagesFormState extends State<SettingsPagesForm> {
   @override
   Widget build(BuildContext context) {
     Fframe.of(context)!
-        .log("presenting SettingsPagesForm", scope: "exampleApp.Settings");
+        .log("Opening SettingsPagesForm", scope: "exampleApp.Settings");
     String path = 'fframe/pages/collection';
     CollectionReference col = FirebaseFirestore.instance.collection(path);
     return Row(

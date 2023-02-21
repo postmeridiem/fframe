@@ -94,7 +94,7 @@ class MainApp extends StatelessWidget {
       darkMode: appDarkTheme,
       themeMode: ThemeMode.system,
       l10nConfig: l10nConfig,
-      logThreshold: LogLevel.dev,
+      logThreshold: LogLevel.prod,
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
@@ -114,12 +114,12 @@ class MainApp extends StatelessWidget {
       // },
       postSignIn: (context) async {
         Fframe.of(context)!
-            .log("execution complete", scope: "exampleApp.postSignIn");
-        Fframe.of(context)!.log("log test fframe level",
+            .log("Execution complete", scope: "exampleApp.postSignIn");
+        Fframe.of(context)!.log("Log test fframe level",
             scope: "exampleApp.postSignIn", level: LogLevel.fframe);
-        Fframe.of(context)!.log("log test dev level",
+        Fframe.of(context)!.log("Log test dev level",
             scope: "exampleApp.postSignIn", level: LogLevel.dev);
-        Fframe.of(context)!.log("log test prod level",
+        Fframe.of(context)!.log("Log test prod level",
             scope: "exampleApp.postSignIn", level: LogLevel.prod);
       },
     );

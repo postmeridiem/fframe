@@ -91,7 +91,10 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Build DocumentList with key ${widget.key.toString()}");
+    Fframe.of(context)!.log(
+        "Build DocumentList with key ${widget.key.toString()}",
+        scope: "fframeLog.DocumentListLoader",
+        level: LogLevel.fframe);
     DocumentScreenConfig documentScreenConfig =
         DocumentScreenConfig.of(context)!;
     DocumentConfig<T> documentConfig =
@@ -133,8 +136,10 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
             ? ScreenSize.tablet
             : ScreenSize.large;
 
-    debugPrint(
-        "Build documentListLoader with key: listScaffold_${widget.key.toString()}");
+    Fframe.of(context)!.log(
+        "Build documentListLoader with key: listScaffold_${widget.key.toString()}",
+        scope: "fframeLog.DocumentListBody",
+        level: LogLevel.fframe);
 
     double listWidth = 250;
     if (ScreenSize.phone == screenSize) {
@@ -267,7 +272,8 @@ class GetDocumentCount<T> extends StatelessWidget {
       ),
       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
         if (snapshot.hasError) {
-          debugPrint(snapshot.error.toString());
+          Fframe.of(context)!.log("ERROR: ${snapshot.error.toString()}",
+              scope: "fframeLog.GetDocumentCount", level: LogLevel.prod);
           return const IgnorePointer();
         }
         if (!snapshot.hasData) {
@@ -354,13 +360,6 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
                   if (autoSelectFirst && index == 0) {
                     documentScreenConfig.load<T>(
                         context: context, docId: queryDocumentSnapshot.id);
-
-                    // debugPrint("Set selectionState to ${queryDocumentSnapshot.id}");
-                    // DocumentScreenConfig.of(context)!.selectionState.setState(SelectionState<T>(
-                    //       data: queryDocumentSnapshot.data(),
-                    //       docId: queryDocumentSnapshot.id,
-                    //       isNew: false,
-                    //     ));
                   }
                   return itemBuilder(context, queryDocumentSnapshot);
                 },

@@ -37,7 +37,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             ? ScreenSize.tablet
             : ScreenSize.large;
 
-    debugPrint("Build _MainScreenState ${screenSize.toString()}");
+    Fframe.of(context)!.log("Build to size: ${screenSize.toString()}",
+        scope: "fframeLog.MainScreen", level: LogLevel.fframe);
 
     if (FRouter.of(context).hasTabs) {
       _tabController = TabController(

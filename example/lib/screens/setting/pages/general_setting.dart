@@ -20,7 +20,7 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
   @override
   Widget build(BuildContext context) {
     Fframe.of(context)!
-        .log("presenting SettingsGeneralForm", scope: "exampleApp.Settings");
+        .log("Opening SettingsGeneralForm", scope: "exampleApp.Settings");
 
     List<L10nReplacer> replacers = [
       L10nReplacer(from: "{locale}", replace: 'replaceworks'),

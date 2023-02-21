@@ -16,11 +16,12 @@ class InitializeL10n extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("Initialize l10n");
+    Fframe.of(context)!.log("Initialize L10n",
+        scope: "fframeLog.L10n", level: LogLevel.fframe);
     return FutureBuilder(
       future: L10nReader.read(context, l10nConfig),
-      builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
-        // debugPrint("l10n ConnectionState $ConnectionState");
+      builder:
+          (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.active:
@@ -31,9 +32,11 @@ class InitializeL10n extends StatelessWidget {
             );
           case ConnectionState.done:
             if (snapshot.hasData) {
-              Map<String, dynamic> localeData = snapshot.data as Map<String, dynamic>;
+              Map<String, dynamic> localeData =
+                  snapshot.data as Map<String, dynamic>;
               // create the language engine
-              debugPrint("L10N: Language engine loaded.");
+              Fframe.of(context)!.log("Language engine loaded",
+                  scope: "fframeLog.L10n", level: LogLevel.fframe);
               return l10Builder(
                 context,
                 L10n(
@@ -43,7 +46,8 @@ class InitializeL10n extends StatelessWidget {
               );
             } else {
               // create the language engine
-              debugPrint("L10N ERROR: Language engine failed to load.");
+              Fframe.of(context)!.log("ERROR: Language engine failed to load.",
+                  scope: "fframeLog.L10n", level: LogLevel.fframe);
               return l10Builder(
                 context,
                 L10n(

@@ -20,8 +20,8 @@ class _SettingsFirestoreToolsFormFormState
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!
-        .log("Presenting Firestore Tool", scope: "exampleApp.FirestoreToosl");
+    Fframe.of(context)!.log("Opening SettingsFirestoreToolsForm",
+        scope: "exampleApp.Settings");
 
     return Form(
       key: _formKey,

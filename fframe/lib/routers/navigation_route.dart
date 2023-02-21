@@ -2,25 +2,33 @@ import 'package:fframe/fframe.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fframe/services/navigation_service.dart';
 
-class FNavigationRouteInformationParser extends RouteInformationParser<NavigationNotifier> {
+class FNavigationRouteInformationParser
+    extends RouteInformationParser<NavigationNotifier> {
   @override
-  Future<NavigationNotifier> parseRouteInformation(RouteInformation routeInformation) async {
-    debugPrint("NavigationRouteInformationParser.parseRouteInformation ${routeInformation.location!}");
-    navigationNotifier.parseRouteInformation(uri: Uri.parse(routeInformation.location!));
+  Future<NavigationNotifier> parseRouteInformation(
+      RouteInformation routeInformation) async {
+    debugPrint(
+        "NavigationRouteInformationParser.parseRouteInformation ${routeInformation.location!}");
+    navigationNotifier.parseRouteInformation(
+        uri: Uri.parse(routeInformation.location!));
     return navigationNotifier;
   }
 
   @override
   // ignore: avoid_renaming_method_parameters
-  RouteInformation? restoreRouteInformation(NavigationNotifier navigationNotifier) {
+  RouteInformation? restoreRouteInformation(
+      NavigationNotifier navigationNotifier) {
     //Updates the browser history
-    debugPrint("NavigationRouteInformationParser.restoreRouteInformation => ${navigationNotifier.composeUri()}");
+    debugPrint(
+        "NavigationRouteInformationParser.restoreRouteInformation => ${navigationNotifier.composeUri()}");
 
-    return RouteInformation(location: navigationNotifier.restoreRouteInformation());
+    return RouteInformation(
+        location: navigationNotifier.restoreRouteInformation());
   }
 }
 
-class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with ChangeNotifier, PopNavigatorRouterDelegateMixin {
+class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier>
+    with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   @override
   final GlobalKey<NavigatorState> navigatorKey;
   bool hasListener = false;
@@ -32,14 +40,16 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
   }
 
   _navigationNotifierListener() {
-    debugPrint("NavigationRouterDelegate.navigationNotifier updated to ${navigationNotifier.uri}, notifyListeners");
+    debugPrint(
+        "NavigationRouterDelegate.navigationNotifier updated to ${navigationNotifier.uri}, notifyListeners");
     notifyListeners();
     // navigationNotifier.removeListener(_navigationNotifierListener);
   }
 
   @override
   NavigationNotifier? get currentConfiguration {
-    debugPrint("NavigationRouterDelegate.currentConfiguration => ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
+    debugPrint(
+        "NavigationRouterDelegate.currentConfiguration => ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
     // currentConfiguration?.uri?.path;
     // navigationNotifier.notifyListeners();
     return navigationNotifier;
@@ -47,7 +57,8 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("NavigationRouterDelegate.build");
+    Fframe.of(context)!.log("NavigationRouterDelegate.build",
+        scope: "fframeLog.NavigationRouter", level: LogLevel.fframe);
 
     return Navigator(
       key: navigatorKey,
@@ -68,7 +79,8 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
   Future<void> setNewRoutePath(NavigationNotifier navigationNotifier) async {
     debugPrint("NavigationRouterDelegate.setNewRoutePath");
 
-    debugPrint("NavigationRouterDelegate.setNewRoutePath => ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
+    debugPrint(
+        "NavigationRouterDelegate.setNewRoutePath => ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
     return;
   }
 

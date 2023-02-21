@@ -57,8 +57,10 @@ class DocumentScreen<T> extends StatelessWidget {
     String? queryStringIdParam;
     bool? embeddedDocument;
     if (parentDocumentScreenConfig != null) {
-      debugPrint(
-          "This is an embedded instance of the DocumentScreen initalize FormCeption");
+      Fframe.of(context)!.log(
+          "This is an embedded instance of the DocumentScreen initalize FormCeption",
+          scope: "fframeLog.DocumentScreen",
+          level: LogLevel.fframe);
       if (queryStringIdParam ==
           parentDocumentScreenConfig.documentConfig.queryStringIdParam) {
         queryStringIdParam =
@@ -390,7 +392,10 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
       );
 
       if (documentSnapshot?.exists ?? false) {
-        debugPrint("Loaded document $docId to selectionState and notify");
+        Fframe.of(context)!.log(
+            "Loaded document $docId to selectionState and notify",
+            scope: "fframeLog.DocumentScreen.load",
+            level: LogLevel.fframe);
         selectionState.setState(
           SelectionState<T>(
             data: documentSnapshot!.data(),
@@ -399,7 +404,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
           notify: true,
         );
       } else {
-        debugPrint("Document does not exist");
+        Fframe.of(context)!.log("ERROR: Document does not exist",
+            scope: "fframeLog.DocumentScreen.load", level: LogLevel.prod);
         FRouter.of(context).updateQueryString(
           queryParameters: {},
           resetQueryString: true,
@@ -446,8 +452,10 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
       if (documentConfig.preSave != null) {
         selectionState.data = documentConfig.preSave!(selectionState.data!);
       }
-
-      debugPrint("Save item $docId in collection ${documentConfig.collection}");
+      Fframe.of(context)!.log(
+          "Save item $docId in collection ${documentConfig.collection}",
+          scope: "fframeLog.DocumentScreen.save",
+          level: LogLevel.dev);
 
       SaveState saveResult = selectionState.isNew
           ? await DatabaseService<T>().createDocument(
@@ -467,16 +475,15 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
       if (saveResult.result) {
         //Success
-        debugPrint("Save was successfull");
-        // if (FRouter.of(context).isQueryStringEmpty && documentConfig.autoSelectFirst == true) {
-        //   //Do not unload the current document, the autoload should pick it up
-        //   return;
-        // }
+        Fframe.of(context)!.log("Save was successfull",
+            scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
+
         if (closeAfterSave) {
           close<T>(context: context, skipWarning: true);
         }
       } else {
-        debugPrint("Save failed");
+        Fframe.of(context)!.log("ERROR: Save failed",
+            scope: "fframeLog.DocumentScreen.save", level: LogLevel.prod);
 
         snackbar(
           context: context,
@@ -499,7 +506,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     int invalidTab = documentConfig.document.activeTabs!
         .map((DocumentTab tab) {
           bool result = tab.formKey.currentState!.validate();
-          debugPrint("tab validation: $result");
+          Fframe.of(context)!.log("Tab validation: $result",
+              scope: "fframeLog.DocumentScreen.validate", level: LogLevel.dev);
           return tab.formKey.currentState!.validate();
         })
         .toList()
@@ -668,7 +676,9 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    debugPrint("build DocumentLoader: ${widget.key.toString()}");
+    Fframe.of(context)!.log("Build DocumentLoader: ${widget.key.toString()}",
+        scope: "fframeLog.DocumentLoader", level: LogLevel.fframe);
+
     DocumentConfig<T> documentConfig =
         DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
 
@@ -766,11 +776,13 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint("build _ScreenBodyState");
+    Fframe.of(context)!.log("Build _ScreenBodyState",
+        scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
     DocumentScreenConfig documentScreenConfig =
         DocumentScreenConfig.of(context)!;
     if (firstDoc != null) {
-      debugPrint("First doc");
+      Fframe.of(context)!.log("First doc",
+          scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -795,7 +807,6 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
 
     //Handle document loads...
 
-    // // debugPrint("Read ${queryDocumentSnapshots?.length} docs from provider");
     if (queryState.queryParameters == null &&
         documentScreenConfig.documentConfig.autoSelectFirst) {
       documentScreenConfig.selectionState.addListener(() {
@@ -819,7 +830,8 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
         documentScreenConfig.selectionState.isNew == false &&
         queryState.queryParameters!.containsKey("new") &&
         queryState.queryParameters!["new"] == "true") {
-      debugPrint("Spawn a new document");
+      Fframe.of(context)!.log("Spawn a new document",
+          scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
       documentScreenConfig.selectionState.setState(
           SelectionState<T>(
               data: documentScreenConfig.documentConfig.createNew(),
@@ -830,7 +842,8 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
     } else if (documentScreenConfig.selectionState.data is T &&
         queryState.queryParameters!.containsKey("new") &&
         queryState.queryParameters!["new"] == "true") {
-      debugPrint("Spawn document from cache");
+      Fframe.of(context)!.log("Spawn document from cache",
+          scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
       // return returnWidget;
     } else if (!queryState.queryParameters!
         .containsKey(documentScreenConfig.documentConfig.queryStringIdParam)) {
@@ -854,7 +867,8 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
           .waitPage(context: context, text: "Loading document");
     }
 
-    debugPrint("Load the AnimatedSwitcher ");
+    Fframe.of(context)!.log("Load the AnimatedSwitcher",
+        scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
     return AnimatedBuilder(
       animation: documentScreenConfig.selectionState as SelectionState<T>,
       builder: ((context, child) => returnWidget),

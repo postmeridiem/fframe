@@ -24,7 +24,7 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log("Presenting SignIn page",
+    Fframe.of(context)!.log("Opening SignIn page",
         scope: "exampleApp.SignIn", level: LogLevel.prod);
 
     // List<ProviderConfiguration>? providerConfigs = Fframe.of(context)?.providerConfigs;

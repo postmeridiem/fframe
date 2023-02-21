@@ -285,17 +285,17 @@ class EmailAuthManagerState extends State<EmailAuthManager>
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(
-        "dynamic link research: ${Uri.base} => ${FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())}");
+    Fframe.of(context)!.log(
+        "dynamic link research: ${Uri.base} => ${FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())}",
+        scope: "fframeLog.EmailAutManager",
+        level: LogLevel.fframe);
     Uri uri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
 
     if (FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())) {
       if (uri.queryParameters.containsKey("hash")) {
         String hash = uri.queryParameters["hash"]!;
         String emailAddress = utf8.decode(base64.decode(hash));
-        debugPrint(emailAddress);
 
-        debugPrint(emailAddress);
         return FutureBuilder<UserCredential>(
             future: FirebaseAuth.instance.signInWithEmailLink(
                 email: emailAddress, emailLink: Uri.base.toString()),
@@ -328,19 +328,24 @@ class EmailAuthManagerState extends State<EmailAuthManager>
                       );
                 case ConnectionState.done:
                   if (snapshot.hasError) {
-                    debugPrint(
-                        "Fframe/emailAuthManager: Link sign in failed: ${snapshot.error}");
+                    Fframe.of(context)!.log(
+                        "Link sign in failed: ${snapshot.error}",
+                        scope: "fframeLog.EmailAutManager",
+                        level: LogLevel.fframe);
                     return const FframePostLoad();
                   }
 
                   UserCredential? userCredential = snapshot.data;
-                  debugPrint(
-                      "Fframe/emailAuthManager: Resulting user: ${userCredential?.user?.email}");
+                  Fframe.of(context)!.log(
+                      "Resulting user: ${userCredential?.user?.email}",
+                      scope: "fframeLog.EmailAutManager",
+                      level: LogLevel.fframe);
                   return const FframePostLoad();
               }
             });
       } else {
-        debugPrint("Fframe/emailAuthManager: emailAddress not found in hash");
+        Fframe.of(context)!.log("emailAddress not found in hash",
+            scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
       }
     }
     return const FframePostAuth();
@@ -368,7 +373,8 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
   Widget build(BuildContext context) {
     if (Fframe.of(context)?.postSignIn == null &&
         Fframe.of(context)?.postSignOut == null) {
-      debugPrint("Fframe.postSignIn/Out: no code provided");
+      Fframe.of(context)!.log("No code provided",
+          scope: "fframeLog.postSignIn/Out", level: LogLevel.fframe);
       return const FframePostLoad();
     } else {
       return StreamBuilder<User?>(
@@ -377,7 +383,8 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
         builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
           if (snapshot.hasData && snapshot.data != null && signedIn == false) {
             //User has gone from signed out to signed in
-            debugPrint("Fframe.postSignIn: code executing");
+            Fframe.of(context)!.log("Code executing",
+                scope: "fframeLog.postSignIn", level: LogLevel.fframe);
             if (Fframe.of(context)?.postSignIn != null) {
               return FutureBuilder<void>(
                 future: Fframe.of(context)!.postSignIn!(context),
@@ -415,7 +422,8 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
             }
           } else {
             //User had gone from signed in to signed out
-            debugPrint("Fframe.postSignOut: code executing");
+            Fframe.of(context)!.log("Code executing",
+                scope: "fframeLog.postSignOut", level: LogLevel.fframe);
             if (Fframe.of(context)?.postSignOut != null) {
               return FutureBuilder<void>(
                 future: Fframe.of(context)!.postSignOut!(context),
@@ -476,10 +484,12 @@ class _FframePostLoadState extends State<FframePostLoad> {
   @override
   Widget build(BuildContext context) {
     if (Fframe.of(context)?.postLoad == null) {
-      debugPrint("Fframe.postLoad: no code provided");
+      Fframe.of(context)!.log("No code provided",
+          scope: "fframeLog.postLoad", level: LogLevel.fframe);
       return const FframeBuilder();
     } else {
-      debugPrint("Fframe.postLoad: code executing");
+      Fframe.of(context)!.log("Code executing",
+          scope: "fframeLog.postLoad", level: LogLevel.fframe);
       return FutureBuilder<void>(
         future: Fframe.of(context)!.postLoad!(context),
         builder: (BuildContext context, snapshot) {

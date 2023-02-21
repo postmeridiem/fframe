@@ -22,7 +22,6 @@ class Configuration extends ChangeNotifier {
   int? order;
 
   Map<String, Object?> toFirestore() {
-    debugPrint("writing <Configuration>");
     return {'active': active, 'name': name, 'icon': icon, 'order': order};
   }
 }

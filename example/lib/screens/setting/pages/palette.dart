@@ -14,7 +14,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
   @override
   Widget build(BuildContext context) {
     Fframe.of(context)!
-        .log("presenting PaletteForm", scope: "exampleApp.Settings");
+        .log("Opening PaletteForm", scope: "exampleApp.Settings");
     return Form(
       key: _formKey,
       child: Padding(

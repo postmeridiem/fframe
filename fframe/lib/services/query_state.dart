@@ -9,17 +9,21 @@ class QueryState {
     return QueryState(queryParameters: uri.queryParameters);
   }
 
-  factory QueryState.mergeComponents(QueryState queryState, Map<String, String>? queryParameters) {
+  factory QueryState.mergeComponents(
+      QueryState queryState, Map<String, String>? queryParameters) {
     Map<String, String> newQueryParameters = {};
     newQueryParameters.addAll(queryState.queryParameters ?? {});
     newQueryParameters.addAll(queryParameters ?? {});
-    debugPrint("Merged parameters: ${newQueryParameters.toString()}");
-    return QueryState(queryParameters: newQueryParameters); //, context: context);
+    debugPrint(
+        "fframeLog.QueryState.mergeComponents: Merged parameters: ${newQueryParameters.toString()}");
+    return QueryState(
+        queryParameters: newQueryParameters); //, context: context);
   }
 
   factory QueryState.defaultroute() {
     if (navigationNotifier.nextState.isNotEmpty) {
-      debugPrint("Route to ${navigationNotifier.nextState.first.queryState.queryString}");
+      debugPrint(
+          "fframeLog.QueryState.defaultroute: Route to ${navigationNotifier.nextState.first.queryState.queryString}");
       return navigationNotifier.nextState.first.queryState;
     }
 
@@ -27,7 +31,11 @@ class QueryState {
   }
 
   String get queryString {
-    return queryParameters?.entries.map((queryParameter) => "${queryParameter.key}=${queryParameter.value}").join("&") ?? "";
+    return queryParameters?.entries
+            .map((queryParameter) =>
+                "${queryParameter.key}=${queryParameter.value}")
+            .join("&") ??
+        "";
   }
 
   @override

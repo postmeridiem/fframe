@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
 class L10n {
@@ -12,7 +13,9 @@ class L10n {
 
   L10n._internal();
 
-  factory L10n({required L10nConfig l10nConfig, required Map<String, dynamic> localeData}) {
+  factory L10n(
+      {required L10nConfig l10nConfig,
+      required Map<String, dynamic> localeData}) {
     instance.config = l10nConfig;
     instance.map = localeData;
 
@@ -32,11 +35,10 @@ class L10n {
       var selectedNameSpace = L10n.instance.map[namespace];
       if (selectedNameSpace.containsKey(key)) {
         output = selectedNameSpace[key]!['translation'];
-      } else {
-        // debugPrint("L10N MISSING KEY: Inserted placeholder. Key not found: <$key>.");
-      }
+      } else {}
     } else {
-      debugPrint("L10N ERROR: Unknown namespace: $namespace while looking for <$key>");
+      debugPrint(
+          "fframeLog.L10N: ERROR: Unknown namespace: $namespace while looking for <$key>");
     }
     return output;
   }
@@ -128,7 +130,7 @@ class L10nConfig {
       // there was no query parameter
       output = defaultLoc;
     }
-    debugPrint("Locale set to [$output]");
+    debugPrint("fframeLog.L10N: Locale set to [$output]");
     return output;
   }
 }
@@ -151,21 +153,29 @@ class L10nReplacer {
 class L10nReader {
   L10nReader();
 
-  static Future<Map<String, dynamic>> read(BuildContext context, L10nConfig config) async {
+  static Future<Map<String, dynamic>> read(
+      BuildContext context, L10nConfig config) async {
     Map<String, dynamic> output = {'fframe': {}, 'global': {}};
     List<String> namespaces = config.namespaces as List<String>;
     String mode = config.source.mode;
 
-    debugPrint("L10N: Translation loader mode: $mode.");
+    Fframe.of(context)!.log("Translation loader mode: $mode.",
+        scope: "fframeLog.L10N", level: LogLevel.fframe);
     switch (mode) {
       case 'local_assets':
         {
           for (String namespace in namespaces) {
-            String sourcepath = "assets/translations/${namespace}_${config.locale.languageCode}_${config.locale.countryCode}.json";
-            debugPrint("L10N: Loading namespace translations from path: <$sourcepath>.");
+            String sourcepath =
+                "assets/translations/${namespace}_${config.locale.languageCode}_${config.locale.countryCode}.json";
+            Fframe.of(context)!.log(
+                "Loading namespace translations from path: <$sourcepath>.",
+                scope: "fframeLog.L10N",
+                level: LogLevel.fframe);
             // loading namespace for locale
-            final String response = await DefaultAssetBundle.of(context).loadString(sourcepath);
-            final Map<String, dynamic> data = json.decode(response) as Map<String, dynamic>;
+            final String response =
+                await DefaultAssetBundle.of(context).loadString(sourcepath);
+            final Map<String, dynamic> data =
+                json.decode(response) as Map<String, dynamic>;
             output[namespace] = data;
           }
         }
@@ -178,7 +188,7 @@ class L10nReader {
         break;
 
       default:
-        throw ("L10N ERROR: Unconfigured translation source.");
+        throw ("fframeLog.L10N: ERROR: Unconfigured translation source.");
     }
 
     return output;
