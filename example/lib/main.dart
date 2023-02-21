@@ -94,7 +94,7 @@ class MainApp extends StatelessWidget {
       darkMode: appDarkTheme,
       themeMode: ThemeMode.system,
       l10nConfig: l10nConfig,
-      logThreshold: LogLevel.prod,
+      logThreshold: LogLevel.fframe,
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
