@@ -1,6 +1,6 @@
 name: fframe
 description: The FlutFrame package.
-version: 0.1.000+29
+version: 0.1.000+30
 homepage: fframe.app
 
 publish_to: none
@@ -16,30 +16,29 @@ dependencies:
   # firebase_core:
   cloud_firestore: ^4.4.2
   firebase_storage:
-  uuid:  #to generate uids
-  flutter_signin_button: 
+  uuid: #to generate uids
+  flutter_signin_button:
   google_sign_in:
   # googleapis:
   # googleapis_auth:
   flutterfire_ui: ^0.4.3+20
-  file_picker: 
-  firebase_analytics: 
+  file_picker:
+  firebase_analytics:
   flutter_riverpod:
   clipboard:
   url_launcher:
   cloud_functions:
   preload_page_view:
   shimmer:
-  shared_preferences: 
+  shared_preferences:
   horizontal_data_table: ^4.1.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.1
-  http: 
+  http:
   test: any
   build_runner:
-
 # The following section is specific to Flutter.
 # === this is configured at the application level when using FlutFrame ===
