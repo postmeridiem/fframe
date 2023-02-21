@@ -8,7 +8,7 @@ class FNavigationRouteInformationParser
   Future<NavigationNotifier> parseRouteInformation(
       RouteInformation routeInformation) async {
     debugPrint(
-        "NavigationRouteInformationParser.parseRouteInformation ${routeInformation.location!}");
+        "fframeLog.NavigationRouteInformationParser.parseRouteInformation: Updated to ${routeInformation.location!}");
     navigationNotifier.parseRouteInformation(
         uri: Uri.parse(routeInformation.location!));
     return navigationNotifier;
@@ -20,7 +20,7 @@ class FNavigationRouteInformationParser
       NavigationNotifier navigationNotifier) {
     //Updates the browser history
     debugPrint(
-        "NavigationRouteInformationParser.restoreRouteInformation => ${navigationNotifier.composeUri()}");
+        "fframeLog.NavigationRouteInformationParser.restoreRouteInformation: Updated to ${navigationNotifier.composeUri()}");
 
     return RouteInformation(
         location: navigationNotifier.restoreRouteInformation());
@@ -34,14 +34,15 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier>
   bool hasListener = false;
 
   FNavigationRouterDelegate() : navigatorKey = GlobalKey<NavigatorState>() {
-    debugPrint("init FNavigationRouterDelegate");
+    debugPrint(
+        "fframeLog.FNavigationRouterDelegate: init FNavigationRouterDelegate");
 
     navigationNotifier.addListener(_navigationNotifierListener);
   }
 
   _navigationNotifierListener() {
     debugPrint(
-        "NavigationRouterDelegate.navigationNotifier updated to ${navigationNotifier.uri}, notifyListeners");
+        "fframeLog.FNavigationRouterDelegate.navigationNotifier: Updated to ${navigationNotifier.uri}, notifyListeners");
     notifyListeners();
     // navigationNotifier.removeListener(_navigationNotifierListener);
   }
@@ -49,7 +50,7 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier>
   @override
   NavigationNotifier? get currentConfiguration {
     debugPrint(
-        "NavigationRouterDelegate.currentConfiguration => ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
+        "fframeLog.FNavigationRouterDelegate.currentConfiguration: Updated to ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
     // currentConfiguration?.uri?.path;
     // navigationNotifier.notifyListeners();
     return navigationNotifier;
@@ -77,10 +78,8 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier>
   @override
   // ignore: avoid_renaming_method_parameters
   Future<void> setNewRoutePath(NavigationNotifier navigationNotifier) async {
-    debugPrint("NavigationRouterDelegate.setNewRoutePath");
-
     debugPrint(
-        "NavigationRouterDelegate.setNewRoutePath => ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
+        "fframeLog.FNavigationRouterDelegate.setNewRoutePath: Updated to ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
     return;
   }
 
