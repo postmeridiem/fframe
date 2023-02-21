@@ -1,6 +1,6 @@
 name: fframe
 description: The FlutFrame package.
-version: 0.1.000+21
+version: 0.1.000+29
 homepage: fframe.app
 
 publish_to: none
@@ -14,7 +14,7 @@ dependencies:
     sdk: flutter
   intl:
   # firebase_core:
-  cloud_firestore: ^4.0.4
+  cloud_firestore: ^4.4.2
   firebase_storage:
   uuid:  #to generate uids
   flutter_signin_button: 

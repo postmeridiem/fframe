@@ -65,6 +65,35 @@ class FRouter extends InheritedWidget {
     navigationNotifier.processRouteInformation(targetState: targetState, queryState: newQueryState);
   }
 
+  navigateToRouteFromNavigationTargets<T>(List<NavigationTarget> navigationTargets, {required String route, String id = ''}) {
+    bool idMode = id == '' ? false : true;
+    debugPrint("FRouter: navigateToRoute: $route ${idMode ? "into id: $id" : ""}");
+    Map<String, String> queryParameters = idMode ? {"id": id} : {};
+    List<String> routeSegments = route.split('/');
+    String selector1 = routeSegments[0];
+    String selector2 = routeSegments[0];
+    NavigationTarget? target;
+
+    for(int i = 0; i < routeSegments.length; i++) {
+
+      if (i == 0) {
+        target = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == selector1);
+      } else {
+        String segment = routeSegments[i];
+        selector1 += "/${routeSegments[i-1]}/$segment";
+        selector2 += "/$segment";
+        target = target!.navigationTabs!.firstWhere((NavigationTab tab) => (tab.path == selector1 || tab.path == selector2));
+      }
+    }
+
+    //NavigationTarget navigationTarget = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == routeSegments.last);
+
+    QueryState newQueryState = QueryState(queryParameters: queryParameters);
+
+    TargetState targetState = TargetState.processRouteRequest(navigationTarget: target!);
+    navigationNotifier.processRouteInformation(targetState: targetState, queryState: newQueryState);
+  }
+
   ///Only QS (persist path and existing QS values)
   ///FRouter.of(context).updateQueryString(queryString: {"id": "cow"});
   ///Only QS (replace path and existing QS values)
