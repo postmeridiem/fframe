@@ -1,4 +1,5 @@
 import 'package:fframe/fframe.dart';
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fframe/services/navigation_service.dart';
 
@@ -7,8 +8,12 @@ class FNavigationRouteInformationParser
   @override
   Future<NavigationNotifier> parseRouteInformation(
       RouteInformation routeInformation) async {
-    debugPrint(
-        "fframeLog.NavigationRouteInformationParser.parseRouteInformation: Updated to ${routeInformation.location!}");
+    Console.log(
+      "Updated to ${routeInformation.location!}s",
+      scope:
+          "fframeLog.FNavigationRouteInformationParser.parseRouteInformation",
+      level: LogLevel.fframe,
+    );
     navigationNotifier.parseRouteInformation(
         uri: Uri.parse(routeInformation.location!));
     return navigationNotifier;
@@ -19,8 +24,13 @@ class FNavigationRouteInformationParser
   RouteInformation? restoreRouteInformation(
       NavigationNotifier navigationNotifier) {
     //Updates the browser history
-    debugPrint(
-        "fframeLog.NavigationRouteInformationParser.restoreRouteInformation: Updated to ${navigationNotifier.composeUri()}");
+
+    Console.log(
+      "Updated to ${navigationNotifier.composeUri()}",
+      scope:
+          "fframeLog.FNavigationRouteInformationParser.restoreRouteInformation",
+      level: LogLevel.fframe,
+    );
 
     return RouteInformation(
         location: navigationNotifier.restoreRouteInformation());
@@ -34,23 +44,33 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier>
   bool hasListener = false;
 
   FNavigationRouterDelegate() : navigatorKey = GlobalKey<NavigatorState>() {
-    debugPrint(
-        "fframeLog.FNavigationRouterDelegate: init FNavigationRouterDelegate");
+    Console.log(
+      "init FNavigationRouterDelegate",
+      scope: "fframeLog.FNavigationRouterDelegate",
+      level: LogLevel.fframe,
+    );
 
     navigationNotifier.addListener(_navigationNotifierListener);
   }
 
   _navigationNotifierListener() {
-    debugPrint(
-        "fframeLog.FNavigationRouterDelegate.navigationNotifier: Updated to ${navigationNotifier.uri}, notifyListeners");
+    Console.log(
+      "Updated to ${navigationNotifier.uri}, notifyListeners",
+      scope: "fframeLog.FNavigationRouterDelegate.navigationNotifier",
+      level: LogLevel.fframe,
+    );
     notifyListeners();
     // navigationNotifier.removeListener(_navigationNotifierListener);
   }
 
   @override
   NavigationNotifier? get currentConfiguration {
-    debugPrint(
-        "fframeLog.FNavigationRouterDelegate.currentConfiguration: Updated to ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
+    Console.log(
+      "Updated to ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}",
+      scope: "fframeLog.FNavigationRouterDelegate.currentConfiguration",
+      level: LogLevel.fframe,
+    );
+
     // currentConfiguration?.uri?.path;
     // navigationNotifier.notifyListeners();
     return navigationNotifier;
@@ -58,7 +78,7 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier>
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log("NavigationRouterDelegate.build",
+    Console.log("NavigationRouterDelegate.build",
         scope: "fframeLog.NavigationRouter", level: LogLevel.fframe);
 
     return Navigator(
@@ -78,8 +98,11 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier>
   @override
   // ignore: avoid_renaming_method_parameters
   Future<void> setNewRoutePath(NavigationNotifier navigationNotifier) async {
-    debugPrint(
-        "fframeLog.FNavigationRouterDelegate.setNewRoutePath: Updated to ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}");
+    Console.log(
+      "Updated to ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}",
+      scope: "fframeLog.FNavigationRouterDelegate.setNewRoutePath",
+      level: LogLevel.fframe,
+    );
     return;
   }
 

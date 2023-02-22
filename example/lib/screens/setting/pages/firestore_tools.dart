@@ -3,8 +3,7 @@ import 'package:fframe/fframe.dart';
 
 import 'package:fframe/helpers/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import 'package:example/helpers/strings.dart';
+import 'package:fframe/helpers/console_logger.dart';
 
 class SettingsFirestoreToolsForm extends StatefulWidget {
   const SettingsFirestoreToolsForm({Key? key}) : super(key: key);
@@ -20,7 +19,7 @@ class _SettingsFirestoreToolsFormFormState
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log("Opening SettingsFirestoreToolsForm",
+    Console.log("Opening SettingsFirestoreToolsForm",
         scope: "exampleApp.Settings");
 
     return Form(
@@ -91,7 +90,9 @@ class StampUpdate {
               },
             ),
           },
-          onError: (e) => debugPrint("Error completing: $e"),
+          onError: (e) => Console.log("ERROR: $e",
+              scope: "exampleApp.SettingsFirestoreToolsForm.applyUpdate",
+              level: LogLevel.prod),
         );
   }
 
@@ -496,7 +497,9 @@ forAllInCollection(String collection) {
                 .set(data, SetOptions(merge: true));
           }),
         },
-        onError: (e) => debugPrint("Error completing: $e"),
+        onError: (e) => Console.log("ERROR: $e",
+            scope: "exampleApp.SettingsFirestoreToolsForm.forAllInCollection",
+            level: LogLevel.prod),
       );
 
   return true;
@@ -517,7 +520,9 @@ touchUpdateDate(String collection) {
                 .set(data, SetOptions(merge: true));
           }),
         },
-        onError: (e) => debugPrint("Error completing: $e"),
+        onError: (e) => Console.log("ERROR: $e",
+            scope: "exampleApp.SettingsFirestoreToolsForm.touchUpdateDate",
+            level: LogLevel.prod),
       );
 
   return true;

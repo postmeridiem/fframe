@@ -5,13 +5,13 @@ class RouterPage extends Page {
 
   @override
   Route createRoute(BuildContext context) {
-    Fframe.of(context)!.log("RouterPage.createRoute",
+    Console.log("RouterPage.createRoute",
         scope: "fframeLog.RouterPage", level: LogLevel.fframe);
     return MaterialPageRoute(
       settings: this,
       builder: (BuildContext context) =>
           Consumer(builder: (context, ref, child) {
-        Fframe.of(context)!.log("Build FRouter",
+        Console.log("Build FRouter",
             scope: "fframeLog.RouterPage", level: LogLevel.fframe);
         return FRouter(
           ref: ref,
@@ -45,15 +45,21 @@ class FRouter extends InheritedWidget {
       Map<String, String>? queryParameters,
       bool? resetQueryString = true,
       T? context}) {
-    debugPrint(
-        "fframeLog.FRouter.navigateTo: ${navigationTarget.path} ${queryParameters == null ? "without" : "with"} queryString ${queryParameters?.toString() ?? ""}. Reset queryString: $resetQueryString");
+    Console.log(
+      "${navigationTarget.path} ${queryParameters == null ? "without" : "with"} queryString ${queryParameters?.toString() ?? ""}. Reset queryString: $resetQueryString",
+      scope: "fframeLog.FRouter.navigateTo",
+      level: LogLevel.fframe,
+    );
     QueryState queryState = ref.read(queryStateProvider);
 
     QueryState newQueryState = (resetQueryString == true)
         ? QueryState(queryParameters: queryParameters)
         : QueryState.mergeComponents(queryState, queryParameters);
-    debugPrint(
-        "fframeLog.newQueryState: Updated to ${newQueryState.toString()}");
+    Console.log(
+      "Updated to ${newQueryState.toString()}",
+      scope: "fframeLog.FRouter.newQueryState",
+      level: LogLevel.fframe,
+    );
 
     TargetState targetState =
         TargetState.processRouteRequest(navigationTarget: navigationTarget);
@@ -68,7 +74,7 @@ class FRouter extends InheritedWidget {
   navigateToRoute<T>(BuildContext context,
       {required String route, String id = ''}) {
     bool idMode = id == '' ? false : true;
-    Fframe.of(context)!.log("$route ${idMode ? "into id: $id" : ""}",
+    Console.log("$route ${idMode ? "into id: $id" : ""}",
         scope: "fframeLog.navigateToRoute", level: LogLevel.prod);
     Map<String, String> queryParameters = idMode ? {"id": id} : {};
 
@@ -91,8 +97,11 @@ class FRouter extends InheritedWidget {
       {required String route,
       String id = ''}) {
     bool idMode = id == '' ? false : true;
-    debugPrint(
-        "fframeLog.FRouter.navigateToRouteFromNavigationTargets: Updated to $route ${idMode ? "into id: $id" : ""}");
+    Console.log(
+      "Updated to $route ${idMode ? "into id: $id" : ""}",
+      scope: "fframeLog.FRouter.navigateToRouteFromNavigationTargets",
+      level: LogLevel.prod,
+    );
     Map<String, String> queryParameters = idMode ? {"id": id} : {};
     List<String> routeSegments = route.split('/');
     String selector1 = routeSegments[0];
@@ -130,15 +139,21 @@ class FRouter extends InheritedWidget {
   updateQueryString<T>(
       {required Map<String, String> queryParameters,
       bool? resetQueryString = false}) {
-    debugPrint(
-        "fframeLog.FRouter.updateQueryString: Updated QueryString to ${queryParameters.toString()}}");
+    Console.log(
+      "Updated QueryString to ${queryParameters.toString()}}",
+      scope: "fframeLog.FRouter.updateQueryString",
+      level: LogLevel.fframe,
+    );
     QueryState queryState = ref.read(queryStateProvider);
 
     QueryState newQueryState = (resetQueryString == true)
         ? QueryState(queryParameters: queryParameters)
         : QueryState.mergeComponents(queryState, queryParameters);
-    debugPrint(
-        "fframeLog.FRouter.updateQueryString: ${newQueryState.toString()}");
+    Console.log(
+      newQueryState.toString(),
+      scope: "fframeLog.FRouter.updateQueryString",
+      level: LogLevel.fframe,
+    );
 
     navigationNotifier.processRouteInformation(queryState: newQueryState);
   }
@@ -320,8 +335,11 @@ class FRouter extends InheritedWidget {
           : pendingTarget;
 
       if (currentTarget.path != pendingTarget.path) {
-        debugPrint(
-            "fframeLog.FRouter.tabSwitch: Switch from ${currentTarget.path} to ${pendingTarget.path}.");
+        Console.log(
+          "Switch from ${currentTarget.path} to ${pendingTarget.path}.",
+          scope: "fframeLog.FRouter.tabSwitch",
+          level: LogLevel.prod,
+        );
         navigateTo(navigationTarget: pendingTarget);
       }
     }
@@ -366,7 +384,11 @@ class FRouter extends InheritedWidget {
                 .filteredNavigationConfig.navigationTargets[index];
             navigateTo(navigationTarget: navigationTarget);
           } else {
-            debugPrint("fframeLog.FRouter.navigationRail: Sign in/out action");
+            Console.log(
+              "Sign in/out action",
+              scope: "fframeLog.FRouter.navigationRail",
+              level: LogLevel.fframe,
+            );
 
             if (isSignedIn) {
               signIn();
@@ -440,7 +462,7 @@ class _RouterScreenState extends State<RouterScreen> {
     Future.delayed(Duration.zero, () {
       navigationNotifier.isBuilding = false;
     });
-    Fframe.of(context)!.log("Build RouterScreen",
+    Console.log("Build RouterScreen",
         scope: "fframeLog.RouterScreen", level: LogLevel.fframe);
     return FRouterConfig.instance.mainScreen;
   }

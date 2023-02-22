@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/providers/state_providers.dart';
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/fframe.dart';
 // import 'package:url_launcher/url_launcher.dart';
@@ -37,7 +38,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             ? ScreenSize.tablet
             : ScreenSize.large;
 
-    Fframe.of(context)!.log("Build to size: ${screenSize.toString()}",
+    Console.log("Build to size: ${screenSize.toString()}",
         scope: "fframeLog.MainScreen", level: LogLevel.fframe);
 
     if (FRouter.of(context).hasTabs) {

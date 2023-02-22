@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
+import 'package:fframe/helpers/console_logger.dart';
 
 class L10n {
   static final L10n instance = L10n._internal();
@@ -37,8 +38,11 @@ class L10n {
         output = selectedNameSpace[key]!['translation'];
       } else {}
     } else {
-      debugPrint(
-          "fframeLog.L10N: ERROR: Unknown namespace: $namespace while looking for <$key>");
+      Console.log(
+        "ERROR: Unknown namespace: $namespace while looking for <$key>",
+        scope: "fframeLog.L10N.string",
+        level: LogLevel.prod,
+      );
     }
     return output;
   }
@@ -130,7 +134,6 @@ class L10nConfig {
       // there was no query parameter
       output = defaultLoc;
     }
-    debugPrint("fframeLog.L10N: Locale set to [$output]");
     return output;
   }
 }
@@ -159,7 +162,7 @@ class L10nReader {
     List<String> namespaces = config.namespaces as List<String>;
     String mode = config.source.mode;
 
-    Fframe.of(context)!.log("Translation loader mode: $mode.",
+    Console.log("Translation loader mode: $mode.",
         scope: "fframeLog.L10N", level: LogLevel.fframe);
     switch (mode) {
       case 'local_assets':
@@ -167,7 +170,7 @@ class L10nReader {
           for (String namespace in namespaces) {
             String sourcepath =
                 "assets/translations/${namespace}_${config.locale.languageCode}_${config.locale.countryCode}.json";
-            Fframe.of(context)!.log(
+            Console.log(
                 "Loading namespace translations from path: <$sourcepath>.",
                 scope: "fframeLog.L10N",
                 level: LogLevel.fframe);

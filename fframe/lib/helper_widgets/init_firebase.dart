@@ -1,4 +1,5 @@
 import 'package:fframe/fframe.dart';
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 
 class InitializeFirebase extends StatelessWidget {
@@ -19,7 +20,7 @@ class InitializeFirebase extends StatelessWidget {
         options: firebaseOptions,
       ),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        Fframe.of(context)!.log("Initialize Firebase",
+        Console.log("Initialize Firebase",
             scope: "fframeLog.Firebase", level: LogLevel.fframe);
         switch (snapshot.connectionState) {
           case ConnectionState.none:

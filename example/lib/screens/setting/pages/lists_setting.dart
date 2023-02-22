@@ -1,4 +1,5 @@
 import 'package:fframe/fframe.dart';
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 
 import 'package:url_launcher/url_launcher.dart';
@@ -21,8 +22,7 @@ class _SettingsListsFormState extends State<SettingsListsForm> {
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!
-        .log("Opening SettingsListsForm", scope: "exampleApp.Settings");
+    Console.log("Opening SettingsListsForm", scope: "exampleApp.Settings");
     String path = 'fframe/lists/collection';
     CollectionReference col = FirebaseFirestore.instance.collection(path);
     return Row(

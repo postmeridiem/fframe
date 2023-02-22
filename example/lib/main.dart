@@ -3,6 +3,7 @@ import 'package:flutterfire_ui/auth.dart';
 
 import 'package:fframe/fframe.dart';
 import 'package:example/themes/themes.dart';
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:example/firebase_options.dart';
 import 'package:example/pages/empty_page.dart';
@@ -94,7 +95,7 @@ class MainApp extends StatelessWidget {
       darkMode: appDarkTheme,
       themeMode: ThemeMode.system,
       l10nConfig: l10nConfig,
-      logThreshold: LogLevel.fframe,
+      consoleLogger: Console(logThreshold: LogLevel.prod),
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
@@ -113,13 +114,15 @@ class MainApp extends StatelessWidget {
       //       .log("execution complete", scope: "exampleApp.postLoad");
       // },
       postSignIn: (context) async {
-        Fframe.of(context)!
-            .log("Execution complete", scope: "exampleApp.postSignIn");
-        Fframe.of(context)!.log("Log test fframe level",
+        Console.log("Execution complete", scope: "exampleApp.postSignIn");
+
+        Console.log("Log test fframe level",
             scope: "exampleApp.postSignIn", level: LogLevel.fframe);
-        Fframe.of(context)!.log("Log test dev level",
+
+        Console.log("Log test dev level",
             scope: "exampleApp.postSignIn", level: LogLevel.dev);
-        Fframe.of(context)!.log("Log test prod level",
+
+        Console.log("Log test prod level",
             scope: "exampleApp.postSignIn", level: LogLevel.prod);
       },
     );

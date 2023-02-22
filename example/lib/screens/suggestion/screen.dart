@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
+import 'package:fframe/helpers/console_logger.dart';
 
 // import 'package:example/services/suggestion_service.dart';
 import 'package:example/models/suggestion.dart';
@@ -181,10 +182,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             dataCellBuilder: ((Suggestion suggestion, Function save) =>
                 DataCell(
                   Text(suggestion.name ?? "?"),
-                  onTap: () => Fframe.of(context)!.log(
-                      "onTap ${suggestion.name}",
-                      scope: "exampleApp.Suggestions",
-                      level: LogLevel.dev),
+                  onTap: () => Console.log("onTap ${suggestion.name}",
+                      scope: "exampleApp.Suggestions", level: LogLevel.dev),
                   placeholder: false,
                 )),
           ),

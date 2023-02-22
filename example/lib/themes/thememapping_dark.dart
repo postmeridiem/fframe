@@ -66,4 +66,17 @@ final ThemeData appDarkTheme = ThemeData(
     labelColor: darkModeConfig.constPrimaryAccentColor,
     unselectedLabelColor: darkModeConfig.constUnselectedColor,
   ),
+  checkboxTheme: CheckboxThemeData(
+    checkColor: MaterialStateColor.resolveWith((states) {
+      return darkModeConfig.constPrimaryAccentColor;
+    }),
+  ),
+  toggleButtonsTheme: ToggleButtonsThemeData(
+    selectedColor: darkModeConfig.constPrimaryAccentColor,
+  ),
+  switchTheme: SwitchThemeData(
+    overlayColor: MaterialStateColor.resolveWith((states) {
+      return darkModeConfig.constPrimaryAccentColor;
+    }),
+  ),
 );

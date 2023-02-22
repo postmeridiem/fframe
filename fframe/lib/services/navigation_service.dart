@@ -1,4 +1,5 @@
 import 'package:fframe/fframe.dart';
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/providers/state_providers.dart';
 
@@ -57,8 +58,11 @@ class NavigationNotifier extends ChangeNotifier {
         Map<String, dynamic>? claims = idTokenResult.claims;
 
         if (claims != null && claims.containsKey("roles") == true) {
-          debugPrint(
-              "fframeLog.NavigationNotifier.authChangeListener: Has roles in ${claims["roles"].runtimeType}");
+          Console.log(
+            "Has roles in ${claims["roles"].runtimeType}",
+            scope: "fframeLog.NavigationNotifier.authChangeListener",
+            level: LogLevel.dev,
+          );
 
           if ("${claims["roles"].runtimeType}".toLowerCase() ==
               "JSArray<dynamic>".toLowerCase()) {
@@ -75,12 +79,18 @@ class NavigationNotifier extends ChangeNotifier {
           }
         }
         roles = roles.map((role) => role.toLowerCase()).toList();
-        debugPrint(
-            "fframeLog.NavigationNotifier.authChangeListener: User is signed in as ${user.uid} ${user.displayName} with roles: ${roles.join(", ")}");
+        Console.log(
+          "User is signed in as ${user.uid} ${user.displayName} with roles: ${roles.join(", ")}",
+          scope: "fframeLog.NavigationNotifier.authChangeListener",
+          level: LogLevel.dev,
+        );
         signIn(roles: roles);
       } catch (e) {
-        debugPrint(
-            "fframeLog.NavigationNotifier.authChangeListener: ERROR: Unable to interpret claims ${e.toString()}");
+        Console.log(
+          "ERROR: Unable to interpret claims ${e.toString()}",
+          scope: "fframeLog.NavigationNotifier.authChangeListener",
+          level: LogLevel.dev,
+        );
         signIn();
       }
     } else {
@@ -205,16 +215,22 @@ class NavigationNotifier extends ChangeNotifier {
                   .toSet();
               Set<String> interSection =
                   userRolesSet.intersection(targetRolesSet);
-              debugPrint(
-                  "fframeLog.NavigationNotifier._filterNavigationRoutes: ${navigationTarget.title}/${navigationTab.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} router: ${targetRolesSet.toString()})");
+              Console.log(
+                "${navigationTarget.title}/${navigationTab.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} router: ${targetRolesSet.toString()})",
+                scope: "fframeLog.NavigationNotifier._filterNavigationRoutes",
+                level: LogLevel.fframe,
+              );
               return interSection.isEmpty;
             });
           }
 
           if (targetRoles.isEmpty) {
             //No role based limitations apply
-            debugPrint(
-                "fframeLog.NavigationNotifier._filterNavigationRoutes: ${navigationTarget.title} => allow");
+            Console.log(
+              "${navigationTarget.title} => allow",
+              scope: "fframeLog.NavigationNotifier._filterNavigationRoutes",
+              level: LogLevel.fframe,
+            );
             return false;
           }
 
@@ -223,8 +239,11 @@ class NavigationNotifier extends ChangeNotifier {
               targetRoles.map((role) => role.toLowerCase()).toSet();
 
           Set<String> interSection = userRolesSet.intersection(targetRolesSet);
-          debugPrint(
-              "fframeLog.NavigationNotifier._filterNavigationRoutes: ${navigationTarget.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} router: ${targetRolesSet.toString()})");
+          Console.log(
+            "${navigationTarget.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} router: ${targetRolesSet.toString()})",
+            scope: "fframeLog.NavigationNotifier._filterNavigationRoutes",
+            level: LogLevel.fframe,
+          );
           return interSection.isEmpty;
         },
       );
@@ -279,23 +298,30 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   parseRouteInformation({required Uri uri}) {
-    debugPrint(
-        "fframeLog.NavigationNotifier.parseRouteInformation: *--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--");
-    debugPrint(
-        "fframeLog.NavigationNotifier.parseRouteInformation: $uri for ${uri.userInfo}");
+    Console.log(
+      "$uri for ${uri.userInfo}",
+      scope: "fframeLog.NavigationNotifier.parseRouteInformation",
+      level: LogLevel.fframe,
+    );
 
     TargetState? targetState = TargetState.fromUri(uri);
     QueryState? queryState = QueryState.fromUri(uri);
 
     if (uri.path != "/") {
-      debugPrint(
-          "fframeLog.NavigationNotifier.parseRouteInformation: NavigationNotifier.parseRouteInformation => Store initial link for later use: ${targetState.navigationTarget.title} ${queryState.queryString}");
+      Console.log(
+        "Store initial link for later use: ${targetState.navigationTarget.title} ${queryState.queryString}",
+        scope: "fframeLog.NavigationNotifier.parseRouteInformation",
+        level: LogLevel.fframe,
+      );
       nextState
           .add(NextState(targetState: targetState, queryState: queryState));
     }
 
-    debugPrint(
-        "fframeLog.NavigationNotifier.parseRouteInformation: ${targetState.navigationTarget.path} :: ${queryState.toString()}");
+    Console.log(
+      "${targetState.navigationTarget.path} :: ${queryState.toString()}",
+      scope: "fframeLog.NavigationNotifier.parseRouteInformation",
+      level: LogLevel.fframe,
+    );
 
     processRouteInformation(targetState: targetState, queryState: queryState);
   }
@@ -317,8 +343,11 @@ class NavigationNotifier extends ChangeNotifier {
         "/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}"
             .replaceAll("//", "/"));
     //Trigger the setter and te external method with it;
-    debugPrint(
-        "fframeLog.NavigationNotifier.parseRouteInformation: compose URI: ${uri.toString()}");
+    Console.log(
+      "compose URI: ${uri.toString()}",
+      scope: "fframeLog.NavigationNotifier.parseRouteInformation",
+      level: LogLevel.fframe,
+    );
     return uri;
   }
 
@@ -331,16 +360,22 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   set uri(Uri? uri) {
-    debugPrint(
-        "fframeLog.NavigationNotifier.uri: NavigationService.setUri: ${uri.toString()} was: $_uri");
+    Console.log(
+      "NavigationService.setUri: ${uri.toString()} was: $_uri",
+      scope: "fframeLog.NavigationNotifier.uri",
+      level: LogLevel.fframe,
+    );
 
     if (_uri == uri) {
       return;
     }
 
     if (_uri == null) {
-      debugPrint(
-          "fframeLog.NavigationNotifier.uri: New load, schedule build. Building: $_isbuilding");
+      Console.log(
+        "New load, schedule build. Building: $_isbuilding",
+        scope: "fframeLog.NavigationNotifier.uri",
+        level: LogLevel.fframe,
+      );
       _uri = uri;
       _buildPending = true;
     } else {
@@ -351,7 +386,11 @@ class NavigationNotifier extends ChangeNotifier {
       updateProviders();
       notifyListeners();
     } else {
-      debugPrint("fframeLog.NavigationNotifier.uri: Schedule delayed build");
+      Console.log(
+        "Schedule delayed build",
+        scope: "fframeLog.NavigationNotifier.uri",
+        level: LogLevel.fframe,
+      );
     }
   }
 
@@ -363,24 +402,36 @@ class NavigationNotifier extends ChangeNotifier {
 
     if (targetStateNotifier.state.navigationTarget.path !=
         _targetState!.navigationTarget.path) {
-      debugPrint(
-          "fframeLog.NavigationNotifier.updateProviders: Update targetState to ${_targetState!.navigationTarget.title} ${_targetState!.navigationTarget.path}");
+      Console.log(
+        "Update targetState to ${_targetState!.navigationTarget.title} ${_targetState!.navigationTarget.path}",
+        scope: "fframeLog.NavigationNotifier.updateProviders",
+        level: LogLevel.fframe,
+      );
       targetStateNotifier.update((state) => _targetState!);
     }
     if (queryStateNotifier.state.queryString != _queryState!.queryString) {
-      debugPrint(
-          "fframeLog.NavigationNotifier.updateProviders: Update queryState to ${_queryState!.queryString}");
+      Console.log(
+        "Update queryState to ${_queryState!.queryString}",
+        scope: "fframeLog.NavigationNotifier.updateProviders",
+        level: LogLevel.fframe,
+      );
       queryStateNotifier.update((state) => _queryState!);
     }
   }
 
   set isBuilding(bool isBuilding) {
-    debugPrint(
-        "fframeLog.NavigationNotifier.isBuilding: Set isBuilding to $isBuilding, buildPending = $_buildPending");
+    Console.log(
+      "Set isBuilding to $isBuilding, buildPending = $_buildPending",
+      scope: "fframeLog.NavigationNotifier.isBuilding",
+      level: LogLevel.fframe,
+    );
     _isbuilding = isBuilding;
     if (isBuilding == false && _buildPending == true) {
-      debugPrint(
-          "fframeLog.NavigationNotifier.isBuilding: Initiate delayed build for $uri");
+      Console.log(
+        "Initiate delayed build for $uri",
+        scope: "fframeLog.NavigationNotifier.isBuilding",
+        level: LogLevel.fframe,
+      );
       _buildPending = false;
       updateProviders();
     }

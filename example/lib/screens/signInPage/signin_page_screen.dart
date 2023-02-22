@@ -1,5 +1,6 @@
 import 'package:fframe/components/auth/decorations.dart';
 import 'package:fframe/fframe.dart';
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:flutterfire_ui/auth.dart';
@@ -24,7 +25,7 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log("Opening SignIn page",
+    Console.log("Opening SignIn page",
         scope: "exampleApp.SignIn", level: LogLevel.prod);
 
     // List<ProviderConfiguration>? providerConfigs = Fframe.of(context)?.providerConfigs;
@@ -46,10 +47,8 @@ class _SignInPageState extends State<SignInPage> {
       //Sign out from Google when signed out from Firebase
       FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
-          Fframe.of(context)!.log(
-              "User signed out. Sign out from Google as well.",
-              scope: "exampleApp.SignIn",
-              level: LogLevel.prod);
+          Console.log("User signed out. Sign out from Google as well.",
+              scope: "exampleApp.SignIn", level: LogLevel.prod);
           silentSignOut();
         }
       });

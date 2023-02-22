@@ -10,10 +10,10 @@ class Fframe extends InheritedWidget {
     required this.darkMode,
     required this.lightMode,
     required this.l10nConfig,
+    required this.consoleLogger,
     this.themeMode = ThemeMode.system,
     this.providerConfigs,
     this.debugShowCheckedModeBanner = true,
-    this.logThreshold = LogLevel.dev,
     this.globalActions,
     this.postLoad,
     this.postSignIn,
@@ -29,12 +29,12 @@ class Fframe extends InheritedWidget {
   final ThemeData lightMode;
   late ThemeMode themeMode;
   final L10nConfig l10nConfig;
+  final Console consoleLogger;
   final bool debugShowCheckedModeBanner;
   final List<Widget>? globalActions;
   final PostFunction? postLoad;
   final PostFunction? postSignIn;
   final PostFunction? postSignOut;
-  final LogLevel logThreshold;
 
   FFrameUser? user;
 
@@ -65,43 +65,6 @@ class Fframe extends InheritedWidget {
   bool updateShouldNotify(Fframe oldWidget) {
     return true;
   }
-
-  void log(
-    String message, {
-    String scope = "Unspecified",
-    LogLevel level = LogLevel.dev,
-  }) {
-    LogLevel logThreshold = this.logThreshold;
-    switch (logThreshold) {
-      case LogLevel.fframe:
-        if (level == LogLevel.fframe ||
-            level == LogLevel.dev ||
-            level == LogLevel.prod) {
-          // show all log prints
-          debugPrint("$scope: $message");
-        }
-        break;
-      case LogLevel.dev:
-        if (level == LogLevel.dev || level == LogLevel.prod) {
-          // show all log prints with level warning or error
-          debugPrint("$scope: $message");
-        }
-        break;
-      case LogLevel.prod:
-        if (level == LogLevel.prod) {
-          // show all log prints with level error
-          debugPrint("$scope: $message");
-        }
-        break;
-      default:
-    }
-  }
-}
-
-enum LogLevel {
-  fframe,
-  dev,
-  prod,
 }
 
 class FFramePreload extends StatelessWidget {
@@ -285,7 +248,7 @@ class EmailAuthManagerState extends State<EmailAuthManager>
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log(
+    Console.log(
         "dynamic link research: ${Uri.base} => ${FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())}",
         scope: "fframeLog.EmailAutManager",
         level: LogLevel.fframe);
@@ -328,23 +291,21 @@ class EmailAuthManagerState extends State<EmailAuthManager>
                       );
                 case ConnectionState.done:
                   if (snapshot.hasError) {
-                    Fframe.of(context)!.log(
-                        "Link sign in failed: ${snapshot.error}",
+                    Console.log("Link sign in failed: ${snapshot.error}",
                         scope: "fframeLog.EmailAutManager",
                         level: LogLevel.fframe);
                     return const FframePostLoad();
                   }
 
                   UserCredential? userCredential = snapshot.data;
-                  Fframe.of(context)!.log(
-                      "Resulting user: ${userCredential?.user?.email}",
+                  Console.log("Resulting user: ${userCredential?.user?.email}",
                       scope: "fframeLog.EmailAutManager",
                       level: LogLevel.fframe);
                   return const FframePostLoad();
               }
             });
       } else {
-        Fframe.of(context)!.log("emailAddress not found in hash",
+        Console.log("emailAddress not found in hash",
             scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
       }
     }
@@ -373,7 +334,7 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
   Widget build(BuildContext context) {
     if (Fframe.of(context)?.postSignIn == null &&
         Fframe.of(context)?.postSignOut == null) {
-      Fframe.of(context)!.log("No code provided",
+      Console.log("No code provided",
           scope: "fframeLog.postSignIn/Out", level: LogLevel.fframe);
       return const FframePostLoad();
     } else {
@@ -383,7 +344,7 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
         builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
           if (snapshot.hasData && snapshot.data != null && signedIn == false) {
             //User has gone from signed out to signed in
-            Fframe.of(context)!.log("Code executing",
+            Console.log("Code executing",
                 scope: "fframeLog.postSignIn", level: LogLevel.fframe);
             if (Fframe.of(context)?.postSignIn != null) {
               return FutureBuilder<void>(
@@ -422,7 +383,7 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
             }
           } else {
             //User had gone from signed in to signed out
-            Fframe.of(context)!.log("Code executing",
+            Console.log("Code executing",
                 scope: "fframeLog.postSignOut", level: LogLevel.fframe);
             if (Fframe.of(context)?.postSignOut != null) {
               return FutureBuilder<void>(
@@ -484,11 +445,11 @@ class _FframePostLoadState extends State<FframePostLoad> {
   @override
   Widget build(BuildContext context) {
     if (Fframe.of(context)?.postLoad == null) {
-      Fframe.of(context)!.log("No code provided",
+      Console.log("No code provided",
           scope: "fframeLog.postLoad", level: LogLevel.fframe);
       return const FframeBuilder();
     } else {
-      Fframe.of(context)!.log("Code executing",
+      Console.log("Code executing",
           scope: "fframeLog.postLoad", level: LogLevel.fframe);
       return FutureBuilder<void>(
         future: Fframe.of(context)!.postLoad!(context),

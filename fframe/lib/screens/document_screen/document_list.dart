@@ -91,10 +91,8 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log(
-        "Build DocumentList with key ${widget.key.toString()}",
-        scope: "fframeLog.DocumentListLoader",
-        level: LogLevel.fframe);
+    Console.log("Build DocumentList with key ${widget.key.toString()}",
+        scope: "fframeLog.DocumentListLoader", level: LogLevel.fframe);
     DocumentScreenConfig documentScreenConfig =
         DocumentScreenConfig.of(context)!;
     DocumentConfig<T> documentConfig =
@@ -136,7 +134,7 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
             ? ScreenSize.tablet
             : ScreenSize.large;
 
-    Fframe.of(context)!.log(
+    Console.log(
         "Build documentListLoader with key: listScaffold_${widget.key.toString()}",
         scope: "fframeLog.DocumentListBody",
         level: LogLevel.fframe);
@@ -272,7 +270,7 @@ class GetDocumentCount<T> extends StatelessWidget {
       ),
       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
         if (snapshot.hasError) {
-          Fframe.of(context)!.log("ERROR: ${snapshot.error.toString()}",
+          Console.log("ERROR: ${snapshot.error.toString()}",
               scope: "fframeLog.GetDocumentCount", level: LogLevel.prod);
           return const IgnorePointer();
         }

@@ -14,16 +14,22 @@ class QueryState {
     Map<String, String> newQueryParameters = {};
     newQueryParameters.addAll(queryState.queryParameters ?? {});
     newQueryParameters.addAll(queryParameters ?? {});
-    debugPrint(
-        "fframeLog.QueryState.mergeComponents: Merged parameters: ${newQueryParameters.toString()}");
+    Console.log(
+      "Merged parameters: ${newQueryParameters.toString()}",
+      scope: "fframeLog.QueryState.mergeComponents",
+      level: LogLevel.fframe,
+    );
     return QueryState(
         queryParameters: newQueryParameters); //, context: context);
   }
 
   factory QueryState.defaultroute() {
     if (navigationNotifier.nextState.isNotEmpty) {
-      debugPrint(
-          "fframeLog.QueryState.defaultroute: Route to ${navigationNotifier.nextState.first.queryState.queryString}");
+      Console.log(
+        "Route to ${navigationNotifier.nextState.first.queryState.queryString}",
+        scope: "fframeLog.QueryState.defaultroute",
+        level: LogLevel.fframe,
+      );
       return navigationNotifier.nextState.first.queryState;
     }
 

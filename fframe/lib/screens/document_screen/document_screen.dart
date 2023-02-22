@@ -57,7 +57,7 @@ class DocumentScreen<T> extends StatelessWidget {
     String? queryStringIdParam;
     bool? embeddedDocument;
     if (parentDocumentScreenConfig != null) {
-      Fframe.of(context)!.log(
+      Console.log(
           "This is an embedded instance of the DocumentScreen initalize FormCeption",
           scope: "fframeLog.DocumentScreen",
           level: LogLevel.fframe);
@@ -392,10 +392,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
       );
 
       if (documentSnapshot?.exists ?? false) {
-        Fframe.of(context)!.log(
-            "Loaded document $docId to selectionState and notify",
-            scope: "fframeLog.DocumentScreen.load",
-            level: LogLevel.fframe);
+        Console.log("Loaded document $docId to selectionState and notify",
+            scope: "fframeLog.DocumentScreen.load", level: LogLevel.fframe);
         selectionState.setState(
           SelectionState<T>(
             data: documentSnapshot!.data(),
@@ -404,7 +402,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
           notify: true,
         );
       } else {
-        Fframe.of(context)!.log("ERROR: Document does not exist",
+        Console.log("ERROR: Document does not exist",
             scope: "fframeLog.DocumentScreen.load", level: LogLevel.prod);
         FRouter.of(context).updateQueryString(
           queryParameters: {},
@@ -452,10 +450,8 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
       if (documentConfig.preSave != null) {
         selectionState.data = documentConfig.preSave!(selectionState.data!);
       }
-      Fframe.of(context)!.log(
-          "Save item $docId in collection ${documentConfig.collection}",
-          scope: "fframeLog.DocumentScreen.save",
-          level: LogLevel.dev);
+      Console.log("Save item $docId in collection ${documentConfig.collection}",
+          scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
 
       SaveState saveResult = selectionState.isNew
           ? await DatabaseService<T>().createDocument(
@@ -475,14 +471,14 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
       if (saveResult.result) {
         //Success
-        Fframe.of(context)!.log("Save was successfull",
+        Console.log("Save was successfull",
             scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
 
         if (closeAfterSave) {
           close<T>(context: context, skipWarning: true);
         }
       } else {
-        Fframe.of(context)!.log("ERROR: Save failed",
+        Console.log("ERROR: Save failed",
             scope: "fframeLog.DocumentScreen.save", level: LogLevel.prod);
 
         snackbar(
@@ -506,7 +502,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     int invalidTab = documentConfig.document.activeTabs!
         .map((DocumentTab tab) {
           bool result = tab.formKey.currentState!.validate();
-          Fframe.of(context)!.log("Tab validation: $result",
+          Console.log("Tab validation: $result",
               scope: "fframeLog.DocumentScreen.validate", level: LogLevel.dev);
           return tab.formKey.currentState!.validate();
         })
@@ -676,7 +672,7 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>>
     with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log("Build DocumentLoader: ${widget.key.toString()}",
+    Console.log("Build DocumentLoader: ${widget.key.toString()}",
         scope: "fframeLog.DocumentLoader", level: LogLevel.fframe);
 
     DocumentConfig<T> documentConfig =
@@ -776,12 +772,12 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log("Build _ScreenBodyState",
+    Console.log("Build _ScreenBodyState",
         scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
     DocumentScreenConfig documentScreenConfig =
         DocumentScreenConfig.of(context)!;
     if (firstDoc != null) {
-      Fframe.of(context)!.log("First doc",
+      Console.log("First doc",
           scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
     }
 
@@ -830,7 +826,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
         documentScreenConfig.selectionState.isNew == false &&
         queryState.queryParameters!.containsKey("new") &&
         queryState.queryParameters!["new"] == "true") {
-      Fframe.of(context)!.log("Spawn a new document",
+      Console.log("Spawn a new document",
           scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
       documentScreenConfig.selectionState.setState(
           SelectionState<T>(
@@ -842,7 +838,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
     } else if (documentScreenConfig.selectionState.data is T &&
         queryState.queryParameters!.containsKey("new") &&
         queryState.queryParameters!["new"] == "true") {
-      Fframe.of(context)!.log("Spawn document from cache",
+      Console.log("Spawn document from cache",
           scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
       // return returnWidget;
     } else if (!queryState.queryParameters!
@@ -867,7 +863,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
           .waitPage(context: context, text: "Loading document");
     }
 
-    Fframe.of(context)!.log("Load the AnimatedSwitcher",
+    Console.log("Load the AnimatedSwitcher",
         scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
     return AnimatedBuilder(
       animation: documentScreenConfig.selectionState as SelectionState<T>,

@@ -69,27 +69,60 @@ final userRolesProvider = StreamProvider<List<String>>((ref) {
   List<String> roles = [];
   ref.watch(userStreamProvider.future).then(
     ((User? user) async {
-      debugPrint("ResolveRoles");
+      Console.log(
+        "ResolveRoles",
+        scope: "fframeLog.userRolesProvider",
+        level: LogLevel.fframe,
+      );
       if (user != null) {
         IdTokenResult idTokenResult = await user.getIdTokenResult();
 
         Map<String, dynamic>? claims = idTokenResult.claims;
 
         if (claims != null && claims.containsKey("roles") == true) {
-          debugPrint("Has roles formatted as ${claims["roles"].runtimeType}: ${claims["roles"].toString()}");
-          if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
-            debugPrint("JSArray mode roles");
+          Console.log(
+            "Has roles formatted as ${claims["roles"].runtimeType}: ${claims["roles"].toString()}",
+            scope: "fframeLog.userRolesProvider",
+            level: LogLevel.fframe,
+          );
+
+          if ("${claims["roles"].runtimeType}".toLowerCase() ==
+              "JSArray<dynamic>".toLowerCase()) {
+            Console.log(
+              "JSArray mode roles",
+              scope: "fframeLog.userRolesProvider",
+              level: LogLevel.fframe,
+            );
 
             roles = List<String>.from(claims["roles"]);
-          } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
-            debugPrint("standard mode roles");
-            debugPrint("${List<String>.from(claims["roles"].map((e) => e.toString()).toList())}");
-            roles = List<String>.from(claims["roles"].map((e) => e.toString()).toList());
+          } else if (List<dynamic> == claims["roles"].runtimeType ||
+              List<String> == claims["roles"].runtimeType) {
+            Console.log(
+              "standard mode roles",
+              scope: "fframeLog.userRolesProvider",
+              level: LogLevel.fframe,
+            );
+            Console.log(
+              "${List<String>.from(claims["roles"].map((e) => e.toString()).toList())}",
+              scope: "fframeLog.userRolesProvider",
+              level: LogLevel.fframe,
+            );
+            roles = List<String>.from(
+                claims["roles"].map((e) => e.toString()).toList());
           } else {
-            debugPrint("map mode roles");
+            Console.log(
+              "map mode roles",
+              scope: "fframeLog.userRolesProvider",
+              level: LogLevel.fframe,
+            );
             //Legacy mode... it's
-            debugPrint("standard mode roles");
-            Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
+            Console.log(
+              "standard mode roles",
+              scope: "fframeLog.userRolesProvider",
+              level: LogLevel.fframe,
+            );
+            Map<String, dynamic>? rolesMap =
+                Map<String, dynamic>.from(claims["roles"]);
             rolesMap.removeWhere((key, value) => value == false);
             roles = List<String>.from(rolesMap.keys);
           }

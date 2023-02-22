@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
-
-import 'package:example/themes/themes.dart';
+import 'package:fframe/helpers/console_logger.dart';
 
 import 'package:example/helpers/prompts.dart';
 import 'package:fframe/helpers/l10n.dart';
@@ -19,8 +18,7 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!
-        .log("Opening SettingsGeneralForm", scope: "exampleApp.Settings");
+    Console.log("Opening SettingsGeneralForm", scope: "exampleApp.Settings");
 
     List<L10nReplacer> replacers = [
       L10nReplacer(from: "{locale}", replace: 'replaceworks'),

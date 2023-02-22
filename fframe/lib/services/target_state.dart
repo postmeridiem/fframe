@@ -11,8 +11,10 @@ class TargetState {
       {required NavigationTarget navigationTarget}) {
     if (navigationTarget.navigationTabs != null &&
         navigationTarget is! NavigationTab) {
-      debugPrint(
-          "fframeLog.TargetState.processRouteRequest: Cannot route to a path which has tabs. Mandatory apply the first tab");
+      Console.log(
+          "Cannot route to a path which has tabs. Mandatory apply the first tab",
+          scope: "fframeLog.TargetState.processRouteReques",
+          level: LogLevel.fframe);
       navigationTarget = navigationTarget.navigationTabs!.first;
     }
     return TargetState(navigationTarget: navigationTarget);
@@ -51,8 +53,8 @@ class TargetState {
         navigationTarget: navigationNotifier.navigationConfig.errorPage);
     try {
       if (navigationNotifier.navigationConfig.navigationTargets.isEmpty) {
-        debugPrint(
-            "fframeLog.TargetState.targetState: No routes have been defined");
+        Console.log("No routes have been defined",
+            scope: "fframeLog.TargetState.targetState", level: LogLevel.fframe);
         return targetState;
       }
 
@@ -63,16 +65,18 @@ class TargetState {
         NavigationTarget navigationTarget = navigationNotifier
             .navigationConfig.navigationTargets
             .firstWhere((NavigationTarget navigationTarget) {
-          debugPrint(
-              "fframeLog.TargetState.targetState: ${navigationTarget.path} == ${uri.pathSegments.first}");
+          Console.log("${navigationTarget.path} == ${uri.pathSegments.first}",
+              scope: "fframeLog.TargetState.targetState",
+              level: LogLevel.fframe);
           return navigationTarget.path == uri.pathSegments.first;
         });
 
         if (navigationTarget.navigationTabs != null &&
             navigationTarget.navigationTabs!.isNotEmpty &&
             uri.pathSegments.length > 1) {
-          debugPrint(
-              "fframeLog.TargetState.targetState: Search for subroutes, get the corresponding tab config.");
+          Console.log("Search for subroutes, get the corresponding tab config",
+              scope: "fframeLog.TargetState.targetState",
+              level: LogLevel.fframe);
           String searchPath =
               "${navigationTarget.path}/${uri.pathSegments.last}";
 
@@ -97,16 +101,18 @@ class TargetState {
           //Assign the root target to the stargetState
           targetState = TargetState(navigationTarget: navigationTarget);
         } else {
-          debugPrint(
-              "fframeLog.TargetState.targetState: WARN: subtab requested, but configuration does not match.");
+          Console.log(
+              "WARN: subtab requested, but configuration does not match",
+              scope: "fframeLog.TargetState.targetState",
+              level: LogLevel.fframe);
         }
       }
     } catch (e) {
-      debugPrint(
-          "fframeLog.TargetState.targetState: ERROR: Routing to ${uri.toString()} failed: ${e.toString()}");
+      Console.log("ERROR: Routing to ${uri.toString()} failed: ${e.toString()}",
+          scope: "fframeLog.TargetState.targetState", level: LogLevel.fframe);
     }
-    debugPrint(
-        "fframeLog.TargetState.targetState: Routing to ${targetState.navigationTarget.path}");
+    Console.log("Routing to ${targetState.navigationTarget.path}",
+        scope: "fframeLog.TargetState.targetState", level: LogLevel.dev);
     return targetState;
   }
 
@@ -137,27 +143,33 @@ class TargetState {
       navigationTarget: navigationTargets.firstWhere(
           (NavigationTarget navigationTarget) => navigationTarget.landingPage,
           orElse: () {
-        debugPrint(
-            "fframeLog.TargetState.defaultRoute: ***** No default route has been configured. Please update the navigation config. *****");
+        Console.log(
+            "***** No default route has been configured. Please update the navigation config. *****",
+            scope: "fframeLog.TargetState.defaultRoute",
+            level: LogLevel.fframe);
         return navigationNotifier.filteredNavigationConfig.errorPage;
       }),
     );
 
     if (targetState.navigationTarget.navigationTabs?.isNotEmpty == true) {
-      debugPrint(
-          "fframeLog.TargetState.defaultRoute: Route to the first available tab");
+      Console.log("Route to the first available tab",
+          scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.dev);
       targetState = TargetState(
           navigationTarget: targetState.navigationTarget.navigationTabs!.first);
     }
 
     if (navigationNotifier.nextState.isNotEmpty) {
-      debugPrint(
-          "fframeLog.TargetState.defaultRoute: Route to ${navigationNotifier.nextState.first.targetState.navigationTarget.title} at ${navigationNotifier.nextState.first.targetState.navigationTarget.path}");
+      Console.log(
+          "Route to ${navigationNotifier.nextState.first.targetState.navigationTarget.title} at ${navigationNotifier.nextState.first.targetState.navigationTarget.path}",
+          scope: "fframeLog.TargetState.defaultRoute",
+          level: LogLevel.fframe);
       return navigationNotifier.nextState.first.targetState;
     }
 
-    debugPrint(
-        "fframeLog.TargetState.defaultRoute: DefaultRoute to ${targetState.navigationTarget.title} at ${targetState.navigationTarget.path}");
+    Console.log(
+        "DefaultRoute to ${targetState.navigationTarget.title} at ${targetState.navigationTarget.path}",
+        scope: "fframeLog.TargetState.defaultRoute",
+        level: LogLevel.fframe);
     return targetState;
   }
 

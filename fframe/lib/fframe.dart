@@ -31,6 +31,7 @@ import 'package:fframe/controllers/selection_state_controller.dart';
 import 'package:fframe/helper_widgets/init_l10n.dart';
 
 import 'package:fframe/helpers/l10n.dart';
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:intl/intl.dart' show toBeginningOfSentenceCase;

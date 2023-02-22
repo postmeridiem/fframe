@@ -24,7 +24,7 @@ class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log("build documentBodyLoader ${widget.key.toString()}",
+    Console.log("build documentBodyLoader ${widget.key.toString()}",
         scope: "fframeLog.DocumentBodyLoader", level: LogLevel.fframe);
     documentScreenConfig = DocumentScreenConfig.of(context)!;
     documentConfig =
@@ -54,7 +54,7 @@ class DocumentBody<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log("build documentBody ${key.toString()}",
+    Console.log("build documentBody ${key.toString()}",
         scope: "fframeLog.DocumentBody", level: LogLevel.fframe);
 
     String tabIndexKey = documentScreenConfig.documentConfig.embeddedDocument
@@ -89,10 +89,8 @@ class DocumentBody<T> extends StatelessWidget {
             tabController.addListener(
               () {
                 if (!tabController.indexIsChanging) {
-                  Fframe.of(context)!.log(
-                      "Navigate to tab ${tabController.index}",
-                      scope: "fframeLog.DocumentBody",
-                      level: LogLevel.prod);
+                  Console.log("Navigate to tab ${tabController.index}",
+                      scope: "fframeLog.DocumentBody", level: LogLevel.prod);
                   if (!documentScreenConfig.selectionState.readOnly &&
                       !documentScreenConfig.selectionState.isNew) {
                     int errorTab =

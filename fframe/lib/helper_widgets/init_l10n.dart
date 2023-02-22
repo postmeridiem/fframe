@@ -1,4 +1,5 @@
 import 'package:fframe/fframe.dart';
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +17,7 @@ class InitializeL10n extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Fframe.of(context)!.log("Initialize L10n",
+    Console.log("Initialize L10n",
         scope: "fframeLog.L10n", level: LogLevel.fframe);
     return FutureBuilder(
       future: L10nReader.read(context, l10nConfig),
@@ -35,7 +36,7 @@ class InitializeL10n extends StatelessWidget {
               Map<String, dynamic> localeData =
                   snapshot.data as Map<String, dynamic>;
               // create the language engine
-              Fframe.of(context)!.log("Language engine loaded",
+              Console.log("Language engine loaded",
                   scope: "fframeLog.L10n", level: LogLevel.fframe);
               return l10Builder(
                 context,
@@ -46,7 +47,7 @@ class InitializeL10n extends StatelessWidget {
               );
             } else {
               // create the language engine
-              Fframe.of(context)!.log("ERROR: Language engine failed to load.",
+              Console.log("ERROR: Language engine failed to load.",
                   scope: "fframeLog.L10n", level: LogLevel.fframe);
               return l10Builder(
                 context,
