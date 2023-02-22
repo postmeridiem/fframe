@@ -1,4 +1,5 @@
 import 'package:fframe/fframe.dart';
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
@@ -47,7 +48,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         ),
       );
     } catch (e) {
-      Fframe.of(context)!.log("ERROR: ${e.toString()}",
+      Console.log("ERROR: ${e.toString()}",
           scope: "exampleApp.addUserRole", level: LogLevel.prod);
     }
   }
@@ -81,7 +82,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         ),
       );
     } catch (e) {
-      Fframe.of(context)!.log("ERROR: ${e.toString()}",
+      Console.log("ERROR: ${e.toString()}",
           scope: "exampleApp.removeUserRole", level: LogLevel.prod);
     }
   }
@@ -112,7 +113,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         ),
       );
     } catch (e) {
-      Fframe.of(context)!.log("ERROR: ${e.toString()}",
+      Console.log("ERROR: ${e.toString()}",
           scope: "exampleApp.getUserRoles", level: LogLevel.prod);
     }
     return [];
@@ -145,6 +146,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
                           else
                             {addUserRole(context, mapEntry.key)}
                         },
+                        activeColor: Theme.of(context).colorScheme.onBackground,
                       ),
                     )
                     .toList(),
