@@ -38,7 +38,7 @@ class Console {
       case LogLevel.prod:
         if (level == LogLevel.prod) {
           // show all log prints with level error
-          debugPrint("$scope: $message");
+          debugPrint(message);
         }
         break;
       default:
