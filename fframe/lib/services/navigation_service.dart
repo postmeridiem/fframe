@@ -61,7 +61,7 @@ class NavigationNotifier extends ChangeNotifier {
           Console.log(
             "Has roles in ${claims["roles"].runtimeType}",
             scope: "fframeLog.NavigationNotifier.authChangeListener",
-            level: LogLevel.dev,
+            level: LogLevel.fframe,
           );
 
           if ("${claims["roles"].runtimeType}".toLowerCase() ==

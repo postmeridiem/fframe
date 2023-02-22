@@ -112,7 +112,7 @@ class TargetState {
           scope: "fframeLog.TargetState.targetState", level: LogLevel.fframe);
     }
     Console.log("Routing to ${targetState.navigationTarget.path}",
-        scope: "fframeLog.TargetState.targetState", level: LogLevel.dev);
+        scope: "fframeLog.TargetState.targetState", level: LogLevel.fframe);
     return targetState;
   }
 
@@ -153,7 +153,7 @@ class TargetState {
 
     if (targetState.navigationTarget.navigationTabs?.isNotEmpty == true) {
       Console.log("Route to the first available tab",
-          scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.dev);
+          scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.fframe);
       targetState = TargetState(
           navigationTarget: targetState.navigationTarget.navigationTabs!.first);
     }
