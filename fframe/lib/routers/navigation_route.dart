@@ -20,20 +20,17 @@ class FNavigationRouteInformationParser
   }
 
   @override
-  // ignore: avoid_renaming_method_parameters
-  RouteInformation? restoreRouteInformation(
-      NavigationNotifier navigationNotifier) {
+  RouteInformation? restoreRouteInformation(NavigationNotifier configuration) {
     //Updates the browser history
 
     Console.log(
-      "Updated to ${navigationNotifier.composeUri()}",
+      "Updated to ${configuration.composeUri()}",
       scope:
           "fframeLog.FNavigationRouteInformationParser.restoreRouteInformation",
       level: LogLevel.fframe,
     );
 
-    return RouteInformation(
-        location: navigationNotifier.restoreRouteInformation());
+    return RouteInformation(location: configuration.restoreRouteInformation());
   }
 }
 
