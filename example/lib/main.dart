@@ -116,13 +116,13 @@ class MainApp extends StatelessWidget {
       postSignIn: (context) async {
         Console.log("Execution complete", scope: "exampleApp.postSignIn");
 
-        Console.log("Log test fframe level",
+        Console.log("Log example fframe level",
             scope: "exampleApp.postSignIn", level: LogLevel.fframe);
 
-        Console.log("Log test dev level",
+        Console.log("Log example dev level",
             scope: "exampleApp.postSignIn", level: LogLevel.dev);
 
-        Console.log("Log test prod level",
+        Console.log("Log example prod level",
             scope: "exampleApp.postSignIn", level: LogLevel.prod);
       },
     );
