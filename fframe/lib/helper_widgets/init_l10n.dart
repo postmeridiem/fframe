@@ -17,8 +17,8 @@ class InitializeL10n extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Console.log("Initialize L10n",
-        scope: "fframeLog.L10n", level: LogLevel.fframe);
+    Console.log("Initializing language engine",
+        scope: "fframeLog.L10n", level: LogLevel.prod);
     return FutureBuilder(
       future: L10nReader.read(context, l10nConfig),
       builder:
@@ -48,7 +48,7 @@ class InitializeL10n extends StatelessWidget {
             } else {
               // create the language engine
               Console.log("ERROR: Language engine failed to load.",
-                  scope: "fframeLog.L10n", level: LogLevel.fframe);
+                  scope: "fframeLog.L10n", level: LogLevel.prod);
               return l10Builder(
                 context,
                 L10n(
