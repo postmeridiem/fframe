@@ -459,11 +459,11 @@ class RouterScreen extends StatefulWidget {
 class _RouterScreenState extends State<RouterScreen> {
   @override
   Widget build(BuildContext context) {
+    Console.log("Build RouterScreen",
+        scope: "fframeLog.RouterScreen", level: LogLevel.fframe);
     Future.delayed(Duration.zero, () {
       navigationNotifier.isBuilding = false;
     });
-    Console.log("Build RouterScreen",
-        scope: "fframeLog.RouterScreen", level: LogLevel.fframe);
     return FRouterConfig.instance.mainScreen;
   }
 }
