@@ -135,6 +135,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   final DocumentConfig documentConfig;
   final SelectionState selectionState;
   final FireStoreQueryState fireStoreQueryState;
+
   static DocumentScreenConfig? of(BuildContext context) {
     return context.dependOnInheritedWidgetOfExactType<DocumentScreenConfig>();
   }
@@ -203,81 +204,81 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   }
 
   delete<T>({required BuildContext context}) async {
-    if (await (confirmationDialog(
-            context: context,
-            cancelText: L10n.string(
-              "iconbutton_document_delete_cancel",
-              placeholder: "Cancel",
-              namespace: 'fframe',
-            ),
-            continueText: L10n.string(
-              "iconbutton_document_delete_continue",
-              placeholder: "Continue",
-              namespace: 'fframe',
-            ),
-            titleText: L10n.string(
-              "iconbutton_document_delete_title",
-              placeholder: "Delete this document",
-              namespace: 'fframe',
-            ),
-            child: SizedBox(
-              height: 100.0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
+
+    bool dialogResult = await (confirmationDialog(
+        context: context,
+        cancelText: L10n.string(
+          "iconbutton_document_delete_cancel",
+          placeholder: "Cancel",
+          namespace: 'fframe',
+        ),
+        continueText: L10n.string(
+          "iconbutton_document_delete_continue",
+          placeholder: "Continue",
+          namespace: 'fframe',
+        ),
+        titleText: L10n.string(
+          "iconbutton_document_delete_title",
+          placeholder: "Delete this document",
+          namespace: 'fframe',
+        ),
+        child: SizedBox(
+          height: 100.0,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Icon(
+                  Icons.warning,
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.warning,
-                      color: Theme.of(context).errorColor,
+                  Text(
+                    L10n.string(
+                      "iconbutton_document_delete1",
+                      placeholder: "Delete this document?",
+                      namespace: 'fframe',
                     ),
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        L10n.string(
-                          "iconbutton_document_delete1",
-                          placeholder: "Delete this document?",
-                          namespace: 'fframe',
-                        ),
-                      ),
-                      Text(
-                        L10n.string(
-                          "iconbutton_document_delete2",
-                          placeholder: "This operation cannot be undone.",
-                          namespace: 'fframe',
-                        ),
-                      ),
-                    ],
+                  Text(
+                    L10n.string(
+                      "iconbutton_document_delete2",
+                      placeholder: "This operation cannot be undone.",
+                      namespace: 'fframe',
+                    ),
                   ),
                 ],
               ),
-            ))) ==
-        true) {
+            ],
+          ),
+        )));
+
+    if (dialogResult == true) {
       DocumentConfig<T> documentConfig =
-          this.documentConfig as DocumentConfig<T>;
+      this.documentConfig as DocumentConfig<T>;
       SaveState saveResult = await DatabaseService<T>().deleteDocument(
         collection: documentConfig.collection,
         documentId: selectionState.docId!,
         fromFirestore: documentConfig.fromFirestore,
         toFirestore: documentConfig.toFirestore,
       );
-      if (saveResult.result == true) {
-        //Close the document
-        // if (!context.mounted) return;
+      if (saveResult.result == true && context.mounted) {
         FRouter.of(context)
             .updateQueryString(queryParameters: {}, resetQueryString: true);
-      } else {
+        } else {
         //show the error
         snackbar(
           context: context,
           text: saveResult.errorMessage!,
           icon: Icon(
             Icons.error,
-            color: Theme.of(context).errorColor,
+            color: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -404,29 +405,32 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
       } else {
         Console.log("ERROR: Document does not exist",
             scope: "fframeLog.DocumentScreen.load", level: LogLevel.prod);
-        FRouter.of(context).updateQueryString(
-          queryParameters: {},
-          resetQueryString: true,
-        );
+        if (context.mounted) {
+          FRouter.of(context).updateQueryString(
+            queryParameters: {},
+            resetQueryString: true,
+          );
+          snackbar(
+            context: context,
+            text: "Referenced document could not be loaded: $docId",
+            icon: Icon(
+              Icons.error,
+              color: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
         snackbar(
           context: context,
-          text: "Referenced document could not be loaded: $docId",
+          text: "Referenced document system broken: $docId \n ${e.toString()}",
           icon: Icon(
             Icons.error,
-            color: Theme.of(context).errorColor,
+            color: Theme.of(context).colorScheme.error,
           ),
         );
       }
-    } catch (e) {
-      snackbar(
-        context: context,
-        text:
-            "Referenced document could not be loaded: $docId \n ${e.toString()}",
-        icon: Icon(
-          Icons.error,
-          color: Theme.of(context).errorColor,
-        ),
-      );
     }
   }
 
@@ -486,7 +490,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
           text: saveResult.errorMessage!,
           icon: Icon(
             Icons.error,
-            color: Theme.of(context).errorColor,
+            color: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -661,6 +665,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
 class DocumentLoader<T> extends ConsumerStatefulWidget {
   final int rowsPerPage;
+
   const DocumentLoader({Key? key, this.rowsPerPage = -1}) : super(key: key);
 
   @override
@@ -765,6 +770,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
   QueryDocumentSnapshot<dynamic>? firstDoc;
   bool building = true;
   late QueryState queryState;
+
   @override
   void initState() {
     super.initState();
