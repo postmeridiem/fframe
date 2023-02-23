@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
 
 import 'package:example/helpers/prompts.dart';
@@ -24,10 +23,6 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
       L10nReplacer(from: "{locale}", replace: 'replaceworks'),
       L10nReplacer(from: "global", replace: 'KAZAN'),
     ];
-    // Settings.getString();
-
-    String label2 =
-        L10n.string("translationkey", placeholder: "als ie er niet is");
 
     String label = L10n.interpolated(
       'test',

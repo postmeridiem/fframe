@@ -186,7 +186,7 @@ class _ProfileButtonState extends State<ProfileButton> {
 
   @override
   Widget build(BuildContext context) {
-    overlayState = Overlay.of(context)!;
+    overlayState = Overlay.of(context);
     return StreamBuilder(
       stream: FirebaseAuth.instance.userChanges(),
       initialData: null,

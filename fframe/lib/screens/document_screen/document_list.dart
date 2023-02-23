@@ -43,8 +43,8 @@ class DocumentListItem<T> extends ConsumerWidget {
               String error = e.toString();
               String path = queryDocumentSnapshot.reference.path;
               return ListTile(
-                leading:
-                    Icon(Icons.warning, color: Theme.of(context).errorColor),
+                leading: Icon(Icons.warning,
+                    color: Theme.of(context).colorScheme.error),
                 subtitle: Text(
                   L10n.interpolated(
                     'errors_dataissue',
@@ -70,7 +70,7 @@ class DocumentListItem<T> extends ConsumerWidget {
       return ListTile(
           leading: Icon(
         Icons.warning,
-        color: Theme.of(context).errorColor,
+        color: Theme.of(context).colorScheme.error,
       ));
     }
   }
@@ -253,12 +253,14 @@ class GetDocumentCount<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (headerType) {
       case HeaderType.header:
-        if (documentConfig.documentList?.headerBuilder == null)
+        if (documentConfig.documentList?.headerBuilder == null) {
           return const IgnorePointer();
+        }
         break;
       case HeaderType.footer:
-        if (documentConfig.documentList?.footerBuilder == null)
+        if (documentConfig.documentList?.footerBuilder == null) {
           return const IgnorePointer();
+        }
         break;
     }
 
@@ -426,7 +428,7 @@ class DataGridToggle<T> extends StatelessWidget {
             const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0, right: 0),
         icon: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).bottomAppBarColor,
+            color: Theme.of(context).colorScheme.secondary,
             borderRadius: const BorderRadius.only(
               // topRight: Radius.circular(40.0),
               // bottomRight: Radius.circular(40.0),

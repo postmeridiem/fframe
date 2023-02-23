@@ -1,5 +1,4 @@
 import 'package:example/screens/user_list/screen.dart';
-import 'package:example/screens/user_list/user_data.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 

@@ -80,7 +80,7 @@ class DocumentBody<T> extends StatelessWidget {
         child: Builder(
           builder: (BuildContext context) {
             final TabController tabController =
-                DefaultTabController.of(context)!;
+                DefaultTabController.of(context);
             tabController.index = tabIndex;
             documentConfig.preloadPageController =
                 PreloadPageController(initialPage: tabController.index);

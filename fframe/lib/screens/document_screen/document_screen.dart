@@ -204,7 +204,6 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   }
 
   delete<T>({required BuildContext context}) async {
-
     bool dialogResult = await (confirmationDialog(
         context: context,
         cancelText: L10n.string(
@@ -261,7 +260,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
     if (dialogResult == true) {
       DocumentConfig<T> documentConfig =
-      this.documentConfig as DocumentConfig<T>;
+          this.documentConfig as DocumentConfig<T>;
       SaveState saveResult = await DatabaseService<T>().deleteDocument(
         collection: documentConfig.collection,
         documentId: selectionState.docId!,
@@ -271,7 +270,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
       if (saveResult.result == true && context.mounted) {
         FRouter.of(context)
             .updateQueryString(queryParameters: {}, resetQueryString: true);
-        } else {
+      } else {
         //show the error
         snackbar(
           context: context,
@@ -479,20 +478,23 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
             scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
 
         if (closeAfterSave) {
-          close<T>(context: context, skipWarning: true);
+          if (context.mounted) {
+            close<T>(context: context, skipWarning: true);
+          }
         }
       } else {
         Console.log("ERROR: Save failed",
             scope: "fframeLog.DocumentScreen.save", level: LogLevel.prod);
-
-        snackbar(
-          context: context,
-          text: saveResult.errorMessage!,
-          icon: Icon(
-            Icons.error,
-            color: Theme.of(context).colorScheme.error,
-          ),
-        );
+        if (context.mounted) {
+          snackbar(
+            context: context,
+            text: saveResult.errorMessage!,
+            icon: Icon(
+              Icons.error,
+              color: Theme.of(context).colorScheme.error,
+            ),
+          );
+        }
       }
     }
   }
