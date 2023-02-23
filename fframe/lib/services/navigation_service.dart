@@ -5,9 +5,11 @@ import 'package:fframe/providers/state_providers.dart';
 
 late NavigationNotifier navigationNotifier;
 
-final navigationProvider = ChangeNotifierProvider<NavigationNotifier>((ref) {
-  return NavigationNotifier(ref: ref);
-});
+final navigationProvider = ChangeNotifierProvider<NavigationNotifier>(
+  (ref) {
+    return NavigationNotifier(ref: ref);
+  },
+);
 
 class NextState {
   NextState({
@@ -89,7 +91,7 @@ class NavigationNotifier extends ChangeNotifier {
         Console.log(
           "ERROR: Unable to interpret claims ${e.toString()}",
           scope: "fframeLog.NavigationNotifier.authChangeListener",
-          level: LogLevel.dev,
+          level: LogLevel.prod,
         );
         signIn();
       }
@@ -298,32 +300,34 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   parseRouteInformation({required Uri uri}) {
-    Console.log(
-      "$uri for ${uri.userInfo}",
-      scope: "fframeLog.NavigationNotifier.parseRouteInformation",
-      level: LogLevel.fframe,
-    );
-
-    TargetState? targetState = TargetState.fromUri(uri);
-    QueryState? queryState = QueryState.fromUri(uri);
-
-    if (uri.path != "/") {
+    if (_buildPending) {
       Console.log(
-        "Store initial link for later use: ${targetState.navigationTarget.title} ${queryState.queryString}",
+        "Build already pending",
         scope: "fframeLog.NavigationNotifier.parseRouteInformation",
         level: LogLevel.fframe,
       );
-      nextState
-          .add(NextState(targetState: targetState, queryState: queryState));
+    } else {
+      TargetState? targetState = TargetState.fromUri(uri);
+      QueryState? queryState = QueryState.fromUri(uri);
+
+      Console.log(
+        "Parsing path: /#/${targetState.navigationTarget.path} query: ${queryState.toString()}",
+        scope: "fframeLog.NavigationNotifier.parseRouteInformation",
+        level: LogLevel.fframe,
+      );
+
+      if (uri.path != "/") {
+        Console.log(
+          "Store initial link for later use: ${targetState.navigationTarget.title} ${queryState.queryString}",
+          scope: "fframeLog.NavigationNotifier.parseRouteInformation",
+          level: LogLevel.fframe,
+        );
+        nextState
+            .add(NextState(targetState: targetState, queryState: queryState));
+      }
+
+      processRouteInformation(targetState: targetState, queryState: queryState);
     }
-
-    Console.log(
-      "${targetState.navigationTarget.path} :: ${queryState.toString()}",
-      scope: "fframeLog.NavigationNotifier.parseRouteInformation",
-      level: LogLevel.fframe,
-    );
-
-    processRouteInformation(targetState: targetState, queryState: queryState);
   }
 
   processRouteInformation({TargetState? targetState, QueryState? queryState}) {
@@ -344,8 +348,8 @@ class NavigationNotifier extends ChangeNotifier {
             .replaceAll("//", "/"));
     //Trigger the setter and te external method with it;
     Console.log(
-      "compose URI: ${uri.toString()}",
-      scope: "fframeLog.NavigationNotifier.parseRouteInformation",
+      "Created URI for: ${uri.toString()}",
+      scope: "fframeLog.NavigationNotifier.composeUri",
       level: LogLevel.fframe,
     );
     return uri;
@@ -371,13 +375,13 @@ class NavigationNotifier extends ChangeNotifier {
     }
 
     if (_uri == null) {
+      _buildPending = true;
       Console.log(
-        "New load, schedule build. Building: $_isbuilding",
+        "New load, schedule build. Building: $_isbuilding, Setting build pending to $_buildPending",
         scope: "fframeLog.NavigationNotifier.uri",
         level: LogLevel.fframe,
       );
       _uri = uri;
-      _buildPending = true;
     } else {
       _uri = uri;
     }
@@ -421,7 +425,7 @@ class NavigationNotifier extends ChangeNotifier {
 
   set isBuilding(bool isBuilding) {
     Console.log(
-      "Set isBuilding to $isBuilding, buildPending = $_buildPending",
+      "Set isBuilding: $isBuilding, buildPending: $_buildPending",
       scope: "fframeLog.NavigationNotifier.isBuilding",
       level: LogLevel.fframe,
     );
