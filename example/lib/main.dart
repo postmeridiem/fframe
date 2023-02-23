@@ -109,12 +109,27 @@ class MainApp extends StatelessWidget {
         BarButtonDuplicate(),
         BarButtonFeedback(),
       ],
-      // postLoad: (context) async {
-      //   Fframe.of(context)!s
-      //       .log("execution complete", scope: "exampleApp.postLoad");
-      // },
-      postSignIn: (context) async {
-        Console.log("Execution complete", scope: "exampleApp.postSignIn");
+      postLoad: (context) async {
+        // you can omit this optional event handler
+        Console.log("Executing postLoad code from main.dart",
+            scope: "exampleApp.postLoad", level: LogLevel.dev);
+      },
+      postSignOut: (context) async {
+        // you can omit this optional event handler
+        Console.log("Executing postSignOut code from main.dart",
+            scope: "exampleApp.postSignOut", level: LogLevel.dev);
+      },
+      postSignIn: (
+        context,
+      ) async {
+        // These console logs serve as a working example of how to include Console logging in
+        // your own application. See <TODO add wiki> for more information.
+
+        Console.log(
+            "Log example for quick usage. these will show up on prod level debug settings, so clean them up");
+
+        Console.log("Executing postSignIn code from main.dart",
+            scope: "exampleApp.postSignIn");
 
         Console.log("Log example fframe level",
             scope: "exampleApp.postSignIn", level: LogLevel.fframe);
@@ -124,8 +139,6 @@ class MainApp extends StatelessWidget {
 
         Console.log("Log example prod level",
             scope: "exampleApp.postSignIn", level: LogLevel.prod);
-
-        // Console.log("Log example for quick usage. this will show up on prod level, so clean them up");
       },
     );
   }
