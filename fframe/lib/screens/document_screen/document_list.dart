@@ -357,7 +357,8 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
                   if (isLastItem && snapshot.hasMore) snapshot.fetchMore();
 
                   final queryDocumentSnapshot = snapshot.docs[index];
-                  if (autoSelectFirst && index == 0) {
+
+                  if (autoSelectFirst && index == 0 && !FRouter.of(context).hasQueryStringParam('id')) {
                     documentScreenConfig.load<T>(
                         context: context, docId: queryDocumentSnapshot.id);
                   }

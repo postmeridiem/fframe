@@ -93,24 +93,24 @@ class FRouter extends InheritedWidget {
   }
 
   navigateToRouteFromNavigationTargets<T>(
-      List<NavigationTarget> navigationTargets,
-      {required String route,
-      String id = ''}) {
-    bool idMode = id == '' ? false : true;
-    Console.log(
-      "Updated to $route ${idMode ? "into id: $id" : ""}",
-      scope: "fframeLog.FRouter.navigateToRouteFromNavigationTargets",
-      level: LogLevel.prod,
-    );
-    Map<String, String> queryParameters = idMode ? {"id": id} : {};
-    List<String> routeSegments = route.split('/');
-    String selector1 = routeSegments[0];
-    String selector2 = routeSegments[0];
-    NavigationTarget? target;
+            List<NavigationTarget> navigationTargets,
+            {required String route,
+              String id = ''}) {
+          bool idMode = id == '' ? false : true;
+          Console.log(
+            "Updated to $route ${idMode ? "into id: $id" : ""}",
+            scope: "fframeLog.FRouter.navigateToRouteFromNavigationTargets",
+            level: LogLevel.prod,
+          );
+          Map<String, String> queryParameters = idMode ? {"id": id} : {};
+          List<String> routeSegments = route.split('/');
+          String selector1 = routeSegments[0];
+          String selector2 = routeSegments[0];
+          NavigationTarget? target;
 
-    for (int i = 0; i < routeSegments.length; i++) {
-      if (i == 0) {
-        target = navigationTargets.firstWhere(
+          for (int i = 0; i < routeSegments.length; i++) {
+            if (i == 0) {
+              target = navigationTargets.firstWhere(
             (NavigationTarget navigationTarget) =>
                 navigationTarget.path == selector1);
       } else {

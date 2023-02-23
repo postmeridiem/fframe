@@ -811,8 +811,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
 
     //Handle document loads...
 
-    if (queryState.queryParameters == null &&
-        documentScreenConfig.documentConfig.autoSelectFirst) {
+    if (queryState.queryParameters == null && documentScreenConfig.documentConfig.autoSelectFirst) {
       documentScreenConfig.selectionState.addListener(() {
         documentScreenConfig.selectionState.removeListener(() {});
         setState(() {});
