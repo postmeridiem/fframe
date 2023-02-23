@@ -344,9 +344,9 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
         builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
           if (snapshot.hasData && snapshot.data != null && signedIn == false) {
             //User has gone from signed out to signed in
-            Console.log("Code executing",
-                scope: "fframeLog.postSignIn", level: LogLevel.fframe);
             if (Fframe.of(context)?.postSignIn != null) {
+              Console.log("Code executing",
+                  scope: "fframeLog.postSignIn", level: LogLevel.fframe);
               return FutureBuilder<void>(
                 future: Fframe.of(context)!.postSignIn!(context),
                 builder: (BuildContext context, snapshot) {
@@ -379,13 +379,15 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
                 },
               );
             } else {
+              Console.log("No code provided",
+                  scope: "fframeLog.postSignIn", level: LogLevel.fframe);
               return const FframePostLoad();
             }
           } else {
             //User had gone from signed in to signed out
-            Console.log("Code executing",
-                scope: "fframeLog.postSignOut", level: LogLevel.fframe);
             if (Fframe.of(context)?.postSignOut != null) {
+              Console.log("Code executing",
+                  scope: "fframeLog.postSignOut", level: LogLevel.fframe);
               return FutureBuilder<void>(
                 future: Fframe.of(context)!.postSignOut!(context),
                 builder: (BuildContext context, snapshot) {
@@ -418,6 +420,8 @@ class _FframeFframePostAuthState extends State<FframePostAuth> {
                 },
               );
             } else {
+              Console.log("No code provided",
+                  scope: "fframeLog.postSignOut", level: LogLevel.fframe);
               return const FframePostLoad();
             }
           }
