@@ -124,6 +124,8 @@ class MainApp extends StatelessWidget {
 
         Console.log("Log example prod level",
             scope: "exampleApp.postSignIn", level: LogLevel.prod);
+
+        // Console.log("Log example for quick usage. this will show up on prod level, so clean them up");
       },
     );
   }

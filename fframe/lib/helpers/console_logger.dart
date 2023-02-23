@@ -15,7 +15,7 @@ class Console {
 
   static void log(
     String message, {
-    String scope = "fframeLog.unspecified",
+    String scope = "fframeLog.global",
     LogLevel level = LogLevel.prod,
   }) {
     LogLevel logThreshold = Console.instance.logThreshold;
