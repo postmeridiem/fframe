@@ -13,6 +13,7 @@ import 'package:example/pages/wait_page.dart';
 import 'package:example/screens/signInPage/signin_page.dart';
 import 'package:example/screens/suggestion/suggestion.dart';
 import 'package:example/screens/setting/setting.dart';
+import 'package:example/screens/tabloader/tabloader.dart';
 import 'package:example/screens/user/user.dart';
 import 'package:example/screens/user_profile/user_profile.dart';
 import 'package:example/screens/user_list/user_list.dart';
@@ -33,6 +34,7 @@ class MainApp extends StatelessWidget {
     final NavigationConfig navigationConfig = NavigationConfig(
       navigationTargets: [
         suggestionNavigationTarget,
+        tabloaderNavigationTarget,
         settingNavigationTarget,
         usersNavigationTarget,
         userListNavigationTarget,
