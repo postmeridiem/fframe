@@ -157,17 +157,6 @@ class NavigationNotifier extends ChangeNotifier {
     return [];
   }
 
-  // List<NavigationTab> get navigationSubTabs {
-  //   if (hasSubTabs) {
-  //     NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
-  //     if ((currentTab.parentTarget is NavigationTab)) {
-  //       return currentTab.parentTarget.navigationTabs!;
-  //     }
-  //     return currentTab.navigationTabs!;
-  //   }
-  //   return [];
-  // }
-
   _filterNavigationRoutes() {
     filteredNavigationConfig = NavigationConfig.clone(navigationConfig);
     FRouterConfig.instance.filteredNavigationConfig = filteredNavigationConfig;
