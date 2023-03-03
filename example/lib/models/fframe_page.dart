@@ -15,6 +15,7 @@ class FframePage extends ChangeNotifier {
     this.icon,
     this.creationDate,
     this.createdBy,
+    this.saveCount = 0,
   });
 
   // fromFirestore<Setting>(DocumentSnapshot<Map<String, dynamic>> snapshot) {
@@ -34,6 +35,7 @@ class FframePage extends ChangeNotifier {
           ? json['creationDate'] as Timestamp
           : null,
       createdBy: json['createdBy'] != null ? json['createdBy'] as String : null,
+      saveCount: json['saveCount'] != null ? json['saveCount'] as double : 0,
     );
 
     return fframePage;
@@ -47,6 +49,7 @@ class FframePage extends ChangeNotifier {
   String? icon;
   Timestamp? creationDate;
   String? createdBy;
+  double saveCount = 0;
 
   Map<String, Object?> toFirestore() {
     String updatedBy =
@@ -64,6 +67,7 @@ class FframePage extends ChangeNotifier {
       "createdBy": createdBy ??
           FirebaseAuth.instance.currentUser?.displayName ??
           "Anonymous",
+      "saveCount": saveCount,
       "changeHistory": FieldValue.arrayUnion([changeHistory]),
     };
   }
