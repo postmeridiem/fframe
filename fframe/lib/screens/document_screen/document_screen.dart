@@ -370,11 +370,14 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     if (documentConfig.document.activeTabs != null &&
         documentConfig.document.activeTabs!.length == 1) {
       FRouter.of(context).updateQueryString<T>(
-          queryParameters: {"new": "true"}, resetQueryString: true);
+        queryParameters: {"new": "true"},
+        resetQueryString: true,
+      );
     } else {
       FRouter.of(context).updateQueryString<T>(
-          queryParameters: {"new": "true", "tabIndex": "0"},
-          resetQueryString: true);
+        queryParameters: {"new": "true", "tabIndex": "0"},
+        resetQueryString: true,
+      );
     }
   }
 
@@ -508,8 +511,10 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     int invalidTab = documentConfig.document.activeTabs!
         .map((DocumentTab tab) {
           bool result = tab.formKey.currentState!.validate();
-          Console.log("Tab validation: $result",
-              scope: "fframeLog.DocumentScreen.validate", level: LogLevel.dev);
+          Console.log(
+              "Tab ${documentConfig.tabController.index} validated: $result",
+              scope: "fframeLog.DocumentScreen.validate",
+              level: LogLevel.dev);
           return tab.formKey.currentState!.validate();
         })
         .toList()
@@ -811,7 +816,8 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
 
     //Handle document loads...
 
-    if (queryState.queryParameters == null && documentScreenConfig.documentConfig.autoSelectFirst) {
+    if (queryState.queryParameters == null &&
+        documentScreenConfig.documentConfig.autoSelectFirst) {
       documentScreenConfig.selectionState.addListener(() {
         documentScreenConfig.selectionState.removeListener(() {});
         setState(() {});

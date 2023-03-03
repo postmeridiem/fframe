@@ -84,6 +84,8 @@ class DocumentBody<T> extends StatelessWidget {
             tabController.index = tabIndex;
             documentConfig.preloadPageController =
                 PreloadPageController(initialPage: tabController.index);
+            documentConfig.pageController =
+                PageController(initialPage: tabController.index);
             documentConfig.tabController = tabController;
 
             tabController.addListener(
@@ -168,138 +170,148 @@ class DocumentBody<T> extends StatelessWidget {
                                 backgroundColor:
                                     Theme.of(context).colorScheme.secondary,
                                 body: NestedScrollView(
-                                  physics: documentConfig
-                                          .document.scrollableHeader
-                                      ? const AlwaysScrollableScrollPhysics()
-                                      : const NeverScrollableScrollPhysics(),
-                                  headerSliverBuilder: (BuildContext context,
-                                      bool innerBoxIsScrolled) {
-                                    return <Widget>[
-                                      SliverAppBar(
-                                        actions: const [
-                                          IgnorePointer()
-                                        ], //To surpess the hamburger
-                                        primary: false,
-                                        title:
-                                            documentConfig.titleBuilder != null
-                                                ? documentConfig.titleBuilder!(
-                                                    context,
-                                                    documentScreenConfig
-                                                        .selectionState.data)
-                                                : Text(documentScreenConfig
-                                                        .selectionState.docId ??
-                                                    ""),
-                                        floating: true,
-                                        pinned: false,
-                                        snap: true,
-                                        centerTitle: true,
-                                        automaticallyImplyLeading: false,
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                        bottom: documentConfig.document
-                                                    .activeTabs!.length !=
-                                                1
-                                            ? TabBar(
-                                                controller: tabController,
-                                                tabs: documentConfig
-                                                    .document.activeTabs!
-                                                    .map(
-                                                      (documentTab) =>
-                                                          documentTab.tabBuilder(
-                                                              Fframe.of(
-                                                                      context)!
-                                                                  .user),
-                                                    )
-                                                    .toList(),
-                                              )
-                                            : null,
-                                      ),
-                                    ];
-                                  },
-                                  body: PreloadPageView.builder(
-                                    itemCount: documentConfig
-                                        .document.activeTabs!.length,
-                                    preloadPagesCount: documentConfig
-                                        .document.activeTabs!.length,
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
-                                    itemBuilder:
-                                        (BuildContext context, int position) {
-                                      documentConfig
-                                          .document
-                                          .activeTabs![position]
-                                          .formKey = GlobalKey<FormState>();
-
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Container(
-                                          key: ValueKey(
-                                              "PreloadPageView_${documentScreenConfig.selectionState.docId}_${tabController.index}"),
-                                          child: Scaffold(
-                                            primary: false,
-                                            body: Form(
-                                              key: documentConfig
-                                                  .document
-                                                  .activeTabs![position]
-                                                  .formKey,
-                                              autovalidateMode: AutovalidateMode
-                                                  .onUserInteraction,
-                                              child: documentConfig.document
-                                                  .activeTabs![position]
-                                                  .childBuilder(
-                                                      documentScreenConfig
-                                                          .selectionState.data,
-                                                      documentScreenConfig
-                                                          .selectionState
-                                                          .readOnly),
-                                            ),
-                                            floatingActionButtonLocation:
-                                                FloatingActionButtonLocation
-                                                    .miniCenterDocked,
-                                            bottomNavigationBar: BottomAppBar(
-                                              elevation: 0,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .background,
-                                              shape:
-                                                  const CircularNotchedRectangle(),
-                                              child: IconTheme(
-                                                data: IconThemeData(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .onPrimary),
-                                                child: Row(
-                                                  children: [
-                                                    ...documentScreenConfig
-                                                        .iconButtons<T>(
-                                                            context)!,
-                                                    //Add any extra configured buttons to the list
-                                                    if (documentConfig.document
-                                                            .extraActionButtons !=
-                                                        null)
-                                                      ...documentConfig.document
-                                                              .extraActionButtons!(
-                                                          context,
-                                                          selectionState.data
-                                                              as T,
-                                                          selectionState
-                                                              .readOnly,
-                                                          selectionState.isNew,
-                                                          Fframe.of(context)!
-                                                              .user),
-                                                  ],
+                                    physics: documentConfig
+                                            .document.scrollableHeader
+                                        ? const AlwaysScrollableScrollPhysics()
+                                        : const NeverScrollableScrollPhysics(),
+                                    headerSliverBuilder: (BuildContext context,
+                                        bool innerBoxIsScrolled) {
+                                      return <Widget>[
+                                        SliverAppBar(
+                                          actions: const [
+                                            IgnorePointer()
+                                          ], //To surpess the hamburger
+                                          primary: false,
+                                          title: documentConfig.titleBuilder !=
+                                                  null
+                                              ? documentConfig.titleBuilder!(
+                                                  context,
+                                                  documentScreenConfig
+                                                      .selectionState.data)
+                                              : Text(documentScreenConfig
+                                                      .selectionState.docId ??
+                                                  ""),
+                                          floating: true,
+                                          pinned: false,
+                                          snap: true,
+                                          centerTitle: true,
+                                          automaticallyImplyLeading: false,
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .secondary,
+                                          bottom: calculateTabBar(
+                                            context: context,
+                                            document: documentConfig.document,
+                                            controller: tabController,
+                                          ),
+                                        ),
+                                      ];
+                                    },
+                                    body: PreloadPageView.builder(
+                                      itemCount: documentConfig
+                                          .document.activeTabs!.length,
+                                      preloadPagesCount: documentConfig
+                                          .document.activeTabs!.length,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      controller:
+                                          documentConfig.preloadPageController,
+                                      itemBuilder: (
+                                        BuildContext context,
+                                        int position,
+                                      ) {
+                                        Console.log(
+                                          "Preloading PreloadPageView_${documentScreenConfig.selectionState.docId}_${tabController.index}",
+                                          scope: "fframe.DocumentBody.PageView",
+                                          level: LogLevel.fframe,
+                                        );
+                                        documentConfig
+                                            .document
+                                            .activeTabs![position]
+                                            .formKey = GlobalKey<FormState>();
+                                        bool preloadCurrentTab = true;
+                                        if (!documentConfig
+                                            .document.prefetchTabs) {
+                                          preloadCurrentTab =
+                                              tabController.index == position;
+                                        }
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            key: ValueKey(
+                                                "PreloadPageView_${documentScreenConfig.selectionState.docId}_${tabController.index}"),
+                                            child: Scaffold(
+                                              primary: false,
+                                              body: Form(
+                                                key: documentConfig
+                                                    .document
+                                                    .activeTabs![position]
+                                                    .formKey,
+                                                autovalidateMode:
+                                                    AutovalidateMode
+                                                        .onUserInteraction,
+                                                child: preloadCurrentTab
+                                                    ? documentConfig.document
+                                                        .activeTabs![position]
+                                                        .childBuilder(
+                                                            documentScreenConfig
+                                                                .selectionState
+                                                                .data,
+                                                            documentScreenConfig
+                                                                .selectionState
+                                                                .readOnly)
+                                                    : Placeholder(
+                                                        child: Center(
+                                                            child: Text(
+                                                                "auto: $position")),
+                                                      ),
+                                              ),
+                                              floatingActionButtonLocation:
+                                                  FloatingActionButtonLocation
+                                                      .miniCenterDocked,
+                                              bottomNavigationBar: BottomAppBar(
+                                                elevation: 0,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .background,
+                                                shape:
+                                                    const CircularNotchedRectangle(),
+                                                child: IconTheme(
+                                                  data: IconThemeData(
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onPrimary),
+                                                  child: Row(
+                                                    children: [
+                                                      ...documentScreenConfig
+                                                          .iconButtons<T>(
+                                                              context)!,
+                                                      //Add any extra configured buttons to the list
+                                                      if (documentConfig
+                                                              .document
+                                                              .extraActionButtons !=
+                                                          null)
+                                                        ...documentConfig
+                                                                .document
+                                                                .extraActionButtons!(
+                                                            context,
+                                                            selectionState.data
+                                                                as T,
+                                                            selectionState
+                                                                .readOnly,
+                                                            selectionState
+                                                                .isNew,
+                                                            Fframe.of(context)!
+                                                                .user),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                    controller:
-                                        documentConfig.preloadPageController,
-                                  ),
-                                ),
+                                        );
+                                      },
+                                    )),
                               ),
                             ),
                           ),
@@ -321,5 +333,23 @@ class DocumentBody<T> extends StatelessWidget {
       return Fframe.of(context)!.showErrorPage(
           context: context, errorText: "Incorrect form configuration");
     }
+  }
+}
+
+calculateTabBar({
+  required BuildContext context,
+  required Document document,
+  required TabController controller,
+}) {
+  List<DocumentTab> activeTabs = document.activeTabs!;
+  if (activeTabs.length != 1) {
+    return TabBar(
+      controller: controller,
+      tabs: activeTabs.map((documentTab) {
+        return documentTab.tabBuilder(Fframe.of(context)!.user);
+      }).toList(),
+    );
+  } else {
+    return null;
   }
 }

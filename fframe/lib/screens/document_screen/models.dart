@@ -32,7 +32,8 @@ class DocumentConfig<T> extends ChangeNotifier {
   final String queryStringIdParam;
   final String collection;
   final bool autoSelectFirst;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
+      fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
@@ -46,6 +47,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   final ViewType initialViewType;
 
   late PreloadPageController preloadPageController;
+  late PageController pageController;
   late TabController tabController;
   ViewType? _viewType;
 
@@ -100,6 +102,7 @@ class Document<T> {
     this.showValidateButton = false,
     this.showSaveButton = true,
     this.showDeleteButton = false,
+    this.prefetchTabs = true,
   });
   final Key? key;
   final DocumentTabsBuilder<T>? documentTabsBuilder;
@@ -117,6 +120,7 @@ class Document<T> {
   bool showCloseButton;
   bool showValidateButton;
   bool showSaveButton;
+  bool prefetchTabs;
 }
 
 class DocumentTab<T> {
@@ -173,7 +177,12 @@ class SearchOption<T> {
   late SearchOptionSortOrder sort;
   late SearchOptionComparisonOperator comparisonOperator;
   late bool isSelected = false;
-  SearchOption({required this.caption, required this.field, required this.type, this.sort = SearchOptionSortOrder.none, this.comparisonOperator = SearchOptionComparisonOperator.equal});
+  SearchOption(
+      {required this.caption,
+      required this.field,
+      required this.type,
+      this.sort = SearchOptionSortOrder.none,
+      this.comparisonOperator = SearchOptionComparisonOperator.equal});
 }
 
 enum SearchOptionType {
