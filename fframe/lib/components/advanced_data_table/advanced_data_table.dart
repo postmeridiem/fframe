@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:horizontal_data_table/horizontal_data_table.dart';
 
+// ignore: must_be_immutable
 class AdvancedDataTable<T> extends StatefulWidget {
 
   AdvancedDataTable({
