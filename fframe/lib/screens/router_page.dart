@@ -45,20 +45,20 @@ class FRouter extends InheritedWidget {
       Map<String, String>? queryParameters,
       bool? resetQueryString = true,
       T? context}) {
-    Console.log(
-      "${navigationTarget.path} ${queryParameters == null ? "without" : "with"} queryString ${queryParameters?.toString() ?? ""}. Reset queryString: $resetQueryString",
-      scope: "fframeLog.FRouter.navigateTo",
-      level: LogLevel.fframe,
-    );
     QueryState queryState = ref.read(queryStateProvider);
 
     QueryState newQueryState = (resetQueryString == true)
         ? QueryState(queryParameters: queryParameters)
         : QueryState.mergeComponents(queryState, queryParameters);
+    // Console.log(
+    //   "${navigationTarget.path} ${queryParameters == null ? "without" : "with"} queryString ${queryParameters?.toString() ?? ""}. Reset queryString: $resetQueryString",
+    //   scope: "fframeLog.FRouter.navigateTo",
+    //   level: LogLevel.fframe,
+    // );
     Console.log(
-      "Updated to ${newQueryState.toString()}",
-      scope: "fframeLog.FRouter.newQueryState",
-      level: LogLevel.fframe,
+      "Update route to /${navigationTarget.path} with query: ${newQueryState.toString()}. Reset queryString: $resetQueryString",
+      scope: "fframeLog.FRouter.navigateTo",
+      level: LogLevel.prod,
     );
 
     TargetState targetState =
@@ -74,7 +74,7 @@ class FRouter extends InheritedWidget {
   navigateToRoute<T>(BuildContext context,
       {required String route, String id = ''}) {
     bool idMode = id == '' ? false : true;
-    Console.log("$route ${idMode ? "into id: $id" : ""}",
+    Console.log("Update route to $route ${idMode ? "into id: $id" : ""}",
         scope: "fframeLog.navigateToRoute", level: LogLevel.prod);
     Map<String, String> queryParameters = idMode ? {"id": id} : {};
 
@@ -93,24 +93,24 @@ class FRouter extends InheritedWidget {
   }
 
   navigateToRouteFromNavigationTargets<T>(
-            List<NavigationTarget> navigationTargets,
-            {required String route,
-              String id = ''}) {
-          bool idMode = id == '' ? false : true;
-          Console.log(
-            "Updated to $route ${idMode ? "into id: $id" : ""}",
-            scope: "fframeLog.FRouter.navigateToRouteFromNavigationTargets",
-            level: LogLevel.prod,
-          );
-          Map<String, String> queryParameters = idMode ? {"id": id} : {};
-          List<String> routeSegments = route.split('/');
-          String selector1 = routeSegments[0];
-          String selector2 = routeSegments[0];
-          NavigationTarget? target;
+      List<NavigationTarget> navigationTargets,
+      {required String route,
+      String id = ''}) {
+    bool idMode = id == '' ? false : true;
+    Console.log(
+      "Update route to $route ${idMode ? "into id: $id" : ""}",
+      scope: "fframeLog.FRouter.navigateToRouteFromNavigationTargets",
+      level: LogLevel.prod,
+    );
+    Map<String, String> queryParameters = idMode ? {"id": id} : {};
+    List<String> routeSegments = route.split('/');
+    String selector1 = routeSegments[0];
+    String selector2 = routeSegments[0];
+    NavigationTarget? target;
 
-          for (int i = 0; i < routeSegments.length; i++) {
-            if (i == 0) {
-              target = navigationTargets.firstWhere(
+    for (int i = 0; i < routeSegments.length; i++) {
+      if (i == 0) {
+        target = navigationTargets.firstWhere(
             (NavigationTarget navigationTarget) =>
                 navigationTarget.path == selector1);
       } else {
