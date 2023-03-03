@@ -194,8 +194,8 @@ class FRouter extends InheritedWidget {
     return navigationNotifier.isSignedIn;
   }
 
-  NavigationTarget get currentTarget {
-    return navigationNotifier.currentTarget.navigationTarget;
+  NavigationTarget? get currentTarget {
+    return navigationNotifier.currentTarget?.navigationTarget;
   }
 
   List<NavigationTab> get navigationTabs {
@@ -317,7 +317,7 @@ class FRouter extends InheritedWidget {
     int index = navigationNotifier.navigationTabs.indexWhere(
       (NavigationTab navigationTab) =>
           navigationTab.path ==
-          navigationNotifier.currentTarget.navigationTarget.path,
+          navigationNotifier.currentTarget!.navigationTarget.path,
     );
     return index == -1 ? 0 : index;
   }
@@ -325,7 +325,7 @@ class FRouter extends InheritedWidget {
   tabSwitch({required TabController tabController, required}) {
     if (!tabController.indexIsChanging) {
       NavigationTarget currentTarget =
-          navigationNotifier.currentTarget.navigationTarget;
+          navigationNotifier.currentTarget!.navigationTarget;
       NavigationTarget pendingTarget =
           navigationNotifier.navigationTabs[tabController.index];
 

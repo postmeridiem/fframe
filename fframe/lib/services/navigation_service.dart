@@ -122,8 +122,8 @@ class NavigationNotifier extends ChangeNotifier {
     processRouteInformation(targetState: targetState, queryState: queryState);
   }
 
-  TargetState get currentTarget {
-    return _targetState!;
+  TargetState? get currentTarget {
+    return _targetState;
   }
 
   bool get hasTabs {
@@ -296,7 +296,7 @@ class NavigationNotifier extends ChangeNotifier {
         level: LogLevel.fframe,
       );
     } else {
-      TargetState? targetState = TargetState.fromUri(uri);
+      TargetState? targetState = TargetState.fromUri(this, uri);
       QueryState? queryState = QueryState.fromUri(uri);
 
       Console.log(

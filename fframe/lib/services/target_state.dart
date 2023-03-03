@@ -13,21 +13,23 @@ class TargetState {
         navigationTarget is! NavigationTab) {
       Console.log(
           "Cannot route to a path which has tabs. Mandatory apply the first tab",
-          scope: "fframeLog.TargetState.processRouteReques",
+          scope: "fframeLog.TargetState.processRouteRequest",
           level: LogLevel.fframe);
       navigationTarget = navigationTarget.navigationTabs!.first;
     }
     return TargetState(navigationTarget: navigationTarget);
   }
 
-  factory TargetState.fromUri(Uri uri) {
-    if (uri.pathSegments.isEmpty) {
+  factory TargetState.fromUri(NavigationNotifier navigationNotifier, Uri uri) {
+    if (uri.pathSegments.isEmpty && navigationNotifier.currentTarget == null) {
       //This either routes to a / route or to the default route.
       return TargetState(
         navigationTarget:
             navigationNotifier.navigationConfig.navigationTargets.firstWhere(
           (NavigationTarget navigationTarget) => navigationTarget.path == "/",
-          orElse: () => TargetState.defaultRoute().navigationTarget,
+          orElse: ()  {
+             return TargetState.defaultRoute().navigationTarget;
+          },
         ),
       );
     }
