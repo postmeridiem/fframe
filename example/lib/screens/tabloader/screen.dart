@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
-import 'package:fframe/helpers/console_logger.dart';
 
 // import 'package:example/services/page_service.dart';
 import 'package:example/models/fframe_page.dart';

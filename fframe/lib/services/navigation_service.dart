@@ -35,19 +35,15 @@ class NavigationNotifier extends ChangeNotifier {
   bool? _isSignedIn;
   List<String>? _roles;
 
-  final NavigationConfig navigationConfig =
-      FRouterConfig.instance.navigationConfig;
-  late NavigationConfig filteredNavigationConfig =
-      FRouterConfig.instance.navigationConfig;
+  final NavigationConfig navigationConfig = FRouterConfig.instance.navigationConfig;
+  late NavigationConfig filteredNavigationConfig = FRouterConfig.instance.navigationConfig;
 
   NavigationNotifier({required this.ref}) {
     _filterNavigationRoutes();
-    FirebaseAuth.instance
-        .authStateChanges()
-        .listen((User? user) => authChangeListener(user));
+    FirebaseAuth.instance.authStateChanges().listen((User? user) => authChangeListener(user));
   }
 
-  int selectedNavRailIndex = 0;
+  int? selectedNavRailIndex;
   bool get pendingAuth => _isSignedIn == null;
   bool get isSignedIn => _isSignedIn ?? false;
 
@@ -66,16 +62,13 @@ class NavigationNotifier extends ChangeNotifier {
             level: LogLevel.fframe,
           );
 
-          if ("${claims["roles"].runtimeType}".toLowerCase() ==
-              "JSArray<dynamic>".toLowerCase()) {
+          if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
             roles = List<String>.from(claims["roles"]);
-          } else if (List<dynamic> == claims["roles"].runtimeType ||
-              List<String> == claims["roles"].runtimeType) {
+          } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
             roles = List<String>.from(claims["roles"]);
           } else {
             //Legacy mode... it's a map..
-            Map<String, dynamic>? rolesMap =
-                Map<String, dynamic>.from(claims["roles"]);
+            Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
             rolesMap.removeWhere((key, value) => value == false);
             roles = List<String>.from(rolesMap.keys);
           }
@@ -110,6 +103,7 @@ class NavigationNotifier extends ChangeNotifier {
       navigationNotifier.nextState.removeAt(0);
     }
     processRouteInformation(targetState: targetState, queryState: queryState);
+    notifyListeners();
   }
 
   signOut() {
@@ -120,6 +114,7 @@ class NavigationNotifier extends ChangeNotifier {
     TargetState? targetState = TargetState.defaultRoute();
     QueryState? queryState = QueryState(queryParameters: null);
     processRouteInformation(targetState: targetState, queryState: queryState);
+    notifyListeners();
   }
 
   TargetState? get currentTarget {
@@ -136,12 +131,8 @@ class NavigationNotifier extends ChangeNotifier {
     // }
 
     if (_targetState!.navigationTarget is NavigationTab) {
-      NavigationTab navigationTab =
-          _targetState!.navigationTarget as NavigationTab;
-      return navigationTab.navigationTabs != null ||
-          (navigationTab.navigationTabs != null &&
-              navigationTab.navigationTabs!.isNotEmpty) ||
-          (navigationTab.parentTarget is NavigationTab);
+      NavigationTab navigationTab = _targetState!.navigationTarget as NavigationTab;
+      return navigationTab.navigationTabs != null || (navigationTab.navigationTabs != null && navigationTab.navigationTabs!.isNotEmpty) || (navigationTab.parentTarget is NavigationTab);
     }
     return false;
     // return _targetState!.navigationTarget.navigationTabs != null || (_targetState!.navigationTarget.navigationTabs != null && _targetState!.navigationTarget.navigationTabs!.isNotEmpty);
@@ -149,8 +140,7 @@ class NavigationNotifier extends ChangeNotifier {
 
   List<NavigationTab> get navigationTabs {
     if (_targetState!.navigationTarget is NavigationTab) {
-      NavigationTab currentTab =
-          _targetState!.navigationTarget as NavigationTab;
+      NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
       NavigationTarget parentTarget = currentTab.parentTarget;
       return parentTarget.navigationTabs!;
     }
@@ -175,22 +165,17 @@ class NavigationNotifier extends ChangeNotifier {
           }
 
           //Role comparison
-          Set<String> userRolesSet =
-              _roles!.map((role) => role.toLowerCase()).toSet();
+          Set<String> userRolesSet = _roles!.map((role) => role.toLowerCase()).toSet();
           List<String> targetRoles = navigationTarget.roles ?? [];
 
           //Check tabs first(if any)
           if (navigationTarget.navigationTabs != null) {
             //Get all roles allowed to see this tab.
-            navigationTarget.navigationTabs!
-                .where((NavigationTab navigationTab) =>
-                    navigationTab.roles != null)
-                .forEach((NavigationTab navigationTab) {
+            navigationTarget.navigationTabs!.where((NavigationTab navigationTab) => navigationTab.roles != null).forEach((NavigationTab navigationTab) {
               targetRoles.addAll(navigationTab.roles!);
             });
 
-            navigationTarget.navigationTabs!
-                .removeWhere((NavigationTab navigationTab) {
+            navigationTarget.navigationTabs!.removeWhere((NavigationTab navigationTab) {
               //If the tab is not private, remove it
               if (navigationTab.private == false) {
                 return true;
@@ -201,11 +186,8 @@ class NavigationNotifier extends ChangeNotifier {
               }
 
               //Check if the intersection contains a value. If so return false
-              Set<String> targetRolesSet = navigationTab.roles!
-                  .map((role) => role.toLowerCase())
-                  .toSet();
-              Set<String> interSection =
-                  userRolesSet.intersection(targetRolesSet);
+              Set<String> targetRolesSet = navigationTab.roles!.map((role) => role.toLowerCase()).toSet();
+              Set<String> interSection = userRolesSet.intersection(targetRolesSet);
               Console.log(
                 "${navigationTarget.title}/${navigationTab.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} router: ${targetRolesSet.toString()})",
                 scope: "fframeLog.NavigationNotifier._filterNavigationRoutes",
@@ -226,8 +208,7 @@ class NavigationNotifier extends ChangeNotifier {
           }
 
           //Check if the intersection contains a value. If so return false
-          Set<String> targetRolesSet =
-              targetRoles.map((role) => role.toLowerCase()).toSet();
+          Set<String> targetRolesSet = targetRoles.map((role) => role.toLowerCase()).toSet();
 
           Set<String> interSection = userRolesSet.intersection(targetRolesSet);
           Console.log(
@@ -240,11 +221,9 @@ class NavigationNotifier extends ChangeNotifier {
       );
     } else {
       //Not signed in. Keep public routes
-      filteredNavigationConfig.navigationTargets
-          .removeWhere((NavigationTarget navigationTarget) {
+      filteredNavigationConfig.navigationTargets.removeWhere((NavigationTarget navigationTarget) {
         if (navigationTarget.navigationTabs != null) {
-          List<NavigationTab> navigationTabs =
-              _filterTabRoutes(navigationTarget.navigationTabs!);
+          List<NavigationTab> navigationTabs = _filterTabRoutes(navigationTarget.navigationTabs!);
           return navigationTabs.isEmpty;
         }
 
@@ -311,8 +290,7 @@ class NavigationNotifier extends ChangeNotifier {
           scope: "fframeLog.NavigationNotifier.parseRouteInformation",
           level: LogLevel.fframe,
         );
-        nextState
-            .add(NextState(targetState: targetState, queryState: queryState));
+        nextState.add(NextState(targetState: targetState, queryState: queryState));
       }
 
       processRouteInformation(targetState: targetState, queryState: queryState);
@@ -327,14 +305,9 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   Uri composeUri() {
-    String pathComponent = (_targetState == null)
-        ? _uri?.path ?? "/"
-        : _targetState!.navigationTarget.path;
-    String queryComponent =
-        (_queryState == null) ? _uri?.query ?? "" : _queryState!.queryString;
-    Uri uri = Uri.parse(
-        "/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}"
-            .replaceAll("//", "/"));
+    String pathComponent = (_targetState == null) ? _uri?.path ?? "/" : _targetState!.navigationTarget.path;
+    String queryComponent = (_queryState == null) ? _uri?.query ?? "" : _queryState!.queryString;
+    Uri uri = Uri.parse("/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}".replaceAll("//", "/"));
     //Trigger the setter and te external method with it;
     Console.log(
       "Created URI for: ${uri.toString()}",
@@ -388,13 +361,10 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   updateProviders() {
-    StateController<TargetState> targetStateNotifier =
-        ref.read(targetStateProvider.notifier);
-    StateController<QueryState> queryStateNotifier =
-        ref.read(queryStateProvider.notifier);
+    StateController<TargetState> targetStateNotifier = ref.read(targetStateProvider.notifier);
+    StateController<QueryState> queryStateNotifier = ref.read(queryStateProvider.notifier);
 
-    if (targetStateNotifier.state.navigationTarget.path !=
-        _targetState!.navigationTarget.path) {
+    if (targetStateNotifier.state.navigationTarget.path != _targetState!.navigationTarget.path) {
       Console.log(
         "Update targetState to ${_targetState!.navigationTarget.title} ${_targetState!.navigationTarget.path}",
         scope: "fframeLog.NavigationNotifier.updateProviders",

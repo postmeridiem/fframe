@@ -1,8 +1,5 @@
-import 'package:fframe/extensions/query.dart';
 import 'package:flutter/material.dart';
-import 'package:fframe/fframe.dart';
 import 'package:fframe/components/advanced_data_table/advanced_data_table.dart';
-import 'package:horizontal_data_table/horizontal_data_table.dart';
 import 'user_data.dart';
 
 import 'package:example/models/appuser.dart';
@@ -21,12 +18,10 @@ class _UserListScreenState extends State<UserListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
-    
     return AdvancedDataTable<AppUser>(
         headerSticky: true,
         columnWidths: const [100, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200],
-        headerWidgets: [
+        headerWidgets: const [
           Text("index"),
           Text("name"),
           Text("email"),
@@ -48,7 +43,7 @@ class _UserListScreenState extends State<UserListScreen> {
           Text("email"),
           Text("email"),
         ],
-        footerWidgets: [Text("index"), Text("name"), Text("email")],
+        footerWidgets: const [Text("index"), Text("name"), Text("email")],
         data: [
           AppUser(uid: '123', displayName: 'Je moeder', active: true, customClaims: null, creationDate: null, email: 'a@a.nl'),
           AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
@@ -103,54 +98,50 @@ class _UserListScreenState extends State<UserListScreen> {
           AppUser(uid: '456', displayName: 'Je oma', active: true, customClaims: null, creationDate: null, email: 'b@b.nl'),
         ],
         cellsForRowAtIndex: <int, AppUser>(index, user) => [
-          Text("${user.uid}"),
-          Text("${user.displayName}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          Text("${user.email}"),
-          // Text("$index  ${user!.uid}"),
-          // Text("$index  ${user!.email}"),
-        ]
-    );
-    
-    
-    
-    user.initData(100);
-    return HorizontalDataTable(
-        leftHandSideColumnWidth: 200,
-        rightHandSideColumnWidth: 31*200,
-        isFixedHeader: true,
-        headerWidgets: _getTitleWidget(),
-        isFixedFooter: true,
-        footerWidgets: _getTitleWidget(),
-        leftSideItemBuilder: _generateFirstColumnRow,
-        rightSideItemBuilder: _generateRightHandSideColumnRow,
-        itemCount: user.userInfo.length,
-        rowSeparatorWidget: const Divider(
-          color: Colors.black38,
-          height: 1.0,
-          thickness: 0.0,
-        ),
-        leftHandSideColBackgroundColor: Theme.of(context).colorScheme.onPrimary,
-        rightHandSideColBackgroundColor: Theme.of(context).colorScheme.onPrimary,
-    );
-  }
+              Text("${user.uid}"),
+              Text("${user.displayName}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              Text("${user.email}"),
+              // Text("$index  ${user!.uid}"),
+              // Text("$index  ${user!.email}"),
+            ]);
 
+    // user.initData(100);
+    // return HorizontalDataTable(
+    //     leftHandSideColumnWidth: 200,
+    //     rightHandSideColumnWidth: 31*200,
+    //     isFixedHeader: true,
+    //     headerWidgets: _getTitleWidget(),
+    //     isFixedFooter: true,
+    //     footerWidgets: _getTitleWidget(),
+    //     leftSideItemBuilder: _generateFirstColumnRow,
+    //     rightSideItemBuilder: _generateRightHandSideColumnRow,
+    //     itemCount: user.userInfo.length,
+    //     rowSeparatorWidget: const Divider(
+    //       color: Colors.black38,
+    //       height: 1.0,
+    //       thickness: 0.0,
+    //     ),
+    //     leftHandSideColBackgroundColor: Theme.of(context).colorScheme.onPrimary,
+    //     rightHandSideColBackgroundColor: Theme.of(context).colorScheme.onPrimary,
+    // );
+  }
 
   List<Widget> _getTitleWidget() {
     return [
@@ -432,6 +423,4 @@ class _UserListScreenState extends State<UserListScreen> {
       ],
     );
   }
-
-
 }
