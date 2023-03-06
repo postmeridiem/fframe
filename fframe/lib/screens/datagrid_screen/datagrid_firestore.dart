@@ -12,7 +12,7 @@ class FirestoreDataGrid<T> extends StatefulWidget {
     this.actions,
     this.sortColumnIndex,
     this.sortAscending = true,
-    this.dataRowHeight = kMinInteractiveDimension,
+    this.dataRowHeight,
     this.headingRowHeight = 56.0,
     this.horizontalMargin = 24.0,
     this.columnSpacing = 56.0,
@@ -77,7 +77,7 @@ class FirestoreDataGrid<T> extends StatefulWidget {
   ///
   /// This value is optional and defaults to kMinInteractiveDimension if not
   /// specified.
-  final double dataRowHeight;
+  final double? dataRowHeight;
 
   /// The current primary sort key's column.
   ///
@@ -191,12 +191,9 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
             ];
             return LayoutBuilder(builder: (context, constraints) {
               double headingRowHeight = widget.headingRowHeight;
-              double dataRowHeight = widget.dataRowHeight;
+              double? dataRowHeight = widget.dataRowHeight;
 
-              int rowsPerPage = widget.rowsPerPage < 0
-                  ? ((constraints.maxHeight - headingRowHeight - 72) ~/
-                      dataRowHeight)
-                  : widget.rowsPerPage;
+              int rowsPerPage = widget.rowsPerPage;
               return PaginatedDataTableExtended(
                 source: fFrameDataTableSource,
                 onSelectAll:
@@ -398,13 +395,13 @@ class DataGridConfig<T> {
       fromFirestore;
   late Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final int rowsPerPage;
-  final double rowHeight;
+  final double? rowHeight;
 
   DataGridConfig(
       {required this.dataGridConfigColumns,
       this.showLinks = true,
       this.rowsPerPage = -1,
-      this.rowHeight = kMinInteractiveDimension});
+      this.rowHeight});
 }
 
 class DataGridConfigColumn<T> {
