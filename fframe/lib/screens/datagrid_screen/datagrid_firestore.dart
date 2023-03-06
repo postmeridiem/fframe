@@ -197,7 +197,7 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
                   ? ((constraints.maxHeight - headingRowHeight - 72) ~/
                       dataRowHeight)
                   : widget.rowsPerPage;
-              return PaginatedDataTable(
+              return PaginatedDataTableExtended(
                 source: fFrameDataTableSource,
                 onSelectAll:
                     selectionEnabled ? fFrameDataTableSource.onSelectAll : null,

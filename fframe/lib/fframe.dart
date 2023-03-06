@@ -54,6 +54,8 @@ import 'package:shimmer/shimmer.dart';
 
 import 'package:fframe/extensions/query.dart';
 
+import 'material/paginated_data_table_extended.dart';
+
 part 'fframe_main.dart';
 part 'frouter/frouter.dart';
 
