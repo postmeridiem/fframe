@@ -5,7 +5,7 @@ class TargetState {
     required this.navigationTarget,
   });
 
-  final NavigationTarget navigationTarget;
+  NavigationTarget navigationTarget;
 
   factory TargetState.processRouteRequest(
       {required NavigationTarget navigationTarget}) {
@@ -23,6 +23,7 @@ class TargetState {
   factory TargetState.fromUri(NavigationNotifier navigationNotifier, Uri uri) {
     if (uri.pathSegments.isEmpty && navigationNotifier.currentTarget == null) {
       //This either routes to a / route or to the default route.
+
       return TargetState(
         navigationTarget:
             navigationNotifier.navigationConfig.navigationTargets.firstWhere(
@@ -60,7 +61,7 @@ class TargetState {
         return targetState;
       }
 
-      bool isValidPath = navigationNotifier.navigationConfig.navigationTargets
+      bool isValidPath = navigationNotifier.filteredNavigationConfig.navigationTargets
           .any((NavigationTarget navigationTarget) =>
               navigationTarget.path == uri.pathSegments.first);
       if (isValidPath) {
