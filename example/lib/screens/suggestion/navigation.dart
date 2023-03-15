@@ -64,6 +64,8 @@ final suggestionNavigationTarget = NavigationTarget(
           namespace: 'global',
         ),
       ),
+      roles: ['user']
+
       // navigationTabs: [ TODO: Allow subtabs
       //   NavigationTab(
       //     title: "Done sub 1",

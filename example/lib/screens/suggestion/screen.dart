@@ -122,7 +122,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         }
       },
 
-      autoSelectFirst: true,
+      autoSelectFirst: false,
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
         footerBuilder: (context, documentCount) {
@@ -172,7 +172,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       ),
 
       dataGrid: DataGridConfig<Suggestion>(
-        // rowsPerPage: 3,
+        rowsPerPage: 30,
         // rowHeight: 200,
         dataGridConfigColumns: [
           DataGridConfigColumn(
