@@ -36,7 +36,7 @@ class NavigationNotifier extends ChangeNotifier {
   List<String>? _roles;
 
   final NavigationConfig navigationConfig = FRouterConfig.instance.navigationConfig;
-  late NavigationConfig filteredNavigationConfig = FRouterConfig.instance.filteredNavigationConfig;
+  late NavigationConfig filteredNavigationConfig = FRouterConfig.instance.navigationConfig;
 
   NavigationNotifier({required this.ref}) {
     _filterNavigationRoutes();
@@ -142,25 +142,7 @@ class NavigationNotifier extends ChangeNotifier {
     if (_targetState!.navigationTarget is NavigationTab) {
       NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
       NavigationTarget parentTarget = currentTab.parentTarget;
-
-      List<NavigationTab> filteredTabs = parentTarget.navigationTabs!.where((tab){
-         List<String> tabRoles = tab.roles ?? [];
-         List<String> userRoles = _roles ?? [];
-
-         bool haveAtlEastOneSimilarRole = false;
-         for (var tabRole in tabRoles) {
-           for (var userRole in userRoles) {
-             if (tabRole == userRole) {
-               haveAtlEastOneSimilarRole = true;
-             }
-           }
-         }
-            return tabRoles.isEmpty || haveAtlEastOneSimilarRole;
-      }).toList();
-
-
-      return filteredTabs;
-      // return parentTarget.navigationTabs!;
+      return parentTarget.navigationTabs!;
     }
     return [];
   }

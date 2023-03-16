@@ -293,56 +293,32 @@ class FRouter extends InheritedWidget {
   }
 
   List<Tab> tabBar(BuildContext context) {
-    List<Tab> filteredTabs = navigationNotifier.navigationTabs
+    return navigationNotifier.navigationTabs
         .where(
-      ((NavigationTab navigationTab) => navigationTab.destination != null),
-    )
+          ((NavigationTab navigationTab) => navigationTab.destination != null),
+        )
         .map(
           (NavigationTab navigationTab) => Tab(
-        icon: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            navigationTab.destination?.icon ?? const IgnorePointer(),
-            (navigationTab.destination?.icon != null && navigationTab.destination?.tabLabel != null) ? const Text(" ") : const IgnorePointer(),
-            Text(navigationTab.destination?.tabLabel!() ?? ''),
-          ],
-        ),
-        // text: navigationTab.destination?.tabLabel ?? '',
-      ),
-    )
+            icon: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                navigationTab.destination?.icon ?? const IgnorePointer(),
+                (navigationTab.destination?.icon != null && navigationTab.destination?.tabLabel != null) ? const Text(" ") : const IgnorePointer(),
+                Text(navigationTab.destination?.tabLabel!() ?? ''),
+              ],
+            ),
+            // text: navigationTab.destination?.tabLabel ?? '',
+          ),
+        )
         .toList();
-    return filteredTabs;
   }
 
   Widget navigationRail() {
     return AnimatedBuilder(
         animation: navigationNotifier,
         builder: (context, child) {
-
-          final List<NavigationRailDestination> _destinations = [
-            ...navigationNotifier.filteredNavigationConfig.navigationTargets
-                .where(
-              ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
-            )
-                .map(
-                  (NavigationTarget navigationTarget) => NavigationRailDestination(
-                icon: navigationTarget.destination!.icon,
-                selectedIcon: navigationTarget.destination!.selectedIcon,
-                label: navigationTarget.destination!.navigationLabel(),
-                padding: navigationTarget.destination!.padding,
-              ),
-            ),
-            if (!navigationNotifier.isSignedIn && navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination != null)
-              NavigationRailDestination(
-                icon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.icon,
-                selectedIcon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
-                label: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
-                padding: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.padding,
-              ),
-          ];
-
-          if (_destinations.length >= 2) {
+          if (navigationNotifier.filteredNavigationConfig.navigationTargets.length >= 2) {
             if (navigationNotifier.selectedNavRailIndex == null) {
               navigationNotifier.selectedNavRailIndex = 0;
               NavigationTarget? currentTarget = navigationNotifier.currentTarget?.navigationTarget;
@@ -358,36 +334,10 @@ class FRouter extends InheritedWidget {
                 }
               }
             }
-            if (
-            _destinations.isEmpty ||
-            navigationNotifier.selectedNavRailIndex == null ||
-                navigationNotifier.selectedNavRailIndex! < 0 ||
-                navigationNotifier.selectedNavRailIndex! > (_destinations.length -1)
-            ) {
+            if (navigationNotifier.selectedNavRailIndex == null || navigationNotifier.selectedNavRailIndex! < 0 || navigationNotifier.selectedNavRailIndex! > navigationNotifier.filteredNavigationConfig.navigationTargets.length) {
               navigationNotifier.selectedNavRailIndex = 0;
             }
-            debugPrint("Selected ${navigationNotifier.selectedNavRailIndex}, notifier: ${_destinations.length}");
-            List<NavigationRailDestination> destinations = [
-              ...navigationNotifier.filteredNavigationConfig.navigationTargets
-                  .where(
-                ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
-              )
-                  .map(
-                    (NavigationTarget navigationTarget) => NavigationRailDestination(
-                  icon: navigationTarget.destination!.icon,
-                  selectedIcon: navigationTarget.destination!.selectedIcon,
-                  label: navigationTarget.destination!.navigationLabel(),
-                  padding: navigationTarget.destination!.padding,
-                ),
-              ),
-              if (!navigationNotifier.isSignedIn && navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination != null)
-                NavigationRailDestination(
-                  icon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.icon,
-                  selectedIcon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
-                  label: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
-                  padding: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.padding,
-                ),
-            ];
+            debugPrint("Selected ${navigationNotifier.selectedNavRailIndex}");
             return NavigationRail(
               selectedIndex: navigationNotifier.selectedNavRailIndex,
               onDestinationSelected: (int index) {
@@ -411,7 +361,27 @@ class FRouter extends InheritedWidget {
                 }
               },
               labelType: NavigationRailLabelType.all,
-              destinations: destinations,
+              destinations: [
+                ...navigationNotifier.filteredNavigationConfig.navigationTargets
+                    .where(
+                      ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
+                    )
+                    .map(
+                      (NavigationTarget navigationTarget) => NavigationRailDestination(
+                        icon: navigationTarget.destination!.icon,
+                        selectedIcon: navigationTarget.destination!.selectedIcon,
+                        label: navigationTarget.destination!.navigationLabel(),
+                        padding: navigationTarget.destination!.padding,
+                      ),
+                    ),
+                if (!navigationNotifier.isSignedIn && navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination != null)
+                  NavigationRailDestination(
+                    icon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.icon,
+                    selectedIcon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
+                    label: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
+                    padding: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.padding,
+                  ),
+              ],
             );
           }
           return const IgnorePointer();
