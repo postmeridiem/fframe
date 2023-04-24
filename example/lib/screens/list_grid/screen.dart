@@ -14,26 +14,19 @@ class _ListGridScreenState extends State<ListGridScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Map<int, TableColumnWidth> columnWidths = {
-    //   0: const FixedColumnWidth(250),
-    //   1: const FixedColumnWidth(50),
-    //   2: const FlexColumnWidth(),
-    //   3: const FixedColumnWidth(100),
-    // };
-
     Map<int, ListGridColumn> columnSettings = {
       0: ListGridColumn(
         key: "name",
         header: "Name",
         columnSizing: ListGridColumnSizingMode.fixed,
-        columnWidth: 2000,
+        columnWidth: 250,
       ),
       1: ListGridColumn(
-        key: "channel",
-        header: "CH",
-        columnSizing: ListGridColumnSizingMode.fixed,
-        columnWidth: 50,
-      ),
+          key: "channel",
+          header: "CH",
+          columnSizing: ListGridColumnSizingMode.fixed,
+          columnWidth: 50,
+          textAlign: TextAlign.center),
       2: ListGridColumn(
         key: "nickname",
         header: "Nickname",
@@ -43,6 +36,8 @@ class _ListGridScreenState extends State<ListGridScreen> {
       //   key: "nickname",
       //   header: "Nickname",
       //   columnSizing: ListGridColumnSizingMode.fixed,
+      //   columnWidth: 200,
+      //   textAlign: TextAlign.end,
       // ),
       3: ListGridColumn(
         key: "numerical",
@@ -60,6 +55,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
     return ListGrid(
       data: mockData,
       columnSettings: columnSettings,
+      cellBorder: 1,
     );
     return Expanded(
       child: Row(

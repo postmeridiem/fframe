@@ -6,7 +6,10 @@ class ListGrid extends StatefulWidget {
     Key? key,
     required this.data,
     required this.columnSettings,
+    this.rowBorder = 1,
+    this.cellBorder = 0,
     this.cellPadding = const EdgeInsets.all(8.0),
+    this.cellVerticalAlignment = TableCellVerticalAlignment.middle,
     this.cellBackgroundColor,
     this.headerHeight,
     this.widgetBackgroundColor,
@@ -18,7 +21,10 @@ class ListGrid extends StatefulWidget {
   final List<Map<String, Object>> data;
   final Map<int, ListGridColumn> columnSettings;
 
+  final double rowBorder;
+  final double cellBorder;
   final EdgeInsetsGeometry cellPadding;
+  final TableCellVerticalAlignment cellVerticalAlignment;
   final Color? cellBackgroundColor;
 
   final Color? widgetBackgroundColor;
@@ -43,12 +49,17 @@ class _ListGridState extends State<ListGrid> {
     widget.columnSettings.forEach((key, value) {
       calculatedMinWidth += value.columnWidth;
       if (value.columnSizing == ListGridColumnSizingMode.flex) {
-        columnWidths.addAll({key: const FlexColumnWidth()});
+        columnWidths.addAll({key: const FlexColumnWidth(1)});
       } else {
         columnWidths.addAll({key: FixedColumnWidth(value.columnWidth)});
       }
     });
-    debugPrint("min width: $calculatedMinWidth");
+    double viewportWidth = ((MediaQuery.of(context).size.width > 1000)
+        ? (MediaQuery.of(context).size.width - 100)
+        : (MediaQuery.of(context).size.width + 0));
+    double calculatedWidth =
+        calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
+    // calculatedWidth = (calculatedMinWidth * 3);
 
     // TODO: probably want to move all the styling defaults into the widget init, since this will not mutate any more, meh
     // set up cell borders,
@@ -75,15 +86,14 @@ class _ListGridState extends State<ListGrid> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(
-                height: 1,
-                width: calculatedMinWidth,
-              ),
-              SizedBox(
                 height: widget.headerHeight,
+                width: calculatedWidth,
                 child: Column(
                   children: [
                     Table(
                       columnWidths: columnWidths,
+                      defaultVerticalAlignment:
+                          TableCellVerticalAlignment.middle,
                       children: [
                         TableRow(
                           children: renderHeaderCells(
@@ -102,20 +112,23 @@ class _ListGridState extends State<ListGrid> {
                 ),
               ),
               Expanded(
-                child: Scrollbar(
-                  thumbVisibility: true,
-                  controller: _vertical,
-                  child: SingleChildScrollView(
+                child: SizedBox(
+                  // height: double.infinity,
+                  width: calculatedWidth,
+                  child: Scrollbar(
                     controller: _vertical,
-                    child: Table(
-                      columnWidths: columnWidths,
-                      defaultColumnWidth: const FlexColumnWidth(),
-                      defaultVerticalAlignment: TableCellVerticalAlignment.top,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: renderRows(
-                        data: widget.data,
-                        columnSettings: widget.columnSettings,
-                        backgroundColor: cellBackgroundColor,
+                    child: SingleChildScrollView(
+                      controller: _vertical,
+                      child: Table(
+                        columnWidths: columnWidths,
+                        defaultColumnWidth: const FlexColumnWidth(),
+                        defaultVerticalAlignment: widget.cellVerticalAlignment,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: renderRows(
+                          data: widget.data,
+                          columnSettings: widget.columnSettings,
+                          backgroundColor: cellBackgroundColor,
+                        ),
                       ),
                     ),
                   ),
@@ -123,6 +136,7 @@ class _ListGridState extends State<ListGrid> {
               ),
               SizedBox(
                 height: widget.footerHeight,
+                width: calculatedWidth,
                 child: Column(
                   children: [
                     const Divider(
@@ -159,6 +173,8 @@ class _ListGridState extends State<ListGrid> {
           children: renderCells(
               data: rowdata,
               padding: widget.cellPadding,
+              rowBorder: widget.rowBorder,
+              cellBorder: widget.cellBorder,
               columnSettings: columnSettings,
               backgroundColor: backgroundColor)));
     }
@@ -204,7 +220,9 @@ class _ListGridState extends State<ListGrid> {
       {required Map<String, Object> data,
       required Map<int, ListGridColumn> columnSettings,
       required EdgeInsetsGeometry padding,
-      required Color backgroundColor}) {
+      required Color backgroundColor,
+      required double rowBorder,
+      required double cellBorder}) {
     List<Widget> output = [];
     columnSettings.forEach((key, value) {
       ListGridColumn currentColumn = columnSettings[key] as ListGridColumn;
@@ -212,12 +230,15 @@ class _ListGridState extends State<ListGrid> {
       if (currentColumn.cellBuilder == null) {
         output.add(
           Padding(
-            padding: const EdgeInsets.only(bottom: 1.0),
+            padding: EdgeInsets.only(bottom: rowBorder, right: cellBorder),
             child: Container(
               color: backgroundColor,
               child: Padding(
                 padding: padding,
-                child: Text("$celldata"),
+                child: Text(
+                  "$celldata",
+                  textAlign: currentColumn.textAlign,
+                ),
               ),
             ),
           ),
@@ -225,7 +246,7 @@ class _ListGridState extends State<ListGrid> {
       } else {
         output.add(
           Padding(
-            padding: const EdgeInsets.only(bottom: 1.0),
+            padding: EdgeInsets.only(bottom: rowBorder, right: cellBorder),
             child: Container(
               color: backgroundColor,
               child: Padding(
@@ -268,6 +289,7 @@ class _ListGridState extends State<ListGrid> {
       required TextStyle textStyle}) {
     List<Widget> output = [];
     columnSettings.forEach((key, value) {
+      ListGridColumn currentColumn = columnSettings[key] as ListGridColumn;
       output.add(
         Container(
           color: color,
@@ -276,6 +298,7 @@ class _ListGridState extends State<ListGrid> {
             child: Text(
               value.header,
               style: textStyle,
+              textAlign: currentColumn.textAlign,
             ),
           ),
         ),
@@ -291,6 +314,7 @@ class ListGridColumn {
     required this.header,
     this.columnSizing = ListGridColumnSizingMode.flex,
     this.columnWidth = 200,
+    this.textAlign = TextAlign.start,
     this.cellColor,
     this.cellBuilder,
 
@@ -301,10 +325,11 @@ class ListGridColumn {
   String header;
   ListGridColumnSizingMode columnSizing;
   double columnWidth;
-
-  Function? cellBuilder;
+  TextAlign textAlign;
 
   Color? cellColor;
+
+  Function? cellBuilder;
 
   // TODO: needs to expose the current row data for calculations and needs to enforce TextStyle and Color as data type
   // Function? dynamicTextStyle;
