@@ -106,7 +106,7 @@ class DocumentScreen<T> extends StatelessWidget {
                 fromFirestore: fromFirestore,
                 query: query,
                 searchConfig: searchConfig,
-                titleBuilder: titleBuilder as TitleBuilder<T>,
+                titleBuilder: titleBuilder,
                 contextCardBuilders: contextCardBuilders,
                 embeddedDocument: embeddedDocument ?? false,
               ),
