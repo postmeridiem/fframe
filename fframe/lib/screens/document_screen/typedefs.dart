@@ -48,7 +48,7 @@ typedef DocumentTabChildBuilder<T> = Widget Function(
   bool isReadOnly,
 );
 
-typedef TitleBuilder<T> = Widget Function(
+typedef TitleBuilder<T> = Widget? Function(
   BuildContext context,
   T data,
 );
