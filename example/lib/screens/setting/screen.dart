@@ -25,7 +25,10 @@ class _SettingScreenState extends State<SettingScreen> {
       titleBuilder: (context, data) {
         return Text(
           data.name ?? "New Setting",
-          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+          style: TextStyle(
+            fontSize: 16,
+            color: Theme.of(context).colorScheme.onBackground,
+          ),
         );
       },
 
@@ -49,6 +52,7 @@ class _SettingScreenState extends State<SettingScreen> {
     return Document<Setting>(
       autoSave: false,
       showSaveButton: false,
+      scrollableHeader: false,
       documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
         return [
           DocumentTab<Setting>(
