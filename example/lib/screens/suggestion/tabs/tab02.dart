@@ -4,23 +4,22 @@ import 'package:flutter/material.dart';
 import '../../../models/models.dart';
 
 class Tab02 extends StatelessWidget {
-  Tab02({
+  const Tab02({
     Key? key,
     required this.suggestion,
     required this.readOnly,
   }) : super(key: key);
   final Suggestion suggestion;
   final bool readOnly;
-  final ScrollController scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      controller: scrollController,
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.only(bottom: 16.0),
             child: TextFormField(
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
@@ -44,11 +43,13 @@ class Tab02 extends StatelessWidget {
               collection: "users",
               fromFirestore: AppUser.fromFirestore,
               toFirestore: (user, options) => user.toFirestore(),
-              builder: (BuildContext context, List<FirestoreDocument<AppUser>> firestoreDocuments) {
+              builder: (BuildContext context,
+                  List<FirestoreDocument<AppUser>> firestoreDocuments) {
                 return Column(
                     children: firestoreDocuments
                         .map(
-                          (FirestoreDocument<AppUser> firestoreDocument) => Text(firestoreDocument.data!.displayName ?? "?"),
+                          (FirestoreDocument<AppUser> firestoreDocument) =>
+                              Text(firestoreDocument.data!.displayName ?? "?"),
                         )
                         .toList());
               },
