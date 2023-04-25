@@ -8,11 +8,16 @@ import 'package:example/screens/user/tabs/tabs.dart';
 
 import 'package:example/models/appuser.dart';
 
-class UsersScreen extends StatelessWidget {
+class UsersScreen extends StatefulWidget {
   const UsersScreen({
     Key? key,
   }) : super(key: key);
 
+  @override
+  State<UsersScreen> createState() => _UsersScreenState();
+}
+
+class _UsersScreenState extends State<UsersScreen> {
   @override
   Widget build(BuildContext context) {
     return DocumentScreen<AppUser>(
@@ -27,13 +32,16 @@ class UsersScreen extends StatelessWidget {
       titleBuilder: (context, data) {
         return Text(
           data.displayName ?? "New User",
-          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+          style: TextStyle(
+            fontSize: 16,
+            color: Theme.of(context).colorScheme.onBackground,
+          ),
         );
       },
       queryBuilder: (query) => query.orderBy("displayName"),
       document: _document(),
       documentList: DocumentList(
-        hoverSelect: true,
+        // hoverSelect: true,
         showCreateButton: false,
         builder: (context, selected, data, fFrameUser) {
           return UserListItem(
@@ -83,17 +91,6 @@ class UsersScreen extends StatelessWidget {
           ),
         ];
       },
-      // contextCards: [
-      //   // (user) => ContextCard(
-      //   //       user: user,
-      //   //     ),
-      //   // (user) => ContextCard(
-      //   //       user: user,
-      //   //     ),
-      //   // (user) => ContextCard(
-      //   //       user: user,
-      //   //     ),
-      // ],
     );
   }
 }
