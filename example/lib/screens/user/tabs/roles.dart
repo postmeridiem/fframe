@@ -14,12 +14,9 @@ class RolesTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: FframeRolesManager(
-        uid: user.uid!,
-        appRoles: appRoles,
-      ),
+    return FframeRolesManager(
+      uid: user.uid!,
+      appRoles: appRoles,
     );
   }
 }

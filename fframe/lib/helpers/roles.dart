@@ -134,7 +134,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
               if (snapshot.hasData) {
                 userRoles = snapshot.data!;
               }
-              return ListView(
+              return Column(
                 children: widget.appRoles.entries
                     .map(
                       (MapEntry mapEntry) => SwitchListTile(
