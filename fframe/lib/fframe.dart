@@ -15,7 +15,6 @@ export 'package:shimmer/shimmer.dart';
 import 'dart:async';
 import 'dart:convert';
 
-
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/controllers/query_state_controller.dart';
 import 'package:fframe/screens/document_screen/document_search.dart';
@@ -77,6 +76,9 @@ part 'screens/document_screen/document_body.dart';
 part 'screens/document_screen/document_context.dart';
 part 'screens/document_screen/document_list.dart';
 part 'package:fframe/screens/datagrid_screen/datagrid_firestore.dart';
+part 'package:fframe/screens/listgrid_screen/listgrid_firestore.dart';
+part 'package:fframe/screens/listgrid_screen/listgrid_widgets.dart';
+part 'package:fframe/screens/listgrid_screen/listgrid_classes.dart';
 part 'screens/router_page.dart';
 
 part 'helpers/validator.dart';

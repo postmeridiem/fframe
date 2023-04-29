@@ -16,6 +16,7 @@ class DocumentConfig<T> extends ChangeNotifier {
     this.searchConfig,
     this.documentList,
     this.dataGrid,
+    this.listGrid,
     this.titleBuilder,
     required this.autoSelectFirst,
     required this.document,
@@ -27,6 +28,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   final GlobalKey<FormState> formKey;
   final DocumentList<T>? documentList;
   final DataGridConfig<T>? dataGrid;
+  final ListGridConfig<T>? listGrid;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
   final String queryStringIdParam;
@@ -55,10 +57,13 @@ class DocumentConfig<T> extends ChangeNotifier {
     switch (initialViewType) {
       case ViewType.auto:
         List<ViewType> returnValue = [];
+        if (listGrid != null) returnValue.add(ViewType.listgrid);
         if (documentList != null) returnValue.add(ViewType.list);
         if (dataGrid != null) returnValue.add(ViewType.grid);
         if (returnValue.isEmpty) returnValue.add(ViewType.none);
         return returnValue;
+      case ViewType.listgrid:
+        return [ViewType.listgrid];
       case ViewType.list:
         return [ViewType.list];
       case ViewType.grid:
@@ -83,7 +88,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   }
 }
 
-enum ViewType { auto, list, grid, none }
+enum ViewType { auto, list, grid, listgrid, none }
 
 class Document<T> {
   Document({
@@ -138,6 +143,25 @@ class DocumentTab<T> {
 
 class DocumentList<T> {
   const DocumentList({
+    required this.builder,
+    this.headerBuilder,
+    this.footerBuilder,
+    this.hoverSelect = false,
+    this.showSeparator = true,
+    this.showCreateButton = true,
+    this.seperatorHeight = 1,
+  });
+  final DocumentListItemBuilder<T> builder;
+  final DocumentListHeaderBuilder<T>? headerBuilder;
+  final DocumentListFooterBuilder<T>? footerBuilder;
+  final bool hoverSelect;
+  final bool showSeparator;
+  final bool showCreateButton;
+  final double seperatorHeight;
+}
+
+class ListGrid<T> {
+  const ListGrid({
     required this.builder,
     this.headerBuilder,
     this.footerBuilder,

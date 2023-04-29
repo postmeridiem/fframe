@@ -13,6 +13,7 @@ class DocumentScreen<T> extends StatelessWidget {
       required this.toFirestore,
       this.documentList,
       this.dataGrid,
+      this.listGrid,
       this.viewType = ViewType.auto,
       this.autoSelectFirst = false,
       this.query,
@@ -30,6 +31,7 @@ class DocumentScreen<T> extends StatelessWidget {
   final Query<T> Function(Query<T> query)? queryBuilder;
   final DocumentList<T>? documentList;
   final DataGridConfig<T>? dataGrid;
+  final ListGridConfig<T>? listGrid;
   final ViewType viewType;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
@@ -75,6 +77,12 @@ class DocumentScreen<T> extends StatelessWidget {
       dataGrid!.fromFirestore = fromFirestore;
     }
 
+    //Aply data to listgrid, if any
+    if (listGrid != null) {
+      listGrid!.toFirestore = toFirestore;
+      listGrid!.fromFirestore = fromFirestore;
+    }
+
     return Column(
       children: [
         if (documentScreenHeaderBuilder != null) documentScreenHeaderBuilder!(),
@@ -94,6 +102,7 @@ class DocumentScreen<T> extends StatelessWidget {
                 collection: collection,
                 documentList: documentList,
                 dataGrid: dataGrid,
+                listGrid: listGrid,
                 initialViewType: viewType,
                 autoSelectFirst: autoSelectFirst,
                 queryStringIdParam:
@@ -729,6 +738,18 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>>
                   dataRowHeight: documentConfig.dataGrid!.rowHeight,
                 ),
                 if (documentConfig.documentList != null) DataGridToggle<T>(),
+              ],
+            );
+          case ViewType.listgrid:
+            Query<T> query = DocumentScreenConfig.of(context)!
+                .fireStoreQueryState
+                .currentQuery() as Query<T>;
+            return Stack(
+              children: [
+                FirestoreListGrid<T>(
+                  listGridConfig: documentConfig.listGrid!,
+                  query: query,
+                ),
               ],
             );
           default:
