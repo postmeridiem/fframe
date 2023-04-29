@@ -313,7 +313,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
-                      color: Theme.of(context).colorScheme.primaryContainer,
+                      color: Theme.of(context).colorScheme.secondaryContainer,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -324,7 +324,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                             style: TextStyle(
                               color: Theme.of(context)
                                   .colorScheme
-                                  .onPrimaryContainer,
+                                  .onSecondaryContainer,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
