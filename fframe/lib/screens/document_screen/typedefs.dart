@@ -60,3 +60,18 @@ typedef DocumentHeaderBuilder<T> = Widget Function(
 
 typedef DocumentScreenHeaderBuilder<T> = Widget Function();
 typedef DocumentScreenFooterBuilder<T> = Widget Function();
+
+typedef ListGridValueBuilderFunction<T> = dynamic Function(
+  BuildContext context,
+  T data,
+);
+
+typedef ListGridCellBuilderFunction<T> = Widget Function(
+  BuildContext context,
+  T data,
+);
+
+typedef ListGridCellBuilder<T> = DataCell Function(
+  T data,
+  Function save,
+);
