@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 
-class ListGrid extends StatefulWidget {
-  const ListGrid({
+class FframeListGrid extends StatefulWidget {
+  const FframeListGrid({
     Key? key,
     required this.data,
     required this.columnSettings,
@@ -34,10 +33,10 @@ class ListGrid extends StatefulWidget {
   final double? footerHeight;
 
   @override
-  State<ListGrid> createState() => _ListGridState();
+  State<FframeListGrid> createState() => _FframeListGridState();
 }
 
-class _ListGridState extends State<ListGrid> {
+class _FframeListGridState extends State<FframeListGrid> {
   final ScrollController _horizontal = ScrollController();
   final ScrollController _vertical = ScrollController();
 

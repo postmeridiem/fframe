@@ -83,7 +83,7 @@ class LightModeThemeConfig {
   Color constDividerColor = const Color.fromARGB(177, 182, 182, 182);
 
   // color that sets the main background behind everything
-  Color constBackgroundColor = const Color.fromARGB(255, 236, 226, 226);
+  Color constBackgroundColor = Color.fromARGB(255, 255, 255, 255);
   Color constOnBackgroundColor = const Color.fromARGB(255, 27, 2, 11);
   Color constOnBackgroundColorFaded = const Color.fromARGB(255, 218, 200, 207);
 
