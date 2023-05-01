@@ -236,10 +236,10 @@ class DocumentBody<T> extends StatelessWidget {
                                                     "fframe.DocumentBody.PageView",
                                                 level: LogLevel.fframe,
                                               );
-                                              documentConfig
-                                                      .document
-                                                      .activeTabs![position]
-                                                      .formKey =
+                                              DocumentTab<T> currentTab =
+                                                  documentConfig.document
+                                                      .activeTabs![position];
+                                              currentTab.formKey =
                                                   GlobalKey<FormState>();
                                               bool preloadCurrentTab = true;
                                               if (!documentConfig
@@ -263,46 +263,45 @@ class DocumentBody<T> extends StatelessWidget {
                                                   child: Scaffold(
                                                     primary: false,
                                                     body: Form(
-                                                      key: documentConfig
-                                                          .document
-                                                          .activeTabs![position]
-                                                          .formKey,
+                                                      key: currentTab.formKey,
                                                       autovalidateMode:
                                                           AutovalidateMode
                                                               .onUserInteraction,
                                                       child: preloadCurrentTab
-                                                          // ? documentConfig
-                                                          //     .document
-                                                          //     .activeTabs![
-                                                          //         position]
-                                                          //     .childBuilder(
-                                                          //     documentScreenConfig
-                                                          //         .selectionState
-                                                          //         .data,
-                                                          //     documentScreenConfig
-                                                          //         .selectionState
-                                                          //         .readOnly,
-                                                          //   )
-                                                          ? ListView(
-                                                              // physics:
-                                                              //     const NeverScrollableScrollPhysics(),
-                                                              controller:
-                                                                  tabScrollController,
-                                                              children: [
-                                                                documentConfig
-                                                                    .document
-                                                                    .activeTabs![
-                                                                        position]
-                                                                    .childBuilder(
-                                                                  documentScreenConfig
-                                                                      .selectionState
-                                                                      .data,
-                                                                  documentScreenConfig
-                                                                      .selectionState
-                                                                      .readOnly,
-                                                                ),
-                                                              ],
-                                                            )
+                                                          ? currentTab
+                                                                  .lockViewportScroll
+                                                              ? SizedBox(
+                                                                  height: double
+                                                                      .infinity,
+                                                                  width: double
+                                                                      .infinity,
+                                                                  child: currentTab
+                                                                      .childBuilder(
+                                                                    documentScreenConfig
+                                                                        .selectionState
+                                                                        .data,
+                                                                    documentScreenConfig
+                                                                        .selectionState
+                                                                        .readOnly,
+                                                                  ),
+                                                                )
+                                                              : ListView(
+                                                                  // physics:
+                                                                  //     const NeverScrollableScrollPhysics(),
+                                                                  controller:
+                                                                      tabScrollController,
+                                                                  children: [
+                                                                    currentTab
+                                                                        .childBuilder(
+                                                                      documentScreenConfig
+                                                                          .selectionState
+                                                                          .data,
+                                                                      documentScreenConfig
+                                                                          .selectionState
+                                                                          .readOnly,
+                                                                    ),
+                                                                  ],
+                                                                )
                                                           : Placeholder(
                                                               child: Center(
                                                                   child: Text(

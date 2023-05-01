@@ -56,6 +56,7 @@ class _SettingScreenState extends State<SettingScreen> {
       documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
         return [
           DocumentTab<Setting>(
+            lockViewportScroll: true,
             tabBuilder: (fFrameUser) {
               return const Tab(
                 text: "Setting",

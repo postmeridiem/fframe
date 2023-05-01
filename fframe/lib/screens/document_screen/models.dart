@@ -134,10 +134,12 @@ class DocumentTab<T> {
   ///
   final DocumentTabBuilder<T> tabBuilder;
   final DocumentTabChildBuilder<T> childBuilder;
+  final bool lockViewportScroll;
   late GlobalKey<FormState> formKey = GlobalKey<FormState>();
   DocumentTab({
     required this.tabBuilder,
     required this.childBuilder,
+    this.lockViewportScroll = false,
   });
 }
 
