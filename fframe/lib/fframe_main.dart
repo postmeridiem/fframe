@@ -213,6 +213,30 @@ class _FRouterLoaderState extends ConsumerState<FRouterLoader> {
             if (snapshot.data != null) {
               Fframe.of(context)!.user =
                   FFrameUser.fromFirebaseUser(firebaseUser: snapshot.data!);
+              try {
+                List<String>? roles = [];
+                snapshot.data?.getIdTokenResult(true).then((idTokenResult) {
+                  Map<String, dynamic>? claims = idTokenResult.claims;
+
+                  if (claims != null && claims.containsKey("roles") == true) {
+                    if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
+                      roles = List<String>.from(claims["roles"]);
+                    } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
+                      roles = List<String>.from(claims["roles"]);
+                    } else {
+                      //Legacy mode... it's a map..
+                      Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
+                      rolesMap.removeWhere((key, value) => value == false);
+                      roles = List<String>.from(rolesMap.keys);
+                    }
+                  }
+                  roles = roles?.map((role) => role.toLowerCase()).toList();
+                  Fframe.of(context)!.user?.roles = roles;
+                });
+              } catch (e) {
+                debugPrint(e.toString());
+              }
+
             } else {
               Fframe.of(context)!.user = null;
             }
