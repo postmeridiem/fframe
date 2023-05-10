@@ -21,7 +21,7 @@ class DarkModeThemeConfig {
   // DARK MODE =======
   final brightness = Brightness.dark;
   // color that sets the appbar, navrail, contextwidgets and FAB
-  Color constPrimaryColor = const Color.fromARGB(255, 27, 2, 11);
+  Color constPrimaryColor = const Color.fromARGB(255, 78, 4, 31);
   Color constOnPrimaryColor = const Color.fromARGB(255, 255, 255, 255);
 
   // color that sets 'secondary' level control widgets
