@@ -34,6 +34,16 @@ class DarkModeThemeConfig {
   Color constTertiaryColor = const Color.fromARGB(255, 36, 3, 15);
   Color constOnTertiaryColor = const Color.fromARGB(255, 238, 238, 238);
 
+  // color that sets the default surface of the app
+  // (window chrome)
+  Color constSurfaceColor = const Color.fromARGB(255, 78, 4, 31);
+  Color constOnSurfaceColor = const Color.fromARGB(255, 255, 255, 255);
+
+  // color that sets the secondary surface of the app
+  // (field backgrounds)
+  Color constSurfaceVariantColor = const Color.fromARGB(255, 255, 255, 255);
+  Color constOnSurfaceVariantColor = const Color.fromARGB(255, 49, 4, 20);
+
   // color that sets the primary accent color
   Color constPrimaryAccentColor = const Color.fromARGB(255, 5, 202, 198);
 
@@ -65,13 +75,23 @@ class LightModeThemeConfig {
 
   // color that sets 'secondary' level control widgets
   // (application surfaces and things that are not navrail, contextwidgets, FAB or appbar...)
-  Color constSecondaryColor = const Color.fromARGB(255, 255, 247, 251);
+  Color constSecondaryColor = const Color.fromARGB(255, 244, 243, 244);
   Color constOnSecondaryColor = const Color.fromARGB(176, 28, 28, 28);
 
   // color that sets 'tertiary' level control widgets
   // (the background of fields and the text that goes in there)
   Color constTertiaryColor = const Color.fromARGB(255, 255, 255, 255);
   Color constOnTertiaryColor = const Color.fromARGB(255, 107, 6, 42);
+
+  // color that sets the default surface of the app
+  // (window chrome)
+  Color constSurfaceColor = const Color.fromARGB(255, 229, 222, 226);
+  Color constOnSurfaceColor = const Color.fromARGB(176, 28, 28, 28);
+
+  // color that sets the secondary surface of the app
+  // (field backgrounds)
+  Color constSurfaceVariantColor = const Color.fromARGB(255, 255, 255, 255);
+  Color constOnSurfaceVariantColor = const Color.fromARGB(255, 49, 4, 20);
 
   // color that sets the primary accent color
   Color constPrimaryAccentColor = const Color.fromARGB(255, 0, 138, 136);
