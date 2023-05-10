@@ -10,6 +10,8 @@ class ListGridColumn<T> {
     this.textAlign = TextAlign.start,
     this.cellColor,
     this.textSelectable = false,
+    this.generateTooltip = false,
+    this.columnSorting = ListGridColumnSortingMode.none,
 
     // this.dynamicTextStyle,
     // this.dynamicBackgroundColor,
@@ -25,6 +27,8 @@ class ListGridColumn<T> {
   ListGridCellBuilderFunction<T>? cellBuilder;
 
   bool textSelectable;
+  bool generateTooltip;
+  ListGridColumnSortingMode columnSorting;
 }
 
 class ListGridDataModeConfig {
@@ -43,6 +47,7 @@ class ListGridConfig<T> {
     required this.columnSettings,
     this.dataMode = const ListGridDataModeConfig(mode: ListGridDatarMode.all),
     this.widgetBackgroundColor,
+    this.widgetColor,
     this.widgetTextStyle,
     this.rowBorder = 1,
     this.cellBorder = 0,
@@ -58,6 +63,7 @@ class ListGridConfig<T> {
   final ListGridDataModeConfig dataMode;
 
   final Color? widgetBackgroundColor;
+  final Color? widgetColor;
   final TextStyle? widgetTextStyle;
 
   final double rowBorder;
@@ -73,6 +79,13 @@ class ListGridConfig<T> {
   late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
       fromFirestore;
   late Map<String, Object?> Function(T, SetOptions?) toFirestore;
+}
+
+enum ListGridColumnSortingMode {
+  none,
+  asc,
+  desc,
+  both,
 }
 
 enum ListGridColumnSizingMode {

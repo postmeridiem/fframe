@@ -1,8 +1,11 @@
 import 'package:example/models/suggestion.dart';
+import 'package:example/themes/config.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
 import 'package:example/helpers/icons.dart';
+import 'package:example/helpers/strings.dart';
+import 'package:flutterfire_ui/auth.dart';
 
 List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
@@ -33,17 +36,67 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     },
   ),
   ListGridColumn(
+    columnSizing: ListGridColumnSizingMode.fixed,
+    columnWidth: 40,
+    textAlign: TextAlign.center,
+    cellBuilder: (context, suggestion) {
+      return Tooltip(
+        message: suggestion.active == true
+            ? "Suggestion is active"
+            : "Suggestion is inactive",
+        child: Icon(
+          suggestion.active == true ? Icons.toggle_on : Icons.toggle_off,
+          color: suggestion.active == true
+              ? SignalColors().constAccentColor
+              : Theme.of(context).disabledColor,
+        ),
+      );
+    },
+  ),
+  ListGridColumn(
     label: "created by",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 300,
+    // textAlign: TextAlign.right,
+    columnSorting: ListGridColumnSortingMode.both,
+    textSelectable: true,
     valueBuilder: (context, suggestion) {
       return "${suggestion.createdBy}";
     },
   ),
   ListGridColumn(
+    label: "",
+    columnSizing: ListGridColumnSizingMode.fixed,
+    columnWidth: 40,
+    cellBuilder: (context, suggestion) {
+      return FutureBuilder(
+        future: Future.delayed(
+          const Duration(
+            seconds: 1,
+          ),
+        ),
+        builder: (c, s) {
+          switch (s.connectionState) {
+            case ConnectionState.done:
+              return Icon(
+                Icons.check,
+                color: SignalColors().constSuccessColor,
+              );
+            default:
+              return LoadingIndicator(
+                size: 10,
+                borderWidth: 1,
+                color: SignalColors().constRunningColor,
+              );
+          }
+        },
+      );
+    },
+  ),
+  ListGridColumn(
     label: "tab 1",
     columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 100,
+    columnWidth: 250,
     valueBuilder: (context, suggestion) {
       return "${suggestion.fieldTab1}";
     },
@@ -51,25 +104,37 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
     label: "tab 2",
     columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 120,
+    columnWidth: 80,
+    generateTooltip: true,
     valueBuilder: (context, suggestion) {
       return "${suggestion.fieldTab2}";
     },
   ),
   ListGridColumn(
-    label: "tab 1",
+    label: "tab 3",
     columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 120,
+    columnWidth: 200,
+    // textSelectable: true,
     valueBuilder: (context, suggestion) {
       return "${suggestion.fieldTab3}";
     },
     cellColor: Colors.pink,
   ),
   ListGridColumn(
+    label: "creation date",
+    columnSizing: ListGridColumnSizingMode.fixed,
+    columnWidth: 1000,
+    columnSorting: ListGridColumnSortingMode.both,
+    valueBuilder: (context, suggestion) {
+      return dateTimeTextTS(suggestion.creationDate as Timestamp);
+    },
+  ),
+  ListGridColumn(
     label: "saveCount",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 120,
     textAlign: TextAlign.end,
+    columnSorting: ListGridColumnSortingMode.both,
     valueBuilder: (context, suggestion) {
       return suggestion.saveCount;
     },

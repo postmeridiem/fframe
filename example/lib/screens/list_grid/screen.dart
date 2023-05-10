@@ -58,31 +58,41 @@ class _ListGridScreenState extends State<ListGridScreen> {
         );
       },
 
-      query: (query) {
-        // return query.where("active", isNull: true);
-        switch (widget.listgridQueryState) {
-          case ListGridQueryStates.active:
-            return query.where("active", isEqualTo: true).limit(100);
+      // query: (query) {
+      //   return query;
+      //   // switch (widget.listgridQueryState) {
+      //   //   case ListGridQueryStates.active:
+      //   //     return query
+      //   //         .where("active", isEqualTo: true)
+      //   //         .orderBy("__name__", descending: true)
+      //   //         .limit(5);
 
-          case ListGridQueryStates.done:
-            return query.where("active", isEqualTo: false).limit(100);
-        }
-      },
+      //   //   case ListGridQueryStates.done:
+      //   //     return query
+      //   //         .where("active", isEqualTo: false)
+      //   //         .orderBy("__name__", descending: true)
+      //   //         .limit(5);
+      //   // }
+      // },
 
       // Optional ListGrid widget
       listGrid: ListGridConfig<Suggestion>(
-        // widgetBackgroundColor: Colors.amber,
-        // widgetTextStyle: const TextStyle(color: Colors.lightBlueAccent),
-
-        // rowBorder: 1,
-        // cellBorder: 1,
+        // widgetBackgroundColor: Theme.of(context).colorScheme.primary,
+        // widgetTextStyle:
+        //     TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+        // widgetColor: Colors.cyan,
+        rowBorder: 1,
+        cellBorder: 1,
         // cellPadding: const EdgeInsets.all(16),
         // cellVerticalAlignment: TableCellVerticalAlignment.top,
         // cellBackgroundColor: Colors.amber,
         // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
         showHeader: true,
         showFooter: true,
-        dataMode: const ListGridDataModeConfig(mode: ListGridDatarMode.pager),
+        dataMode: const ListGridDataModeConfig(
+          mode: ListGridDatarMode.lazy,
+          limit: 20,
+        ),
 
         columnSettings: listGridColumns,
       ),

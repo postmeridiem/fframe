@@ -87,7 +87,7 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
     }
     double viewportWidth = getViewportWidth(context);
     double calculatedWidth = calculateWidth(calculatedMinWidth, viewportWidth);
-    calculatedWidth = (calculatedMinWidth * 2);
+    // calculatedWidth = (calculatedMinWidth * 2);
 
     // TODO: probably want to move all the styling defaults into the widget init, since this will not mutate any more, meh
     // set up cell borders,
@@ -102,19 +102,35 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
 
     //apply passed chrome /widget components styling settings to grid or default to theme sensible
     Color widgetBackgroundColor = listGridConfig.widgetBackgroundColor ??
-        Theme.of(context).colorScheme.secondaryContainer;
+        Theme.of(context).colorScheme.primary;
     TextStyle widgetTextStyle = listGridConfig.widgetTextStyle ??
         TextStyle(
           fontSize: 16,
-          color: Theme.of(context).colorScheme.onBackground,
+          color: Theme.of(context).colorScheme.onPrimary,
         );
+    Color widgetColor =
+        listGridConfig.widgetColor ?? Theme.of(context).colorScheme.onPrimary;
+
     double? headerHeight = listGridConfig.showHeader ? null : 0;
     double? footerHeight = listGridConfig.showFooter ? null : 0;
     double rowBorder = listGridConfig.rowBorder;
     EdgeInsetsGeometry cellPadding = listGridConfig.cellPadding;
+
+    // Query<T> computedQuery = _query.orderBy("creationDate", descending: true);
+    Query<T> computedQuery = _query;
+
+    // Future<int> collectionCount = countQueryResult(query: computedQuery);
+    // collectionCount.then(
+    //   (value) {
+    //     setState(() {
+    //       _count = value;
+    //     });
+    //   },
+    // );
+
     return FirestoreQueryBuilder<T>(
       pageSize: listGridConfig.dataMode.limit,
-      query: _query,
+      query: computedQuery,
       builder: (context, snapshot, child) {
         // fFrameDataTableSource.fromSnapShot(snapshot);
         List<QueryDocumentSnapshot<T>> data = snapshot.docs;
@@ -133,70 +149,115 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                       columnWidths: columnWidths,
                       columnSettings: columnSettings,
                       widgetBackgroundColor: widgetBackgroundColor,
+                      widgetColor: widgetColor,
                       widgetTextStyle: widgetTextStyle,
                       cellPadding: cellPadding,
                       cellBorder: listGridConfig.cellBorder,
                       headerHeight: headerHeight,
                       addEndFlex: addEndFlex,
-                      cellBorderColor:
-                          Theme.of(context).colorScheme.onBackground,
                     ),
                     Expanded(
                       child: SizedBox(
-                        // height: double.infinity,
                         width: calculatedWidth,
-                        child: Scrollbar(
-                          controller: _vertical,
-                          child: SingleChildScrollView(
-                            controller: _vertical,
-                            child: Table(
-                              columnWidths: columnWidths,
-                              // defaultColumnWidth: const FlexColumnWidth(),
-                              defaultVerticalAlignment:
-                                  listGridConfig.cellVerticalAlignment,
-                              textBaseline: TextBaseline.alphabetic,
-                              children: data.map((e) {
-                                final QueryDocumentSnapshot<T>
-                                    documentSnapshot = e;
-                                final T rowdata = documentSnapshot.data();
-                                return TableRow(
-                                  decoration: BoxDecoration(
-                                    color: cellBackgroundColor,
-                                    // border: Border(
-                                    //   bottom: BorderSide(
-                                    //     color: widgetBackgroundColor,
-                                    //     width: rowBorder,
-                                    //   ),
-                                    // ),
+                        child: snapshot.hasError
+                            ? Card(
+                                child: SizedBox(
+                                  width: 500,
+                                  height: double.infinity,
+                                  child: Text(
+                                    "error ${snapshot.error}",
+                                    overflow: TextOverflow.fade,
                                   ),
-                                  children: renderRow(
-                                    context: context,
-                                    rowdata: rowdata,
-                                    padding: listGridConfig.cellPadding,
-                                    cellBorder: listGridConfig.cellBorder,
-                                    rowBorder: rowBorder,
-                                    columnSettings: columnSettings,
-                                    cellBackgroundColor: cellBackgroundColor,
-                                    defaultTextStyle: defaultTextStyle,
-                                    widgetBackgroundColor:
-                                        widgetBackgroundColor,
-                                    addEndFlex: addEndFlex,
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ),
-                        ),
+                                ),
+                              )
+                            : Scrollbar(
+                                controller: _vertical,
+                                child: ListView.separated(
+                                  itemCount: snapshot.docs.length,
+                                  separatorBuilder: (context, index) {
+                                    return const IgnorePointer();
+                                  },
+                                  itemBuilder: (context, index) {
+                                    final isLastItem =
+                                        index + 1 == snapshot.docs.length;
+                                    if (isLastItem && snapshot.hasMore) {
+                                      snapshot.fetchMore();
+                                    }
+
+                                    final queryDocumentSnapshot =
+                                        snapshot.docs[index];
+                                    final T rowdata =
+                                        queryDocumentSnapshot.data();
+                                    return Table(
+                                        columnWidths: columnWidths,
+                                        // defaultColumnWidth: const FlexColumnWidth(),
+                                        defaultVerticalAlignment: listGridConfig
+                                            .cellVerticalAlignment,
+                                        textBaseline: TextBaseline.alphabetic,
+                                        children: [
+                                          TableRow(
+                                            decoration: BoxDecoration(
+                                              color: cellBackgroundColor,
+                                              // border: Border(
+                                              //   bottom: BorderSide(
+                                              //     color: widgetBackgroundColor,
+                                              //     width: rowBorder,
+                                              //   ),
+                                              // ),
+                                            ),
+                                            children: renderRow(
+                                              context: context,
+                                              rowdata: rowdata,
+                                              padding:
+                                                  listGridConfig.cellPadding,
+                                              cellBorder:
+                                                  listGridConfig.cellBorder,
+                                              rowBorder: rowBorder,
+                                              columnSettings: columnSettings,
+                                              cellBackgroundColor:
+                                                  cellBackgroundColor,
+                                              defaultTextStyle:
+                                                  defaultTextStyle,
+                                              widgetBackgroundColor:
+                                                  widgetBackgroundColor,
+                                              addEndFlex: addEndFlex,
+                                            ),
+                                          ),
+                                        ]);
+                                  },
+                                  scrollDirection: Axis.vertical,
+                                  reverse: false,
+                                  controller: _vertical,
+                                  // primary: primary,
+                                  // physics: physics,
+                                  shrinkWrap: false,
+                                  // padding: padding,
+                                  // // itemExtent: itemExtent,
+                                  // // prototypeItem: prototypeItem,
+                                  addAutomaticKeepAlives: true,
+                                  addRepaintBoundaries: true,
+                                  addSemanticIndexes: true,
+                                  // cacheExtent: cacheExtent,
+                                  // semanticChildCount: semanticChildCount,
+                                  dragStartBehavior: DragStartBehavior.start,
+                                  keyboardDismissBehavior:
+                                      ScrollViewKeyboardDismissBehavior.manual,
+                                  // restorationId: restorationId,
+                                  clipBehavior: Clip.hardEdge,
+                                ),
+                              ),
                       ),
                     ),
                     ListGridFooter(
-                      // listgrid: widget,
+                      query: computedQuery,
                       viewportWidth: viewportWidth,
                       widgetBackgroundColor: widgetBackgroundColor,
+                      widgetColor: widgetColor,
                       widgetTextStyle: widgetTextStyle,
                       cellPadding: cellPadding,
                       footerHeight: footerHeight,
                       dataMode: listGridConfig.dataMode.mode,
+                      updateCount: (listGridConfig.showHeader) ? true : false,
                     ),
                   ],
                 ),
@@ -206,13 +267,15 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ListGridFooter(
-                  // listgrid: widget,
+                  query: computedQuery,
                   viewportWidth: viewportWidth,
                   widgetBackgroundColor: widgetBackgroundColor,
+                  widgetColor: widgetColor,
                   widgetTextStyle: widgetTextStyle,
                   cellPadding: cellPadding,
                   footerHeight: footerHeight,
                   dataMode: listGridConfig.dataMode.mode,
+                  updateCount: false,
                 ),
               ],
             ),
@@ -299,16 +362,44 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                       : BorderSide.none,
                 ),
               ),
-              child: Padding(
-                padding: padding,
-                child: Text(
-                  stringValue,
-                  textAlign: column.textAlign,
-                  style: defaultTextStyle,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                // child: const Text("cell"),
-              ),
+              child: column.generateTooltip
+                  ? Tooltip(
+                      message: prepTooltip(stringValue),
+                      child: Padding(
+                        padding: padding,
+                        child: column.textSelectable
+                            ? SelectableText(
+                                stringValue,
+                                textAlign: column.textAlign,
+                                style: defaultTextStyle,
+                                // overflow: TextOverflow.ellipsis,
+                              )
+                            : Text(
+                                stringValue,
+                                textAlign: column.textAlign,
+                                style: defaultTextStyle,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                        // child: const Text("cell"),
+                      ),
+                    )
+                  : Padding(
+                      padding: padding,
+                      child: column.textSelectable
+                          ? SelectableText(
+                              stringValue,
+                              textAlign: column.textAlign,
+                              style: defaultTextStyle,
+                              // overflow: TextOverflow.ellipsis,
+                            )
+                          : Text(
+                              stringValue,
+                              textAlign: column.textAlign,
+                              style: defaultTextStyle,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                      // child: const Text("cell"),
+                    ),
             ),
           ),
         );
@@ -357,12 +448,6 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
               // color: Colors.green,
               color: cellBackgroundColor,
               border: Border(
-                right: cellBorder > 0
-                    ? BorderSide(
-                        color: widgetBackgroundColor,
-                        width: cellBorder,
-                      )
-                    : BorderSide.none,
                 bottom: rowBorder > 0
                     ? BorderSide(
                         color: widgetBackgroundColor,
@@ -379,6 +464,25 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
           ),
         ),
       );
+    }
+
+    return output;
+  }
+
+  Future<int> countQueryResult({required Query<T> query}) async {
+    AggregateQuerySnapshot snaphot = await query.count().get();
+    return snaphot.count;
+  }
+
+  String prepTooltip(String input) {
+    String output = "";
+    List<String> words = input.split(" ");
+    for (var i = 0; i < words.length; i++) {
+      String word = words[i];
+      output = "$output $word";
+      if (i % 6 == 5) {
+        output = "$output \n";
+      }
     }
 
     return output;
