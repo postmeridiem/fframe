@@ -81,18 +81,18 @@ class _ListGridScreenState extends State<ListGridScreen> {
         // widgetTextStyle:
         //     TextStyle(color: Theme.of(context).colorScheme.onPrimary),
         // widgetColor: Colors.cyan,
-        rowBorder: 1,
+        // rowBorder: 1,
         cellBorder: 1,
         // cellPadding: const EdgeInsets.all(16),
         // cellVerticalAlignment: TableCellVerticalAlignment.top,
         // cellBackgroundColor: Colors.amber,
         // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
-        showHeader: true,
-        showFooter: true,
-        dataMode: const ListGridDataModeConfig(
-          mode: ListGridDatarMode.lazy,
-          limit: 20,
-        ),
+        // showHeader: true,
+        // showFooter: true,
+        // dataMode: const ListGridDataModeConfig(
+        //   mode: ListGridDatarMode.lazy,
+        //   limit: 20,
+        // ),
 
         columnSettings: listGridColumns,
       ),

@@ -102,14 +102,14 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
 
     //apply passed chrome /widget components styling settings to grid or default to theme sensible
     Color widgetBackgroundColor = listGridConfig.widgetBackgroundColor ??
-        Theme.of(context).colorScheme.primary;
+        Theme.of(context).colorScheme.surface;
     TextStyle widgetTextStyle = listGridConfig.widgetTextStyle ??
         TextStyle(
           fontSize: 16,
-          color: Theme.of(context).colorScheme.onPrimary,
+          color: Theme.of(context).colorScheme.onSurface,
         );
     Color widgetColor =
-        listGridConfig.widgetColor ?? Theme.of(context).colorScheme.onPrimary;
+        listGridConfig.widgetColor ?? Theme.of(context).colorScheme.onSurface;
 
     double? headerHeight = listGridConfig.showHeader ? null : 0;
     double? footerHeight = listGridConfig.showFooter ? null : 0;
@@ -137,7 +137,23 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
         return Stack(
           children: [
             Container(
-              color: widgetBackgroundColor,
+              decoration: BoxDecoration(
+                color: widgetBackgroundColor,
+                border: Border(
+                  left: BorderSide(
+                    width: 1,
+                    color: widgetBackgroundColor,
+                  ),
+                  top: BorderSide(
+                    width: 1,
+                    color: widgetBackgroundColor,
+                  ),
+                  right: BorderSide(
+                    width: 1,
+                    color: widgetBackgroundColor,
+                  ),
+                ),
+              ),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Column(
@@ -157,95 +173,108 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                       addEndFlex: addEndFlex,
                     ),
                     Expanded(
-                      child: SizedBox(
-                        width: calculatedWidth,
-                        child: snapshot.hasError
-                            ? Card(
-                                child: SizedBox(
-                                  width: 500,
-                                  height: double.infinity,
-                                  child: Text(
-                                    "error ${snapshot.error}",
-                                    overflow: TextOverflow.fade,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: widgetBackgroundColor,
+                          border: Border(
+                            top: BorderSide(
+                              width: 1,
+                              color: widgetColor,
+                            ),
+                          ),
+                        ),
+                        child: SizedBox(
+                          width: calculatedWidth,
+                          child: snapshot.hasError
+                              ? Card(
+                                  child: SizedBox(
+                                    width: 500,
+                                    height: double.infinity,
+                                    child: Text(
+                                      "error ${snapshot.error}",
+                                      overflow: TextOverflow.fade,
+                                    ),
+                                  ),
+                                )
+                              : Scrollbar(
+                                  controller: _vertical,
+                                  child: ListView.separated(
+                                    itemCount: snapshot.docs.length,
+                                    separatorBuilder: (context, index) {
+                                      return const IgnorePointer();
+                                    },
+                                    itemBuilder: (context, index) {
+                                      final isLastItem =
+                                          index + 1 == snapshot.docs.length;
+                                      if (isLastItem && snapshot.hasMore) {
+                                        snapshot.fetchMore();
+                                      }
+
+                                      final queryDocumentSnapshot =
+                                          snapshot.docs[index];
+                                      final T rowdata =
+                                          queryDocumentSnapshot.data();
+                                      return Table(
+                                          columnWidths: columnWidths,
+                                          // defaultColumnWidth: const FlexColumnWidth(),
+                                          defaultVerticalAlignment:
+                                              listGridConfig
+                                                  .cellVerticalAlignment,
+                                          textBaseline: TextBaseline.alphabetic,
+                                          children: [
+                                            TableRow(
+                                              decoration: BoxDecoration(
+                                                color: cellBackgroundColor,
+                                                // border: Border(
+                                                //   bottom: BorderSide(
+                                                //     color: widgetBackgroundColor,
+                                                //     width: rowBorder,
+                                                //   ),
+                                                // ),
+                                              ),
+                                              children: renderRow(
+                                                context: context,
+                                                rowdata: rowdata,
+                                                padding:
+                                                    listGridConfig.cellPadding,
+                                                cellBorder:
+                                                    listGridConfig.cellBorder,
+                                                rowBorder: rowBorder,
+                                                columnSettings: columnSettings,
+                                                cellBackgroundColor:
+                                                    cellBackgroundColor,
+                                                defaultTextStyle:
+                                                    defaultTextStyle,
+                                                widgetBackgroundColor:
+                                                    widgetBackgroundColor,
+                                                addEndFlex: addEndFlex,
+                                              ),
+                                            ),
+                                          ]);
+                                    },
+                                    scrollDirection: Axis.vertical,
+                                    reverse: false,
+                                    controller: _vertical,
+                                    // primary: primary,
+                                    // physics: physics,
+                                    shrinkWrap: false,
+                                    // padding: padding,
+                                    // // itemExtent: itemExtent,
+                                    // // prototypeItem: prototypeItem,
+                                    addAutomaticKeepAlives: true,
+                                    addRepaintBoundaries: true,
+                                    addSemanticIndexes: true,
+                                    // cacheExtent: cacheExtent,
+                                    // semanticChildCount: semanticChildCount,
+                                    dragStartBehavior: DragStartBehavior.start,
+                                    keyboardDismissBehavior:
+                                        ScrollViewKeyboardDismissBehavior
+                                            .manual,
+                                    // restorationId: restorationId,
+                                    clipBehavior: Clip.hardEdge,
                                   ),
                                 ),
-                              )
-                            : Scrollbar(
-                                controller: _vertical,
-                                child: ListView.separated(
-                                  itemCount: snapshot.docs.length,
-                                  separatorBuilder: (context, index) {
-                                    return const IgnorePointer();
-                                  },
-                                  itemBuilder: (context, index) {
-                                    final isLastItem =
-                                        index + 1 == snapshot.docs.length;
-                                    if (isLastItem && snapshot.hasMore) {
-                                      snapshot.fetchMore();
-                                    }
-
-                                    final queryDocumentSnapshot =
-                                        snapshot.docs[index];
-                                    final T rowdata =
-                                        queryDocumentSnapshot.data();
-                                    return Table(
-                                        columnWidths: columnWidths,
-                                        // defaultColumnWidth: const FlexColumnWidth(),
-                                        defaultVerticalAlignment: listGridConfig
-                                            .cellVerticalAlignment,
-                                        textBaseline: TextBaseline.alphabetic,
-                                        children: [
-                                          TableRow(
-                                            decoration: BoxDecoration(
-                                              color: cellBackgroundColor,
-                                              // border: Border(
-                                              //   bottom: BorderSide(
-                                              //     color: widgetBackgroundColor,
-                                              //     width: rowBorder,
-                                              //   ),
-                                              // ),
-                                            ),
-                                            children: renderRow(
-                                              context: context,
-                                              rowdata: rowdata,
-                                              padding:
-                                                  listGridConfig.cellPadding,
-                                              cellBorder:
-                                                  listGridConfig.cellBorder,
-                                              rowBorder: rowBorder,
-                                              columnSettings: columnSettings,
-                                              cellBackgroundColor:
-                                                  cellBackgroundColor,
-                                              defaultTextStyle:
-                                                  defaultTextStyle,
-                                              widgetBackgroundColor:
-                                                  widgetBackgroundColor,
-                                              addEndFlex: addEndFlex,
-                                            ),
-                                          ),
-                                        ]);
-                                  },
-                                  scrollDirection: Axis.vertical,
-                                  reverse: false,
-                                  controller: _vertical,
-                                  // primary: primary,
-                                  // physics: physics,
-                                  shrinkWrap: false,
-                                  // padding: padding,
-                                  // // itemExtent: itemExtent,
-                                  // // prototypeItem: prototypeItem,
-                                  addAutomaticKeepAlives: true,
-                                  addRepaintBoundaries: true,
-                                  addSemanticIndexes: true,
-                                  // cacheExtent: cacheExtent,
-                                  // semanticChildCount: semanticChildCount,
-                                  dragStartBehavior: DragStartBehavior.start,
-                                  keyboardDismissBehavior:
-                                      ScrollViewKeyboardDismissBehavior.manual,
-                                  // restorationId: restorationId,
-                                  clipBehavior: Clip.hardEdge,
-                                ),
-                              ),
+                        ),
                       ),
                     ),
                     ListGridFooter(
