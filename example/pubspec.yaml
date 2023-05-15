@@ -22,7 +22,7 @@ dependencies:
   #Remove this fframe reference
   fframe:
     path: ../fframe
-  intl: ^0.17.0
+  intl: ^0.18.0
   flutter_signin_button: 
   google_sign_in:
   flutterfire_ui:
