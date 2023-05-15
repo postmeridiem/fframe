@@ -373,7 +373,6 @@ class FRouter extends InheritedWidget {
     return filteredTabs;
   }
 
-
   Widget navigationRail() {
     return AnimatedBuilder(
         animation: navigationNotifier,
@@ -409,7 +408,6 @@ class FRouter extends InheritedWidget {
                         .filteredNavigationConfig.navigationTargets.length) {
               navigationNotifier.selectedNavRailIndex = 0;
             }
-            debugPrint("Selected ${navigationNotifier.selectedNavRailIndex}");
             return NavigationRail(
               selectedIndex: navigationNotifier.selectedNavRailIndex,
               onDestinationSelected: (int index) {
