@@ -57,6 +57,7 @@ class ListGridConfig<T> {
     this.defaultTextStyle,
     this.showHeader = true,
     this.showFooter = false,
+    this.searchConfig,
   });
 
   final List<ListGridColumn<T>> columnSettings;
@@ -76,9 +77,20 @@ class ListGridConfig<T> {
   final bool showHeader;
   final bool showFooter;
 
+  final ListGridSearchConfig? searchConfig;
+
   late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
       fromFirestore;
   late Map<String, Object?> Function(T, SetOptions?) toFirestore;
+}
+
+class ListGridSearchConfig {
+  const ListGridSearchConfig({
+    required this.mode,
+    required this.field,
+  });
+  final ListGridSearchMode mode;
+  final String field;
 }
 
 enum ListGridColumnSortingMode {
@@ -105,4 +117,12 @@ enum ListGridDataMode {
   lazy,
   limit,
   pager,
+}
+
+enum ListGridSearchMode {
+  singleFieldString,
+  // singleFieldArray,
+  // multiFieldString,
+  // multiFieldArray,
+  underscoreTypeAhead,
 }

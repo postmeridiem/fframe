@@ -3,6 +3,7 @@ part of fframe;
 class ListGridHeader extends StatelessWidget {
   const ListGridHeader({
     super.key,
+    required this.searchConfig,
     required this.calculatedWidth,
     required this.columnWidths,
     required this.columnSettings,
@@ -14,6 +15,7 @@ class ListGridHeader extends StatelessWidget {
     required this.headerHeight,
     required this.addEndFlex,
   });
+  final ListGridSearchConfig? searchConfig;
   final double calculatedWidth;
   final Map<int, TableColumnWidth> columnWidths;
   final List<ListGridColumn> columnSettings;
@@ -29,11 +31,14 @@ class ListGridHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ListGridSearchWidget(
-          calculatedWidth: calculatedWidth,
-          widgetColor: widgetColor,
-          cellBorder: cellBorder,
-        ),
+        searchConfig != null
+            ? ListGridSearchWidget(
+                searchConfig: searchConfig as ListGridSearchConfig,
+                calculatedWidth: calculatedWidth,
+                widgetColor: widgetColor,
+                cellBorder: cellBorder,
+              )
+            : const IgnorePointer(),
         SizedBox(
           height: headerHeight,
           width: calculatedWidth,
@@ -139,11 +144,13 @@ class ListGridHeader extends StatelessWidget {
 class ListGridSearchWidget extends StatelessWidget {
   const ListGridSearchWidget({
     super.key,
+    required this.searchConfig,
     required this.calculatedWidth,
     required this.widgetColor,
     required this.cellBorder,
   });
 
+  final ListGridSearchConfig searchConfig;
   final double calculatedWidth;
   final Color widgetColor;
   final double cellBorder;
@@ -297,8 +304,7 @@ class ListGridFooter<T> extends StatelessWidget {
     required this.cellPadding,
     required this.footerHeight,
     required this.dataMode,
-    required this.query,
-    required this.updateCount,
+    required this.count,
   });
   final double viewportWidth;
   final Color widgetBackgroundColor;
@@ -307,12 +313,10 @@ class ListGridFooter<T> extends StatelessWidget {
   final EdgeInsetsGeometry cellPadding;
   final double? footerHeight;
   final ListGridDataMode dataMode;
-  final Query<T> query;
-  final bool updateCount;
+  final int count;
 
   @override
   Widget build(BuildContext context) {
-    int collectionCount = 0;
     return SizedBox(
       height: footerHeight,
       width: viewportWidth,
@@ -333,13 +337,13 @@ class ListGridFooter<T> extends StatelessWidget {
                     (dataMode == ListGridDataMode.autopager ||
                             dataMode == ListGridDataMode.pager)
                         ? ListGridPaginator(
-                            collectionCount: collectionCount,
+                            collectionCount: count,
                             widgetTextStyle: widgetTextStyle,
                             widgetBackgroundColor: widgetBackgroundColor,
                             widgetColor: widgetColor,
                           )
                         : ListGridDefaultFooter(
-                            collectionCount: collectionCount,
+                            collectionCount: count,
                             widgetTextStyle: widgetTextStyle,
                           ),
                   ],
@@ -367,7 +371,7 @@ class ListGridDefaultFooter extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(right: 100.0),
-          child: Text("count: 82", style: widgetTextStyle),
+          child: Text("count: $collectionCount", style: widgetTextStyle),
         ),
         const SizedBox(
           width: 280,

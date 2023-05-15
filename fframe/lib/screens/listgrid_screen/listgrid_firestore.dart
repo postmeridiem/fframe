@@ -133,7 +133,7 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
       query: computedQuery,
       builder: (context, snapshot, child) {
         // fFrameDataTableSource.fromSnapShot(snapshot);
-        List<QueryDocumentSnapshot<T>> data = snapshot.docs;
+        int count = snapshot.docs.length;
         return Stack(
           children: [
             Container(
@@ -161,6 +161,7 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ListGridHeader(
+                      searchConfig: listGridConfig.searchConfig,
                       calculatedWidth: calculatedWidth,
                       columnWidths: columnWidths,
                       columnSettings: columnSettings,
@@ -277,37 +278,39 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                         ),
                       ),
                     ),
-                    ListGridFooter(
-                      query: computedQuery,
-                      viewportWidth: viewportWidth,
-                      widgetBackgroundColor: widgetBackgroundColor,
-                      widgetColor: widgetColor,
-                      widgetTextStyle: widgetTextStyle,
-                      cellPadding: cellPadding,
-                      footerHeight: footerHeight,
-                      dataMode: listGridConfig.dataMode.mode,
-                      updateCount: (listGridConfig.showHeader) ? true : false,
-                    ),
+                    listGridConfig.showFooter
+                        ? ListGridFooter(
+                            count: count,
+                            viewportWidth: viewportWidth,
+                            widgetBackgroundColor: widgetBackgroundColor,
+                            widgetColor: widgetColor,
+                            widgetTextStyle: widgetTextStyle,
+                            cellPadding: cellPadding,
+                            footerHeight: footerHeight,
+                            dataMode: listGridConfig.dataMode.mode,
+                          )
+                        : const IgnorePointer(),
                   ],
                 ),
               ),
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ListGridFooter(
-                  query: computedQuery,
-                  viewportWidth: viewportWidth,
-                  widgetBackgroundColor: widgetBackgroundColor,
-                  widgetColor: widgetColor,
-                  widgetTextStyle: widgetTextStyle,
-                  cellPadding: cellPadding,
-                  footerHeight: footerHeight,
-                  dataMode: listGridConfig.dataMode.mode,
-                  updateCount: false,
-                ),
-              ],
-            ),
+            listGridConfig.showFooter
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      ListGridFooter(
+                        count: count,
+                        viewportWidth: viewportWidth,
+                        widgetBackgroundColor: widgetBackgroundColor,
+                        widgetColor: widgetColor,
+                        widgetTextStyle: widgetTextStyle,
+                        cellPadding: cellPadding,
+                        footerHeight: footerHeight,
+                        dataMode: listGridConfig.dataMode.mode,
+                      ),
+                    ],
+                  )
+                : const IgnorePointer(),
           ],
         );
       },

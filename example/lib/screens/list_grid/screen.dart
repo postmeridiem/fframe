@@ -87,13 +87,16 @@ class _ListGridScreenState extends State<ListGridScreen> {
         // cellVerticalAlignment: TableCellVerticalAlignment.top,
         // cellBackgroundColor: Colors.amber,
         // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
-        // showHeader: true,
-        // showFooter: true,
+        // showHeader: false,
+        showFooter: true,
         // dataMode: const ListGridDataModeConfig(
         //   mode: ListGridDatarMode.lazy,
         //   limit: 20,
         // ),
-
+        // searchConfig: const ListGridSearchConfig(
+        //   mode: ListGridSearchMode.singleFieldString,
+        //   field: 'createdBy',
+        // ),
         columnSettings: listGridColumns,
       ),
 
