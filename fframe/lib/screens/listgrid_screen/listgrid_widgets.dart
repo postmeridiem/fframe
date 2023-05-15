@@ -3,59 +3,42 @@ part of fframe;
 class ListGridHeader extends StatelessWidget {
   const ListGridHeader({
     super.key,
-    required this.searchConfig,
     required this.calculatedWidth,
-    required this.columnWidths,
-    required this.columnSettings,
-    required this.widgetBackgroundColor,
-    required this.widgetColor,
-    required this.widgetTextStyle,
-    required this.cellPadding,
-    required this.cellBorder,
-    required this.headerHeight,
     required this.addEndFlex,
   });
-  final ListGridSearchConfig? searchConfig;
   final double calculatedWidth;
-  final Map<int, TableColumnWidth> columnWidths;
-  final List<ListGridColumn> columnSettings;
-  final Color widgetBackgroundColor;
-  final Color widgetColor;
-  final TextStyle widgetTextStyle;
-  final EdgeInsetsGeometry cellPadding;
-  final double cellBorder;
-  final double? headerHeight;
   final bool addEndFlex;
 
   @override
   Widget build(BuildContext context) {
+    ListGridController listgrid = ListGridController.of(context);
     return Column(
       children: [
-        searchConfig != null
+        listgrid.searchConfig != null
             ? ListGridSearchWidget(
-                searchConfig: searchConfig as ListGridSearchConfig,
+                searchConfig: listgrid.searchConfig!,
                 calculatedWidth: calculatedWidth,
-                widgetColor: widgetColor,
-                cellBorder: cellBorder,
+                widgetColor: listgrid.widgetColor,
+                cellBorder: listgrid.cellBorder,
               )
             : const IgnorePointer(),
         SizedBox(
-          height: headerHeight,
+          height: listgrid.headerHeight,
           width: calculatedWidth,
           child: Column(
             children: [
               Table(
-                columnWidths: columnWidths,
+                columnWidths: listgrid.columnWidths,
                 defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                 children: [
                   TableRow(
                     children: renderHeaderCells(
-                      columnSettings: columnSettings,
-                      cellPadding: cellPadding,
-                      cellBorder: cellBorder,
-                      widgetBackgroundColor: widgetBackgroundColor,
-                      widgetTextStyle: widgetTextStyle,
-                      widgetColor: widgetColor,
+                      columnSettings: listgrid.columnSettings,
+                      cellPadding: listgrid.cellPadding,
+                      cellBorder: listgrid.cellBorder,
+                      widgetBackgroundColor: listgrid.widgetBackgroundColor,
+                      widgetTextStyle: listgrid.widgetTextStyle,
+                      widgetColor: listgrid.widgetColor,
                     ),
                   ),
                 ],
@@ -200,6 +183,12 @@ class ListGridSearchWidget extends StatelessWidget {
                     focusColor: Theme.of(context).colorScheme.onPrimary,
                     // border: null,
                   ),
+                  onChanged: (String value) {
+                    ListGridController controller =
+                        ListGridController.of(context);
+                    controller.searchString = value;
+                    controller.updateShouldNotify(controller);
+                  },
                 ),
               ],
             ),
@@ -298,27 +287,17 @@ class ListGridFooter<T> extends StatelessWidget {
   const ListGridFooter({
     super.key,
     required this.viewportWidth,
-    required this.widgetBackgroundColor,
-    required this.widgetColor,
-    required this.widgetTextStyle,
-    required this.cellPadding,
-    required this.footerHeight,
     required this.dataMode,
-    required this.count,
   });
   final double viewportWidth;
-  final Color widgetBackgroundColor;
-  final Color widgetColor;
-  final TextStyle widgetTextStyle;
-  final EdgeInsetsGeometry cellPadding;
-  final double? footerHeight;
   final ListGridDataMode dataMode;
-  final int count;
 
   @override
   Widget build(BuildContext context) {
+    ListGridController listgrid = ListGridController.of(context);
+    int collectionCount = listgrid.collectionCount ?? 0;
     return SizedBox(
-      height: footerHeight,
+      height: listgrid.footerHeight,
       width: viewportWidth,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -327,9 +306,9 @@ class ListGridFooter<T> extends StatelessWidget {
           //   height: 1,
           // ),
           Container(
-            color: widgetBackgroundColor,
+            color: listgrid.widgetBackgroundColor,
             child: Padding(
-                padding: cellPadding,
+                padding: listgrid.cellPadding,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -337,14 +316,15 @@ class ListGridFooter<T> extends StatelessWidget {
                     (dataMode == ListGridDataMode.autopager ||
                             dataMode == ListGridDataMode.pager)
                         ? ListGridPaginator(
-                            collectionCount: count,
-                            widgetTextStyle: widgetTextStyle,
-                            widgetBackgroundColor: widgetBackgroundColor,
-                            widgetColor: widgetColor,
+                            collectionCount: collectionCount,
+                            widgetTextStyle: listgrid.widgetTextStyle,
+                            widgetBackgroundColor:
+                                listgrid.widgetBackgroundColor,
+                            widgetColor: listgrid.widgetColor,
                           )
                         : ListGridDefaultFooter(
-                            collectionCount: count,
-                            widgetTextStyle: widgetTextStyle,
+                            collectionCount: collectionCount,
+                            widgetTextStyle: listgrid.widgetTextStyle,
                           ),
                   ],
                 )),

@@ -59,7 +59,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
       },
 
       // query: (query) {
-      //   return query;
+      //   return query.where("active", isEqualTo: true);
       //   // switch (widget.listgridQueryState) {
       //   //   case ListGridQueryStates.active:
       //   //     return query
@@ -78,8 +78,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
       // Optional ListGrid widget
       listGrid: ListGridConfig<Suggestion>(
         // widgetBackgroundColor: Theme.of(context).colorScheme.primary,
-        // widgetTextStyle:
-        //     TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+        // widgetTextStyle: TextStyle(color: Colors.amber),
         // widgetColor: Colors.cyan,
         // rowBorder: 1,
         cellBorder: 1,
@@ -89,14 +88,12 @@ class _ListGridScreenState extends State<ListGridScreen> {
         // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
         // showHeader: false,
         showFooter: true,
-        // dataMode: const ListGridDataModeConfig(
-        //   mode: ListGridDatarMode.lazy,
-        //   limit: 20,
-        // ),
-        // searchConfig: const ListGridSearchConfig(
-        //   mode: ListGridSearchMode.singleFieldString,
-        //   field: 'createdBy',
-        // ),
+        dataMode: const ListGridDataModeConfig(
+          mode: ListGridDataMode.lazy,
+          limit: 10,
+        ),
+        searchConfig: const ListGridSearchConfig(
+            mode: ListGridSearchMode.singleFieldString, field: 'createdBy'),
         columnSettings: listGridColumns,
       ),
 
