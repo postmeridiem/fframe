@@ -24,11 +24,11 @@ class _SettingsFirestoreToolsFormFormState
 
     return Form(
       key: _formKey,
-      child: Padding(
-        padding: const EdgeInsets.all(6.0),
+      child: const Padding(
+        padding: EdgeInsets.all(6.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             StampUpdater(),
           ],
         ),

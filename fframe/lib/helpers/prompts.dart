@@ -66,9 +66,9 @@ Future<bool> promptOK({
                   ),
                 ),
               ),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: const [
+                children: [
                   Padding(
                     padding: EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
                     child: Text(
@@ -161,9 +161,9 @@ Future<bool> promptOKCancel({
                   ),
                 ),
               ),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.end,
-                children: const [
+                children: [
                   Padding(
                     padding: EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
                     child: Text(

@@ -306,7 +306,7 @@ class ListGridFooter<T> extends StatelessWidget {
   final TextStyle widgetTextStyle;
   final EdgeInsetsGeometry cellPadding;
   final double? footerHeight;
-  final ListGridDatarMode dataMode;
+  final ListGridDataMode dataMode;
   final Query<T> query;
   final bool updateCount;
 
@@ -330,8 +330,8 @@ class ListGridFooter<T> extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const IgnorePointer(),
-                    (dataMode == ListGridDatarMode.autopager ||
-                            dataMode == ListGridDatarMode.pager)
+                    (dataMode == ListGridDataMode.autopager ||
+                            dataMode == ListGridDataMode.pager)
                         ? ListGridPaginator(
                             collectionCount: collectionCount,
                             widgetTextStyle: widgetTextStyle,

@@ -39,14 +39,14 @@ class _PaletteFormFormState extends State<PaletteForm> {
                     ),
                     Card(
                       color: Theme.of(context).colorScheme.tertiary,
-                      child: SizedBox(
+                      child: const SizedBox(
                         height: 60,
                         width: 250,
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: EdgeInsets.all(16.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: const [
+                            children: [
                               Text(
                                 "OpenSans",
                                 style: TextStyle(

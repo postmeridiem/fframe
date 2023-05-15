@@ -316,10 +316,10 @@ class _ProfileButtonState extends State<ProfileButton> {
                     Divider(
                       color: Theme.of(context).colorScheme.onSecondary,
                     ),
-                    Expanded(
+                    const Expanded(
                       flex: 1,
                       child: Column(
-                        children: const [
+                        children: [
                           // ThemeDropdown(),
                           // LocaleDropdown(),
                         ],

@@ -61,10 +61,10 @@ class ReadFromFireStoreByDocumentId<T> extends StatelessWidget {
             }
             if (!snapshot.hasData || snapshot.data == null) {
               if (notFoundBuilder == null) {
-                return Column(
+                return const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(Icons.warning),
                     Text("Not found"),
                   ],
@@ -155,10 +155,10 @@ class QueryFromFireStore<T> extends StatelessWidget {
                 snapshot.data == null ||
                 snapshot.data!.docs.isEmpty) {
               if (notFoundBuilder == null) {
-                return Column(
+                return const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(Icons.warning),
                     Text("Not found"),
                   ],
@@ -255,10 +255,10 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
                 snapshot.data == null ||
                 snapshot.data!.docs.isEmpty) {
               if (notFoundBuilder == null) {
-                return Column(
+                return const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(Icons.warning),
                     Text("Not found"),
                   ],

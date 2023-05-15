@@ -33,11 +33,11 @@ class ListGridColumn<T> {
 
 class ListGridDataModeConfig {
   const ListGridDataModeConfig({
-    this.mode = ListGridDatarMode.limit,
+    this.mode = ListGridDataMode.limit,
     this.limit = 1000,
     // this.autopagerRowHeight,
   });
-  final ListGridDatarMode mode;
+  final ListGridDataMode mode;
   final int limit;
   // final double? autopagerRowHeight;
 }
@@ -45,7 +45,7 @@ class ListGridDataModeConfig {
 class ListGridConfig<T> {
   ListGridConfig({
     required this.columnSettings,
-    this.dataMode = const ListGridDataModeConfig(mode: ListGridDatarMode.all),
+    this.dataMode = const ListGridDataModeConfig(mode: ListGridDataMode.all),
     this.widgetBackgroundColor,
     this.widgetColor,
     this.widgetTextStyle,
@@ -99,7 +99,7 @@ enum ListGridConfigColumnSortMode {
   none,
 }
 
-enum ListGridDatarMode {
+enum ListGridDataMode {
   all,
   autopager,
   lazy,
