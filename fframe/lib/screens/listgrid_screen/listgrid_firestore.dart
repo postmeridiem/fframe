@@ -3,13 +3,13 @@ part of fframe;
 class FirestoreListGrid<T> extends StatefulWidget {
   const FirestoreListGrid({
     Key? key,
-    required this.listGridConfig,
+    required this.config,
     required this.query,
   }) : super(key: key);
 
-  final ListGridConfig listGridConfig;
+  final ListGridConfig config;
 
-  /// The firestore query that will be displayed
+  /// The firestore core query that was provided
   final Query<T> query;
   @override
   FirestoreListGridState createState() => FirestoreListGridState<T>();
@@ -21,12 +21,9 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
 
   late List<ListGridColumn<T>> columnSettings;
 
-  late Query<T> _query;
-
   @override
   void initState() {
     super.initState();
-    _query = widget.query;
   }
 
   @override
@@ -34,239 +31,195 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.query.hashCode != oldWidget.query.hashCode) {
-      _query = widget.query;
+      // _query = widget.query;
       // _query = _unwrapQuery(widget.query);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    ListGridConfig listGridConfig = widget.listGridConfig;
-    columnSettings = listGridConfig.columnSettings as List<ListGridColumn<T>>;
-    double calculatedMinWidth = 0;
-    //extract column widths from settings for flutter Table
-    Map<int, TableColumnWidth> columnWidths = {};
-
-    // track if all columns have fixed width
-    // if so, add an extra blank column at the end with flex
-    // to fill the screen
-    bool addEndFlex = true;
-    int columnCount = 0;
-    for (var i = 0; i < columnSettings.length; i++) {
-      columnCount += 1;
-      // get the settings for the current column
-      ListGridColumn columnSetting = columnSettings[i];
-      // add this column's width to the min width.
-      // each flex column will add the default column width
-      // unless specified otherwise
-      calculatedMinWidth += columnSetting.columnWidth;
-
-      // apply the sizing enum to actual table column widths
-      if (columnSetting.columnSizing == ListGridColumnSizingMode.flex) {
-        addEndFlex = false;
-        columnWidths.addAll({i: const FlexColumnWidth(1)});
-      } else {
-        columnWidths.addAll({i: FixedColumnWidth(columnSetting.columnWidth)});
-      }
-    }
-    if (addEndFlex) {
-      columnWidths.addAll({columnCount: const FlexColumnWidth(1)});
-    }
-    double viewportWidth = getViewportWidth(context);
-    double calculatedWidth = calculateWidth(calculatedMinWidth, viewportWidth);
-    // calculatedWidth = (calculatedMinWidth * 2);
-
-    // Query<T> computedQuery = _query.orderBy("creationDate", descending: true);
-    Query<T> computedQuery = _query;
-
-    // Future<int> collectionCount = countQueryResult(query: computedQuery);
-    // collectionCount.then(
-    //   (value) {
-    //     setState(() {
-    //       _count = value;
-    //     });
-    //   },
-    // );
-    void getCollectionCount(
-        {required BuildContext context,
-        required ListGridController controller,
-        required Query<T> query}) async {
-      AggregateQuerySnapshot snapshot = await query.count().get();
-      int collectionCount = snapshot.count;
-      controller.collectionCount = collectionCount;
-      controller.updateShouldNotify(controller);
-    }
-
     return ListGridController(
-      listGridConfig: listGridConfig,
-      columnSettings: columnSettings,
-      columnWidths: columnWidths,
+      query: widget.query,
+      config: widget.config,
       viewportSize: MediaQuery.of(context).size,
       theme: Theme.of(context),
-      child: FirestoreQueryBuilder<T>(
-        pageSize: listGridConfig.dataMode.limit,
-        query: computedQuery,
-        builder: (context, snapshot, child) {
-          ListGridController listgrid = ListGridController.of(context);
-          // int count = snapshot.docs.length;
-          getCollectionCount(
-              context: context,
-              controller: ListGridController.of(context),
-              query: computedQuery);
-          return Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: listgrid.widgetBackgroundColor,
-                  border: Border(
-                    left: BorderSide(
-                      width: 1,
-                      color: listgrid.widgetBackgroundColor,
-                    ),
-                    top: BorderSide(
-                      width: 1,
-                      color: listgrid.widgetBackgroundColor,
-                    ),
-                    right: BorderSide(
-                      width: 1,
-                      color: listgrid.widgetBackgroundColor,
-                    ),
-                  ),
-                ),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      child: Builder(builder: (context) {
+        ListGridController listgrid = ListGridController.of(context);
+        return AnimatedBuilder(
+            animation: ListGridController.of(context).notifier,
+            builder: (context, child) {
+              return FirestoreQueryBuilder<T>(
+                pageSize: listgrid.dataMode.limit,
+                query: ListGridController.of(context).computedQuery as Query<T>,
+                builder: (context, snapshot, child) {
+                  // int count = snapshot.docs.length;
+                  return Stack(
                     children: [
-                      ListGridHeader(
-                        calculatedWidth: calculatedWidth,
-                        addEndFlex: addEndFlex,
-                      ),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: listgrid.widgetBackgroundColor,
-                            border: Border(
-                              top: BorderSide(
-                                width: 1,
-                                color: listgrid.widgetColor,
-                              ),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: listgrid.widgetBackgroundColor,
+                          border: Border(
+                            left: BorderSide(
+                              width: 1,
+                              color: listgrid.widgetBackgroundColor,
+                            ),
+                            top: BorderSide(
+                              width: 1,
+                              color: listgrid.widgetBackgroundColor,
+                            ),
+                            right: BorderSide(
+                              width: 1,
+                              color: listgrid.widgetBackgroundColor,
                             ),
                           ),
-                          child: SizedBox(
-                            width: calculatedWidth,
-                            child: snapshot.hasError
-                                ? Card(
-                                    child: SizedBox(
-                                      width: 500,
-                                      height: double.infinity,
-                                      child: Text(
-                                        "error ${snapshot.error}",
-                                        overflow: TextOverflow.fade,
+                        ),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              listgrid.showHeader
+                                  ? ListGridHeader(
+                                      calculatedWidth: listgrid.calculatedWidth,
+                                      addEndFlex: listgrid.addEndFlex,
+                                    )
+                                  : const IgnorePointer(),
+                              Expanded(
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: listgrid.widgetBackgroundColor,
+                                    border: Border(
+                                      top: BorderSide(
+                                        width: 1,
+                                        color: listgrid.widgetColor,
                                       ),
                                     ),
-                                  )
-                                : Scrollbar(
-                                    controller: _vertical,
-                                    child: ListView.separated(
-                                      itemCount: snapshot.docs.length,
-                                      separatorBuilder: (context, index) {
-                                        return const IgnorePointer();
-                                      },
-                                      itemBuilder: (context, index) {
-                                        final isLastItem =
-                                            index + 1 == snapshot.docs.length;
-                                        if (isLastItem && snapshot.hasMore) {
-                                          snapshot.fetchMore();
-                                        }
-
-                                        final queryDocumentSnapshot =
-                                            snapshot.docs[index];
-                                        final T rowdata =
-                                            queryDocumentSnapshot.data();
-                                        return Table(
-                                            columnWidths: listgrid.columnWidths,
-                                            // defaultColumnWidth: const FlexColumnWidth(),
-                                            defaultVerticalAlignment:
-                                                listgrid.cellVerticalAlignment,
-                                            textBaseline:
-                                                TextBaseline.alphabetic,
-                                            children: [
-                                              TableRow(
-                                                decoration: BoxDecoration(
-                                                  color: listgrid
-                                                      .cellBackgroundColor,
-                                                  // border: Border(
-                                                  //   bottom: BorderSide(
-                                                  //     color: widgetBackgroundColor,
-                                                  //     width: rowBorder,
-                                                  //   ),
-                                                  // ),
-                                                ),
-                                                children: renderRow(
-                                                  context: context,
-                                                  rowdata: rowdata,
-                                                  columnSettings:
-                                                      columnSettings,
-                                                  addEndFlex: addEndFlex,
-                                                ),
-                                              ),
-                                            ]);
-                                      },
-                                      scrollDirection: Axis.vertical,
-                                      reverse: false,
-                                      controller: _vertical,
-                                      // primary: primary,
-                                      // physics: physics,
-                                      physics: const BouncingScrollPhysics(),
-                                      shrinkWrap: false,
-                                      // padding: padding,
-                                      // // itemExtent: itemExtent,
-                                      // // prototypeItem: prototypeItem,
-                                      addAutomaticKeepAlives: true,
-                                      addRepaintBoundaries: true,
-                                      addSemanticIndexes: true,
-                                      // cacheExtent: cacheExtent,
-                                      // cacheExtent: 1000,
-                                      // semanticChildCount: semanticChildCount,
-                                      dragStartBehavior:
-                                          DragStartBehavior.start,
-                                      keyboardDismissBehavior:
-                                          ScrollViewKeyboardDismissBehavior
-                                              .manual,
-                                      // restorationId: restorationId,
-                                      clipBehavior: Clip.hardEdge,
-                                    ),
                                   ),
+                                  child: SizedBox(
+                                    width: listgrid.calculatedWidth,
+                                    child: snapshot.hasError
+                                        ? Card(
+                                            child: SizedBox(
+                                              width: 500,
+                                              height: double.infinity,
+                                              child: Text(
+                                                "error ${snapshot.error}",
+                                                overflow: TextOverflow.fade,
+                                              ),
+                                            ),
+                                          )
+                                        : Scrollbar(
+                                            controller: _vertical,
+                                            child: ListView.separated(
+                                              itemCount: snapshot.docs.length,
+                                              separatorBuilder:
+                                                  (context, index) {
+                                                return const IgnorePointer();
+                                              },
+                                              itemBuilder: (context, index) {
+                                                final isLastItem = index + 1 ==
+                                                    snapshot.docs.length;
+                                                if (isLastItem &&
+                                                    snapshot.hasMore) {
+                                                  snapshot.fetchMore();
+                                                }
+
+                                                final queryDocumentSnapshot =
+                                                    snapshot.docs[index];
+                                                final T rowdata =
+                                                    queryDocumentSnapshot
+                                                        .data();
+                                                return Table(
+                                                    columnWidths:
+                                                        listgrid.columnWidths,
+                                                    // defaultColumnWidth: const FlexColumnWidth(),
+                                                    defaultVerticalAlignment:
+                                                        listgrid
+                                                            .cellVerticalAlignment,
+                                                    textBaseline:
+                                                        TextBaseline.alphabetic,
+                                                    children: [
+                                                      TableRow(
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: listgrid
+                                                              .cellBackgroundColor,
+                                                          // border: Border(
+                                                          //   bottom: BorderSide(
+                                                          //     color: widgetBackgroundColor,
+                                                          //     width: rowBorder,
+                                                          //   ),
+                                                          // ),
+                                                        ),
+                                                        children: renderRow(
+                                                          context: context,
+                                                          rowdata: rowdata,
+                                                          columnSettings: listgrid
+                                                                  .columnSettings
+                                                              as List<
+                                                                  ListGridColumn<
+                                                                      T>>,
+                                                          addEndFlex: listgrid
+                                                              .addEndFlex,
+                                                        ),
+                                                      ),
+                                                    ]);
+                                              },
+                                              scrollDirection: Axis.vertical,
+                                              reverse: false,
+                                              controller: _vertical,
+                                              // primary: primary,
+                                              physics:
+                                                  const BouncingScrollPhysics(),
+                                              shrinkWrap: false,
+                                              // itemExtent: itemExtent,
+                                              // prototypeItem: prototypeItem,
+                                              addAutomaticKeepAlives: true,
+                                              addRepaintBoundaries: true,
+                                              addSemanticIndexes: true,
+                                              // cacheExtent: cacheExtent,
+                                              // cacheExtent: 1000,
+                                              // semanticChildCount: semanticChildCount,
+                                              dragStartBehavior:
+                                                  DragStartBehavior.start,
+                                              keyboardDismissBehavior:
+                                                  ScrollViewKeyboardDismissBehavior
+                                                      .manual,
+                                              // restorationId: restorationId,
+                                              clipBehavior: Clip.hardEdge,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                              listgrid.showFooter
+                                  ? ListGridFooter(
+                                      viewportWidth: listgrid.viewportWidth,
+                                      dataMode: listgrid.dataMode.mode,
+                                    )
+                                  : const IgnorePointer(),
+                            ],
                           ),
                         ),
                       ),
-                      listGridConfig.showFooter
-                          ? ListGridFooter(
-                              viewportWidth: viewportWidth,
-                              dataMode: listGridConfig.dataMode.mode,
+                      listgrid.showFooter
+                          ? Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ListGridFooter(
+                                  viewportWidth: listgrid.viewportWidth,
+                                  dataMode: listgrid.dataMode.mode,
+                                ),
+                              ],
                             )
                           : const IgnorePointer(),
                     ],
-                  ),
-                ),
-              ),
-              listGridConfig.showFooter
-                  ? Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ListGridFooter(
-                          viewportWidth: viewportWidth,
-                          dataMode: listGridConfig.dataMode.mode,
-                        ),
-                      ],
-                    )
-                  : const IgnorePointer(),
-            ],
-          );
-        },
-      ),
+                  );
+                },
+              );
+            });
+      }),
     );
   }
 

@@ -1,107 +1,241 @@
 part of fframe;
 
 // ignore: must_be_immutable
-class ListGridController extends InheritedModel<ListGridController> {
+class ListGridController extends InheritedModel {
   ListGridController({
     super.key,
     required child,
+    required this.query,
     required this.theme,
-    required this.listGridConfig,
-    required this.columnWidths,
-    required this.columnSettings,
+    required this.config,
     required this.viewportSize,
   }) : super(child: child) {
-    _searchString = null;
-    _collectionCount = null;
+    _columnWidths = {};
+    double calculatedMinWidth = 0;
+
+    // track if all columns have fixed width
+    // if so, add an extra blank column at the end with flex
+    // to fill the screen
+    _addEndFlex = true;
+    int columnCount = 0;
+    for (var i = 0; i < config.columnSettings.length; i++) {
+      columnCount += 1;
+      // get the settings for the current column
+      ListGridColumn columnSetting = columnSettings[i];
+      // add this column's width to the min width.
+      // each flex column will add the default column width
+      // unless specified otherwise
+      calculatedMinWidth += columnSetting.columnWidth;
+
+      // apply the sizing enum to actual table column widths
+      if (columnSetting.columnSizing == ListGridColumnSizingMode.flex) {
+        _addEndFlex = false;
+        _columnWidths.addAll({i: const FlexColumnWidth(1)});
+      } else {
+        _columnWidths.addAll({i: FixedColumnWidth(columnSetting.columnWidth)});
+      }
+    }
+    if (_addEndFlex) {
+      _columnWidths.addAll({columnCount: const FlexColumnWidth(1)});
+    }
+    _viewportWidth = _getViewportWidth(viewportSize: viewportSize);
+    _calculatedWidth = _calculateWidth(calculatedMinWidth, viewportWidth);
+
+    // register the grid controller update notifier
+    notifier = ListGridNotifier(
+      query: query,
+    );
   }
+  late ListGridNotifier notifier;
 
+  final ListGridConfig config;
   final ThemeData theme;
-
-  final ListGridConfig listGridConfig;
-  final Map<int, TableColumnWidth> columnWidths;
-  final List<ListGridColumn> columnSettings;
   final Size viewportSize;
-  late String? _searchString;
-  late int? _collectionCount;
 
-  // late Map<int, TableColumnWidth> columnWidths;
+  late Map<int, TableColumnWidth> _columnWidths;
+  late Query query;
+  late double _calculatedWidth;
+  late double _viewportWidth;
+  late bool _addEndFlex;
 
   double get rowBorder {
-    return listGridConfig.rowBorder;
+    return config.rowBorder;
   }
 
   double get cellBorder {
-    return listGridConfig.rowBorder;
+    return config.rowBorder;
   }
 
   EdgeInsetsGeometry get cellPadding {
-    return listGridConfig.cellPadding;
+    return config.cellPadding;
   }
 
   TableCellVerticalAlignment get cellVerticalAlignment {
-    return listGridConfig.cellVerticalAlignment;
+    return config.cellVerticalAlignment;
   }
 
   Color get cellBackgroundColor {
-    return listGridConfig.cellBackgroundColor ?? theme.colorScheme.background;
+    return config.cellBackgroundColor ?? theme.colorScheme.background;
   }
 
   Color get widgetColor {
-    return listGridConfig.widgetColor ?? theme.colorScheme.onSurface;
+    return config.widgetColor ?? theme.colorScheme.onSurface;
   }
 
   Color get widgetBackgroundColor {
-    return listGridConfig.widgetBackgroundColor ?? theme.colorScheme.surface;
+    return config.widgetBackgroundColor ?? theme.colorScheme.surface;
   }
 
   TextStyle get widgetTextStyle {
-    return listGridConfig.widgetTextStyle ??
+    return config.widgetTextStyle ??
         TextStyle(
           fontSize: 16,
           color: theme.colorScheme.onSurface,
         );
   }
 
+  ListGridDataModeConfig get dataMode {
+    return config.dataMode;
+  }
+
   TextStyle get defaultTextStyle {
-    return listGridConfig.defaultTextStyle ??
+    return config.defaultTextStyle ??
         TextStyle(
           fontSize: 14,
           color: theme.colorScheme.onSecondaryContainer,
         );
   }
 
+  double get calculatedWidth {
+    return _calculatedWidth;
+  }
+
+  double get viewportWidth {
+    return _viewportWidth;
+  }
+
+  bool get showHeader {
+    return config.showHeader;
+  }
+
   double? get headerHeight {
-    return listGridConfig.showHeader ? null : 0;
+    return config.showHeader ? null : 0;
+  }
+
+  bool get showFooter {
+    return config.showFooter;
   }
 
   double? get footerHeight {
-    return listGridConfig.showFooter ? null : 0;
+    return config.showFooter ? null : 0;
   }
 
   ListGridSearchConfig? get searchConfig {
-    return listGridConfig.searchConfig;
+    return config.searchConfig;
+  }
+
+  List<ListGridColumn> get columnSettings {
+    return config.columnSettings;
+  }
+
+  Map<int, TableColumnWidth> get columnWidths {
+    return _columnWidths;
+  }
+
+  bool get addEndFlex {
+    return _addEndFlex;
   }
 
   int? get collectionCount {
-    return _collectionCount;
-  }
-
-  set collectionCount(int? collectionCount) {
-    _collectionCount = collectionCount;
+    return notifier.collectionCount;
   }
 
   String? get searchString {
-    return _searchString;
+    return notifier.searchString;
   }
 
   set searchString(String? searchString) {
-    //TODO: add some kind of rate limiting
-    if (searchString != null && searchString.isNotEmpty) {
-      _searchString = searchString;
-      debugPrint("Set searching for: $_searchString");
+    notifier.searchString = searchString;
+  }
+
+  Query get computedQuery {
+    if (searchString == null) {
+      return query;
     } else {
-      _searchString = null;
+      if (config.searchConfig != null) {
+        ListGridSearchConfig searchConfig =
+            config.searchConfig as ListGridSearchConfig;
+        switch (searchConfig.mode) {
+          case ListGridSearchMode.singleFieldString:
+            if (searchConfig.field == null) {
+              Console.log(
+                  "ListGrid computedQuery: ListGridSearchConfig: ListGridSearchMode.singleFieldString requires field to be provided");
+            }
+            debugPrint(
+                "ListGridSearchMode.singleFieldString search in ${searchConfig.field}");
+            return query
+                .startsWith("${searchConfig.field}", searchString!)
+                .orderBy("${searchConfig.field}");
+          case ListGridSearchMode.multiFieldString:
+            if (searchConfig.field == null) {
+              Console.log(
+                  "ListGrid computedQuery: ListGridSearchConfig: ListGridSearchMode.multiFieldString to be provided");
+            }
+            //unsupported for now
+            // return query.startsWith("createdBy", "Arn").orderBy("createdBy");
+            return query;
+          case ListGridSearchMode.underscoreTypeAhead:
+            if (searchConfig.field == null) {
+              Console.log(
+                  "ListGrid computedQuery: ListGridSearchConfig: ListGridSearchMode.underscoreTypeAhead to be provided");
+            }
+            return query
+                .startsWith(
+                    "${searchConfig.field}", searchString!.replaceAll(' ', '_'))
+                .orderBy("${searchConfig.field}");
+        }
+      } else {
+        return query;
+      }
     }
+  }
+
+  double _calculateWidth(double calculatedMinWidth, double viewportWidth) {
+    double calculatedWidth =
+        calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
+    return calculatedWidth;
+  }
+
+  double _getViewportWidth({required Size viewportSize}) {
+    double viewportWidth = ((viewportSize.width > 1000)
+        ? (viewportSize).width - 100
+        : (viewportSize.width + 0));
+    return viewportWidth;
+  }
+
+  @override
+  bool updateShouldNotify(covariant ListGridController oldWidget) {
+    bool updated = false;
+
+    // test if any fields are changed that should trigger an update
+    updated = (config != oldWidget.config) ? true : updated;
+    updated = (columnSettings != oldWidget.columnSettings) ? true : updated;
+    updated = (columnWidths != oldWidget.columnWidths) ? true : updated;
+    updated = (theme != oldWidget.theme) ? true : updated;
+    updated = (searchString != oldWidget.searchString) ? true : updated;
+    updated = (collectionCount != oldWidget.collectionCount) ? true : updated;
+
+    notifier.update();
+    return updated;
+  }
+
+  @override
+  bool updateShouldNotifyDependent(
+    covariant InheritedModel oldWidget,
+    Set dependencies,
+  ) {
+    // TODO: implement updateShouldNotifyDependent
+    return true;
   }
 
   static ListGridController? maybeOf(BuildContext context) {
@@ -114,29 +248,56 @@ class ListGridController extends InheritedModel<ListGridController> {
     assert(result != null, 'No ListGridController found in context');
     return result!;
   }
+}
 
-  @override
-  bool updateShouldNotify(ListGridController oldWidget) {
-    bool updated = false;
+class ListGridNotifier extends ChangeNotifier {
+  ListGridNotifier({
+    required this.query,
+  }) : super() {
+    // not empyy
+    _searchString = '';
+    _collectionCount = 0;
 
-    // test if any fields are changed that should trigger an update
-    updated = (listGridConfig != oldWidget.listGridConfig);
-    updated = (columnSettings != oldWidget.columnSettings);
-    updated = (columnWidths != oldWidget.columnWidths);
-    updated = (theme != oldWidget.theme);
-    updated = (_searchString != oldWidget._searchString);
+    //update the collection count
+    _updateCollectionCount(query: query);
+  }
+  late Query query;
+  late String? _searchString;
+  late int _collectionCount;
 
-    return updated;
+  String? get searchString {
+    return _searchString;
   }
 
-  @override
-  bool updateShouldNotifyDependent(
-    covariant InheritedModel<ListGridController> oldWidget,
-    Set<ListGridController> dependencies,
-  ) {
-    debugPrint(_searchString);
-    // TODO: implement updateShouldNotifyDependent
-    return true;
+  set searchString(String? searchString) {
+    //TODO: add some kind of rate limiting
+    if (searchString != null && searchString.isNotEmpty) {
+      _searchString = searchString;
+    } else {
+      _searchString = null;
+    }
+    _updateCollectionCount(query: query);
+    notifyListeners();
+  }
+
+  int get collectionCount {
+    return _collectionCount;
+  }
+
+  void _updateCollectionCount({required Query query}) async {
+    AggregateQuerySnapshot snapshot = await query.count().get();
+    int collectionCount = snapshot.count;
+    _collectionCount = collectionCount;
+  }
+
+  set collectionCount(int collectionCount) {
+    _collectionCount = collectionCount;
+    notifyListeners();
+  }
+
+  void update() {
+    debugPrint("notifier fired");
+    notifyListeners();
   }
 }
 

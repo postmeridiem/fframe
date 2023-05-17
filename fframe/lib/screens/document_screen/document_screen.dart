@@ -747,9 +747,26 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>>
             return Stack(
               children: [
                 FirestoreListGrid<T>(
-                  listGridConfig: documentConfig.listGrid!,
+                  config: documentConfig.listGrid!,
                   query: query,
                 ),
+                // Row(
+                //   children: [
+                //     const SizedBox(
+                //       width: 300,
+                //       child: IgnorePointer(),
+                //     ),
+                //     Expanded(
+                //       child: Container(
+                //         color: Theme.of(context).colorScheme.surface,
+                //         child: ScreenBody<T>(
+                //           key: ValueKey(
+                //               "ScreenBody_${documentConfig.collection}"),
+                //         ),
+                //       ),
+                //     ),
+                //   ],
+                // ),
               ],
             );
           default:
@@ -761,29 +778,6 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>>
         }
       },
     );
-
-    // if (documentConfig.currentViewType == ViewType.list) {
-    //   return Row(
-    //     children: [
-    //       if (documentConfig.documentList != null)
-    //         DocumentListLoader<T>(
-    //           key: ValueKey("DocumentListBuilder_${documentConfig.collection}"),
-    //           ref: ref,
-    //         ),
-    //       Expanded(
-    //         child: ScreenBody<T>(
-    //           key: ValueKey("ScreenBody_${documentConfig.collection}"),
-    //         ),
-    //       ),
-    //     ],
-    //   );
-    // } else {
-    //   Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
-    //   return FirestoreDataGrid<T>(
-    //     dataGridConfig: documentConfig.dataGrid!,
-    //     query: query,
-    //   );
-    // }
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:fframe/extensions/query.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
@@ -59,7 +60,8 @@ class _ListGridScreenState extends State<ListGridScreen> {
       },
 
       // query: (query) {
-      //   return query.where("active", isEqualTo: true);
+      //   return query.startsWith("createdBy", "Jer").orderBy("createdBy");
+      // },
       //   // switch (widget.listgridQueryState) {
       //   //   case ListGridQueryStates.active:
       //   //     return query
@@ -93,7 +95,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
           limit: 10,
         ),
         searchConfig: const ListGridSearchConfig(
-            mode: ListGridSearchMode.singleFieldString, field: 'createdBy'),
+            mode: ListGridSearchMode.singleFieldString, field: 'name'),
         columnSettings: listGridColumns,
       ),
 

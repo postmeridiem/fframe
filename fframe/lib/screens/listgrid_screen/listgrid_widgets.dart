@@ -186,8 +186,9 @@ class ListGridSearchWidget extends StatelessWidget {
                   onChanged: (String value) {
                     ListGridController controller =
                         ListGridController.of(context);
-                    controller.searchString = value;
-                    controller.updateShouldNotify(controller);
+                    ListGridController.of(context).searchString = value;
+                    ListGridController.of(context)
+                        .updateShouldNotify(controller);
                   },
                 ),
               ],
