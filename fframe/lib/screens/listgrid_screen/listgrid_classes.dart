@@ -188,11 +188,13 @@ class ListGridController extends InheritedModel {
             if (searchConfig.field == null) {
               Console.log(
                   "ListGrid computedQuery: ListGridSearchConfig: ListGridSearchMode.underscoreTypeAhead to be provided");
+              return query;
+            } else {
+              return query
+                  .startsWith(searchConfig.field!.toLowerCase(),
+                      searchString!.replaceAll(' ', '_'))
+                  .orderBy("${searchConfig.field}");
             }
-            return query
-                .startsWith(
-                    "${searchConfig.field}", searchString!.replaceAll(' ', '_'))
-                .orderBy("${searchConfig.field}");
         }
       } else {
         return query;
