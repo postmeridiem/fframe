@@ -95,7 +95,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
           limit: 10,
         ),
         searchConfig: const ListGridSearchConfig(
-            mode: ListGridSearchMode.singleFieldString, field: 'name'),
+            mode: ListGridSearchMode.underscoreTypeAhead, field: 'name'),
         columnSettings: listGridColumns,
       ),
 
