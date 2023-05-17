@@ -160,10 +160,19 @@ class ListGridController extends InheritedModel {
   }
 
   Query get computedQuery {
+    Query computedQuery = query;
     if (searchString == null) {
-      return query;
+      return computedQuery;
     } else {
-      if (config.searchConfig != null) {
+      if (config.searchConfig == null) {
+        return computedQuery;
+      } else {
+        if (notifier.sorting != null) {
+          ListGridQuerySorting sorting =
+              notifier.sorting as ListGridQuerySorting;
+          computedQuery.orderBy(sorting.fieldName,
+              descending: sorting.descending);
+        }
         ListGridSearchConfig searchConfig =
             config.searchConfig as ListGridSearchConfig;
         switch (searchConfig.mode) {
@@ -172,13 +181,10 @@ class ListGridController extends InheritedModel {
             if (searchConfig.field == null) {
               Console.log(
                   "ListGrid computedQuery: ListGridSearchConfig: ListGridSearchMode.singleFieldString requires field to be provided");
-              return query;
+              return computedQuery;
             } else {
-              ListGridQuerySorting sorting =
-                  notifier.sorting as ListGridQuerySorting;
-              return query
-                  .startsWith("${searchConfig.field}", searchString!)
-                  .orderBy(sorting.fieldName, descending: sorting.descending);
+              return computedQuery.startsWith(
+                  "${searchConfig.field}", searchString!);
             }
 
           case ListGridSearchMode.multiFieldString:
@@ -188,21 +194,17 @@ class ListGridController extends InheritedModel {
             }
             //unsupported for now
             // return query.startsWith("createdBy", "Arn").orderBy("createdBy");
-            return query;
+            return computedQuery;
           case ListGridSearchMode.underscoreTypeAhead:
             if (searchConfig.field == null) {
               Console.log(
                   "ListGrid computedQuery: ListGridSearchConfig: ListGridSearchMode.underscoreTypeAhead to be provided");
-              return query;
+              return computedQuery;
             } else {
-              return query
-                  .startsWith(searchConfig.field!,
-                      searchString!.toLowerCase().replaceAll(' ', '_'))
-                  .orderBy("${searchConfig.field}");
+              return computedQuery.startsWith(searchConfig.field!,
+                  searchString!.toLowerCase().replaceAll(' ', '_'));
             }
         }
-      } else {
-        return query;
       }
     }
   }
