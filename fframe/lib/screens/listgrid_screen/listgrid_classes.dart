@@ -191,8 +191,8 @@ class ListGridController extends InheritedModel {
               return query;
             } else {
               return query
-                  .startsWith(searchConfig.field!.toLowerCase(),
-                      searchString!.replaceAll(' ', '_'))
+                  .startsWith(searchConfig.field!,
+                      searchString!.toLowerCase().replaceAll(' ', '_'))
                   .orderBy("${searchConfig.field}");
             }
         }
