@@ -44,6 +44,7 @@ class ListGridController extends InheritedModel {
     // register the grid controller update notifier
     notifier = ListGridNotifier(
       query: query,
+      searchConfig: config.searchConfig,
     );
   }
   late ListGridNotifier notifier;
@@ -167,15 +168,19 @@ class ListGridController extends InheritedModel {
             config.searchConfig as ListGridSearchConfig;
         switch (searchConfig.mode) {
           case ListGridSearchMode.singleFieldString:
+            // first apply the default sort for this search mode
             if (searchConfig.field == null) {
               Console.log(
                   "ListGrid computedQuery: ListGridSearchConfig: ListGridSearchMode.singleFieldString requires field to be provided");
+              return query;
+            } else {
+              ListGridQuerySorting sorting =
+                  notifier.sorting as ListGridQuerySorting;
+              return query
+                  .startsWith("${searchConfig.field}", searchString!)
+                  .orderBy(sorting.fieldName, descending: sorting.descending);
             }
-            debugPrint(
-                "ListGridSearchMode.singleFieldString search in ${searchConfig.field}");
-            return query
-                .startsWith("${searchConfig.field}", searchString!)
-                .orderBy("${searchConfig.field}");
+
           case ListGridSearchMode.multiFieldString:
             if (searchConfig.field == null) {
               Console.log(
@@ -255,17 +260,23 @@ class ListGridController extends InheritedModel {
 class ListGridNotifier extends ChangeNotifier {
   ListGridNotifier({
     required this.query,
+    required this.searchConfig,
   }) : super() {
     // not empyy
     _searchString = '';
     _collectionCount = 0;
 
+    // initialize the sorting object
+    _sorting = _initializeSorting(searchConfig: searchConfig);
+
     //update the collection count
     _updateCollectionCount(query: query);
   }
   late Query query;
+  final ListGridSearchConfig? searchConfig;
   late String? _searchString;
   late int _collectionCount;
+  late ListGridQuerySorting? _sorting;
 
   String? get searchString {
     return _searchString;
@@ -282,8 +293,22 @@ class ListGridNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  ListGridQuerySorting? get sorting {
+    return _sorting;
+  }
+
+  set sorting(ListGridQuerySorting? sorting) {
+    _sorting = sorting;
+    notifyListeners();
+  }
+
   int get collectionCount {
     return _collectionCount;
+  }
+
+  set collectionCount(int collectionCount) {
+    _collectionCount = collectionCount;
+    notifyListeners();
   }
 
   void _updateCollectionCount({required Query query}) async {
@@ -292,13 +317,24 @@ class ListGridNotifier extends ChangeNotifier {
     _collectionCount = collectionCount;
   }
 
-  set collectionCount(int collectionCount) {
-    _collectionCount = collectionCount;
-    notifyListeners();
+  ListGridQuerySorting? _initializeSorting(
+      {required ListGridSearchConfig? searchConfig}) {
+    if (searchConfig != null) {
+      if (searchConfig.mode == ListGridSearchMode.singleFieldString ||
+          searchConfig.mode == ListGridSearchMode.underscoreTypeAhead) {
+        return ListGridQuerySorting(
+          fieldName: searchConfig.field as String,
+          descending: false,
+        );
+      } else {
+        return null;
+      }
+    } else {
+      return null;
+    }
   }
 
   void update() {
-    debugPrint("notifier fired");
     notifyListeners();
   }
 }
@@ -396,6 +432,12 @@ class ListGridSearchConfig {
   final ListGridSearchMode mode;
   final String? field;
   final List<String>? multiFields;
+}
+
+class ListGridQuerySorting {
+  ListGridQuerySorting({required this.fieldName, required this.descending});
+  final String fieldName;
+  final bool descending;
 }
 
 enum ListGridColumnSortingMode {
