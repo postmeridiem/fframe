@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Flutter Web Chrome @ 8000",
+            "name": "Flutter Web Chrome @ 8888",
             "request": "launch",
             "type": "dart",
             "program": "example/lib/main.dart",
@@ -10,11 +10,11 @@
                 "-d",
                 "chrome",
                 "--web-port",
-                "8000"
+                "8888"
             ],
         },
         {
-            "name": "Flutter Web WebServer @ 8000",
+            "name": "Flutter Web WebServer @ 8888",
             "request": "launch",
             "type": "dart",
             "program": "example/bin/main.dart",
@@ -22,7 +22,7 @@
                 "-d",
                 "web-server",
                 "--web-port",
-                "8000"
+                "8888"
             ],
         }
     ]
