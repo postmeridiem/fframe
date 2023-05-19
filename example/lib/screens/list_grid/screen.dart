@@ -58,24 +58,6 @@ class _ListGridScreenState extends State<ListGridScreen> {
         );
       },
 
-      // query: (query) {
-      //   return query.startsWith("createdBy", "Jer").orderBy("createdBy");
-      // },
-      //   // switch (widget.listgridQueryState) {
-      //   //   case ListGridQueryStates.active:
-      //   //     return query
-      //   //         .where("active", isEqualTo: true)
-      //   //         .orderBy("__name__", descending: true)
-      //   //         .limit(5);
-
-      //   //   case ListGridQueryStates.done:
-      //   //     return query
-      //   //         .where("active", isEqualTo: false)
-      //   //         .orderBy("__name__", descending: true)
-      //   //         .limit(5);
-      //   // }
-      // },
-
       // Optional ListGrid widget
       listGrid: ListGridConfig<Suggestion>(
         // widgetBackgroundColor: Theme.of(context).colorScheme.primary,
@@ -93,8 +75,6 @@ class _ListGridScreenState extends State<ListGridScreen> {
           mode: ListGridDataMode.lazy,
           limit: 10,
         ),
-        searchConfig: const ListGridSearchConfig(
-            mode: ListGridSearchMode.singleFieldString, field: 'fieldTab3'),
         columnSettings: listGridColumns,
       ),
 
