@@ -305,18 +305,24 @@ class ListGridNotifier extends ChangeNotifier {
             Console.log(
                 "ListGrid: ERROR: Multiple searchable columns not supported at this time. Defaulting to first one");
           }
-          if (columnSettings.first.fieldName != null) {
-            ListGridColumn column = columnSettings.first;
-            String fieldName = column.fieldName!;
+          if (columnSettings[searchableColumns.first].fieldName != null) {
+            ListGridColumn curColumn = columnSettings[searchableColumns.first];
+            String fieldName = curColumn.fieldName!;
             outputQuery = outputQuery.orderBy(fieldName,
-                descending: columnSettings.first.descending);
-            if (column.searchMask == null) {
+                descending: curColumn.descending);
+            if (curColumn.searchMask == null) {
               outputQuery = outputQuery.startsWith(fieldName, curSearch);
             } else {
-              if (column.searchMask!.toLowerCase) {
+              debugPrint("applying search mask");
+              if (curColumn.searchMask!.toLowerCase) {
                 curSearch = curSearch.toLowerCase();
               }
-              outputQuery = outputQuery.startsWith(fieldName, searchString!);
+              outputQuery = outputQuery.startsWith(
+                  fieldName,
+                  curSearch.replaceAll(
+                    curColumn.searchMask!.from,
+                    curColumn.searchMask!.to,
+                  ));
             }
           }
         }
