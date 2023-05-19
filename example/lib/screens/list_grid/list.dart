@@ -116,15 +116,15 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
       return "${suggestion.fieldTab2}";
     },
   ),
-  // ListGridColumn(
-  //   label: "tab 3",
-  //   columnSizing: ListGridColumnSizingMode.fixed,
-  //   columnWidth: 200,
-  //   valueBuilder: (context, suggestion) {
-  //     return "${suggestion.fieldTab3}";
-  //   },
-  //   cellColor: Colors.pink,
-  // ),
+  ListGridColumn(
+    label: "tab 3",
+    columnSizing: ListGridColumnSizingMode.fixed,
+    columnWidth: 200,
+    valueBuilder: (context, suggestion) {
+      return "${suggestion.fieldTab3}";
+    },
+    cellColor: Colors.pink,
+  ),
   ListGridColumn(
     label: "creation date",
     columnSizing: ListGridColumnSizingMode.fixed,

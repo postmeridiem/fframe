@@ -60,9 +60,10 @@ class _ListGridScreenState extends State<ListGridScreen> {
 
       // Optional ListGrid widget
       listGrid: ListGridConfig<Suggestion>(
-        // widgetBackgroundColor: Theme.of(context).colorScheme.primary,
-        // widgetTextStyle: TextStyle(color: Colors.amber),
-        // widgetColor: Colors.cyan,
+        // widgetBackgroundColor: Colors.amber,
+        // widgetColor: Colors.pink,
+        // widgetTextColor: Colors.pink,
+        // widgetTextSize: 20,
         // rowBorder: 1,
         cellBorder: 1,
         // cellPadding: const EdgeInsets.all(16),
