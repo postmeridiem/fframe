@@ -4,9 +4,11 @@ class ListGridHeader extends StatelessWidget {
   const ListGridHeader({
     super.key,
     required this.calculatedWidth,
+    required this.enableSearchBar,
     required this.addEndFlex,
   });
   final double calculatedWidth;
+  final bool enableSearchBar;
   final bool addEndFlex;
 
   @override
@@ -14,9 +16,8 @@ class ListGridHeader extends StatelessWidget {
     ListGridController listgrid = ListGridController.of(context);
     return Column(
       children: [
-        listgrid.searchConfig != null
+        enableSearchBar
             ? ListGridSearchWidget(
-                searchConfig: listgrid.searchConfig!,
                 calculatedWidth: calculatedWidth,
                 widgetColor: listgrid.widgetColor,
                 cellBorder: listgrid.cellBorder,
@@ -33,12 +34,15 @@ class ListGridHeader extends StatelessWidget {
                 children: [
                   TableRow(
                     children: renderHeaderCells(
+                      context: context,
                       columnSettings: listgrid.columnSettings,
                       cellPadding: listgrid.cellPadding,
                       cellBorder: listgrid.cellBorder,
                       widgetBackgroundColor: listgrid.widgetBackgroundColor,
-                      widgetTextStyle: listgrid.widgetTextStyle,
+                      widgetTextColor: listgrid.widgetTextColor,
+                      widgetTextSize: listgrid.widgetTextSize,
                       widgetColor: listgrid.widgetColor,
+                      sortedColumnIndex: listgrid.sortedColumnIndex,
                     ),
                   ),
                 ],
@@ -54,49 +58,61 @@ class ListGridHeader extends StatelessWidget {
   }
 
   List<Widget> renderHeaderCells({
+    required BuildContext context,
     required List<ListGridColumn> columnSettings,
     required Color widgetBackgroundColor,
     required Color widgetColor,
     // required EdgeInsetsGeometry padding,
-    required TextStyle widgetTextStyle,
+    required Color widgetTextColor,
+    required double widgetTextSize,
     required EdgeInsetsGeometry cellPadding,
     required double cellBorder,
+    required int? sortedColumnIndex,
   }) {
     List<Widget> output = [];
-    for (ListGridColumn column in columnSettings) {
-      output.add(
-        Container(
-          decoration: BoxDecoration(
-            // color: Colors.green,
-            color: widgetBackgroundColor,
-            border: Border(
-              right: cellBorder > 0
-                  ? BorderSide(
-                      color: widgetColor,
-                      width: cellBorder,
-                    )
-                  : BorderSide.none,
+    for (var i = 0; i < columnSettings.length; i++) {
+      bool isSorted = (sortedColumnIndex != null && sortedColumnIndex == i);
+      ListGridColumn column = columnSettings[i];
+      if (column.visible) {
+        output.add(
+          Container(
+            decoration: BoxDecoration(
+              // color: Colors.green,
+              color: widgetBackgroundColor,
+              border: Border(
+                right: cellBorder > 0
+                    ? BorderSide(
+                        color: widgetColor,
+                        width: cellBorder,
+                      )
+                    : BorderSide.none,
+              ),
+            ),
+            child: Stack(
+              children: [
+                Padding(
+                  padding: cellPadding,
+                  child: Text(
+                    column.label,
+                    textAlign: column.textAlign,
+                    style: TextStyle(
+                      color: isSorted
+                          ? Theme.of(context).colorScheme.onBackground
+                          : widgetTextColor,
+                      fontSize: widgetTextSize,
+                    ),
+                  ),
+                ),
+                HeaderSortingWidget(
+                  column: column,
+                  columnIndex: i,
+                  widgetColor: widgetColor,
+                ),
+              ],
             ),
           ),
-          child: Stack(
-            children: [
-              Padding(
-                padding: cellPadding,
-                child: Text(
-                  column.label,
-                  textAlign: column.textAlign,
-                  style: widgetTextStyle,
-                ),
-              ),
-              HeaderSortingWidget(
-                column: column,
-                widgetColor: widgetColor,
-                widgetBackgroundColor: widgetBackgroundColor,
-              ),
-            ],
-          ),
-        ),
-      );
+        );
+      }
     }
 
     if (addEndFlex) {
@@ -114,7 +130,10 @@ class ListGridHeader extends StatelessWidget {
             // child: const IgnorePointer(),
             child: Text(
               "",
-              style: widgetTextStyle,
+              style: TextStyle(
+                color: widgetTextColor,
+                fontSize: widgetTextSize,
+              ),
             ),
           ),
         ),
@@ -127,13 +146,11 @@ class ListGridHeader extends StatelessWidget {
 class ListGridSearchWidget extends StatelessWidget {
   const ListGridSearchWidget({
     super.key,
-    required this.searchConfig,
     required this.calculatedWidth,
     required this.widgetColor,
     required this.cellBorder,
   });
 
-  final ListGridSearchConfig searchConfig;
   final double calculatedWidth;
   final Color widgetColor;
   final double cellBorder;
@@ -184,11 +201,7 @@ class ListGridSearchWidget extends StatelessWidget {
                     // border: null,
                   ),
                   onChanged: (String value) {
-                    ListGridController controller =
-                        ListGridController.of(context);
                     ListGridController.of(context).searchString = value;
-                    ListGridController.of(context)
-                        .updateShouldNotify(controller);
                   },
                 ),
               ],
@@ -205,81 +218,81 @@ class HeaderSortingWidget extends StatelessWidget {
   const HeaderSortingWidget({
     super.key,
     required this.column,
-    required this.widgetBackgroundColor,
+    required this.columnIndex,
     required this.widgetColor,
   });
 
   final ListGridColumn column;
-  final Color widgetBackgroundColor;
+  final int columnIndex;
   final Color widgetColor;
 
   @override
   Widget build(BuildContext context) {
-    switch (column.columnSorting) {
-      case ListGridColumnSortingMode.both:
-        return Positioned.fill(
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.only(right: 4.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 12,
-                    width: 12,
-                    child: IconButton(
-                      padding: const EdgeInsets.all(0),
-                      onPressed: () {
-                        debugPrint(column.label);
-                      },
-                      icon: const Icon(Icons.expand_less),
-                      iconSize: 12,
-                      color: widgetBackgroundColor,
-                      style: const ButtonStyle(
-                        padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
-                          EdgeInsets.all(0),
-                        ),
+    ListGridController controller = ListGridController.of(context);
+    if (column.sortable) {
+      bool isSorted = (columnIndex == controller.sortedColumnIndex);
+      return Positioned.fill(
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: const EdgeInsets.only(right: 4.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 12,
+                  width: 12,
+                  child: IconButton(
+                    padding: const EdgeInsets.all(0),
+                    onPressed: () {
+                      controller.sortColumn(
+                          columnIndex: columnIndex, descending: false);
+                    },
+                    icon: const Icon(Icons.expand_less),
+                    iconSize: 12,
+                    color: (isSorted && !column.descending)
+                        ? Theme.of(context).colorScheme.onBackground
+                        : widgetColor,
+                    style: const ButtonStyle(
+                      padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
+                        EdgeInsets.all(0),
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 12,
-                    width: 12,
-                    child: IconButton(
-                      isSelected: true,
-                      padding: const EdgeInsets.all(0),
-                      onPressed: () {
-                        debugPrint(column.label);
-                      },
-                      icon: const Icon(Icons.expand_more),
-                      iconSize: 12,
-                      color: widgetColor,
-                      style: ButtonStyle(
-                        surfaceTintColor: MaterialStatePropertyAll<Color>(
-                          Colors.grey.shade500,
-                        ),
-                        padding:
-                            const MaterialStatePropertyAll<EdgeInsetsGeometry>(
-                          EdgeInsets.all(0),
-                        ),
+                ),
+                SizedBox(
+                  height: 12,
+                  width: 12,
+                  child: IconButton(
+                    isSelected: true,
+                    padding: const EdgeInsets.all(0),
+                    onPressed: () {
+                      controller.sortColumn(
+                          columnIndex: columnIndex, descending: true);
+                    },
+                    icon: const Icon(Icons.expand_more),
+                    iconSize: 12,
+                    color: (isSorted && column.descending)
+                        ? Theme.of(context).colorScheme.onBackground
+                        : widgetColor,
+                    style: ButtonStyle(
+                      surfaceTintColor: MaterialStatePropertyAll<Color>(
+                        Colors.grey.shade500,
+                      ),
+                      padding:
+                          const MaterialStatePropertyAll<EdgeInsetsGeometry>(
+                        EdgeInsets.all(0),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        );
-      case ListGridColumnSortingMode.asc:
-        return const IgnorePointer();
-
-      case ListGridColumnSortingMode.desc:
-        return const IgnorePointer();
-
-      case ListGridColumnSortingMode.none:
-      default:
-        return const IgnorePointer();
+        ),
+      );
+    } else {
+      return const IgnorePointer();
     }
   }
 }
@@ -318,14 +331,16 @@ class ListGridFooter<T> extends StatelessWidget {
                             dataMode == ListGridDataMode.pager)
                         ? ListGridPaginator(
                             collectionCount: collectionCount,
-                            widgetTextStyle: listgrid.widgetTextStyle,
+                            widgetTextColor: listgrid.widgetTextColor,
+                            widgetTextSize: listgrid.widgetTextSize,
                             widgetBackgroundColor:
                                 listgrid.widgetBackgroundColor,
                             widgetColor: listgrid.widgetColor,
                           )
                         : ListGridDefaultFooter(
                             collectionCount: collectionCount,
-                            widgetTextStyle: listgrid.widgetTextStyle,
+                            widgetTextColor: listgrid.widgetTextColor,
+                            widgetTextSize: listgrid.widgetTextSize,
                           ),
                   ],
                 )),
@@ -340,11 +355,13 @@ class ListGridDefaultFooter extends StatelessWidget {
   const ListGridDefaultFooter({
     super.key,
     required this.collectionCount,
-    required this.widgetTextStyle,
+    required this.widgetTextColor,
+    required this.widgetTextSize,
   });
 
   final int collectionCount;
-  final TextStyle widgetTextStyle;
+  final Color widgetTextColor;
+  final double widgetTextSize;
 
   @override
   Widget build(BuildContext context) {
@@ -352,7 +369,13 @@ class ListGridDefaultFooter extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.only(right: 100.0),
-          child: Text("count: $collectionCount", style: widgetTextStyle),
+          child: Text(
+            "count: $collectionCount",
+            style: TextStyle(
+              color: widgetTextColor,
+              fontSize: widgetTextSize,
+            ),
+          ),
         ),
         const SizedBox(
           width: 280,
@@ -367,13 +390,15 @@ class ListGridPaginator extends StatelessWidget {
   const ListGridPaginator({
     super.key,
     required this.collectionCount,
-    required this.widgetTextStyle,
+    required this.widgetTextColor,
+    required this.widgetTextSize,
     required this.widgetBackgroundColor,
     required this.widgetColor,
   });
 
   final int collectionCount;
-  final TextStyle widgetTextStyle;
+  final Color widgetTextColor;
+  final double widgetTextSize;
   final Color widgetBackgroundColor;
   final Color widgetColor;
 
@@ -389,7 +414,10 @@ class ListGridPaginator extends StatelessWidget {
           padding: const EdgeInsets.only(right: 8.0),
           child: Text(
             "page 1 of 9 (count: $collectionCount)",
-            style: widgetTextStyle,
+            style: TextStyle(
+              color: widgetTextColor,
+              fontSize: widgetTextSize,
+            ),
           ),
         ),
         SizedBox(

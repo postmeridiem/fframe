@@ -39,7 +39,7 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
   @override
   Widget build(BuildContext context) {
     return ListGridController(
-      query: widget.query,
+      sourceQuery: widget.query,
       config: widget.config,
       viewportSize: MediaQuery.of(context).size,
       theme: Theme.of(context),
@@ -50,7 +50,7 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
             builder: (context, child) {
               return FirestoreQueryBuilder<T>(
                 pageSize: listgrid.dataMode.limit,
-                query: ListGridController.of(context).computedQuery as Query<T>,
+                query: ListGridController.of(context).currentQuery as Query<T>,
                 builder: (context, snapshot, child) {
                   // int count = snapshot.docs.length;
                   return Stack(
@@ -82,6 +82,7 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                               listgrid.showHeader
                                   ? ListGridHeader(
                                       calculatedWidth: listgrid.calculatedWidth,
+                                      enableSearchBar: listgrid.enableSearchBar,
                                       addEndFlex: listgrid.addEndFlex,
                                     )
                                   : const IgnorePointer(),
@@ -100,12 +101,17 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                                     width: listgrid.calculatedWidth,
                                     child: snapshot.hasError
                                         ? Card(
-                                            child: SizedBox(
-                                              width: 500,
-                                              height: double.infinity,
-                                              child: Text(
-                                                "error ${snapshot.error}",
-                                                overflow: TextOverflow.fade,
+                                            child: Center(
+                                              child: SizedBox(
+                                                width: 500,
+                                                height: double.infinity,
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      40.0),
+                                                  child: SelectableText(
+                                                    "error ${snapshot.error}",
+                                                  ),
+                                                ),
                                               ),
                                             ),
                                           )
@@ -245,60 +251,79 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
     ListGridController listgrid = ListGridController.of(context);
     List<Widget> output = [];
     for (ListGridColumn<T> column in columnSettings) {
-      if (column.cellBuilder != null) {
-        output.add(
-          TableCell(
-            verticalAlignment: TableCellVerticalAlignment.bottom,
-            child: Container(
-              decoration: BoxDecoration(
-                // color: Colors.green,
-                color: listgrid.cellBackgroundColor,
-                border: Border(
-                  bottom: listgrid.rowBorder > 0
-                      ? BorderSide(
-                          color: listgrid.widgetBackgroundColor,
-                          width: listgrid.rowBorder,
-                        )
-                      : BorderSide.none,
+      if (column.visible) {
+        if (column.cellBuilder != null) {
+          output.add(
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.bottom,
+              child: Container(
+                decoration: BoxDecoration(
+                  // color: Colors.green,
+                  color: listgrid.cellBackgroundColor,
+                  border: Border(
+                    bottom: listgrid.rowBorder > 0
+                        ? BorderSide(
+                            color: listgrid.widgetBackgroundColor,
+                            width: listgrid.rowBorder,
+                          )
+                        : BorderSide.none,
+                  ),
                 ),
-              ),
-              child: Padding(
-                padding: listgrid.cellPadding,
-                child: column.cellBuilder!(context, rowdata),
-                // child: const Text("cell"),
+                child: Padding(
+                  padding: listgrid.cellPadding,
+                  child: column.cellBuilder!(context, rowdata),
+                  // child: const Text("cell"),
+                ),
               ),
             ),
-          ),
-        );
-      } else if (column.valueBuilder != null) {
-        dynamic dynValue = column.valueBuilder!(context, rowdata);
-        String stringValue = "$dynValue";
-        output.add(
-          TableCell(
-            verticalAlignment: TableCellVerticalAlignment.bottom,
-            child: Container(
-              decoration: BoxDecoration(
-                // color: Colors.green,
-                color: listgrid.cellBackgroundColor,
-                border: Border(
-                  right: listgrid.cellBorder > 0
-                      ? BorderSide(
-                          color: listgrid.widgetBackgroundColor,
-                          width: listgrid.cellBorder,
-                        )
-                      : BorderSide.none,
-                  bottom: listgrid.rowBorder > 0
-                      ? BorderSide(
-                          color: listgrid.widgetBackgroundColor,
-                          width: listgrid.rowBorder,
-                        )
-                      : BorderSide.none,
+          );
+        } else if (column.valueBuilder != null) {
+          dynamic dynValue = column.valueBuilder!(context, rowdata);
+          String stringValue = "$dynValue";
+          output.add(
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.bottom,
+              child: Container(
+                decoration: BoxDecoration(
+                  // color: Colors.green,
+                  color: listgrid.cellBackgroundColor,
+                  border: Border(
+                    right: listgrid.cellBorder > 0
+                        ? BorderSide(
+                            color: listgrid.widgetBackgroundColor,
+                            width: listgrid.cellBorder,
+                          )
+                        : BorderSide.none,
+                    bottom: listgrid.rowBorder > 0
+                        ? BorderSide(
+                            color: listgrid.widgetBackgroundColor,
+                            width: listgrid.rowBorder,
+                          )
+                        : BorderSide.none,
+                  ),
                 ),
-              ),
-              child: column.generateTooltip
-                  ? Tooltip(
-                      message: prepTooltip(stringValue),
-                      child: Padding(
+                child: column.generateTooltip
+                    ? Tooltip(
+                        message: prepTooltip(stringValue),
+                        child: Padding(
+                          padding: listgrid.cellPadding,
+                          child: column.textSelectable
+                              ? SelectableText(
+                                  stringValue,
+                                  textAlign: column.textAlign,
+                                  style: listgrid.defaultTextStyle,
+                                  // overflow: TextOverflow.ellipsis,
+                                )
+                              : Text(
+                                  stringValue,
+                                  textAlign: column.textAlign,
+                                  style: listgrid.defaultTextStyle,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                          // child: const Text("cell"),
+                        ),
+                      )
+                    : Padding(
                         padding: listgrid.cellPadding,
                         child: column.textSelectable
                             ? SelectableText(
@@ -315,61 +340,44 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                               ),
                         // child: const Text("cell"),
                       ),
-                    )
-                  : Padding(
-                      padding: listgrid.cellPadding,
-                      child: column.textSelectable
-                          ? SelectableText(
-                              stringValue,
-                              textAlign: column.textAlign,
-                              style: listgrid.defaultTextStyle,
-                              // overflow: TextOverflow.ellipsis,
-                            )
-                          : Text(
-                              stringValue,
-                              textAlign: column.textAlign,
-                              style: listgrid.defaultTextStyle,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                      // child: const Text("cell"),
-                    ),
-            ),
-          ),
-        );
-      } else {
-        output.add(
-          TableCell(
-            verticalAlignment: TableCellVerticalAlignment.bottom,
-            child: Container(
-              decoration: BoxDecoration(
-                // color: Colors.green,
-                color: listgrid.cellBackgroundColor,
-                border: Border(
-                  right: listgrid.cellBorder > 0
-                      ? BorderSide(
-                          color: listgrid.widgetBackgroundColor,
-                          width: listgrid.cellBorder,
-                        )
-                      : BorderSide.none,
-                  bottom: listgrid.rowBorder > 0
-                      ? BorderSide(
-                          color: listgrid.widgetBackgroundColor,
-                          width: listgrid.rowBorder,
-                        )
-                      : BorderSide.none,
-                ),
-              ),
-              child: Padding(
-                padding: listgrid.cellPadding,
-                child: Text(
-                  "undefined",
-                  style: listgrid.defaultTextStyle,
-                ),
-                // child: const Text("cell"),
               ),
             ),
-          ),
-        );
+          );
+        } else {
+          output.add(
+            TableCell(
+              verticalAlignment: TableCellVerticalAlignment.bottom,
+              child: Container(
+                decoration: BoxDecoration(
+                  // color: Colors.green,
+                  color: listgrid.cellBackgroundColor,
+                  border: Border(
+                    right: listgrid.cellBorder > 0
+                        ? BorderSide(
+                            color: listgrid.widgetBackgroundColor,
+                            width: listgrid.cellBorder,
+                          )
+                        : BorderSide.none,
+                    bottom: listgrid.rowBorder > 0
+                        ? BorderSide(
+                            color: listgrid.widgetBackgroundColor,
+                            width: listgrid.rowBorder,
+                          )
+                        : BorderSide.none,
+                  ),
+                ),
+                child: Padding(
+                  padding: listgrid.cellPadding,
+                  child: Text(
+                    "undefined",
+                    style: listgrid.defaultTextStyle,
+                  ),
+                  // child: const Text("cell"),
+                ),
+              ),
+            ),
+          );
+        }
       }
     }
     if (addEndFlex) {

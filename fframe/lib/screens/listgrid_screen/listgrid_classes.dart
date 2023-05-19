@@ -5,34 +5,47 @@ class ListGridController extends InheritedModel {
   ListGridController({
     super.key,
     required child,
-    required this.query,
+    required this.sourceQuery,
     required this.theme,
     required this.config,
     required this.viewportSize,
   }) : super(child: child) {
     _columnWidths = {};
+    _searchableColumns = [];
     double calculatedMinWidth = 0;
 
     // track if all columns have fixed width
     // if so, add an extra blank column at the end with flex
     // to fill the screen
     _addEndFlex = true;
+    _enableSearchBar = false;
     int columnCount = 0;
     for (var i = 0; i < config.columnSettings.length; i++) {
-      columnCount += 1;
       // get the settings for the current column
       ListGridColumn columnSetting = columnSettings[i];
-      // add this column's width to the min width.
-      // each flex column will add the default column width
-      // unless specified otherwise
-      calculatedMinWidth += columnSetting.columnWidth;
 
-      // apply the sizing enum to actual table column widths
-      if (columnSetting.columnSizing == ListGridColumnSizingMode.flex) {
-        _addEndFlex = false;
-        _columnWidths.addAll({i: const FlexColumnWidth(1)});
-      } else {
-        _columnWidths.addAll({i: FixedColumnWidth(columnSetting.columnWidth)});
+      // calculate the grid width based on visibility
+      if (columnSetting.visible) {
+        columnSetting.columnIndex = i;
+        columnCount += 1;
+        // add this column's width to the min width.
+        // each flex column will add the default column width
+        // unless specified otherwise
+        calculatedMinWidth += columnSetting.columnWidth;
+
+        // apply the sizing enum to actual table column widths
+        if (columnSetting.columnSizing == ListGridColumnSizingMode.flex) {
+          _addEndFlex = false;
+          _columnWidths.addAll({i: const FlexColumnWidth(1)});
+        } else {
+          _columnWidths
+              .addAll({i: FixedColumnWidth(columnSetting.columnWidth)});
+        }
+      }
+      // calculate the list of searchable fields for the search box
+      if (columnSetting.searchable && columnSetting.fieldName != null) {
+        _enableSearchBar = true;
+        _searchableColumns.add(i);
       }
     }
     if (_addEndFlex) {
@@ -43,8 +56,9 @@ class ListGridController extends InheritedModel {
 
     // register the grid controller update notifier
     notifier = ListGridNotifier(
-      query: query,
-      searchConfig: config.searchConfig,
+      sourceQuery: sourceQuery,
+      columnSettings: columnSettings,
+      searchableColumns: _searchableColumns,
     );
   }
   late ListGridNotifier notifier;
@@ -54,7 +68,9 @@ class ListGridController extends InheritedModel {
   final Size viewportSize;
 
   late Map<int, TableColumnWidth> _columnWidths;
-  late Query query;
+  late bool _enableSearchBar;
+  late List<int> _searchableColumns;
+  late Query sourceQuery;
   late double _calculatedWidth;
   late double _viewportWidth;
   late bool _addEndFlex;
@@ -87,12 +103,12 @@ class ListGridController extends InheritedModel {
     return config.widgetBackgroundColor ?? theme.colorScheme.surface;
   }
 
-  TextStyle get widgetTextStyle {
-    return config.widgetTextStyle ??
-        TextStyle(
-          fontSize: 16,
-          color: theme.colorScheme.onSurface,
-        );
+  double get widgetTextSize {
+    return config.widgetTextSize;
+  }
+
+  Color get widgetTextColor {
+    return config.widgetTextColor ?? theme.colorScheme.onSurface;
   }
 
   ListGridDataModeConfig get dataMode {
@@ -131,10 +147,6 @@ class ListGridController extends InheritedModel {
     return config.showFooter ? null : 0;
   }
 
-  ListGridSearchConfig? get searchConfig {
-    return config.searchConfig;
-  }
-
   List<ListGridColumn> get columnSettings {
     return config.columnSettings;
   }
@@ -151,6 +163,10 @@ class ListGridController extends InheritedModel {
     return notifier.collectionCount;
   }
 
+  bool get enableSearchBar {
+    return _enableSearchBar;
+  }
+
   String? get searchString {
     return notifier.searchString;
   }
@@ -159,54 +175,16 @@ class ListGridController extends InheritedModel {
     notifier.searchString = searchString;
   }
 
-  Query get computedQuery {
-    Query computedQuery = query;
-    if (searchString == null) {
-      return computedQuery;
-    } else {
-      if (config.searchConfig == null) {
-        return computedQuery;
-      } else {
-        if (notifier.sorting != null) {
-          ListGridQuerySorting sorting =
-              notifier.sorting as ListGridQuerySorting;
-          computedQuery.orderBy(sorting.fieldName,
-              descending: sorting.descending);
-        }
-        ListGridSearchConfig searchConfig =
-            config.searchConfig as ListGridSearchConfig;
-        switch (searchConfig.mode) {
-          case ListGridSearchMode.singleFieldString:
-            // first apply the default sort for this search mode
-            if (searchConfig.field == null) {
-              Console.log(
-                  "ListGrid computedQuery: ListGridSearchConfig: ListGridSearchMode.singleFieldString requires field to be provided");
-              return computedQuery;
-            } else {
-              return computedQuery.startsWith(
-                  "${searchConfig.field}", searchString!);
-            }
+  void sortColumn({required int columnIndex, bool descending = false}) {
+    notifier.sortColumn(columnIndex: columnIndex, descending: descending);
+  }
 
-          case ListGridSearchMode.multiFieldString:
-            if (searchConfig.field == null) {
-              Console.log(
-                  "ListGrid computedQuery: ListGridSearchConfig: ListGridSearchMode.multiFieldString to be provided");
-            }
-            //unsupported for now
-            // return query.startsWith("createdBy", "Arn").orderBy("createdBy");
-            return computedQuery;
-          case ListGridSearchMode.underscoreTypeAhead:
-            if (searchConfig.field == null) {
-              Console.log(
-                  "ListGrid computedQuery: ListGridSearchConfig: ListGridSearchMode.underscoreTypeAhead to be provided");
-              return computedQuery;
-            } else {
-              return computedQuery.startsWith(searchConfig.field!,
-                  searchString!.toLowerCase().replaceAll(' ', '_'));
-            }
-        }
-      }
-    }
+  int? get sortedColumnIndex {
+    return notifier._sortedColumnIndex;
+  }
+
+  Query get currentQuery {
+    return notifier._currentQuery;
   }
 
   double _calculateWidth(double calculatedMinWidth, double viewportWidth) {
@@ -261,24 +239,34 @@ class ListGridController extends InheritedModel {
 
 class ListGridNotifier extends ChangeNotifier {
   ListGridNotifier({
-    required this.query,
-    required this.searchConfig,
+    required this.sourceQuery,
+    // required this.searchConfig,
+    required this.columnSettings,
+    required this.searchableColumns,
   }) : super() {
     // not empyy
     _searchString = '';
     _collectionCount = 0;
 
     // initialize the sorting object
-    _sorting = _initializeSorting(searchConfig: searchConfig);
+    _sortedColumnIndex = null;
+
+    // initialize the current query, based on sorting and settings
+    _currentQuery = sourceQuery;
+    _queryBuilder();
 
     //update the collection count
-    _updateCollectionCount(query: query);
+    _updateCollectionCount(query: _currentQuery);
   }
-  late Query query;
-  final ListGridSearchConfig? searchConfig;
+  final Query sourceQuery;
+  // final ListGridSearchConfig? searchConfig;
+  final List<ListGridColumn> columnSettings;
+  final List<int> searchableColumns;
   late String? _searchString;
   late int _collectionCount;
-  late ListGridQuerySorting? _sorting;
+  late Query _currentQuery;
+
+  late int? _sortedColumnIndex;
 
   String? get searchString {
     return _searchString;
@@ -291,17 +279,83 @@ class ListGridNotifier extends ChangeNotifier {
     } else {
       _searchString = null;
     }
-    _updateCollectionCount(query: query);
+    _queryBuilder();
+  }
+
+  void _queryBuilder() {
+    Query outputQuery = sourceQuery;
+
+    // handle sorting
+    if (sortedColumnIndex != null) {
+      // reset the search
+      ListGridColumn sortedColumn = columnSettings[sortedColumnIndex!];
+
+      outputQuery = outputQuery.orderBy(sortedColumn.fieldName!,
+          descending: sortedColumn.descending);
+
+      if (columnSettings[sortedColumnIndex!].fieldName != null) {
+        String fieldName = columnSettings[sortedColumnIndex!].fieldName!;
+        outputQuery = outputQuery.startsWith(fieldName, searchString!);
+      }
+    } else {
+      if (searchableColumns.isNotEmpty) {
+        if (searchString != null && searchString!.isNotEmpty) {
+          if (searchableColumns.length > 1) {
+            //TODO make multiple columns supported
+            Console.log(
+                "ListGrid: ERROR: Multiple searchable columns not supported at this time. Defaulting to first one");
+          }
+          if (columnSettings[0].fieldName != null) {
+            String fieldName = columnSettings[0].fieldName!;
+            outputQuery = outputQuery.orderBy(fieldName,
+                descending: columnSettings[0].descending);
+            outputQuery = outputQuery.startsWith(fieldName, searchString!);
+          }
+        }
+      }
+    }
+
+    // apply the newly computedQuery as the current query
+    _currentQuery = outputQuery;
+
+    // the query has changed; recalculate the result collection count
+    _updateCollectionCount(query: _currentQuery);
+
+    // notify the listeners that a redraw is needed
     notifyListeners();
   }
 
-  ListGridQuerySorting? get sorting {
-    return _sorting;
+  void sortColumn({required int columnIndex, bool descending = false}) {
+    // get the config for the selected column
+    ListGridColumn selectedColumn = columnSettings
+        .where((element) => element.columnIndex == columnIndex)
+        .first;
+
+    if (columnIndex == _sortedColumnIndex &&
+        descending == selectedColumn.descending) {
+      // this column and sort direction were already selected. user is deselecting sort
+      _sortedColumnIndex = null;
+      debugPrint(
+          "deselecting column: ${selectedColumn.fieldName}($columnIndex)");
+    } else {
+      // change the sort to the selected state
+      // set the currently sorted column to this one
+      _sortedColumnIndex = columnIndex;
+
+      // set the columns search direction to the input
+      columnSettings[columnIndex].descending = descending;
+
+      debugPrint(
+          "sorting column: ${selectedColumn.fieldName}($columnIndex) ${descending ? "descending" : "ascending"}");
+    }
+
+    // run the query builder to interpret the new sorting settings
+    // and call notifyListeners
+    _queryBuilder();
   }
 
-  set sorting(ListGridQuerySorting? sorting) {
-    _sorting = sorting;
-    notifyListeners();
+  int? get sortedColumnIndex {
+    return _sortedColumnIndex;
   }
 
   int get collectionCount {
@@ -319,23 +373,6 @@ class ListGridNotifier extends ChangeNotifier {
     _collectionCount = collectionCount;
   }
 
-  ListGridQuerySorting? _initializeSorting(
-      {required ListGridSearchConfig? searchConfig}) {
-    if (searchConfig != null) {
-      if (searchConfig.mode == ListGridSearchMode.singleFieldString ||
-          searchConfig.mode == ListGridSearchMode.underscoreTypeAhead) {
-        return ListGridQuerySorting(
-          fieldName: searchConfig.field as String,
-          descending: false,
-        );
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
-  }
-
   void update() {
     notifyListeners();
   }
@@ -344,6 +381,12 @@ class ListGridNotifier extends ChangeNotifier {
 class ListGridColumn<T> {
   ListGridColumn({
     this.label = '',
+    this.visible = true,
+    this.fieldName,
+    this.searchable = false,
+    this.searchMask,
+    this.sortable = false,
+    this.descending = false,
     this.valueBuilder,
     this.cellBuilder,
     this.columnSizing = ListGridColumnSizingMode.flex,
@@ -352,12 +395,17 @@ class ListGridColumn<T> {
     this.cellColor,
     this.textSelectable = false,
     this.generateTooltip = false,
-    this.columnSorting = ListGridColumnSortingMode.none,
 
     // this.dynamicTextStyle,
     // this.dynamicBackgroundColor,
   });
   String label;
+  bool visible;
+  String? fieldName;
+  bool searchable;
+  ListGridSearchMask? searchMask;
+  bool sortable;
+  bool descending;
   ListGridColumnSizingMode columnSizing;
   double columnWidth;
   TextAlign textAlign;
@@ -369,7 +417,9 @@ class ListGridColumn<T> {
 
   bool textSelectable;
   bool generateTooltip;
-  ListGridColumnSortingMode columnSorting;
+
+  late int? columnIndex;
+  late bool sortedColumn = false;
 }
 
 class ListGridDataModeConfig {
@@ -389,7 +439,8 @@ class ListGridConfig<T> {
     this.dataMode = const ListGridDataModeConfig(mode: ListGridDataMode.all),
     this.widgetBackgroundColor,
     this.widgetColor,
-    this.widgetTextStyle,
+    this.widgetTextColor,
+    this.widgetTextSize = 16,
     this.rowBorder = 1,
     this.cellBorder = 0,
     this.cellPadding = const EdgeInsets.all(8.0),
@@ -398,7 +449,6 @@ class ListGridConfig<T> {
     this.defaultTextStyle,
     this.showHeader = true,
     this.showFooter = false,
-    this.searchConfig,
   });
 
   final List<ListGridColumn<T>> columnSettings;
@@ -406,7 +456,8 @@ class ListGridConfig<T> {
 
   final Color? widgetBackgroundColor;
   final Color? widgetColor;
-  final TextStyle? widgetTextStyle;
+  final Color? widgetTextColor;
+  final double widgetTextSize;
 
   final double rowBorder;
   final double cellBorder;
@@ -417,8 +468,6 @@ class ListGridConfig<T> {
 
   final bool showHeader;
   final bool showFooter;
-
-  final ListGridSearchConfig? searchConfig;
 
   late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
       fromFirestore;
@@ -436,28 +485,20 @@ class ListGridSearchConfig {
   final List<String>? multiFields;
 }
 
-class ListGridQuerySorting {
-  ListGridQuerySorting({required this.fieldName, required this.descending});
-  final String fieldName;
-  final bool descending;
-}
-
-enum ListGridColumnSortingMode {
-  none,
-  asc,
-  desc,
-  both,
+class ListGridSearchMask {
+  const ListGridSearchMask({
+    required this.from,
+    required this.to,
+    this.toLowerCase = false,
+  });
+  final String from;
+  final String to;
+  final bool toLowerCase;
 }
 
 enum ListGridColumnSizingMode {
   flex,
   fixed,
-}
-
-enum ListGridConfigColumnSortMode {
-  descending,
-  ascending,
-  none,
 }
 
 enum ListGridDataMode {
@@ -470,7 +511,6 @@ enum ListGridDataMode {
 
 enum ListGridSearchMode {
   singleFieldString,
-  // singleFieldArray,
   multiFieldString,
   underscoreTypeAhead,
 }
