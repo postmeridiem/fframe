@@ -61,6 +61,12 @@ class Fframe extends InheritedWidget {
     themeMode = newThemeMode;
   }
 
+  ThemeMode get getSystemThemeMode {
+    var brightness =
+        SchedulerBinding.instance.platformDispatcher.platformBrightness;
+    return (brightness == Brightness.dark) ? ThemeMode.dark : ThemeMode.light;
+  }
+
   @override
   bool updateShouldNotify(Fframe oldWidget) {
     return true;
@@ -219,13 +225,16 @@ class _FRouterLoaderState extends ConsumerState<FRouterLoader> {
                   Map<String, dynamic>? claims = idTokenResult.claims;
 
                   if (claims != null && claims.containsKey("roles") == true) {
-                    if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
+                    if ("${claims["roles"].runtimeType}".toLowerCase() ==
+                        "JSArray<dynamic>".toLowerCase()) {
                       roles = List<String>.from(claims["roles"]);
-                    } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
+                    } else if (List<dynamic> == claims["roles"].runtimeType ||
+                        List<String> == claims["roles"].runtimeType) {
                       roles = List<String>.from(claims["roles"]);
                     } else {
                       //Legacy mode... it's a map..
-                      Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
+                      Map<String, dynamic>? rolesMap =
+                          Map<String, dynamic>.from(claims["roles"]);
                       rolesMap.removeWhere((key, value) => value == false);
                       roles = List<String>.from(rolesMap.keys);
                     }
@@ -236,7 +245,6 @@ class _FRouterLoaderState extends ConsumerState<FRouterLoader> {
               } catch (e) {
                 debugPrint(e.toString());
               }
-
             } else {
               Fframe.of(context)!.user = null;
             }
