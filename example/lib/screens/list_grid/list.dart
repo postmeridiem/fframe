@@ -10,7 +10,7 @@ import 'package:flutterfire_ui/auth.dart';
 List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
     fieldName: 'name',
-    searchable: true,
+    searchable: false,
     searchMask: const ListGridSearchMask(from: " ", to: "_", toLowerCase: true),
     sortable: true,
     columnSizing: ListGridColumnSizingMode.fixed,
@@ -140,6 +140,15 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     textAlign: TextAlign.end,
     valueBuilder: (context, suggestion) {
       return suggestion.saveCount;
+    },
+  ),
+  ListGridColumn(
+    fieldName: 'name',
+    visible: false,
+    searchable: true,
+    // searchMask: const ListGridSearchMask(from: " ", to: "_", toLowerCase: true),
+    valueBuilder: (context, suggestion) {
+      return suggestion.name;
     },
   ),
 ];

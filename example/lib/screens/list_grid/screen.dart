@@ -72,10 +72,6 @@ class _ListGridScreenState extends State<ListGridScreen> {
         // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
         // showHeader: false,
         showFooter: true,
-        dataMode: const ListGridDataModeConfig(
-          mode: ListGridDataMode.lazy,
-          limit: 10,
-        ),
         columnSettings: listGridColumns,
       ),
 
