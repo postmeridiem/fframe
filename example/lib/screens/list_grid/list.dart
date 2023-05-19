@@ -9,6 +9,10 @@ import 'package:flutterfire_ui/auth.dart';
 
 List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
+    fieldName: 'name',
+    searchable: true,
+    searchMask: const ListGridSearchMask(from: " ", to: "_", toLowerCase: true),
+    sortable: true,
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 300,
     cellBuilder: (context, suggestion) {
@@ -55,10 +59,12 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ),
   ListGridColumn(
     label: "created by",
+    visible: true,
+    fieldName: 'createdBy',
+    sortable: true,
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 300,
     // textAlign: TextAlign.right,
-    columnSorting: ListGridColumnSortingMode.both,
     textSelectable: true,
     valueBuilder: (context, suggestion) {
       return "${suggestion.createdBy}";
@@ -110,21 +116,19 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
       return "${suggestion.fieldTab2}";
     },
   ),
-  ListGridColumn(
-    label: "tab 3",
-    columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 200,
-    // textSelectable: true,
-    valueBuilder: (context, suggestion) {
-      return "${suggestion.fieldTab3}";
-    },
-    cellColor: Colors.pink,
-  ),
+  // ListGridColumn(
+  //   label: "tab 3",
+  //   columnSizing: ListGridColumnSizingMode.fixed,
+  //   columnWidth: 200,
+  //   valueBuilder: (context, suggestion) {
+  //     return "${suggestion.fieldTab3}";
+  //   },
+  //   cellColor: Colors.pink,
+  // ),
   ListGridColumn(
     label: "creation date",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 1000,
-    columnSorting: ListGridColumnSortingMode.both,
     valueBuilder: (context, suggestion) {
       return dateTimeTextTS(suggestion.creationDate as Timestamp);
     },
@@ -134,7 +138,6 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 120,
     textAlign: TextAlign.end,
-    columnSorting: ListGridColumnSortingMode.both,
     valueBuilder: (context, suggestion) {
       return suggestion.saveCount;
     },

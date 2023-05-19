@@ -287,7 +287,6 @@ class ListGridNotifier extends ChangeNotifier {
 
     // handle sorting
     if (sortedColumnIndex != null) {
-      // reset the search
       ListGridColumn sortedColumn = columnSettings[sortedColumnIndex!];
 
       outputQuery = outputQuery.orderBy(sortedColumn.fieldName!,
@@ -300,16 +299,25 @@ class ListGridNotifier extends ChangeNotifier {
     } else {
       if (searchableColumns.isNotEmpty) {
         if (searchString != null && searchString!.isNotEmpty) {
+          String curSearch = searchString!;
           if (searchableColumns.length > 1) {
             //TODO make multiple columns supported
             Console.log(
                 "ListGrid: ERROR: Multiple searchable columns not supported at this time. Defaulting to first one");
           }
-          if (columnSettings[0].fieldName != null) {
-            String fieldName = columnSettings[0].fieldName!;
+          if (columnSettings.first.fieldName != null) {
+            ListGridColumn column = columnSettings.first;
+            String fieldName = column.fieldName!;
             outputQuery = outputQuery.orderBy(fieldName,
-                descending: columnSettings[0].descending);
-            outputQuery = outputQuery.startsWith(fieldName, searchString!);
+                descending: columnSettings.first.descending);
+            if (column.searchMask == null) {
+              outputQuery = outputQuery.startsWith(fieldName, curSearch);
+            } else {
+              if (column.searchMask!.toLowerCase) {
+                curSearch = curSearch.toLowerCase();
+              }
+              outputQuery = outputQuery.startsWith(fieldName, searchString!);
+            }
           }
         }
       }
