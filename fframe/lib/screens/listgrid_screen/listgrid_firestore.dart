@@ -97,105 +97,114 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                                       ),
                                     ),
                                   ),
-                                  child: SizedBox(
-                                    width: listgrid.calculatedWidth,
-                                    child: snapshot.hasError
-                                        ? Card(
-                                            child: Center(
-                                              child: SizedBox(
-                                                width: 500,
-                                                height: double.infinity,
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      40.0),
-                                                  child: SelectableText(
-                                                    "error ${snapshot.error}",
+                                  child: Container(
+                                    color: (Fframe.of(context)!
+                                                .getSystemThemeMode ==
+                                            ThemeMode.dark)
+                                        ? Colors.black.withOpacity(0.2)
+                                        : Colors.white.withOpacity(0.2),
+                                    child: SizedBox(
+                                      width: listgrid.calculatedWidth,
+                                      child: snapshot.hasError
+                                          ? Card(
+                                              child: Center(
+                                                child: SizedBox(
+                                                  width: 500,
+                                                  height: double.infinity,
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            40.0),
+                                                    child: SelectableText(
+                                                      "error ${snapshot.error}",
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          )
-                                        : Scrollbar(
-                                            controller: _vertical,
-                                            child: ListView.separated(
-                                              itemCount: snapshot.docs.length,
-                                              separatorBuilder:
-                                                  (context, index) {
-                                                return const IgnorePointer();
-                                              },
-                                              itemBuilder: (context, index) {
-                                                final isLastItem = index + 1 ==
-                                                    snapshot.docs.length;
-                                                if (isLastItem &&
-                                                    snapshot.hasMore) {
-                                                  snapshot.fetchMore();
-                                                }
-
-                                                final queryDocumentSnapshot =
-                                                    snapshot.docs[index];
-                                                final T rowdata =
-                                                    queryDocumentSnapshot
-                                                        .data();
-                                                return Table(
-                                                    columnWidths:
-                                                        listgrid.columnWidths,
-                                                    // defaultColumnWidth: const FlexColumnWidth(),
-                                                    defaultVerticalAlignment:
-                                                        listgrid
-                                                            .cellVerticalAlignment,
-                                                    textBaseline:
-                                                        TextBaseline.alphabetic,
-                                                    children: [
-                                                      TableRow(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: listgrid
-                                                              .cellBackgroundColor,
-                                                          // border: Border(
-                                                          //   bottom: BorderSide(
-                                                          //     color: widgetBackgroundColor,
-                                                          //     width: rowBorder,
-                                                          //   ),
-                                                          // ),
-                                                        ),
-                                                        children: renderRow(
-                                                          context: context,
-                                                          rowdata: rowdata,
-                                                          columnSettings: listgrid
-                                                                  .columnSettings
-                                                              as List<
-                                                                  ListGridColumn<
-                                                                      T>>,
-                                                          addEndFlex: listgrid
-                                                              .addEndFlex,
-                                                        ),
-                                                      ),
-                                                    ]);
-                                              },
-                                              scrollDirection: Axis.vertical,
-                                              reverse: false,
+                                            )
+                                          : Scrollbar(
                                               controller: _vertical,
-                                              // primary: primary,
-                                              physics:
-                                                  const BouncingScrollPhysics(),
-                                              shrinkWrap: false,
-                                              // itemExtent: itemExtent,
-                                              // prototypeItem: prototypeItem,
-                                              addAutomaticKeepAlives: true,
-                                              addRepaintBoundaries: true,
-                                              addSemanticIndexes: true,
-                                              // cacheExtent: cacheExtent,
-                                              // cacheExtent: 1000,
-                                              // semanticChildCount: semanticChildCount,
-                                              dragStartBehavior:
-                                                  DragStartBehavior.start,
-                                              keyboardDismissBehavior:
-                                                  ScrollViewKeyboardDismissBehavior
-                                                      .manual,
-                                              // restorationId: restorationId,
-                                              clipBehavior: Clip.hardEdge,
+                                              child: ListView.separated(
+                                                itemCount: snapshot.docs.length,
+                                                separatorBuilder:
+                                                    (context, index) {
+                                                  return const IgnorePointer();
+                                                },
+                                                itemBuilder: (context, index) {
+                                                  final isLastItem =
+                                                      index + 1 ==
+                                                          snapshot.docs.length;
+                                                  if (isLastItem &&
+                                                      snapshot.hasMore) {
+                                                    snapshot.fetchMore();
+                                                  }
+
+                                                  final queryDocumentSnapshot =
+                                                      snapshot.docs[index];
+                                                  final T rowdata =
+                                                      queryDocumentSnapshot
+                                                          .data();
+                                                  return Table(
+                                                      columnWidths:
+                                                          listgrid.columnWidths,
+                                                      // defaultColumnWidth: const FlexColumnWidth(),
+                                                      defaultVerticalAlignment:
+                                                          listgrid
+                                                              .cellVerticalAlignment,
+                                                      textBaseline: TextBaseline
+                                                          .alphabetic,
+                                                      children: [
+                                                        TableRow(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: listgrid
+                                                                .cellBackgroundColor,
+                                                            // border: Border(
+                                                            //   bottom: BorderSide(
+                                                            //     color: widgetBackgroundColor,
+                                                            //     width: rowBorder,
+                                                            //   ),
+                                                            // ),
+                                                          ),
+                                                          children: renderRow(
+                                                            context: context,
+                                                            rowdata: rowdata,
+                                                            columnSettings: listgrid
+                                                                    .columnSettings
+                                                                as List<
+                                                                    ListGridColumn<
+                                                                        T>>,
+                                                            addEndFlex: listgrid
+                                                                .addEndFlex,
+                                                          ),
+                                                        ),
+                                                      ]);
+                                                },
+                                                scrollDirection: Axis.vertical,
+                                                reverse: false,
+                                                controller: _vertical,
+                                                // primary: primary,
+                                                physics:
+                                                    const BouncingScrollPhysics(),
+                                                shrinkWrap: false,
+                                                // itemExtent: itemExtent,
+                                                // prototypeItem: prototypeItem,
+                                                addAutomaticKeepAlives: true,
+                                                addRepaintBoundaries: true,
+                                                addSemanticIndexes: true,
+                                                // cacheExtent: cacheExtent,
+                                                // cacheExtent: 1000,
+                                                // semanticChildCount: semanticChildCount,
+                                                dragStartBehavior:
+                                                    DragStartBehavior.start,
+                                                keyboardDismissBehavior:
+                                                    ScrollViewKeyboardDismissBehavior
+                                                        .manual,
+                                                // restorationId: restorationId,
+                                                clipBehavior: Clip.hardEdge,
+                                              ),
                                             ),
-                                          ),
+                                    ),
                                   ),
                                 ),
                               ),
