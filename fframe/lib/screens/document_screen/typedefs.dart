@@ -75,3 +75,10 @@ typedef ListGridCellBuilder<T> = DataCell Function(
   T data,
   Function save,
 );
+
+typedef ListGridCellControlsBuilderFunction<T> = List<IconButton> Function(
+  BuildContext context,
+  FFrameUser? user,
+  T data,
+  String stringValue,
+);

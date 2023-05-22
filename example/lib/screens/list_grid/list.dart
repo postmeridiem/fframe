@@ -1,32 +1,40 @@
-import 'package:example/models/suggestion.dart';
-import 'package:example/themes/config.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-
-import 'package:example/helpers/icons.dart';
-import 'package:example/helpers/strings.dart';
 import 'package:flutterfire_ui/auth.dart';
 
+import 'package:example/models/suggestion.dart';
+import 'package:example/themes/config.dart';
+import 'package:example/helpers/icons.dart';
+import 'package:example/helpers/strings.dart';
+
 List<ListGridColumn<Suggestion>> listGridColumns = [
+  // ListGridColumn(
+  //   fieldName: 'name',
+  //   searchable: false,
+  //   sortable: true,
+  //   columnSizing: ListGridColumnSizingMode.fixed,
+  //   columnWidth: 300,
+  //   cellBuilder: (context, suggestion) {
+  //     return SuggestionListItem(
+  //       suggestion: suggestion,
+  //       selected: true,
+  //       user: FFrameUser(),
+  //     );
+  //   },
+  // ),
   ListGridColumn(
     fieldName: 'name',
     searchable: false,
-    searchMask: const ListGridSearchMask(from: " ", to: "_", toLowerCase: true),
     sortable: true,
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 300,
-    cellBuilder: (context, suggestion) {
-      return SuggestionListItem(
-        suggestion: suggestion,
-        selected: true,
-        user: FFrameUser(),
-      );
+    valueBuilder: (context, suggestion) {
+      return suggestion.name;
     },
   ),
   ListGridColumn(
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 200,
-    textAlign: TextAlign.center,
     cellBuilder: (context, suggestion) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -42,7 +50,6 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 40,
-    textAlign: TextAlign.center,
     cellBuilder: (context, suggestion) {
       return Tooltip(
         message: suggestion.active == true
@@ -64,10 +71,44 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     sortable: true,
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 300,
-    // textAlign: TextAlign.right,
+    alignment: Alignment.bottomRight,
     textSelectable: true,
     valueBuilder: (context, suggestion) {
       return "${suggestion.createdBy}";
+    },
+    cellControlsBuilder: (
+      context,
+      user,
+      suggestion,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(suggestion.createdBy!);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+        IconButton(
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: ListTile(
+                  leading: Icon(
+                    Icons.alarm,
+                    color: Colors.amber[900],
+                  ),
+                  title: Text('${suggestion.createdBy}'),
+                  textColor: Colors.amber[900],
+                ),
+              ),
+            );
+          },
+          icon: const Icon(Icons.alarm_add),
+          tooltip: 'Show snackbar',
+        ),
+      ];
     },
   ),
   ListGridColumn(
@@ -104,7 +145,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 250,
     valueBuilder: (context, suggestion) {
-      return "${suggestion.fieldTab1}";
+      return suggestion.fieldTab1;
     },
   ),
   ListGridColumn(
@@ -113,7 +154,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     columnWidth: 80,
     generateTooltip: true,
     valueBuilder: (context, suggestion) {
-      return "${suggestion.fieldTab2}";
+      return suggestion.fieldTab2;
     },
   ),
   ListGridColumn(
@@ -121,7 +162,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 200,
     valueBuilder: (context, suggestion) {
-      return "${suggestion.fieldTab3}";
+      return suggestion.fieldTab3;
     },
     cellColor: Colors.pink,
   ),
@@ -137,7 +178,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     label: "saveCount",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 120,
-    textAlign: TextAlign.end,
+    alignment: Alignment.bottomRight,
     valueBuilder: (context, suggestion) {
       return suggestion.saveCount;
     },
@@ -147,9 +188,9 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     visible: false,
     searchable: true,
     // searchMask: const ListGridSearchMask(from: " ", to: "_", toLowerCase: true),
-    valueBuilder: (context, suggestion) {
-      return suggestion.name;
-    },
+    // valueBuilder: (context, suggestion) {
+    //   return suggestion.name;
+    // },
   ),
 ];
 
@@ -157,7 +198,7 @@ renderButtons({required BuildContext context, required Suggestion suggestion}) {
   return Row(
     children: [
       Tooltip(
-        message: 'Retry Run...',
+        message: 'Retry...',
         child: OutlinedButton.icon(
           icon: const Icon(
             Icons.send_outlined,
@@ -173,7 +214,7 @@ renderButtons({required BuildContext context, required Suggestion suggestion}) {
         ),
       ),
       Tooltip(
-        message: 'Kill Run...',
+        message: 'Stop...',
         child: OutlinedButton.icon(
           icon: const Icon(
             Icons.front_hand,
@@ -189,7 +230,7 @@ renderButtons({required BuildContext context, required Suggestion suggestion}) {
         ),
       ),
       Tooltip(
-        message: 'Open run in new tab...',
+        message: 'Open in new tab...',
         child: OutlinedButton.icon(
           icon: const Icon(
             Icons.open_in_browser,
@@ -197,13 +238,6 @@ renderButtons({required BuildContext context, required Suggestion suggestion}) {
           ),
           label: const Text(""),
           onPressed: () {},
-          // onPressed: () {
-          //   FRouter.of(context).navigateToRouteFromNavigationTargets(
-          //     FRouter.of(context).navigationConfig.navigationTargets,
-          //     route: "runs/${run.cluster!['branch']}",
-          //     id: run.id!,
-          //   );
-          // },
           style: OutlinedButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(0),

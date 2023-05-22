@@ -71,6 +71,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
         // cellBackgroundColor: Colors.amber,
         // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
         // showHeader: false,
+        rowsSelectable: true,
         showFooter: true,
         columnSettings: listGridColumns,
       ),

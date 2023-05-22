@@ -1,7 +1,7 @@
 part of fframe;
 
 // ignore: must_be_immutable
-class ListGridController extends InheritedModel {
+class ListGridController<T> extends InheritedModel {
   ListGridController({
     super.key,
     required child,
@@ -20,14 +20,24 @@ class ListGridController extends InheritedModel {
     _addEndFlex = true;
     _enableSearchBar = false;
     int columnCount = 0;
-    for (var i = 0; i < config.columnSettings.length; i++) {
+
+    if (config.rowsSelectable) {
+      // this grid has row selection enabled.
+      // draw an extra column for the check box
+      double selectionColumnWidth = 40;
+      calculatedMinWidth += selectionColumnWidth;
+      _columnWidths
+          .addAll({columnCount: FixedColumnWidth(selectionColumnWidth)});
+      columnCount += 1;
+    }
+
+    for (var i = 0; i < (config.columnSettings.length); i++) {
       // get the settings for the current column
       ListGridColumn columnSetting = columnSettings[i];
 
       // calculate the grid width based on visibility
       if (columnSetting.visible) {
         columnSetting.columnIndex = i;
-        columnCount += 1;
         // add this column's width to the min width.
         // each flex column will add the default column width
         // unless specified otherwise
@@ -36,11 +46,12 @@ class ListGridController extends InheritedModel {
         // apply the sizing enum to actual table column widths
         if (columnSetting.columnSizing == ListGridColumnSizingMode.flex) {
           _addEndFlex = false;
-          _columnWidths.addAll({i: const FlexColumnWidth(1)});
+          _columnWidths.addAll({columnCount: const FlexColumnWidth(1)});
         } else {
-          _columnWidths
-              .addAll({i: FixedColumnWidth(columnSetting.columnWidth)});
+          _columnWidths.addAll(
+              {columnCount: FixedColumnWidth(columnSetting.columnWidth)});
         }
+        columnCount += 1;
       }
       // calculate the list of searchable fields for the search box
       if (columnSetting.searchable && columnSetting.fieldName != null) {
@@ -74,6 +85,8 @@ class ListGridController extends InheritedModel {
   late double _calculatedWidth;
   late double _viewportWidth;
   late bool _addEndFlex;
+
+  // late Map<String, bool> listGridSelection = {};
 
   double get rowBorder {
     return config.rowBorder;
@@ -153,6 +166,22 @@ class ListGridController extends InheritedModel {
 
   Map<int, TableColumnWidth> get columnWidths {
     return _columnWidths;
+  }
+
+  Map<String, T> get listGridSelection {
+    return notifier.listGridSelection as Map<String, T>;
+  }
+
+  int get selectionCount {
+    return notifier.selectionCount;
+  }
+
+  void selectRow({required String documentId, required T document}) {
+    notifier.selectRow(documentId: documentId, document: document);
+  }
+
+  void unselectRow({required String documentId}) {
+    notifier.unselectRow(documentId: documentId);
   }
 
   bool get addEndFlex {
@@ -237,7 +266,7 @@ class ListGridController extends InheritedModel {
   }
 }
 
-class ListGridNotifier extends ChangeNotifier {
+class ListGridNotifier<T> extends ChangeNotifier {
   ListGridNotifier({
     required this.sourceQuery,
     // required this.searchConfig,
@@ -250,6 +279,9 @@ class ListGridNotifier extends ChangeNotifier {
 
     // initialize the sorting object
     _sortedColumnIndex = null;
+
+    // initialize the row selections
+    _listGridSelection = {};
 
     // initialize the current query, based on sorting and settings
     _currentQuery = sourceQuery;
@@ -267,6 +299,8 @@ class ListGridNotifier extends ChangeNotifier {
   late Query _currentQuery;
 
   late int? _sortedColumnIndex;
+
+  late Map<String, T> _listGridSelection;
 
   String? get searchString {
     return _searchString;
@@ -376,6 +410,24 @@ class ListGridNotifier extends ChangeNotifier {
     return _collectionCount;
   }
 
+  Map<String, T> get listGridSelection {
+    return _listGridSelection;
+  }
+
+  int get selectionCount {
+    return _listGridSelection.isNotEmpty ? _listGridSelection.length : 0;
+  }
+
+  void selectRow({required String documentId, required T document}) {
+    _listGridSelection[documentId] = document;
+    notifyListeners();
+  }
+
+  void unselectRow({required String documentId}) {
+    _listGridSelection.remove(documentId);
+    notifyListeners();
+  }
+
   set collectionCount(int collectionCount) {
     _collectionCount = collectionCount;
     notifyListeners();
@@ -405,10 +457,11 @@ class ListGridColumn<T> {
     this.cellBuilder,
     this.columnSizing = ListGridColumnSizingMode.flex,
     this.columnWidth = 200,
-    this.textAlign = TextAlign.start,
+    this.alignment = Alignment.bottomLeft,
     this.cellColor,
     this.textSelectable = false,
     this.generateTooltip = false,
+    this.cellControlsBuilder,
 
     // this.dynamicTextStyle,
     // this.dynamicBackgroundColor,
@@ -422,12 +475,14 @@ class ListGridColumn<T> {
   bool descending;
   ListGridColumnSizingMode columnSizing;
   double columnWidth;
-  TextAlign textAlign;
+  Alignment alignment;
 
   Color? cellColor;
 
   ListGridValueBuilderFunction<T>? valueBuilder;
   ListGridCellBuilderFunction<T>? cellBuilder;
+  ListGridCellControlsBuilderFunction<T>? cellControlsBuilder;
+  // List<IconButton>? cellControls;
 
   bool textSelectable;
   bool generateTooltip;
@@ -463,6 +518,7 @@ class ListGridConfig<T> {
     this.defaultTextStyle,
     this.showHeader = true,
     this.showFooter = false,
+    this.rowsSelectable = false,
   });
 
   final List<ListGridColumn<T>> columnSettings;
@@ -482,6 +538,7 @@ class ListGridConfig<T> {
 
   final bool showHeader;
   final bool showFooter;
+  final bool rowsSelectable;
 
   late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
       fromFirestore;
