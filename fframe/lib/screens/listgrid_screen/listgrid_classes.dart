@@ -6,6 +6,7 @@ class ListGridConfig<T> {
     this.dataMode = const ListGridDataModeConfig(mode: ListGridDataMode.all),
     this.widgetBackgroundColor,
     this.widgetColor,
+    this.widgetAccentColor,
     this.widgetTextColor,
     this.widgetTextSize = 16,
     this.rowBorder = 1,
@@ -17,7 +18,7 @@ class ListGridConfig<T> {
     this.showHeader = true,
     this.showFooter = true,
     this.rowsSelectable = false,
-    this.gridActions,
+    this.actionBar = const [],
   });
 
   final List<ListGridColumn<T>> columnSettings;
@@ -25,6 +26,7 @@ class ListGridConfig<T> {
 
   final Color? widgetBackgroundColor;
   final Color? widgetColor;
+  final Color? widgetAccentColor;
   final Color? widgetTextColor;
   final double widgetTextSize;
 
@@ -38,14 +40,14 @@ class ListGridConfig<T> {
   final bool showHeader;
   final bool showFooter;
   final bool rowsSelectable;
-  final List<ListGridActionMenu>? gridActions;
+  final List<ListGridActionMenu<T>> actionBar;
 
   late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
       fromFirestore;
   late Map<String, Object?> Function(T, SetOptions?) toFirestore;
 }
 
-class ListGridActionMenu {
+class ListGridActionMenu<T> {
   const ListGridActionMenu({
     required this.menuItems,
     this.label,
@@ -56,15 +58,17 @@ class ListGridActionMenu {
   final IconData? icon;
 }
 
-class ListGridActionMenuItem {
+class ListGridActionMenuItem<T> {
   const ListGridActionMenuItem({
     required this.label,
     required this.icon,
-    this.multiFields,
+    this.requireSelection = true,
+    required this.clickHandler,
   });
-  final String? label;
-  final IconData? icon;
-  final List<String>? multiFields;
+  final String label;
+  final IconData icon;
+  final bool requireSelection;
+  final ListGridActionHandler<T> clickHandler;
 }
 
 class ListGridColumn<T> {

@@ -45,6 +45,7 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
   @override
   Widget build(BuildContext context) {
     return ListGridController(
+      context: context,
       sourceQuery: widget.query,
       config: widget.config,
       viewportSize: MediaQuery.of(context).size,

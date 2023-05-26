@@ -31,6 +31,7 @@ class ListGridHeader extends StatelessWidget {
                   cellBorder: listgrid.cellBorder,
                   widgetBackgroundColor: listgrid.widgetBackgroundColor,
                   widgetTextColor: listgrid.widgetTextColor,
+                  widgetAccentColor: listgrid.widgetAccentColor,
                   widgetTextSize: listgrid.widgetTextSize,
                   widgetColor: listgrid.widgetColor,
                   sortedColumnIndex: listgrid.sortedColumnIndex,
@@ -52,6 +53,7 @@ class ListGridHeader extends StatelessWidget {
     required Color widgetBackgroundColor,
     required Color widgetColor,
     required Color widgetTextColor,
+    required Color widgetAccentColor,
     required double widgetTextSize,
     required EdgeInsetsGeometry cellPadding,
     required double cellBorder,
@@ -63,7 +65,6 @@ class ListGridHeader extends StatelessWidget {
       output.add(
         Container(
           decoration: BoxDecoration(
-            // color: Colors.green,
             color: widgetBackgroundColor,
             border: const Border(
               right: BorderSide.none,
@@ -91,7 +92,6 @@ class ListGridHeader extends StatelessWidget {
         output.add(
           Container(
             decoration: BoxDecoration(
-              // color: Colors.green,
               color: widgetBackgroundColor,
               border: Border(
                 right: cellBorder > 0
@@ -108,9 +108,7 @@ class ListGridHeader extends StatelessWidget {
                 child: Text(
                   column.label,
                   style: TextStyle(
-                    color: isSorted
-                        ? Theme.of(context).colorScheme.onBackground
-                        : widgetTextColor,
+                    color: isSorted ? widgetAccentColor : widgetTextColor,
                     fontSize: widgetTextSize,
                   ),
                 ),
@@ -119,6 +117,7 @@ class ListGridHeader extends StatelessWidget {
                 column: column,
                 columnIndex: i,
                 widgetColor: widgetColor,
+                widgetAccentColor: widgetAccentColor,
               )
             ]),
           ),
@@ -130,7 +129,6 @@ class ListGridHeader extends StatelessWidget {
       output.add(
         Container(
           decoration: BoxDecoration(
-            // color: Colors.green,
             color: widgetBackgroundColor,
             border: const Border(
               right: BorderSide.none,
@@ -277,32 +275,7 @@ class ListGridActionBarWidget<T> extends StatelessWidget {
               ),
             ),
             child: Row(
-              children: [
-                ListGridActionMenuWidget(
-                  listgrid: listgrid,
-                  label: "Set Inactive",
-                  icon: Icons.toggle_off_outlined,
-                  requireSelection: true,
-                ),
-                ListGridActionMenuWidget(
-                  listgrid: listgrid,
-                  label: "Set Active",
-                  icon: Icons.toggle_on,
-                  requireSelection: true,
-                ),
-                ListGridActionMenuWidget(
-                  listgrid: listgrid,
-                  label: "Delete",
-                  icon: Icons.delete_outlined,
-                  requireSelection: true,
-                ),
-                ListGridActionMenuWidget(
-                  listgrid: listgrid,
-                  label: "Help",
-                  icon: Icons.help_outline,
-                  requireSelection: false,
-                ),
-              ],
+              children: renderActionBar(actionBar: listgrid.config.actionBar),
             ),
           ),
         ),
@@ -310,21 +283,62 @@ class ListGridActionBarWidget<T> extends StatelessWidget {
       ),
     );
   }
+
+  List<ListGridActionMenuWidget> renderActionBar(
+      {required List<ListGridActionMenu> actionBar}) {
+    List<ListGridActionMenuWidget> output = [];
+
+    for (ListGridActionMenu actionMenu in actionBar) {
+      bool isMenuHeader = actionMenu.menuItems.length > 1;
+      output.add(
+        ListGridActionMenuWidget(
+          listgrid: listgrid,
+          actionMenu: actionMenu,
+          isMenuHeader: isMenuHeader,
+        ),
+      );
+    }
+    return output;
+    // return [
+    //   ListGridActionMenuWidget(
+    //     listgrid: listgrid,
+    //     label: "Set Inactive",
+    //     icon: Icons.toggle_off_outlined,
+    //     requireSelection: true,
+    //   ),
+    //   ListGridActionMenuWidget(
+    //     listgrid: listgrid,
+    //     label: "Set Active",
+    //     icon: Icons.toggle_on,
+    //     requireSelection: true,
+    //   ),
+    //   ListGridActionMenuWidget(
+    //     listgrid: listgrid,
+    //     label: "Delete",
+    //     icon: Icons.delete_outlined,
+    //     requireSelection: true,
+    //   ),
+    //   ListGridActionMenuWidget(
+    //     listgrid: listgrid,
+    //     label: "Help",
+    //     icon: Icons.help_outline,
+    //     requireSelection: false,
+    //   ),
+    // ];
+  }
 }
 
 class ListGridActionMenuWidget extends StatefulWidget {
   const ListGridActionMenuWidget({
     super.key,
     required this.listgrid,
-    required this.icon,
-    required this.label,
-    required this.requireSelection,
+    required this.actionMenu,
+    required this.isMenuHeader,
   });
 
   final ListGridController listgrid;
-  final IconData icon;
-  final String label;
-  final bool requireSelection;
+  final ListGridActionMenu actionMenu;
+  final bool isMenuHeader;
 
   @override
   State<ListGridActionMenuWidget> createState() =>
@@ -332,14 +346,18 @@ class ListGridActionMenuWidget extends StatefulWidget {
 }
 
 class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
-  OverlayEntry? menuWidget;
-  bool menuOpen = false;
+  late OverlayEntry? menuWidget;
+  late bool menuOpen = false;
+  late bool mouseOver = false;
   @override
   void initState() {
     super.initState();
+    menuWidget = null;
   }
 
-  void openMenu({required ListGridController listgrid}) {
+  void openMenu(
+      {required ListGridController listgrid,
+      required ListGridActionMenu actionMenu}) {
     if (menuOpen) {
       // menu was already open. tap just means close
       closeMenu();
@@ -350,6 +368,16 @@ class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
       final Size size = renderBox.size;
       final Offset offset = renderBox.localToGlobal(Offset.zero);
 
+      List<Widget> menuItems = [];
+      for (var actionMenuItem in actionMenu.menuItems) {
+        menuItems.add(
+          ListGridActionMenuItemWIdget(
+            listgrid: listgrid,
+            actionMenuItem: actionMenuItem,
+          ),
+        );
+      }
+
       menuWidget = OverlayEntry(
         builder: (context) => Positioned(
           width: size.width + 20,
@@ -358,15 +386,18 @@ class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
           child: Material(
             elevation: 1,
             color: listgrid.widgetBackgroundColor,
-            child: const Padding(
+            child: Padding(
               padding: EdgeInsets.all(8.0),
               child: Column(
-                children: [
-                  Text("menu item"),
-                  Text("menu item"),
-                  Text("menu item"),
-                  Text("menu item")
-                ],
+                children: menuItems,
+                // children: [
+                //   Text("menu item"),
+                //   ListGridActionMenuItemWIdget(
+                //     listgrid: listgrid,
+                //     actionMenuItem: actionMenu.menuItems.first,
+                //     isEnabled: isEnabled,
+                //   )
+                // ],
               ),
             ),
           ),
@@ -388,46 +419,211 @@ class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
   @override
   Widget build(BuildContext context) {
     ListGridController listgrid = widget.listgrid;
-
-    bool isEnabled = (widget.listgrid.selectionCount > 0);
+    ListGridActionMenu actionMenu = widget.actionMenu;
     // enable ActionMenu if selection requirement is not set
-    isEnabled = widget.requireSelection ? isEnabled : true;
-
-    return Opacity(
-      opacity: isEnabled ? 1 : 0.4,
-      child: TapRegion(
-        onTapInside: (event) {
-          if (isEnabled) {
-            openMenu(listgrid: listgrid);
-          }
+    // isEnabled = widget.requireSelection ? isEnabled : true;
+    if (widget.isMenuHeader) {
+      String label = actionMenu.label ?? actionMenu.menuItems.first.label;
+      IconData icon = actionMenu.icon ?? actionMenu.menuItems.first.icon;
+      return MouseRegion(
+        cursor: SystemMouseCursors.click,
+        onEnter: (event) {
+          setState(() {
+            mouseOver = true;
+          });
         },
-        onTapOutside: (event) {
-          if (isEnabled) {
+        onExit: (event) {
+          setState(() {
+            mouseOver = false;
+          });
+        },
+        child: TapRegion(
+          onTapInside: (event) {
+            openMenu(listgrid: listgrid, actionMenu: actionMenu);
+          },
+          onTapOutside: (event) {
             closeMenu();
-          }
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border(
-              right: listgrid.cellBorder > 0
-                  ? BorderSide(
-                      color: listgrid.widgetColor,
-                      width: listgrid.cellBorder,
-                    )
-                  : BorderSide.none,
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                right: listgrid.cellBorder > 0
+                    ? BorderSide(
+                        color: listgrid.widgetColor,
+                        width: listgrid.cellBorder,
+                      )
+                    : BorderSide.none,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: Row(
+                children: [
+                  Icon(
+                    icon,
+                    color: (menuOpen || mouseOver)
+                        ? listgrid.widgetAccentColor
+                        : listgrid.widgetColor,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                    child: Text(
+                      label,
+                      style: TextStyle(
+                        color: (menuOpen || mouseOver)
+                            ? listgrid.widgetAccentColor
+                            : listgrid.widgetColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
+        ),
+      );
+    } else {
+      bool isEnabled = (actionMenu.menuItems.first.requireSelection == false) ||
+          (widget.listgrid.selectionCount > 0);
+      ListGridActionMenuItem headerItem = actionMenu.menuItems.first;
+      return Opacity(
+        opacity: isEnabled ? 1 : 0.4,
+        child: MouseRegion(
+          cursor: isEnabled ? SystemMouseCursors.click : MouseCursor.defer,
+          onEnter: isEnabled
+              ? (event) {
+                  setState(() {
+                    mouseOver = true;
+                  });
+                }
+              : (event) {},
+          onExit: isEnabled
+              ? (event) {
+                  setState(() {
+                    mouseOver = false;
+                  });
+                }
+              : (event) {},
+          child: TapRegion(
+            onTapInside: isEnabled
+                ? (event) {
+                    headerItem.clickHandler(
+                      listgrid.context,
+                      Fframe.of(context)!.user,
+                      listgrid.selectedDocuments,
+                    );
+                  }
+                : (event) {},
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  right: listgrid.cellBorder > 0
+                      ? BorderSide(
+                          color: listgrid.widgetColor,
+                          width: listgrid.cellBorder,
+                        )
+                      : BorderSide.none,
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Row(
+                  children: [
+                    Icon(
+                      headerItem.icon,
+                      color: (isEnabled && mouseOver)
+                          ? listgrid.widgetAccentColor
+                          : listgrid.widgetColor,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: Text(
+                        headerItem.label,
+                        style: TextStyle(
+                          color: (isEnabled && mouseOver)
+                              ? listgrid.widgetAccentColor
+                              : listgrid.widgetColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+  }
+}
+
+class ListGridActionMenuItemWIdget extends StatefulWidget {
+  const ListGridActionMenuItemWIdget({
+    super.key,
+    required this.listgrid,
+    required this.actionMenuItem,
+  });
+  final ListGridController listgrid;
+  final ListGridActionMenuItem actionMenuItem;
+
+  @override
+  State<ListGridActionMenuItemWIdget> createState() =>
+      _ListGridActionMenuItemWIdgetState();
+}
+
+class _ListGridActionMenuItemWIdgetState
+    extends State<ListGridActionMenuItemWIdget> {
+  late bool mouseOver = false;
+  @override
+  Widget build(BuildContext context) {
+    ListGridController listgrid = widget.listgrid;
+    ListGridActionMenuItem actionMenuItem = widget.actionMenuItem;
+    bool isEnabled =
+        actionMenuItem.requireSelection ? (listgrid.selectionCount > 0) : true;
+    return Opacity(
+      opacity: isEnabled ? 1 : 0.4,
+      child: MouseRegion(
+        cursor: isEnabled ? SystemMouseCursors.click : MouseCursor.defer,
+        onEnter: (event) {
+          setState(() {
+            mouseOver = true;
+          });
+        },
+        onExit: (event) {
+          setState(() {
+            mouseOver = false;
+          });
+        },
+        child: TapRegion(
+          onTapInside: isEnabled
+              ? (event) {
+                  actionMenuItem.clickHandler(
+                    listgrid.context,
+                    Fframe.of(context)!.user,
+                    listgrid.selectedDocuments,
+                  );
+                }
+              : (event) {},
           child: Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
                 Icon(
-                  widget.icon,
-                  color: listgrid.widgetColor,
+                  actionMenuItem.icon,
+                  color: (isEnabled && mouseOver)
+                      ? listgrid.widgetAccentColor
+                      : listgrid.widgetColor,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                  child: Text(widget.label),
+                  child: Text(
+                    actionMenuItem.label,
+                    style: TextStyle(
+                      color: (isEnabled && mouseOver)
+                          ? listgrid.widgetAccentColor
+                          : listgrid.widgetColor,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -439,16 +635,17 @@ class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
 }
 
 class HeaderSortingWidget extends StatelessWidget {
-  const HeaderSortingWidget({
-    super.key,
-    required this.column,
-    required this.columnIndex,
-    required this.widgetColor,
-  });
+  const HeaderSortingWidget(
+      {super.key,
+      required this.column,
+      required this.columnIndex,
+      required this.widgetColor,
+      required this.widgetAccentColor});
 
   final ListGridColumn column;
   final int columnIndex;
   final Color widgetColor;
+  final Color widgetAccentColor;
 
   @override
   Widget build(BuildContext context) {
@@ -478,7 +675,7 @@ class HeaderSortingWidget extends StatelessWidget {
                         icon: const Icon(Icons.expand_less),
                         iconSize: 12,
                         color: (isSorted && !column.descending)
-                            ? Theme.of(context).colorScheme.onBackground
+                            ? widgetAccentColor
                             : widgetColor,
                         style: const ButtonStyle(
                           padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
@@ -500,7 +697,7 @@ class HeaderSortingWidget extends StatelessWidget {
                         icon: const Icon(Icons.expand_more),
                         iconSize: 12,
                         color: (isSorted && column.descending)
-                            ? Theme.of(context).colorScheme.onBackground
+                            ? widgetAccentColor
                             : widgetColor,
                         style: ButtonStyle(
                           surfaceTintColor: MaterialStatePropertyAll<Color>(
@@ -723,12 +920,11 @@ class _ListGridRowSelectorState extends State<ListGridRowSelector> {
   @override
   Widget build(BuildContext context) {
     ListGridController listgrid = widget.listgrid;
-    bool isSelected = listgrid.listGridSelection.containsKey(widget.documentId);
+    bool isSelected = listgrid.selectedDocuments.containsKey(widget.documentId);
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.bottom,
       child: Container(
         decoration: BoxDecoration(
-          // color: Colors.green,
           color: listgrid.cellBackgroundColor,
           border: Border(
             bottom: listgrid.rowBorder > 0
@@ -835,7 +1031,6 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
         onExit: cellMouseOut,
         child: Container(
             decoration: BoxDecoration(
-              // color: Colors.green,
               color: listgrid.cellBackgroundColor,
               border: Border(
                 right: listgrid.cellBorder > 0

@@ -1,7 +1,9 @@
+import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
 import 'package:example/models/suggestion.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'list_grid.dart';
 
 enum ListGridQueryStates { active, done }
@@ -72,6 +74,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
         // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
         // showHeader: false,
         // showFooter: false,
+        actionBar: sampleActionMenus(),
         rowsSelectable: true,
         columnSettings: listGridColumns,
       ),
@@ -140,4 +143,83 @@ class _ListGridScreenState extends State<ListGridScreen> {
       },
     );
   }
+}
+
+List<ListGridActionMenu<T>> sampleActionMenus<T>() {
+  return [
+    ListGridActionMenu(
+      label: "Toggle active",
+      icon: Icons.toggle_off_outlined,
+      menuItems: [
+        ListGridActionMenuItem(
+          label: "Set inactive",
+          icon: Icons.toggle_off_outlined,
+          clickHandler: (context, user, selectedDocumentsById) {
+            selectedDocumentsById.forEach((documentId, currentSuggestion) {
+              currentSuggestion.active = false;
+              currentSuggestion.toFirestore();
+            });
+          },
+        ),
+        ListGridActionMenuItem(
+          label: "Set Active",
+          icon: Icons.toggle_on,
+          clickHandler: (context, user, selectedDocumentsById) {
+            selectedDocumentsById.forEach((documentId, currentSuggestion) {
+              currentSuggestion.active = true;
+              currentSuggestion.toFirestore();
+            });
+          },
+        ),
+      ],
+    ),
+    ListGridActionMenu(
+      menuItems: [
+        ListGridActionMenuItem(
+          label: "Delete",
+          icon: Icons.delete_outline,
+          clickHandler: (context, user, selectedDocumentsById) {
+            selectedDocumentsById.forEach((documentId, currentSuggestion) {
+              Console.log(
+                "NOT deleting ${currentSuggestion.name}. Jus' printing this.",
+                scope: "exampleApp.ListGrid.deleteAction",
+                level: LogLevel.prod,
+              );
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: ListTile(
+                  leading: Icon(
+                    Icons.date_range,
+                    color: Colors.amber[900],
+                  ),
+                  title: Text(
+                    "NOT deleting ${selectedDocumentsById.length} documents... Jus' giving you this snack.",
+                  ),
+                  textColor: Colors.amber[900],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    ),
+    ListGridActionMenu(
+      menuItems: [
+        ListGridActionMenuItem(
+          label: "Help...",
+          icon: Icons.help_outline,
+          requireSelection: false,
+          clickHandler: (context, user, selectedDocumentsById) {
+            launchUrl(
+              Uri.parse(
+                  'https://github.com/postmeridiem/fframe/blob/main/fframe/lib/screens/listgrid_screen/listgrid.md'),
+              webOnlyWindowName: "_blank",
+            );
+          },
+        ),
+      ],
+    ),
+  ];
 }

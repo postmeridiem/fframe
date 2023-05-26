@@ -344,10 +344,11 @@ Row renderButtons(
   );
 }
 
-List<IconButton> renderCreatedByCellIcons(
-    {required BuildContext context,
-    required Suggestion suggestion,
-    required String stringValue}) {
+List<IconButton> renderCreatedByCellIcons({
+  required BuildContext context,
+  required Suggestion suggestion,
+  required String stringValue,
+}) {
   return [
     IconButton(
       onPressed: () {

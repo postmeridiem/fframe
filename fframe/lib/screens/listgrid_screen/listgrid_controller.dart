@@ -5,6 +5,7 @@ class ListGridController<T> extends InheritedModel {
   ListGridController({
     super.key,
     required child,
+    required this.context,
     required this.sourceQuery,
     required this.theme,
     required this.config,
@@ -14,12 +15,15 @@ class ListGridController<T> extends InheritedModel {
     _searchableColumns = [];
     double calculatedMinWidth = 0;
 
+    // count  action bar items to see if
+    // the actionbar should be drawm
+    _enableActionBar = (config.actionBar.isNotEmpty) ? true : false;
+
     // track if all columns have fixed width
     // if so, add an extra blank column at the end with flex
     // to fill the screen
     _addEndFlex = true;
     _enableSearchBar = false;
-    _enableActionBar = true;
     int columnCount = 0;
 
     if (config.rowsSelectable) {
@@ -75,6 +79,7 @@ class ListGridController<T> extends InheritedModel {
   }
   late ListGridNotifier notifier;
 
+  final BuildContext context;
   final ListGridConfig config;
   final ThemeData theme;
   final Size viewportSize;
@@ -112,6 +117,10 @@ class ListGridController<T> extends InheritedModel {
 
   Color get widgetColor {
     return config.widgetColor ?? theme.colorScheme.onSurface;
+  }
+
+  Color get widgetAccentColor {
+    return config.widgetAccentColor ?? theme.colorScheme.onBackground;
   }
 
   Color get widgetBackgroundColor {
@@ -170,8 +179,8 @@ class ListGridController<T> extends InheritedModel {
     return _columnWidths;
   }
 
-  Map<String, T> get listGridSelection {
-    return notifier.listGridSelection as Map<String, T>;
+  Map<String, T> get selectedDocuments {
+    return notifier.selectedDocuments as Map<String, T>;
   }
 
   int get selectionCount {
@@ -190,7 +199,7 @@ class ListGridController<T> extends InheritedModel {
     return _addEndFlex;
   }
 
-  int? get collectionCount {
+  int get collectionCount {
     return notifier.collectionCount;
   }
 
@@ -291,7 +300,7 @@ class ListGridNotifier<T> extends ChangeNotifier {
     _sortedColumnIndex = null;
 
     // initialize the row selections
-    _listGridSelection = {};
+    _selectedDocuments = {};
 
     // initialize the current query, based on sorting and settings
     _currentQuery = sourceQuery;
@@ -310,7 +319,7 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
   late int? _sortedColumnIndex;
 
-  late Map<String, T> _listGridSelection;
+  late Map<String, T> _selectedDocuments;
 
   String? get searchString {
     return _searchString;
@@ -452,21 +461,21 @@ class ListGridNotifier<T> extends ChangeNotifier {
     return _collectionCount;
   }
 
-  Map<String, T> get listGridSelection {
-    return _listGridSelection;
+  Map<String, T> get selectedDocuments {
+    return _selectedDocuments;
   }
 
   int get selectionCount {
-    return _listGridSelection.isNotEmpty ? _listGridSelection.length : 0;
+    return _selectedDocuments.isNotEmpty ? _selectedDocuments.length : 0;
   }
 
   void selectRow({required String documentId, required T document}) {
-    _listGridSelection[documentId] = document;
+    _selectedDocuments[documentId] = document;
     notifyListeners();
   }
 
   void unselectRow({required String documentId}) {
-    _listGridSelection.remove(documentId);
+    _selectedDocuments.remove(documentId);
     notifyListeners();
   }
 
