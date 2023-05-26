@@ -278,25 +278,25 @@ class ListGridActionBarWidget<T> extends StatelessWidget {
             ),
             child: Row(
               children: [
-                ListGridActionMenu(
+                ListGridActionMenuWidget(
                   listgrid: listgrid,
                   label: "Set Inactive",
                   icon: Icons.toggle_off_outlined,
                   requireSelection: true,
                 ),
-                ListGridActionMenu(
+                ListGridActionMenuWidget(
                   listgrid: listgrid,
                   label: "Set Active",
                   icon: Icons.toggle_on,
                   requireSelection: true,
                 ),
-                ListGridActionMenu(
+                ListGridActionMenuWidget(
                   listgrid: listgrid,
                   label: "Delete",
                   icon: Icons.delete_outlined,
                   requireSelection: true,
                 ),
-                ListGridActionMenu(
+                ListGridActionMenuWidget(
                   listgrid: listgrid,
                   label: "Help",
                   icon: Icons.help_outline,
@@ -312,8 +312,8 @@ class ListGridActionBarWidget<T> extends StatelessWidget {
   }
 }
 
-class ListGridActionMenu extends StatefulWidget {
-  const ListGridActionMenu({
+class ListGridActionMenuWidget extends StatefulWidget {
+  const ListGridActionMenuWidget({
     super.key,
     required this.listgrid,
     required this.icon,
@@ -327,10 +327,64 @@ class ListGridActionMenu extends StatefulWidget {
   final bool requireSelection;
 
   @override
-  State<ListGridActionMenu> createState() => _ListGridActionMenuState();
+  State<ListGridActionMenuWidget> createState() =>
+      _ListGridActionMenuWidgetState();
 }
 
-class _ListGridActionMenuState extends State<ListGridActionMenu> {
+class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
+  OverlayEntry? menuWidget;
+  bool menuOpen = false;
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  void openMenu({required ListGridController listgrid}) {
+    if (menuOpen) {
+      // menu was already open. tap just means close
+      closeMenu();
+    } else {
+      // menu was closed, open menu
+      final OverlayState overlay = Overlay.of(context);
+      final RenderBox renderBox = context.findRenderObject() as RenderBox;
+      final Size size = renderBox.size;
+      final Offset offset = renderBox.localToGlobal(Offset.zero);
+
+      menuWidget = OverlayEntry(
+        builder: (context) => Positioned(
+          width: size.width + 20,
+          left: offset.dx,
+          top: (offset.dy + size.height + 7),
+          child: Material(
+            elevation: 1,
+            color: listgrid.widgetBackgroundColor,
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  Text("menu item"),
+                  Text("menu item"),
+                  Text("menu item"),
+                  Text("menu item")
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+
+      overlay.insert(menuWidget!);
+      menuOpen = true;
+    }
+  }
+
+  void closeMenu() {
+    if (menuWidget == null || menuWidget?.mounted == false) return;
+    menuWidget?.remove();
+    menuWidget = null;
+    menuOpen = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     ListGridController listgrid = widget.listgrid;
@@ -341,30 +395,42 @@ class _ListGridActionMenuState extends State<ListGridActionMenu> {
 
     return Opacity(
       opacity: isEnabled ? 1 : 0.4,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            right: listgrid.cellBorder > 0
-                ? BorderSide(
-                    color: listgrid.widgetColor,
-                    width: listgrid.cellBorder,
-                  )
-                : BorderSide.none,
+      child: TapRegion(
+        onTapInside: (event) {
+          if (isEnabled) {
+            openMenu(listgrid: listgrid);
+          }
+        },
+        onTapOutside: (event) {
+          if (isEnabled) {
+            closeMenu();
+          }
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border(
+              right: listgrid.cellBorder > 0
+                  ? BorderSide(
+                      color: listgrid.widgetColor,
+                      width: listgrid.cellBorder,
+                    )
+                  : BorderSide.none,
+            ),
           ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-          child: Row(
-            children: [
-              Icon(
-                widget.icon,
-                color: listgrid.widgetColor,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                child: Text(widget.label),
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Row(
+              children: [
+                Icon(
+                  widget.icon,
+                  color: listgrid.widgetColor,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  child: Text(widget.label),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -707,13 +773,13 @@ class ListGridDataCell<T> extends StatefulWidget {
     super.key,
     required this.listgrid,
     required this.column,
-    required this.stringValue,
+    required this.dynValue,
     required this.document,
   });
 
   final ListGridController listgrid;
   final ListGridColumn column;
-  final String stringValue;
+  final dynamic dynValue;
   final T document;
 
   @override
@@ -727,9 +793,16 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
   Widget build(BuildContext context) {
     ListGridController listgrid = widget.listgrid;
     ListGridColumn column = widget.column;
-    // dynamic dynValue =
-    //     column.valueBuilder!(context, widget.document as T);
-    String stringValue = widget.stringValue;
+    // TODO: use typeOf to do stuff like:
+    //  - automatic timestamp conversions
+    //  - rendering of a toggle icon for booleans
+    //  - currency masks?
+    //  - enums?
+    //  - maps to treeview?
+    String stringValue = "${widget.dynValue}";
+
+    // TODO: add onTap to cell to toggle the button menu
+    // for touch screens
 
     void cellMouseIn(PointerEvent details) {
       setState(() {
