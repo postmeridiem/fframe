@@ -738,7 +738,7 @@ class ListGridFooter<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ListGridController listgrid = ListGridController.of(context);
-    int collectionCount = listgrid.collectionCount ?? 0;
+    int collectionCount = listgrid.collectionCount;
     int selectionCount = listgrid.selectionCount;
     return SizedBox(
       height: listgrid.footerHeight,
