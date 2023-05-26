@@ -31,20 +31,21 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     valueBuilder: (context, suggestion) {
       return suggestion.name;
     },
-  ),
-  ListGridColumn(
-    columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 200,
-    cellBuilder: (context, suggestion) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          renderButtons(
-            context: context,
-            suggestion: suggestion,
-          ),
-        ],
-      );
+    cellControlsBuilder: (
+      context,
+      user,
+      suggestion,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(stringValue);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+      ];
     },
   ),
   ListGridColumn(
@@ -67,6 +68,21 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     },
   ),
   ListGridColumn(
+    columnSizing: ListGridColumnSizingMode.fixed,
+    columnWidth: 200,
+    cellBuilder: (context, suggestion) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          renderButtons(
+            context: context,
+            suggestion: suggestion,
+          ),
+        ],
+      );
+    },
+  ),
+  ListGridColumn(
     label: "created by",
     visible: true,
     fieldName: 'createdBy',
@@ -85,52 +101,11 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
       suggestion,
       stringValue,
     ) {
-      return [
-        IconButton(
-          onPressed: () {
-            FlutterClipboard.copy(suggestion.createdBy!);
-          },
-          icon: const Icon(Icons.copy),
-          tooltip: 'Copy',
-        ),
-        IconButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: ListTile(
-                  leading: const Icon(
-                    Icons.date_range,
-                  ),
-                  title: Text(
-                    dateTimeTextTS(suggestion.creationDate as Timestamp),
-                  ),
-                  textColor: Colors.amber[900],
-                ),
-              ),
-            );
-          },
-          icon: const Icon(Icons.date_range),
-          tooltip: 'Show creation date',
-        ),
-        IconButton(
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: ListTile(
-                  leading: Icon(
-                    Icons.alarm,
-                    color: Colors.amber[900],
-                  ),
-                  title: Text(stringValue),
-                  textColor: Colors.amber[900],
-                ),
-              ),
-            );
-          },
-          icon: const Icon(Icons.alarm_add),
-          tooltip: 'Show value in snackbar',
-        ),
-      ];
+      return renderCreatedByCellIcons(
+        context: context,
+        suggestion: suggestion,
+        stringValue: stringValue,
+      );
     },
   ),
   ListGridColumn(
@@ -161,32 +136,97 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
         },
       );
     },
+    cellControlsBuilder: (
+      context,
+      user,
+      suggestion,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(stringValue);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+      ];
+    },
   ),
   ListGridColumn(
     label: "tab 1",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 250,
+    generateTooltip: true,
     valueBuilder: (context, suggestion) {
       return suggestion.fieldTab1;
+    },
+    cellControlsBuilder: (
+      context,
+      user,
+      suggestion,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(stringValue);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+      ];
     },
   ),
   ListGridColumn(
     label: "tab 2",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 80,
-    generateTooltip: true,
     valueBuilder: (context, suggestion) {
       return suggestion.fieldTab2;
+    },
+    cellControlsBuilder: (
+      context,
+      user,
+      suggestion,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(stringValue);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+      ];
     },
   ),
   ListGridColumn(
     label: "tab 3",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 200,
+    generateTooltip: true,
     valueBuilder: (context, suggestion) {
       return suggestion.fieldTab3;
     },
     cellColor: Colors.pink,
+    cellControlsBuilder: (
+      context,
+      user,
+      suggestion,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(stringValue);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+      ];
+    },
   ),
   ListGridColumn(
     label: "creation date",
@@ -194,6 +234,22 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     columnWidth: 1000,
     valueBuilder: (context, suggestion) {
       return dateTimeTextTS(suggestion.creationDate as Timestamp);
+    },
+    cellControlsBuilder: (
+      context,
+      user,
+      suggestion,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(stringValue);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+      ];
     },
   ),
   ListGridColumn(
@@ -203,6 +259,22 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     alignment: Alignment.bottomRight,
     valueBuilder: (context, suggestion) {
       return suggestion.saveCount;
+    },
+    cellControlsBuilder: (
+      context,
+      user,
+      suggestion,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(stringValue);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+      ];
     },
   ),
   // ListGridColumn(
@@ -216,7 +288,8 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   // ),
 ];
 
-renderButtons({required BuildContext context, required Suggestion suggestion}) {
+Row renderButtons(
+    {required BuildContext context, required Suggestion suggestion}) {
   return Row(
     children: [
       Tooltip(
@@ -269,6 +342,58 @@ renderButtons({required BuildContext context, required Suggestion suggestion}) {
       ),
     ],
   );
+}
+
+List<IconButton> renderCreatedByCellIcons(
+    {required BuildContext context,
+    required Suggestion suggestion,
+    required String stringValue}) {
+  return [
+    IconButton(
+      onPressed: () {
+        FlutterClipboard.copy(stringValue);
+      },
+      icon: const Icon(Icons.copy),
+      tooltip: 'Copy',
+    ),
+    IconButton(
+      onPressed: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: ListTile(
+              leading: const Icon(
+                Icons.date_range,
+              ),
+              title: Text(
+                dateTimeTextTS(suggestion.creationDate as Timestamp),
+              ),
+              textColor: Colors.amber[900],
+            ),
+          ),
+        );
+      },
+      icon: const Icon(Icons.date_range),
+      tooltip: 'Show creation date',
+    ),
+    IconButton(
+      onPressed: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: ListTile(
+              leading: Icon(
+                Icons.alarm,
+                color: Colors.amber[900],
+              ),
+              title: Text(stringValue),
+              textColor: Colors.amber[900],
+            ),
+          ),
+        );
+      },
+      icon: const Icon(Icons.alarm_add),
+      tooltip: 'Show value in snackbar',
+    ),
+  ];
 }
 
 class SuggestionListItem extends StatelessWidget {
