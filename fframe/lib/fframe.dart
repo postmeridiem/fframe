@@ -79,6 +79,7 @@ part 'screens/document_screen/document_context.dart';
 part 'screens/document_screen/document_list.dart';
 part 'package:fframe/screens/datagrid_screen/datagrid_firestore.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_firestore.dart';
+part 'package:fframe/screens/listgrid_screen/listgrid_controller.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_widgets.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_classes.dart';
 part 'screens/router_page.dart';

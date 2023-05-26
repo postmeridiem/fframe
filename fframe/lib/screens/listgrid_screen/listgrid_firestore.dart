@@ -348,13 +348,12 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
           );
         } else if (column.valueBuilder != null) {
           dynamic dynValue = column.valueBuilder!(context, document);
-          String stringValue = "$dynValue";
           output.add(
             ListGridDataCell(
               listgrid: listgrid,
               column: column,
               document: document,
-              stringValue: stringValue,
+              dynValue: dynValue,
             ),
           );
         } else {
