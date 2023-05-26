@@ -24,7 +24,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   // ),
   ListGridColumn(
     fieldName: 'name',
-    searchable: false,
+    searchable: true,
     sortable: true,
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 300,
@@ -56,7 +56,9 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
             ? "Suggestion is active"
             : "Suggestion is inactive",
         child: Icon(
-          suggestion.active == true ? Icons.toggle_on : Icons.toggle_off,
+          suggestion.active == true
+              ? Icons.toggle_on
+              : Icons.toggle_off_outlined,
           color: suggestion.active == true
               ? SignalColors().constAccentColor
               : Theme.of(context).disabledColor,
@@ -68,13 +70,14 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     label: "created by",
     visible: true,
     fieldName: 'createdBy',
+    // searchable: true,
     sortable: true,
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 300,
     alignment: Alignment.bottomRight,
     textSelectable: true,
     valueBuilder: (context, suggestion) {
-      return "${suggestion.createdBy}";
+      return suggestion.createdBy;
     },
     cellControlsBuilder: (
       context,
@@ -95,18 +98,37 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: ListTile(
+                  leading: const Icon(
+                    Icons.date_range,
+                  ),
+                  title: Text(
+                    dateTimeTextTS(suggestion.creationDate as Timestamp),
+                  ),
+                  textColor: Colors.amber[900],
+                ),
+              ),
+            );
+          },
+          icon: const Icon(Icons.date_range),
+          tooltip: 'Show creation date',
+        ),
+        IconButton(
+          onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: ListTile(
                   leading: Icon(
                     Icons.alarm,
                     color: Colors.amber[900],
                   ),
-                  title: Text('${suggestion.createdBy}'),
+                  title: Text(stringValue),
                   textColor: Colors.amber[900],
                 ),
               ),
             );
           },
           icon: const Icon(Icons.alarm_add),
-          tooltip: 'Show snackbar',
+          tooltip: 'Show value in snackbar',
         ),
       ];
     },
@@ -183,15 +205,15 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
       return suggestion.saveCount;
     },
   ),
-  ListGridColumn(
-    fieldName: 'name',
-    visible: false,
-    searchable: true,
-    // searchMask: const ListGridSearchMask(from: " ", to: "_", toLowerCase: true),
-    // valueBuilder: (context, suggestion) {
-    //   return suggestion.name;
-    // },
-  ),
+  // ListGridColumn(
+  //   fieldName: 'name',
+  //   visible: false,
+  //   searchable: true,
+  //   // searchMask: const ListGridSearchMask(from: " ", to: "_", toLowerCase: true),
+  //   // valueBuilder: (context, suggestion) {
+  //   //   return suggestion.name;
+  //   // },
+  // ),
 ];
 
 renderButtons({required BuildContext context, required Suggestion suggestion}) {
