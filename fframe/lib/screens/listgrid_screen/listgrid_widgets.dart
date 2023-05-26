@@ -156,17 +156,32 @@ class ListGridHeader extends StatelessWidget {
 class ListGridSearchWidget extends StatelessWidget {
   const ListGridSearchWidget({
     super.key,
-    required this.calculatedWidth,
-    required this.widgetColor,
-    required this.cellBorder,
+    required this.listgrid,
   });
-
-  final double calculatedWidth;
-  final Color widgetColor;
-  final double cellBorder;
+  final ListGridController listgrid;
 
   @override
   Widget build(BuildContext context) {
+    Color widgetColor = listgrid.widgetColor;
+    double calculatedWidth = listgrid.calculatedWidth;
+    List<InputChip> searchChips = [];
+
+    if (listgrid.searchableColumns.length > 1) {
+      for (int searchableColumnIndex in listgrid.searchableColumns) {
+        ListGridColumn searchableColumn =
+            listgrid.columnSettings[searchableColumnIndex];
+        searchChips.add(
+          InputChip(
+            label: Text(
+              searchableColumn.label,
+              style: TextStyle(color: listgrid.widgetColor),
+            ),
+            backgroundColor: listgrid.widgetBackgroundColor,
+            disabledColor: listgrid.widgetBackgroundColor,
+          ),
+        );
+      }
+    }
     return Theme(
       data: ThemeData(
         textSelectionTheme: TextSelectionThemeData(
@@ -193,32 +208,165 @@ class ListGridSearchWidget extends StatelessWidget {
           child: Padding(
             // padding: EdgeInsets.only(left: 8.0, right: 8.0),
             padding: const EdgeInsets.all(0),
-            child: Stack(
+            child: TextField(
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 16,
+              ),
+              decoration: InputDecoration(
+                contentPadding: const EdgeInsets.all(10.0),
+                focusColor: Theme.of(context).colorScheme.onPrimary,
+                // prefix: Card(
+                //   // color: Colors.amber,
+                //   child: Wrap(
+                //     children: searchChips,
+                //   ),
+                // ),
+                prefixIcon: const Icon(Icons.search),
+              ),
+              onChanged: (String value) {
+                ListGridController.of(context).searchString = value;
+              },
+            ),
+          ),
+        ),
+        // color:
+      ),
+    );
+  }
+}
+
+class ListGridActionBarWidget<T> extends StatelessWidget {
+  const ListGridActionBarWidget({
+    super.key,
+    required this.listgrid,
+  });
+
+  final ListGridController listgrid;
+
+  @override
+  Widget build(BuildContext context) {
+    double calculatedWidth = listgrid.calculatedWidth;
+    Color widgetColor = listgrid.widgetColor;
+    Color widgetBackgroundColor = listgrid.widgetBackgroundColor;
+    double cellBorder = listgrid.cellBorder;
+    return Theme(
+      data: ThemeData(
+        textSelectionTheme: TextSelectionThemeData(
+          cursorColor: Theme.of(context).colorScheme.onSurfaceVariant,
+          selectionColor: Colors.grey.shade400,
+          selectionHandleColor: widgetColor,
+        ),
+        focusColor: widgetColor,
+      ),
+      child: SizedBox(
+        height: 36,
+        width: calculatedWidth,
+        child: Padding(
+          padding: const EdgeInsets.all(0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: widgetBackgroundColor,
+              border: Border(
+                bottom: cellBorder > 0
+                    ? BorderSide(
+                        color: widgetColor,
+                        width: cellBorder,
+                      )
+                    : BorderSide.none,
+              ),
+            ),
+            child: Row(
               children: [
-                const Padding(
-                  padding: EdgeInsets.all(10.0),
-                  child: Icon(Icons.search),
+                ListGridActionMenu(
+                  listgrid: listgrid,
+                  label: "Set Inactive",
+                  icon: Icons.toggle_off_outlined,
+                  requireSelection: true,
                 ),
-                TextField(
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontSize: 16,
-                  ),
-                  decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.only(left: 40.0, right: 8.0),
-                    focusColor: Theme.of(context).colorScheme.onPrimary,
-                    // border: null,
-                  ),
-                  onChanged: (String value) {
-                    ListGridController.of(context).searchString = value;
-                  },
+                ListGridActionMenu(
+                  listgrid: listgrid,
+                  label: "Set Active",
+                  icon: Icons.toggle_on,
+                  requireSelection: true,
+                ),
+                ListGridActionMenu(
+                  listgrid: listgrid,
+                  label: "Delete",
+                  icon: Icons.delete_outlined,
+                  requireSelection: true,
+                ),
+                ListGridActionMenu(
+                  listgrid: listgrid,
+                  label: "Help",
+                  icon: Icons.help_outline,
+                  requireSelection: false,
                 ),
               ],
             ),
           ),
         ),
         // color:
+      ),
+    );
+  }
+}
+
+class ListGridActionMenu extends StatefulWidget {
+  const ListGridActionMenu({
+    super.key,
+    required this.listgrid,
+    required this.icon,
+    required this.label,
+    required this.requireSelection,
+  });
+
+  final ListGridController listgrid;
+  final IconData icon;
+  final String label;
+  final bool requireSelection;
+
+  @override
+  State<ListGridActionMenu> createState() => _ListGridActionMenuState();
+}
+
+class _ListGridActionMenuState extends State<ListGridActionMenu> {
+  @override
+  Widget build(BuildContext context) {
+    ListGridController listgrid = widget.listgrid;
+
+    bool isEnabled = (widget.listgrid.selectionCount > 0);
+    // enable ActionMenu if selection requirement is not set
+    isEnabled = widget.requireSelection ? isEnabled : true;
+
+    return Opacity(
+      opacity: isEnabled ? 1 : 0.4,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            right: listgrid.cellBorder > 0
+                ? BorderSide(
+                    color: listgrid.widgetColor,
+                    width: listgrid.cellBorder,
+                  )
+                : BorderSide.none,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          child: Row(
+            children: [
+              Icon(
+                widget.icon,
+                color: listgrid.widgetColor,
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                child: Text(widget.label),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -668,7 +816,7 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
                               ),
                         // child: const Text("cell"),
                       ),
-                (true || column.cellControlsBuilder != null)
+                (column.cellControlsBuilder != null)
                     ? Row(
                         mainAxisAlignment:
                             (column.alignment == Alignment.bottomLeft ||
@@ -685,13 +833,24 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
                               child: Card(
                                 color: listgrid.widgetBackgroundColor,
                                 child: Row(
-                                  // children: column.cellControlsBuilder!(
-                                  //   context,
-                                  //   Fframe.of(context)!.user,
-                                  //   widget.document,
-                                  //   stringValue,
-                                  // ),
-                                  children: [],
+                                  children: buttonMouseOver
+                                      ? column.cellControlsBuilder!(
+                                          context,
+                                          Fframe.of(context)!.user,
+                                          widget.document,
+                                          stringValue,
+                                        )
+                                      : [
+                                          column
+                                              .cellControlsBuilder!(
+                                            context,
+                                            Fframe.of(context)!.user,
+                                            widget.document,
+                                            stringValue,
+                                          )
+                                              .first
+                                        ],
+                                  // children: [],
                                 ),
                               ),
                             ),

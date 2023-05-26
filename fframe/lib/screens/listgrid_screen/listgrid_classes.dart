@@ -19,6 +19,7 @@ class ListGridController<T> extends InheritedModel {
     // to fill the screen
     _addEndFlex = true;
     _enableSearchBar = false;
+    _enableActionBar = true;
     int columnCount = 0;
 
     if (config.rowsSelectable) {
@@ -80,6 +81,7 @@ class ListGridController<T> extends InheritedModel {
 
   late Map<int, TableColumnWidth> _columnWidths;
   late bool _enableSearchBar;
+  late bool _enableActionBar;
   late List<int> _searchableColumns;
   late Query sourceQuery;
   late double _calculatedWidth;
@@ -202,6 +204,14 @@ class ListGridController<T> extends InheritedModel {
 
   set searchString(String? searchString) {
     notifier.searchString = searchString;
+  }
+
+  List<int> get searchableColumns {
+    return _searchableColumns;
+  }
+
+  bool get enableActionBar {
+    return _enableActionBar;
   }
 
   void sortColumn({required int columnIndex, bool descending = false}) {
@@ -333,30 +343,59 @@ class ListGridNotifier<T> extends ChangeNotifier {
     } else {
       if (searchableColumns.isNotEmpty) {
         if (searchString != null && searchString!.isNotEmpty) {
-          String curSearch = searchString!;
           if (searchableColumns.length > 1) {
             //TODO make multiple columns supported
-            Console.log(
-                "ListGrid: ERROR: Multiple searchable columns not supported at this time. Defaulting to first one");
-          }
-          if (columnSettings[searchableColumns.first].fieldName != null) {
-            ListGridColumn curColumn = columnSettings[searchableColumns.first];
-            String fieldName = curColumn.fieldName!;
-            outputQuery = outputQuery.orderBy(fieldName,
-                descending: curColumn.descending);
-            if (curColumn.searchMask == null) {
-              outputQuery = outputQuery.startsWith(fieldName, curSearch);
-            } else {
-              debugPrint("applying search mask");
-              if (curColumn.searchMask!.toLowerCase) {
-                curSearch = curSearch.toLowerCase();
+            // Console.log(
+            //     "ListGrid: ERROR: Multiple searchable columns not supported at this time. Defaulting to first one");
+            List<Filter> currentFilters = [];
+            for (int searchableColumnIndex in searchableColumns) {
+              String curSearch = searchString!;
+              ListGridColumn curColumn = columnSettings[searchableColumnIndex];
+              if (curColumn.fieldName != null) {
+                String fieldName = curColumn.fieldName!;
+                outputQuery = outputQuery.orderBy(fieldName,
+                    descending: curColumn.descending);
+                if (curColumn.searchMask != null) {
+                  if (curColumn.searchMask!.toLowerCase) {
+                    curSearch = curSearch.toLowerCase();
+                  }
+                  curSearch = curSearch.replaceAll(
+                    curColumn.searchMask!.from,
+                    curColumn.searchMask!.to,
+                  );
+                }
+                currentFilters.add(Filter(fieldName, isEqualTo: curSearch));
+                // outputQuery = outputQuery.startsWith(
+                //   fieldName,
+                //   curSearch,
+                // );
               }
-              outputQuery = outputQuery.startsWith(
+              // outputQuery = outputQuery
+              //     .where(Filter.or(currentFilters[0], currentFilters[1]));
+            }
+          } else {
+            if (columnSettings[searchableColumns.first].fieldName != null) {
+              String curSearch = searchString!;
+              ListGridColumn curColumn =
+                  columnSettings[searchableColumns.first];
+              String fieldName = curColumn.fieldName!;
+              outputQuery = outputQuery.orderBy(fieldName,
+                  descending: curColumn.descending);
+              if (curColumn.searchMask == null) {
+                outputQuery = outputQuery.startsWith(fieldName, curSearch);
+              } else {
+                debugPrint("applying search mask");
+                if (curColumn.searchMask!.toLowerCase) {
+                  curSearch = curSearch.toLowerCase();
+                }
+                outputQuery = outputQuery.startsWith(
                   fieldName,
                   curSearch.replaceAll(
                     curColumn.searchMask!.from,
                     curColumn.searchMask!.to,
-                  ));
+                  ),
+                );
+              }
             }
           }
         }
@@ -393,8 +432,11 @@ class ListGridNotifier<T> extends ChangeNotifier {
       // set the columns search direction to the input
       columnSettings[columnIndex].descending = descending;
 
-      debugPrint(
-          "sorting column: ${selectedColumn.fieldName}($columnIndex) ${descending ? "descending" : "ascending"}");
+      Console.log(
+        "Sorting column: ${selectedColumn.fieldName} (column: ${columnIndex + 1}) ${descending ? "descending" : "ascending"}",
+        scope: "fframeLog.ListGrid",
+        level: LogLevel.fframe,
+      );
     }
 
     // run the query builder to interpret the new sorting settings
@@ -517,8 +559,9 @@ class ListGridConfig<T> {
     this.cellBackgroundColor,
     this.defaultTextStyle,
     this.showHeader = true,
-    this.showFooter = false,
+    this.showFooter = true,
     this.rowsSelectable = false,
+    // this.gridActions,
   });
 
   final List<ListGridColumn<T>> columnSettings;
@@ -539,6 +582,7 @@ class ListGridConfig<T> {
   final bool showHeader;
   final bool showFooter;
   final bool rowsSelectable;
+  // final Map<int,ListGridActionMenu> gridActions;
 
   late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
       fromFirestore;

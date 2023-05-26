@@ -11,6 +11,7 @@ class FirestoreListGrid<T> extends StatefulWidget {
 
   /// The firestore core query that was provided
   final Query<T> query;
+
   @override
   FirestoreListGridState createState() => FirestoreListGridState<T>();
 }
@@ -23,6 +24,11 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
 
   @override
   void initState() {
+    Console.log(
+      "Initializing ListGrid",
+      scope: "fframeLog.ListGrid",
+      level: LogLevel.fframe,
+    );
     super.initState();
   }
 
@@ -56,12 +62,16 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                   return Stack(
                     children: [
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
+                          listgrid.enableActionBar
+                              ? ListGridActionBarWidget(
+                                  listgrid: listgrid,
+                                )
+                              : const IgnorePointer(),
                           listgrid.enableSearchBar
                               ? ListGridSearchWidget(
-                                  calculatedWidth: listgrid.viewportWidth,
-                                  widgetColor: listgrid.widgetColor,
-                                  cellBorder: listgrid.cellBorder,
+                                  listgrid: listgrid,
                                 )
                               : const IgnorePointer(),
                           Expanded(
