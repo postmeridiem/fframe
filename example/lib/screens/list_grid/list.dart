@@ -378,6 +378,7 @@ List<IconButton> renderCreatedByCellIcons({
     ),
     IconButton(
       onPressed: () {
+        suggestion.active = false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: ListTile(

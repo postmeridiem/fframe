@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
@@ -155,20 +157,55 @@ List<ListGridActionMenu<T>> sampleActionMenus<T>() {
           label: "Set inactive",
           icon: Icons.toggle_off_outlined,
           clickHandler: (context, user, selectedDocumentsById) {
-            selectedDocumentsById.forEach((documentId, currentSuggestion) {
-              currentSuggestion.active = false;
-              currentSuggestion.toFirestore();
+            selectedDocumentsById.forEach((documentId, currentDocument) {
+              // TODO: Arno, pls hlp...
+              // how do I make this save using the embedded document models?
+              // I can make my own connection to the backend and to a cheap write,
+              // but that is not very clean.
+
+              // Suggestion currentSuggestion = currentDocument as Suggestion;
+              // currentSuggestion.active = false;
+              // currentSuggestion.toFirestore();
             });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: ListTile(
+                  leading: Icon(
+                    Icons.toggle_off_outlined,
+                    color: Colors.amber[900],
+                  ),
+                  title: Text(
+                    "Toggled ${selectedDocumentsById.length} documents to the inactive state.",
+                  ),
+                  textColor: Colors.amber[900],
+                ),
+              ),
+            );
           },
         ),
         ListGridActionMenuItem(
           label: "Set Active",
           icon: Icons.toggle_on,
           clickHandler: (context, user, selectedDocumentsById) {
-            selectedDocumentsById.forEach((documentId, currentSuggestion) {
-              currentSuggestion.active = true;
-              currentSuggestion.toFirestore();
+            selectedDocumentsById.forEach((documentId, currentDocument) {
+              // Suggestion currentSuggestion = currentDocument as Suggestion;
             });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: ListTile(
+                  leading: Icon(
+                    Icons.toggle_on,
+                    color: Colors.amber[900],
+                  ),
+                  title: Text(
+                    "Toggled ${selectedDocumentsById.length} documents to the active state.",
+                  ),
+                  textColor: Colors.amber[900],
+                ),
+              ),
+            );
           },
         ),
       ],
@@ -191,7 +228,7 @@ List<ListGridActionMenu<T>> sampleActionMenus<T>() {
               SnackBar(
                 content: ListTile(
                   leading: Icon(
-                    Icons.date_range,
+                    Icons.delete_outline,
                     color: Colors.amber[900],
                   ),
                   title: Text(

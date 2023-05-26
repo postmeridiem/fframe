@@ -227,8 +227,9 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
                         }),
                   ),
                   GetDocumentCount<T>(
-                      documentConfig: widget.documentConfig,
-                      headerType: HeaderType.footer),
+                    documentConfig: widget.documentConfig,
+                    headerType: HeaderType.footer,
+                  ),
                 ],
               ),
               if (widget.documentConfig.dataGrid != null) DataGridToggle<T>(),
@@ -358,7 +359,9 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
 
                   final queryDocumentSnapshot = snapshot.docs[index];
 
-                  if (autoSelectFirst && index == 0 && !FRouter.of(context).hasQueryStringParam('id')) {
+                  if (autoSelectFirst &&
+                      index == 0 &&
+                      !FRouter.of(context).hasQueryStringParam('id')) {
                     documentScreenConfig.load<T>(
                         context: context, docId: queryDocumentSnapshot.id);
                   }

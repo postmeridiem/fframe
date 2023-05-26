@@ -387,7 +387,7 @@ class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
             elevation: 1,
             color: listgrid.widgetBackgroundColor,
             child: Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: menuItems,
                 // children: [
@@ -405,6 +405,7 @@ class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
       );
 
       overlay.insert(menuWidget!);
+      mouseOver = false;
       menuOpen = true;
     }
   }
@@ -461,7 +462,7 @@ class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
                 children: [
                   Icon(
                     icon,
-                    color: (menuOpen || mouseOver)
+                    color: (mouseOver)
                         ? listgrid.widgetAccentColor
                         : listgrid.widgetColor,
                   ),
@@ -470,7 +471,7 @@ class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
                     child: Text(
                       label,
                       style: TextStyle(
-                        color: (menuOpen || mouseOver)
+                        color: (mouseOver)
                             ? listgrid.widgetAccentColor
                             : listgrid.widgetColor,
                       ),
@@ -512,6 +513,9 @@ class _ListGridActionMenuWidgetState extends State<ListGridActionMenuWidget> {
                       Fframe.of(context)!.user,
                       listgrid.selectedDocuments,
                     );
+                    setState(() {
+                      mouseOver = false;
+                    });
                   }
                 : (event) {},
             child: Container(
@@ -602,6 +606,9 @@ class _ListGridActionMenuItemWIdgetState
                     Fframe.of(context)!.user,
                     listgrid.selectedDocuments,
                   );
+                  setState(() {
+                    mouseOver = false;
+                  });
                 }
               : (event) {},
           child: Padding(
