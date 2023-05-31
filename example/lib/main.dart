@@ -132,6 +132,9 @@ class MainApp extends StatelessWidget {
         Console.log(
             "Log example for quick usage. these will show up on prod level debug settings, so clean them up");
 
+        Console.log(L10n.string("main_demo_l10n",
+            placeholder: "this is a log from the L10n engine (placeholder)"));
+
         Console.log("Executing postSignIn code from main.dart",
             scope: "exampleApp.postSignIn");
 

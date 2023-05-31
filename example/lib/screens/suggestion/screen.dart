@@ -247,24 +247,29 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       },
       documentTabsBuilder:
           (context, suggestion, isReadOnly, isNew, fFrameUser) {
-        return [
-          DocumentTab<Suggestion>(
-            tabBuilder: (user) {
-              return Tab(
-                text: "${suggestion.name}",
-                icon: const Icon(
-                  Icons.pest_control,
-                ),
-              );
-            },
-            childBuilder: (suggestion, readOnly) {
-              return Tab01(
-                suggestion: suggestion,
-                readOnly: readOnly,
-                // user: user,
-              );
-            },
-          ),
+        List<DocumentTab<Suggestion>> output = [];
+        if (fFrameUser!.roles!.contains('user')) {
+          output.add(
+            DocumentTab<Suggestion>(
+              tabBuilder: (user) {
+                return Tab(
+                  text: "${suggestion.name}",
+                  icon: const Icon(
+                    Icons.pest_control,
+                  ),
+                );
+              },
+              childBuilder: (suggestion, readOnly) {
+                return Tab01(
+                  suggestion: suggestion,
+                  readOnly: readOnly,
+                  // user: user,
+                );
+              },
+            ),
+          );
+        }
+        output.add(
           DocumentTab<Suggestion>(
             tabBuilder: (user) {
               return const Tab(
@@ -281,6 +286,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
               );
             },
           ),
+        );
+        output.add(
           DocumentTab<Suggestion>(
             tabBuilder: (user) {
               return const Tab(
@@ -296,8 +303,10 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
                 readOnly: readOnly,
               );
             },
-          )
-        ];
+          ),
+        );
+
+        return output;
       },
       contextCards: [
         (suggestion) => ContextCard(

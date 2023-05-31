@@ -11,6 +11,12 @@
 	"suggestions_tab_done": {
 		"translation": "Done (from keys)"
 	},
+	"tab3_label": {
+		"translation": "Tab 3"
+	},
+	"main_demo_l10n": {
+		"translation": "this is a log from the L10n engine (from assets)"
+	},
 	"firestore_tools_stamper_title": {
 		"translation": "--== Firestore fucker-upper ==--"
 	},

@@ -277,15 +277,15 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
       ];
     },
   ),
-  // ListGridColumn(
-  //   fieldName: 'name',
-  //   visible: false,
-  //   searchable: true,
-  //   // searchMask: const ListGridSearchMask(from: " ", to: "_", toLowerCase: true),
-  //   // valueBuilder: (context, suggestion) {
-  //   //   return suggestion.name;
-  //   // },
-  // ),
+  ListGridColumn(
+    fieldName: 'carBuilderKeyGroup',
+    visible: false,
+    searchable: true,
+    // searchMask: const ListGridSearchMask(from: " ", to: "_", toLowerCase: true),
+    // valueBuilder: (context, suggestion) {
+    //   return suggestion.name;
+    // },
+  ),
 ];
 
 Row renderButtons(

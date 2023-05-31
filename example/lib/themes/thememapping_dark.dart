@@ -15,6 +15,7 @@ final ThemeData appDarkTheme = ThemeData(
   scaffoldBackgroundColor: darkModeConfig.constBackgroundColor,
   indicatorColor: darkModeConfig.constPrimaryAccentColor,
   dividerColor: darkModeConfig.constDividerColor,
+  disabledColor: Colors.grey.shade400,
   unselectedWidgetColor: darkModeConfig.constUnselectedColor,
   errorColor: darkModeConfig.signalColors.constErrorColor,
   hintColor: darkModeConfig.signalColors.constSuccessColor,
@@ -69,16 +70,20 @@ final ThemeData appDarkTheme = ThemeData(
     unselectedLabelColor: darkModeConfig.constUnselectedColor,
   ),
   checkboxTheme: CheckboxThemeData(
-    checkColor: MaterialStateColor.resolveWith((states) {
-      return darkModeConfig.constPrimaryAccentColor;
-    }),
+    checkColor: MaterialStateColor.resolveWith(
+      (states) {
+        return darkModeConfig.constPrimaryAccentColor;
+      },
+    ),
   ),
   toggleButtonsTheme: ToggleButtonsThemeData(
     selectedColor: darkModeConfig.constPrimaryAccentColor,
   ),
   switchTheme: SwitchThemeData(
-    overlayColor: MaterialStateColor.resolveWith((states) {
-      return darkModeConfig.constPrimaryAccentColor;
-    }),
+    overlayColor: MaterialStateColor.resolveWith(
+      (states) {
+        return darkModeConfig.constPrimaryAccentColor;
+      },
+    ),
   ),
 );

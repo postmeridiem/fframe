@@ -212,6 +212,10 @@ class ListGridSearchWidget extends StatelessWidget {
                 fontSize: 16,
               ),
               decoration: InputDecoration(
+                hintText: listgrid.config.searchHint,
+                hintStyle: TextStyle(
+                  color: Theme.of(context).disabledColor,
+                ),
                 contentPadding: const EdgeInsets.all(10.0),
                 focusColor: Theme.of(context).colorScheme.onPrimary,
                 // prefix: Card(

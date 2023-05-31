@@ -62,18 +62,20 @@ class _ListGridScreenState extends State<ListGridScreen> {
 
       // Optional ListGrid widget
       listGrid: ListGridConfig<Suggestion>(
+        searchHint: "search suggestion names",
         // widgetBackgroundColor: Colors.amber,
         // widgetColor: Colors.pink,
         // widgetTextColor: Colors.pink,
         // widgetTextSize: 20,
+        // widgetAccentColor: Colors.cyan,
         // rowBorder: 1,
-        cellBorder: 1,
+        // cellBorder: 1,
         // cellPadding: const EdgeInsets.all(16),
         // cellVerticalAlignment: TableCellVerticalAlignment.top,
         // cellBackgroundColor: Colors.amber,
-        // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
+        // // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
         // showHeader: false,
-        // showFooter: false,
+        // // showFooter: false,
         actionBar: sampleActionMenus(),
         rowsSelectable: true,
         columnSettings: listGridColumns,
@@ -161,9 +163,9 @@ List<ListGridActionMenu<T>> sampleActionMenus<T>() {
               // I can make my own connection to the backend and to a cheap write,
               // but that is not very clean.
 
-              // Suggestion currentSuggestion = currentDocument as Suggestion;
-              // currentSuggestion.active = false;
-              // currentSuggestion.toFirestore();
+              Suggestion currentSuggestion = currentDocument as Suggestion;
+              currentSuggestion.active = false;
+              currentSuggestion.toFirestore();
             });
 
             ScaffoldMessenger.of(context).showSnackBar(
