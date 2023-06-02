@@ -122,7 +122,6 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         }
       },
 
-      autoSelectFirst: false,
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
         footerBuilder: (context, documentCount) {
