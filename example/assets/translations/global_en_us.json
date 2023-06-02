@@ -6,10 +6,10 @@
 		"translation": "Suggestions"
 	},
 	"suggestions_tab_active": {
-		"translation": "Active (from keys)"
+		"translation": "Active"
 	},
 	"suggestions_tab_done": {
-		"translation": "Done (from keys)"
+		"translation": "Inactive"
 	},
 	"tab3_label": {
 		"translation": "Tab 3"

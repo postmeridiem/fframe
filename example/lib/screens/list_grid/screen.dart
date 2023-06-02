@@ -6,7 +6,7 @@ import 'package:example/models/suggestion.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'list_grid.dart';
 
-enum ListGridQueryStates { active, done }
+enum ListGridQueryStates { active, inactive }
 
 class ListGridScreen<Suggestion> extends StatefulWidget {
   const ListGridScreen({
@@ -40,10 +40,6 @@ class _ListGridScreenState extends State<ListGridScreen> {
         return suggestion;
       },
 
-      viewType: widget.listgridQueryState == ListGridQueryStates.active
-          ? ViewType.auto
-          : ViewType.grid,
-
       createNew: () => Suggestion(
         active: true,
         createdBy: FirebaseAuth.instance.currentUser?.displayName ??
@@ -60,7 +56,19 @@ class _ListGridScreenState extends State<ListGridScreen> {
         );
       },
 
+      query: (query) {
+        // return query.where("active", isNull: true);
+        switch (widget.listgridQueryState) {
+          case ListGridQueryStates.active:
+            return query.where("active", isEqualTo: true);
+
+          case ListGridQueryStates.inactive:
+            return query.where("active", isEqualTo: false);
+        }
+      },
+
       // Optional ListGrid widget
+      viewType: ViewType.listgrid,
       listGrid: ListGridConfig<Suggestion>(
         searchHint: "search suggestion names",
         // widgetBackgroundColor: Colors.amber,
@@ -76,8 +84,8 @@ class _ListGridScreenState extends State<ListGridScreen> {
         // // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
         // showHeader: false,
         // // showFooter: false,
-        actionBar: sampleActionMenus(),
         rowsSelectable: true,
+        actionBar: sampleActionMenus(),
         columnSettings: listGridColumns,
       ),
 

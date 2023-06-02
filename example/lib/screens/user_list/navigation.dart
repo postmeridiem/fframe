@@ -10,6 +10,6 @@ final userListNavigationTarget = NavigationTarget(
     icon: const Icon(Icons.person),
     navigationLabel: () => const Text('User List'),
   ),
-  roles: ["User", 'UserAdmin', 'SuperAdmin'],
+  roles: ["Developer"],
   private: true,
 );
