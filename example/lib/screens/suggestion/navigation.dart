@@ -47,26 +47,27 @@ final suggestionNavigationTarget = NavigationTarget(
       ),
     ),
     NavigationTab(
-        title: "Done",
-        path: "done",
-        private: true,
-        contentPane: const SuggestionScreen(
-            suggestionQueryState: SuggestionQueryStates.done),
-        destination: Destination(
-          icon: const Icon(Icons.toggle_off_outlined),
-          navigationLabel: () => Text(
-            L10n.string(
-              'suggestions_tab_done',
-              placeholder: 'Done (placeholder)',
-              namespace: 'global',
-            ),
-          ),
-          tabLabel: () => L10n.string(
+      title: "Done",
+      path: "done",
+      private: true,
+      contentPane: const SuggestionScreen(
+          suggestionQueryState: SuggestionQueryStates.done),
+      destination: Destination(
+        icon: const Icon(Icons.toggle_off_outlined),
+        navigationLabel: () => Text(
+          L10n.string(
             'suggestions_tab_done',
             placeholder: 'Done (placeholder)',
             namespace: 'global',
           ),
         ),
-        roles: ['user']),
+        tabLabel: () => L10n.string(
+          'suggestions_tab_done',
+          placeholder: 'Done (placeholder)',
+          namespace: 'global',
+        ),
+      ),
+      roles: ['user'],
+    ),
   ],
 );

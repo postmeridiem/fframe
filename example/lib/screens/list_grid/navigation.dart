@@ -41,27 +41,28 @@ final listGridNavigationTarget = NavigationTarget(
         ),
       ),
     ),
-    NavigationTab(
-        title: "Done",
-        path: "done",
-        private: true,
-        contentPane: const ListGridScreen(
-            listgridQueryState: ListGridQueryStates.inactive),
-        destination: Destination(
-          icon: const Icon(Icons.toggle_off_outlined),
-          navigationLabel: () => Text(
-            L10n.string(
-              'suggestions_tab_done',
-              placeholder: 'Inactive',
-              namespace: 'global',
-            ),
-          ),
-          tabLabel: () => L10n.string(
-            'suggestions_tab_done',
-            placeholder: 'Inactive',
-            namespace: 'global',
-          ),
-        ),
-        roles: ['Developer']),
+    // NavigationTab(
+    //   title: "Done",
+    //   path: "done",
+    //   private: true,
+    //   contentPane: const ListGridScreen(
+    //       listgridQueryState: ListGridQueryStates.inactive),
+    //   destination: Destination(
+    //     icon: const Icon(Icons.toggle_off_outlined),
+    //     navigationLabel: () => Text(
+    //       L10n.string(
+    //         'suggestions_tab_done',
+    //         placeholder: 'Inactive',
+    //         namespace: 'global',
+    //       ),
+    //     ),
+    //     tabLabel: () => L10n.string(
+    //       'suggestions_tab_done',
+    //       placeholder: 'Inactive',
+    //       namespace: 'global',
+    //     ),
+    //   ),
+    //   roles: ['Developer'],
+    // ),
   ],
 );
