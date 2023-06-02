@@ -530,7 +530,8 @@ class FframeBuilder extends StatelessWidget {
       restorationScopeId: 'app',
       routeInformationParser: FNavigationRouteInformationParser(),
       routerDelegate: FNavigationRouterDelegate(),
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner:
+          Fframe.of(context)!.debugShowCheckedModeBanner,
       theme: Fframe.of(context)!.lightMode,
       darkTheme: Fframe.of(context)!.darkMode,
       themeMode: Fframe.of(context)!.themeMode,
