@@ -64,7 +64,7 @@ typedef DocumentScreenFooterBuilder<T> = Widget Function();
 typedef ListGridActionHandler<T> = void Function(
   BuildContext context,
   FFrameUser? user,
-  Map<String, dynamic> selectedDocumentsById,
+  Map<String, T> selectedDocumentsById,
 );
 
 typedef ListGridValueBuilderFunction<T> = dynamic Function(

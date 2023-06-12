@@ -10,6 +10,7 @@ class ListGridController<T> extends InheritedModel {
     required this.theme,
     required this.config,
     required this.viewportSize,
+    required this.documentOpen,
   }) : super(child: child) {
     _columnWidths = {};
     _searchableColumns = [];
@@ -83,6 +84,7 @@ class ListGridController<T> extends InheritedModel {
   final ListGridConfig config;
   final ThemeData theme;
   final Size viewportSize;
+  final bool documentOpen;
 
   late Map<int, TableColumnWidth> _columnWidths;
   late bool _enableSearchBar;
@@ -221,6 +223,10 @@ class ListGridController<T> extends InheritedModel {
 
   bool get enableActionBar {
     return _enableActionBar;
+  }
+
+  void actionBar(bool enabled) {
+    _enableActionBar = enabled;
   }
 
   void sortColumn({required int columnIndex, bool descending = false}) {

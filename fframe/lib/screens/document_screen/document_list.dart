@@ -21,8 +21,9 @@ class DocumentListItem<T> extends ConsumerWidget {
 
     try {
       return GestureDetector(
-        onTap: () =>
-            documentScreenConfig.selectDocument(context, queryDocumentSnapshot),
+        onTap: () {
+          documentScreenConfig.selectDocument(context, queryDocumentSnapshot);
+        },
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           onHover: (_) {

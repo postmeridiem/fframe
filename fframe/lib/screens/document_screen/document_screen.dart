@@ -744,30 +744,9 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>>
             Query<T> query = DocumentScreenConfig.of(context)!
                 .fireStoreQueryState
                 .currentQuery() as Query<T>;
-            return Stack(
-              children: [
-                FirestoreListGrid<T>(
-                  config: documentConfig.listGrid!,
-                  query: query,
-                ),
-                // Row(
-                //   children: [
-                //     const SizedBox(
-                //       width: 300,
-                //       child: IgnorePointer(),
-                //     ),
-                //     Expanded(
-                //       child: Container(
-                //         color: Theme.of(context).colorScheme.surface,
-                //         child: ScreenBody<T>(
-                //           key: ValueKey(
-                //               "ScreenBody_${documentConfig.collection}"),
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
-              ],
+            return FirestoreListGrid<T>(
+              config: documentConfig.listGrid!,
+              query: query,
             );
           default:
             return Fframe.of(context)?.navigationConfig.errorPage.contentPane ??

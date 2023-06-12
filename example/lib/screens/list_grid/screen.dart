@@ -161,10 +161,15 @@ List<ListGridActionMenu<T>> sampleActionMenus<T>() {
       label: "Toggle active",
       icon: Icons.toggle_off_outlined,
       menuItems: [
-        ListGridActionMenuItem(
+        ListGridActionMenuItem<T>(
           label: "Set inactive",
           icon: Icons.toggle_off_outlined,
           clickHandler: (context, user, selectedDocumentsById) {
+            DocumentScreenConfig documentScreenConfig =
+                DocumentScreenConfig.of(context) as DocumentScreenConfig;
+            DocumentConfig<T> documentConfig =
+                documentScreenConfig.documentConfig as DocumentConfig<T>;
+
             selectedDocumentsById.forEach((documentId, currentDocument) {
               // TODO: Arno, pls hlp...
               // how do I make this save using the embedded document models?
@@ -173,7 +178,8 @@ List<ListGridActionMenu<T>> sampleActionMenus<T>() {
 
               Suggestion currentSuggestion = currentDocument as Suggestion;
               currentSuggestion.active = false;
-              currentSuggestion.toFirestore();
+              documentConfig.toFirestore(
+                  currentDocument, SetOptions(merge: true));
             });
 
             ScaffoldMessenger.of(context).showSnackBar(

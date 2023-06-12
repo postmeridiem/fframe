@@ -16,16 +16,22 @@ class ListGridHeader extends StatelessWidget {
     ListGridController listgrid = ListGridController.of(context);
     return SizedBox(
       height: listgrid.headerHeight,
-      width: calculatedWidth,
+      width: listgrid.documentOpen ? 300 : calculatedWidth,
       child: Column(
         children: [
           Table(
-            columnWidths: listgrid.columnWidths,
+            columnWidths: listgrid.documentOpen
+                ? {
+                    0: listgrid.columnWidths[rowsSelectable ? 1 : 0]
+                        as TableColumnWidth
+                  }
+                : listgrid.columnWidths,
             defaultVerticalAlignment: TableCellVerticalAlignment.middle,
             children: [
               TableRow(
                 children: renderHeaderCells(
                   context: context,
+                  documentOpen: listgrid.documentOpen,
                   columnSettings: listgrid.columnSettings,
                   cellPadding: listgrid.cellPadding,
                   cellBorder: listgrid.cellBorder,
@@ -49,6 +55,7 @@ class ListGridHeader extends StatelessWidget {
 
   List<Widget> renderHeaderCells({
     required BuildContext context,
+    required bool documentOpen,
     required List<ListGridColumn> columnSettings,
     required Color widgetBackgroundColor,
     required Color widgetColor,
@@ -61,7 +68,7 @@ class ListGridHeader extends StatelessWidget {
   }) {
     List<Widget> output = [];
 
-    if (rowsSelectable) {
+    if (!documentOpen && rowsSelectable) {
       output.add(
         Container(
           decoration: BoxDecoration(
@@ -85,7 +92,7 @@ class ListGridHeader extends StatelessWidget {
       );
     }
 
-    for (var i = 0; i < columnSettings.length; i++) {
+    for (var i = 0; i < (documentOpen ? 1 : columnSettings.length); i++) {
       bool isSorted = (sortedColumnIndex != null && sortedColumnIndex == i);
       ListGridColumn column = columnSettings[i];
       if (column.visible) {
@@ -155,13 +162,17 @@ class ListGridSearchWidget extends StatelessWidget {
   const ListGridSearchWidget({
     super.key,
     required this.listgrid,
+    required this.documentOpen,
   });
   final ListGridController listgrid;
+  final bool documentOpen;
 
   @override
   Widget build(BuildContext context) {
     Color widgetColor = listgrid.widgetColor;
-    double calculatedWidth = listgrid.calculatedWidth;
+    double calculatedWidth = documentOpen ? 300 : listgrid.calculatedWidth;
+
+    ///lalalala
     List<InputChip> searchChips = [];
 
     if (listgrid.searchableColumns.length > 1) {
@@ -758,7 +769,9 @@ class ListGridFooter<T> extends StatelessWidget {
             child: Padding(
                 padding: listgrid.cellPadding,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: listgrid.documentOpen
+                      ? MainAxisAlignment.start
+                      : MainAxisAlignment.spaceBetween,
                   children: [
                     const IgnorePointer(),
                     (dataMode == ListGridDataMode.autopager ||
@@ -805,7 +818,7 @@ class ListGridDefaultFooter extends StatelessWidget {
     return Row(
       children: [
         Padding(
-          padding: const EdgeInsets.only(right: 100.0),
+          padding: const EdgeInsets.only(left: 16.0, right: 100.0),
           child: Text(
             "count: $collectionCount",
             style: TextStyle(
@@ -975,18 +988,92 @@ class _ListGridRowSelectorState extends State<ListGridRowSelector> {
   }
 }
 
+class ListGridBuilderCell<T> extends StatefulWidget {
+  const ListGridBuilderCell({
+    super.key,
+    required this.listgrid,
+    required this.column,
+    required this.queryDocumentSnapshot,
+    required this.document,
+    required this.cellWidget,
+  });
+
+  final ListGridController listgrid;
+  final ListGridColumn column;
+  final QueryDocumentSnapshot<T> queryDocumentSnapshot;
+  final T document;
+  final Widget cellWidget;
+
+  @override
+  State<ListGridBuilderCell<T>> createState() => _ListGridBuilderCellState<T>();
+}
+
+class _ListGridBuilderCellState<T> extends State<ListGridBuilderCell<T>> {
+  bool cellMouseOver = false;
+
+  void cellMouseIn(PointerEvent details) {
+    setState(() {
+      cellMouseOver = true;
+    });
+  }
+
+  void cellMouseOut(PointerEvent details) {
+    setState(() {
+      cellMouseOver = false;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    DocumentScreenConfig documentScreenConfig =
+        DocumentScreenConfig.of(context)!;
+    return TableCell(
+      verticalAlignment: TableCellVerticalAlignment.bottom,
+      child: MouseRegion(
+        cursor: MaterialStateMouseCursor.clickable,
+        child: GestureDetector(
+          onTap: () {
+            documentScreenConfig.selectDocument(
+                context, widget.queryDocumentSnapshot);
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: widget.listgrid.cellBackgroundColor,
+              border: Border(
+                bottom: widget.listgrid.rowBorder > 0
+                    ? BorderSide(
+                        color: widget.listgrid.widgetBackgroundColor,
+                        width: widget.listgrid.rowBorder,
+                      )
+                    : BorderSide.none,
+              ),
+            ),
+            child: Padding(
+              padding: widget.listgrid.cellPadding,
+              child: widget.cellWidget,
+              // child: const Text("cell"),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class ListGridDataCell<T> extends StatefulWidget {
   const ListGridDataCell({
     super.key,
     required this.listgrid,
     required this.column,
     required this.dynValue,
+    required this.queryDocumentSnapshot,
     required this.document,
   });
 
   final ListGridController listgrid;
   final ListGridColumn column;
   final dynamic dynValue;
+  final QueryDocumentSnapshot<T> queryDocumentSnapshot;
   final T document;
 
   @override
@@ -1000,6 +1087,7 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
   Widget build(BuildContext context) {
     ListGridController listgrid = widget.listgrid;
     ListGridColumn column = widget.column;
+
     // TODO: use typeOf to do stuff like:
     //  - automatic timestamp conversions
     //  - rendering of a toggle icon for booleans
@@ -1007,9 +1095,6 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
     //  - enums?
     //  - maps to treeview?
     String stringValue = "${widget.dynValue}";
-
-    // TODO: add onTap to cell to toggle the button menu
-    // for touch screens
 
     void cellMouseIn(PointerEvent details) {
       setState(() {
@@ -1035,36 +1120,61 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
       });
     }
 
+    DocumentScreenConfig documentScreenConfig =
+        DocumentScreenConfig.of(context)!;
+
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.bottom,
       child: MouseRegion(
+        cursor: MaterialStateMouseCursor.clickable,
         onEnter: cellMouseIn,
         onExit: cellMouseOut,
-        child: Container(
-            decoration: BoxDecoration(
-              color: listgrid.cellBackgroundColor,
-              border: Border(
-                right: listgrid.cellBorder > 0
-                    ? BorderSide(
-                        color: listgrid.widgetBackgroundColor,
-                        width: listgrid.cellBorder,
-                      )
-                    : BorderSide.none,
-                bottom: listgrid.rowBorder > 0
-                    ? BorderSide(
-                        color: listgrid.widgetBackgroundColor,
-                        width: listgrid.rowBorder,
-                      )
-                    : BorderSide.none,
+        child: GestureDetector(
+          onTap: () {
+            documentScreenConfig.selectDocument(
+                context, widget.queryDocumentSnapshot);
+          },
+          child: Container(
+              decoration: BoxDecoration(
+                color: listgrid.cellBackgroundColor,
+                border: Border(
+                  right: listgrid.cellBorder > 0
+                      ? BorderSide(
+                          color: listgrid.widgetBackgroundColor,
+                          width: listgrid.cellBorder,
+                        )
+                      : BorderSide.none,
+                  bottom: listgrid.rowBorder > 0
+                      ? BorderSide(
+                          color: listgrid.widgetBackgroundColor,
+                          width: listgrid.rowBorder,
+                        )
+                      : BorderSide.none,
+                ),
               ),
-            ),
-            child: Stack(
-              alignment: column.alignment,
-              children: [
-                column.generateTooltip
-                    ? Tooltip(
-                        message: prepTooltip(stringValue),
-                        child: Padding(
+              child: Stack(
+                alignment: column.alignment,
+                children: [
+                  column.generateTooltip
+                      ? Tooltip(
+                          message: prepTooltip(stringValue),
+                          child: Padding(
+                            padding: listgrid.cellPadding,
+                            child: column.textSelectable
+                                ? SelectableText(
+                                    stringValue,
+                                    style: listgrid.defaultTextStyle,
+                                    // overflow: TextOverflow.ellipsis,
+                                  )
+                                : Text(
+                                    stringValue,
+                                    style: listgrid.defaultTextStyle,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                            // child: const Text("cell"),
+                          ),
+                        )
+                      : Padding(
                           padding: listgrid.cellPadding,
                           child: column.textSelectable
                               ? SelectableText(
@@ -1079,66 +1189,52 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
                                 ),
                           // child: const Text("cell"),
                         ),
-                      )
-                    : Padding(
-                        padding: listgrid.cellPadding,
-                        child: column.textSelectable
-                            ? SelectableText(
-                                stringValue,
-                                style: listgrid.defaultTextStyle,
-                                // overflow: TextOverflow.ellipsis,
-                              )
-                            : Text(
-                                stringValue,
-                                style: listgrid.defaultTextStyle,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                        // child: const Text("cell"),
-                      ),
-                (column.cellControlsBuilder != null)
-                    ? Row(
-                        mainAxisAlignment:
-                            (column.alignment == Alignment.bottomLeft ||
-                                    column.alignment == Alignment.topLeft)
-                                ? MainAxisAlignment.end
-                                : MainAxisAlignment.start,
-                        children: [
-                          Opacity(
-                            opacity:
-                                buttonMouseOver ? 1 : (cellMouseOver ? 0.2 : 0),
-                            child: MouseRegion(
-                              onEnter: buttonMouseIn,
-                              onExit: buttonMouseOut,
-                              child: Card(
-                                color: listgrid.widgetBackgroundColor,
-                                child: Row(
-                                  children: buttonMouseOver
-                                      ? column.cellControlsBuilder!(
-                                          context,
-                                          Fframe.of(context)!.user,
-                                          widget.document,
-                                          stringValue,
-                                        )
-                                      : [
-                                          column
-                                              .cellControlsBuilder!(
+                  (column.cellControlsBuilder != null)
+                      ? Row(
+                          mainAxisAlignment:
+                              (column.alignment == Alignment.bottomLeft ||
+                                      column.alignment == Alignment.topLeft)
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
+                          children: [
+                            Opacity(
+                              opacity: buttonMouseOver
+                                  ? 1
+                                  : (cellMouseOver ? 0.2 : 0),
+                              child: MouseRegion(
+                                onEnter: buttonMouseIn,
+                                onExit: buttonMouseOut,
+                                child: Card(
+                                  color: listgrid.widgetBackgroundColor,
+                                  child: Row(
+                                    children: buttonMouseOver
+                                        ? column.cellControlsBuilder!(
                                             context,
                                             Fframe.of(context)!.user,
                                             widget.document,
                                             stringValue,
                                           )
-                                              .first
-                                        ],
-                                  // children: [],
+                                        : [
+                                            column
+                                                .cellControlsBuilder!(
+                                              context,
+                                              Fframe.of(context)!.user,
+                                              widget.document,
+                                              stringValue,
+                                            )
+                                                .first
+                                          ],
+                                    // children: [],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      )
-                    : const IgnorePointer(),
-              ],
-            )),
+                          ],
+                        )
+                      : const IgnorePointer(),
+                ],
+              )),
+        ),
       ),
     );
   }
@@ -1155,5 +1251,71 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
     }
 
     return output;
+  }
+}
+
+class ListGridDocument<T> extends ConsumerStatefulWidget {
+  const ListGridDocument({
+    super.key,
+    required this.documentConfig,
+    required this.listgrid,
+    required this.documentOpen,
+  });
+  final DocumentConfig<T> documentConfig;
+  final ListGridController listgrid;
+  final bool documentOpen;
+
+  @override
+  ConsumerState<ListGridDocument<T>> createState() =>
+      _ListGridDocumentState<T>();
+}
+
+class _ListGridDocumentState<T> extends ConsumerState<ListGridDocument<T>> {
+  @override
+  Widget build(BuildContext context) {
+    DocumentScreenConfig documentScreenConfig =
+        DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig =
+        documentScreenConfig.documentConfig as DocumentConfig<T>;
+    return widget.documentOpen
+        ? Row(
+            children: [
+              const SizedBox(
+                width: 300,
+                child: IgnorePointer(),
+              ),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: widget.listgrid.widgetBackgroundColor,
+                    // color: Colors.cyan,
+                    border: Border(
+                      left: BorderSide(
+                        width: 1,
+                        color: widget.listgrid.widgetBackgroundColor,
+                      ),
+                      top: BorderSide(
+                        width: 1,
+                        color: widget.listgrid.widgetBackgroundColor,
+                      ),
+                      right: BorderSide(
+                        width: 1,
+                        color: widget.listgrid.widgetBackgroundColor,
+                      ),
+                    ),
+                  ),
+                  // color: Theme.of(context).colorScheme.surface,
+                  // child: Text(
+                  //   queryState.queryString.toString(),
+                  // )
+                  // child: Column(children: [Text("${document}")]),
+                  child: ScreenBody<T>(
+                    key: ValueKey("ScreenBody_${documentConfig.collection}"),
+                  ),
+                ),
+              ),
+            ],
+          )
+        : const IgnorePointer();
   }
 }
