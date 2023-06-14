@@ -27,10 +27,10 @@ class _ListGridScreenState extends State<ListGridScreen> {
       // formKey: GlobalKey<FormState>(),
       collection: "suggestions",
       fromFirestore: Suggestion.fromFirestore,
-      toFirestore: (suggestion, options) {
+      toFirestore: (Suggestion suggestion, SetOptions? options) {
         return suggestion.toFirestore();
       },
-      createDocumentId: (suggestion) {
+      createDocumentId: (Suggestion suggestion) {
         return "${suggestion.name}";
       },
 
@@ -165,12 +165,11 @@ List<ListGridActionMenu<T>> sampleActionMenus<T>() {
           label: "Set inactive",
           icon: Icons.toggle_off_outlined,
           clickHandler: (context, user, selectedDocumentsById) {
-            DocumentScreenConfig documentScreenConfig =
-                DocumentScreenConfig.of(context) as DocumentScreenConfig;
-            DocumentConfig<T> documentConfig =
-                documentScreenConfig.documentConfig as DocumentConfig<T>;
-
             selectedDocumentsById.forEach((documentId, currentDocument) {
+              DocumentScreenConfig documentScreenConfig =
+                  DocumentScreenConfig.of(context) as DocumentScreenConfig;
+              DocumentConfig<T> documentConfig =
+                  documentScreenConfig.documentConfig as DocumentConfig<T>;
               // TODO: Arno, pls hlp...
               // how do I make this save using the embedded document models?
               // I can make my own connection to the backend and to a cheap write,
