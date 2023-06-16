@@ -67,7 +67,7 @@ final suggestionNavigationTarget = NavigationTarget(
           namespace: 'global',
         ),
       ),
-      roles: ['user'],
+      roles: ['developer'],
     ),
   ],
 );

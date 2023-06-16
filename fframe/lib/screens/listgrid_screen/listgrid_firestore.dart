@@ -425,22 +425,16 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
               context,
               document,
               () {
-                T Function(DocumentSnapshot<Map<String, dynamic>>,
-                        SnapshotOptions?) fromFirestore =
-                    listgrid.config.fromFirestore as T Function(
-                        DocumentSnapshot<Map<String, dynamic>>,
-                        SnapshotOptions?);
-
-                Map<String, Object?> Function(dynamic, SetOptions?)
-                    toFirestore = listgrid.config.toFirestore
-                        as Map<String, Object?> Function(dynamic, SetOptions?);
+                DocumentConfig<T> documentConfig =
+                    DocumentScreenConfig.of(context)?.documentConfig
+                        as DocumentConfig<T>;
 
                 return DatabaseService<T>().updateDocument(
                   collection: queryDocumentSnapshot.reference.parent.path,
                   documentId: queryDocumentSnapshot.id,
                   data: document,
-                  fromFirestore: fromFirestore,
-                  toFirestore: toFirestore,
+                  fromFirestore: documentConfig.fromFirestore,
+                  toFirestore: documentConfig.toFirestore,
                 );
               },
             );
