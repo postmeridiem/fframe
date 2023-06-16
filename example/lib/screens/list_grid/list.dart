@@ -14,7 +14,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   //   sortable: true,
   //   columnSizing: ListGridColumnSizingMode.fixed,
   //   columnWidth: 300,
-  //   cellBuilder: (context, suggestion) {
+  //   cellBuilder: (BuildContext context, Suggestion suggestion) {
   //     return SuggestionListItem(
   //       suggestion: suggestion,
   //       selected: true,
@@ -28,7 +28,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     sortable: true,
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 300,
-    valueBuilder: (context, suggestion) {
+    valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.name;
     },
     cellControlsBuilder: (
@@ -50,27 +50,23 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ),
   ListGridColumn(
     columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 40,
-    cellBuilder: (context, suggestion) {
-      return Tooltip(
-        message: suggestion.active == true
-            ? "Suggestion is active"
-            : "Suggestion is inactive",
-        child: Icon(
-          suggestion.active == true
-              ? Icons.toggle_on
-              : Icons.toggle_off_outlined,
-          color: suggestion.active == true
-              ? SignalColors().constAccentColor
-              : Theme.of(context).disabledColor,
-        ),
+    columnWidth: 60,
+    cellBuilder:
+        (BuildContext context, Suggestion suggestion, Function saveDocument) {
+      return Switch(
+        value: (suggestion.active ?? false),
+        onChanged: (bool value) {
+          suggestion.active = value;
+          saveDocument();
+        },
       );
     },
   ),
   ListGridColumn(
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 200,
-    cellBuilder: (context, suggestion) {
+    cellBuilder:
+        (BuildContext context, Suggestion suggestion, Function saveDocument) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -92,7 +88,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     columnWidth: 300,
     alignment: Alignment.bottomRight,
     textSelectable: true,
-    valueBuilder: (context, suggestion) {
+    valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.createdBy;
     },
     cellControlsBuilder: (
@@ -112,7 +108,8 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     label: "",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 40,
-    cellBuilder: (context, suggestion) {
+    cellBuilder:
+        (BuildContext context, Suggestion suggestion, Function saveDocument) {
       return FutureBuilder(
         future: Future.delayed(
           const Duration(
@@ -137,10 +134,10 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
       );
     },
     cellControlsBuilder: (
-      context,
-      user,
+      BuildContext context,
+      FFrameUser? user,
       suggestion,
-      stringValue,
+      String stringValue,
     ) {
       return [
         IconButton(
@@ -158,7 +155,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 250,
     generateTooltip: true,
-    valueBuilder: (context, suggestion) {
+    valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.fieldTab1;
     },
     cellControlsBuilder: (
@@ -182,7 +179,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     label: "tab 2",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 80,
-    valueBuilder: (context, suggestion) {
+    valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.fieldTab2;
     },
     cellControlsBuilder: (
@@ -207,7 +204,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 200,
     generateTooltip: true,
-    valueBuilder: (context, suggestion) {
+    valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.fieldTab3;
     },
     cellColor: Colors.pink,
@@ -232,7 +229,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     label: "creation date",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 1000,
-    valueBuilder: (context, suggestion) {
+    valueBuilder: (BuildContext context, Suggestion suggestion) {
       return dateTimeTextTS(suggestion.creationDate as Timestamp);
     },
     cellControlsBuilder: (
@@ -257,7 +254,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 120,
     alignment: Alignment.bottomRight,
-    valueBuilder: (context, suggestion) {
+    valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.saveCount;
     },
     cellControlsBuilder: (
@@ -278,6 +275,38 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     },
   ),
 ];
+
+class SuggestionActiveToggle extends StatelessWidget {
+  const SuggestionActiveToggle({
+    Key? key,
+    required this.suggestion,
+  }) : super(key: key);
+
+  final Suggestion suggestion;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: suggestion.active == true
+          ? "Suggestion is active"
+          : "Suggestion is inactive",
+      // child: Icon(
+      //   suggestion.active == true ? Icons.toggle_on : Icons.toggle_off_outlined,
+      //   color: suggestion.active == true
+      //       ? SignalColors().constAccentColor
+      //       : Theme.of(context).disabledColor,
+      // ),
+      child: Switch(
+        value: (suggestion.active ?? false),
+        onChanged: (bool value) {
+          suggestion.active = value;
+          // save();
+          // DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+        },
+      ),
+    );
+  }
+}
 
 Row renderButtons(
     {required BuildContext context, required Suggestion suggestion}) {
