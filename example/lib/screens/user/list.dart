@@ -1,6 +1,8 @@
-import 'package:example/models/appuser.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
+
+import 'package:example/models/appuser.dart';
+import 'package:example/helpers/strings.dart';
 
 List<ListGridColumn<AppUser>> listGridColumns = [
   ListGridColumn(
@@ -31,8 +33,8 @@ List<ListGridColumn<AppUser>> listGridColumns = [
   ),
   ListGridColumn(
     label: "Email",
-    columnSizing: ListGridColumnSizingMode.flex,
-    columnWidth: 250,
+    columnSizing: ListGridColumnSizingMode.fixed,
+    columnWidth: 400,
     generateTooltip: true,
     valueBuilder: (BuildContext context, AppUser appUser) {
       return appUser.email;
@@ -52,6 +54,16 @@ List<ListGridColumn<AppUser>> listGridColumns = [
           tooltip: 'Copy',
         ),
       ];
+    },
+  ),
+  ListGridColumn(
+    label: "Creation Date",
+    visible: true,
+    columnSizing: ListGridColumnSizingMode.fixed,
+    alignment: Alignment.bottomRight,
+    columnWidth: 200,
+    valueBuilder: (BuildContext context, AppUser appUser) {
+      return dateTimeTextTS(appUser.creationDate as Timestamp);
     },
   ),
 ];
