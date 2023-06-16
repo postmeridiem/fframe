@@ -41,6 +41,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
         (BuildContext context, Suggestion suggestion, Function saveDocument) {
       return Switch(
         value: (suggestion.active ?? false),
+        activeColor: SignalColors().constAccentColor,
         onChanged: (bool value) {
           suggestion.active = value;
           saveDocument();
