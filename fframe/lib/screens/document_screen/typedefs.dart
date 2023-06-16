@@ -75,10 +75,6 @@ typedef ListGridValueBuilderFunction<T> = dynamic Function(
 typedef ListGridCellBuilderFunction<T> = Widget Function(
   BuildContext context,
   T data,
-);
-
-typedef ListGridCellBuilder<T> = DataCell Function(
-  T data,
   Function save,
 );
 
