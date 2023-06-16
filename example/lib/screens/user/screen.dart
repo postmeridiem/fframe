@@ -38,19 +38,30 @@ class _UsersScreenState extends State<UsersScreen> {
           ),
         );
       },
-      queryBuilder: (query) => query.orderBy("displayName"),
-      document: _document(),
-      documentList: DocumentList(
-        // hoverSelect: true,
-        showCreateButton: false,
-        builder: (context, selected, data, fFrameUser) {
-          return UserListItem(
-            user: data,
-            selected: selected,
-            fFrameUser: fFrameUser,
-          );
-        },
+
+      // Optional ListGrid widget
+      viewType: ViewType.listgrid,
+      listGrid: ListGridConfig<AppUser>(
+        searchHint: "search user names",
+        // widgetBackgroundColor: Colors.amber,
+        // widgetColor: Colors.pink,
+        // widgetTextColor: Colors.pink,
+        // widgetTextSize: 20,
+        // widgetAccentColor: Colors.cyan,
+        // rowBorder: 1,
+        // cellBorder: 1,
+        // cellPadding: const EdgeInsets.all(16),
+        // cellVerticalAlignment: TableCellVerticalAlignment.top,
+        // cellBackgroundColor: Colors.amber,
+        // // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
+        // showHeader: false,
+        // // showFooter: false,
+        // rowsSelectable: true,
+        // actionBar: sampleActionMenus(),
+        columnSettings: listGridColumns,
       ),
+
+      document: _document(),
     );
   }
 

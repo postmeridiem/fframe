@@ -2,6 +2,60 @@ import 'package:example/models/appuser.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
+List<ListGridColumn<AppUser>> listGridColumns = [
+  ListGridColumn(
+    fieldName: 'displayName',
+    searchable: true,
+    sortable: true,
+    columnSizing: ListGridColumnSizingMode.fixed,
+    columnWidth: 300,
+    valueBuilder: (BuildContext context, AppUser appUser) {
+      return appUser.displayName;
+    },
+    cellControlsBuilder: (
+      context,
+      user,
+      appUser,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(stringValue);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+      ];
+    },
+  ),
+  ListGridColumn(
+    label: "Email",
+    columnSizing: ListGridColumnSizingMode.flex,
+    columnWidth: 250,
+    generateTooltip: true,
+    valueBuilder: (BuildContext context, AppUser appUser) {
+      return appUser.email;
+    },
+    cellControlsBuilder: (
+      context,
+      user,
+      appUser,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(stringValue);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+      ];
+    },
+  ),
+];
+
 class UserListItem extends StatelessWidget {
   const UserListItem({
     required this.user,
@@ -14,15 +68,20 @@ class UserListItem extends StatelessWidget {
   final FFrameUser? fFrameUser;
   @override
   Widget build(BuildContext context) {
-    List<String>? avatarText = user.displayName?.split(' ').map((part) => part.trim().substring(0, 1)).toList();
+    List<String>? avatarText = user.displayName
+        ?.split(' ')
+        .map((part) => part.trim().substring(0, 1))
+        .toList();
     return ListTile(
       mouseCursor: SystemMouseCursors.click,
       selected: selected,
       leading: (avatarText != null || user.photoURL != null)
           ? CircleAvatar(
               radius: 18.0,
-              backgroundImage: (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
-              backgroundColor: (user.photoURL == null) ? Colors.amber : Colors.transparent,
+              backgroundImage:
+                  (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
+              backgroundColor:
+                  (user.photoURL == null) ? Colors.amber : Colors.transparent,
               child: (user.photoURL == null && avatarText != null)
                   ? Text(
                       "${avatarText.first}${avatarText.last}",
