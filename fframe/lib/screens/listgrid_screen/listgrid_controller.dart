@@ -413,6 +413,15 @@ class ListGridNotifier<T> extends ChangeNotifier {
               }
             }
           }
+        } else {
+          // no search string provided, and no column user sorted. make sure to sort the primary search column if available.
+
+          if (columnSettings[searchableColumns.first].fieldName != null) {
+            ListGridColumn curColumn = columnSettings[searchableColumns.first];
+            String fieldName = curColumn.fieldName!;
+            outputQuery = outputQuery.orderBy(fieldName,
+                descending: curColumn.descending);
+          }
         }
       }
     }
