@@ -8,20 +8,6 @@ import 'package:example/helpers/icons.dart';
 import 'package:example/helpers/strings.dart';
 
 List<ListGridColumn<Suggestion>> listGridColumns = [
-  // ListGridColumn(
-  //   fieldName: 'name',
-  //   searchable: false,
-  //   sortable: true,
-  //   columnSizing: ListGridColumnSizingMode.fixed,
-  //   columnWidth: 300,
-  //   cellBuilder: (BuildContext context, Suggestion suggestion) {
-  //     return SuggestionListItem(
-  //       suggestion: suggestion,
-  //       selected: true,
-  //       user: FFrameUser(),
-  //     );
-  //   },
-  // ),
   ListGridColumn(
     fieldName: 'name',
     searchable: true,
@@ -275,38 +261,6 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     },
   ),
 ];
-
-class SuggestionActiveToggle extends StatelessWidget {
-  const SuggestionActiveToggle({
-    Key? key,
-    required this.suggestion,
-  }) : super(key: key);
-
-  final Suggestion suggestion;
-
-  @override
-  Widget build(BuildContext context) {
-    return Tooltip(
-      message: suggestion.active == true
-          ? "Suggestion is active"
-          : "Suggestion is inactive",
-      // child: Icon(
-      //   suggestion.active == true ? Icons.toggle_on : Icons.toggle_off_outlined,
-      //   color: suggestion.active == true
-      //       ? SignalColors().constAccentColor
-      //       : Theme.of(context).disabledColor,
-      // ),
-      child: Switch(
-        value: (suggestion.active ?? false),
-        onChanged: (bool value) {
-          suggestion.active = value;
-          // save();
-          // DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
-        },
-      ),
-    );
-  }
-}
 
 Row renderButtons(
     {required BuildContext context, required Suggestion suggestion}) {
