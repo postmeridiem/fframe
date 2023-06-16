@@ -1,7 +1,7 @@
 part of fframe;
 
 // ignore: must_be_immutable
-class ListGridController<T> extends InheritedModel {
+class ListGridController extends InheritedModel {
   ListGridController({
     super.key,
     required child,
@@ -181,15 +181,15 @@ class ListGridController<T> extends InheritedModel {
     return _columnWidths;
   }
 
-  Map<String, T> get selectedDocuments {
-    return notifier.selectedDocuments as Map<String, T>;
+  Map<String, dynamic> get selectedDocuments {
+    return notifier.selectedDocuments;
   }
 
   int get selectionCount {
     return notifier.selectionCount;
   }
 
-  void selectRow({required String documentId, required T document}) {
+  void selectRow({required String documentId, required dynamic document}) {
     notifier.selectRow(documentId: documentId, document: document);
   }
 
