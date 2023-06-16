@@ -23,7 +23,9 @@ class AppUser extends ChangeNotifier {
       email: json['email'] as String?,
       photoURL: json["photoURL"] as String?,
       //creationDate: json['metadata.creationTime'] as Timestamp?,
-      // creationDate: json['creationDate'] != null ? json['creationDate'] as Timestamp : Timestamp.now(),
+      creationDate: json['creationDate'] != null
+          ? json['creationDate'] as Timestamp
+          : Timestamp.now(),
     );
   }
 
@@ -38,7 +40,7 @@ class AppUser extends ChangeNotifier {
 
   Map<String, Object?> toFirestore() {
     return {
-      // 'name': displayName,
+      'name': displayName,
       // 'creationDate': creationDate,
     };
   }
