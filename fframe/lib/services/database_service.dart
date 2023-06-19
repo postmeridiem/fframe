@@ -23,8 +23,9 @@ class DatabaseService<T> {
     Query<T> Function(Query<T> query)? queryBuilder,
     int? limit,
   }) {
-    Query<T> query = FirebaseFirestore.instance.collection(collection).withConverter(
+    Query<T> query = FirebaseFirestore.instance.collection(collection).withConverter<T>(
           fromFirestore: fromFirestore,
+          // ignore: avoid_types_as_parameter_names
           toFirestore: (T, _) => {},
         );
 
@@ -45,6 +46,7 @@ class DatabaseService<T> {
   }) async {
     Query<T> query = FirebaseFirestore.instance.collection(collection).withConverter(
           fromFirestore: fromFirestore,
+          // ignore: avoid_types_as_parameter_names
           toFirestore: (T, _) => {},
         );
 

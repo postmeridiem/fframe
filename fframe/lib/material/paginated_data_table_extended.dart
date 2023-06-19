@@ -134,7 +134,7 @@ class PaginatedDataTableExtended extends StatefulWidget {
   ///
   /// This value is optional and defaults to kMinInteractiveDimension if not
   /// specified.
-  double? dataRowHeight;
+  final double? dataRowHeight;
 
   /// The height of the heading row.
   ///
