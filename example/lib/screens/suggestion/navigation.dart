@@ -27,8 +27,7 @@ final suggestionNavigationTarget = NavigationTarget(
       title: "Active",
       path: "active",
       private: true,
-      contentPane: const SuggestionScreen(
-          suggestionQueryState: SuggestionQueryStates.active),
+      contentPane: const SuggestionScreen(suggestionQueryState: SuggestionQueryStates.active),
       destination: Destination(
         icon: Icon(
           Icons.toggle_on,
@@ -50,8 +49,7 @@ final suggestionNavigationTarget = NavigationTarget(
       title: "Done",
       path: "done",
       private: true,
-      contentPane: const SuggestionScreen(
-          suggestionQueryState: SuggestionQueryStates.done),
+      contentPane: const SuggestionScreen(suggestionQueryState: SuggestionQueryStates.done),
       destination: Destination(
         icon: const Icon(Icons.toggle_off_outlined),
         navigationLabel: () => Text(
@@ -67,7 +65,7 @@ final suggestionNavigationTarget = NavigationTarget(
           namespace: 'global',
         ),
       ),
-      roles: ['developer'],
+      roles: ['nonexistingrole'],
     ),
   ],
 );

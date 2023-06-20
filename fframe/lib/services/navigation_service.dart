@@ -35,8 +35,8 @@ class NavigationNotifier extends ChangeNotifier {
   bool? _isSignedIn;
   List<String>? _roles;
 
-  final NavigationConfig navigationConfig = FRouterConfig.instance.navigationConfig;
-  late NavigationConfig filteredNavigationConfig = FRouterConfig.instance.navigationConfig;
+  late NavigationConfig _navigationConfig = FRouterConfig.instance.navigationConfig;
+  late NavigationConfig _filteredNavigationConfig = FRouterConfig.instance.navigationConfig;
 
   NavigationNotifier({required this.ref}) {
     _filterNavigationRoutes();
@@ -122,7 +122,8 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   bool get hasTabs {
-    return _targetState!.navigationTarget is NavigationTab;
+    if (_targetState!.navigationTarget is NavigationTab) return false;
+    return _targetState!.navigationTarget.navigationTabs?.isNotEmpty ?? false;
   }
 
   bool get hasSubTabs {
@@ -138,21 +139,35 @@ class NavigationNotifier extends ChangeNotifier {
     // return _targetState!.navigationTarget.navigationTabs != null || (_targetState!.navigationTarget.navigationTabs != null && _targetState!.navigationTarget.navigationTabs!.isNotEmpty);
   }
 
+  NavigationConfig get navigationConfig {
+    _filterNavigationRoutes();
+    return _filteredNavigationConfig;
+  }
+
+  // NavigationConfig get filteredNavigationConfig {
+  //   _filterNavigationRoutes();
+  //   return _filteredNavigationConfig;
+  // }
+
+  set navigationConfig(NavigationConfig navigationConfig) {
+    _navigationConfig = navigationConfig;
+  }
+
   List<NavigationTab> get navigationTabs {
     if (_targetState!.navigationTarget is NavigationTab) {
       NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
-      NavigationTarget parentTarget = currentTab.parentTarget;
+      NavigationTarget parentTarget = _filteredNavigationConfig.navigationTargets.firstWhere((navigationTarget) => navigationTarget.path == currentTab.parentTarget.path);
       return parentTarget.navigationTabs!;
     }
     return [];
   }
 
   _filterNavigationRoutes() {
-    filteredNavigationConfig = NavigationConfig.clone(navigationConfig);
-    FRouterConfig.instance.filteredNavigationConfig = filteredNavigationConfig;
+    _filteredNavigationConfig = NavigationConfig.clone(_navigationConfig);
+
     if (_isSignedIn ?? false) {
       //Check routes for roles
-      filteredNavigationConfig.navigationTargets.removeWhere(
+      _filteredNavigationConfig.navigationTargets.removeWhere(
         (NavigationTarget navigationTarget) {
           //Remove all routes which are not private
           if (navigationTarget.private == false) {
@@ -191,7 +206,7 @@ class NavigationNotifier extends ChangeNotifier {
               Console.log(
                 "${navigationTarget.title}/${navigationTab.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} router: ${targetRolesSet.toString()})",
                 scope: "fframeLog.NavigationNotifier._filterNavigationRoutes",
-                level: LogLevel.fframe,
+                level: LogLevel.dev,
               );
               return interSection.isEmpty;
             });
@@ -219,9 +234,10 @@ class NavigationNotifier extends ChangeNotifier {
           return interSection.isEmpty;
         },
       );
+      FRouterConfig.instance.filteredNavigationConfig = _filteredNavigationConfig;
     } else {
       //Not signed in. Keep public routes
-      filteredNavigationConfig.navigationTargets.removeWhere((NavigationTarget navigationTarget) {
+      _filteredNavigationConfig.navigationTargets.removeWhere((NavigationTarget navigationTarget) {
         if (navigationTarget.navigationTabs != null) {
           List<NavigationTab> navigationTabs = _filterTabRoutes(navigationTarget.navigationTabs!);
           return navigationTabs.isEmpty;
@@ -229,6 +245,7 @@ class NavigationNotifier extends ChangeNotifier {
 
         return navigationTarget.public == false;
       });
+      FRouterConfig.instance.filteredNavigationConfig = _filteredNavigationConfig;
     }
   }
 
