@@ -12,7 +12,6 @@ class DocumentScreen<T> extends StatelessWidget {
       required this.fromFirestore,
       required this.toFirestore,
       this.documentList,
-      this.dataGrid,
       this.listGrid,
       this.viewType = ViewType.auto,
       this.autoSelectFirst = false,
@@ -30,7 +29,6 @@ class DocumentScreen<T> extends StatelessWidget {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final Query<T> Function(Query<T> query)? queryBuilder;
   final DocumentList<T>? documentList;
-  final DataGridConfig<T>? dataGrid;
   final ListGridConfig<T>? listGrid;
   final ViewType viewType;
   final Query<T> Function(Query<T> query)? query;
@@ -71,12 +69,6 @@ class DocumentScreen<T> extends StatelessWidget {
       embeddedDocument = true;
     }
 
-    //Aply data to datagrid, if any
-    if (dataGrid != null) {
-      dataGrid!.toFirestore = toFirestore;
-      dataGrid!.fromFirestore = fromFirestore;
-    }
-
     //Aply data to listgrid, if any
     if (listGrid != null) {
       listGrid!.toFirestore = toFirestore;
@@ -101,7 +93,6 @@ class DocumentScreen<T> extends StatelessWidget {
                 formKey: formKey,
                 collection: collection,
                 documentList: documentList,
-                dataGrid: dataGrid,
                 listGrid: listGrid,
                 initialViewType: viewType,
                 autoSelectFirst: autoSelectFirst,
@@ -723,21 +714,6 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>>
                     key: ValueKey("ScreenBody_${documentConfig.collection}"),
                   ),
                 ),
-              ],
-            );
-          case ViewType.grid:
-            Query<T> query = DocumentScreenConfig.of(context)!
-                .fireStoreQueryState
-                .currentQuery() as Query<T>;
-            return Stack(
-              children: [
-                FirestoreDataGrid<T>(
-                  dataGridConfig: documentConfig.dataGrid!,
-                  query: query,
-                  rowsPerPage: documentConfig.dataGrid!.rowsPerPage,
-                  dataRowHeight: documentConfig.dataGrid!.rowHeight,
-                ),
-                if (documentConfig.documentList != null) DataGridToggle<T>(),
               ],
             );
           case ViewType.listgrid:

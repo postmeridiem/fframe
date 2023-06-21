@@ -15,7 +15,6 @@ class DocumentConfig<T> extends ChangeNotifier {
     this.query,
     this.searchConfig,
     this.documentList,
-    this.dataGrid,
     this.listGrid,
     this.titleBuilder,
     required this.autoSelectFirst,
@@ -27,7 +26,6 @@ class DocumentConfig<T> extends ChangeNotifier {
 
   final GlobalKey<FormState> formKey;
   final DocumentList<T>? documentList;
-  final DataGridConfig<T>? dataGrid;
   final ListGridConfig<T>? listGrid;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
@@ -59,15 +57,16 @@ class DocumentConfig<T> extends ChangeNotifier {
         List<ViewType> returnValue = [];
         if (listGrid != null) returnValue.add(ViewType.listgrid);
         if (documentList != null) returnValue.add(ViewType.list);
-        if (dataGrid != null) returnValue.add(ViewType.grid);
         if (returnValue.isEmpty) returnValue.add(ViewType.none);
         return returnValue;
       case ViewType.listgrid:
         return [ViewType.listgrid];
       case ViewType.list:
         return [ViewType.list];
-      case ViewType.grid:
-        return [ViewType.grid];
+      case ViewType.swimlanes:
+        return [ViewType.swimlanes];
+      case ViewType.dashboard:
+        return [ViewType.dashboard];
       case ViewType.none:
         return [];
     }
@@ -88,7 +87,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   }
 }
 
-enum ViewType { auto, list, grid, listgrid, none }
+enum ViewType { auto, list, listgrid, swimlanes, dashboard, none }
 
 class Document<T> {
   Document({
