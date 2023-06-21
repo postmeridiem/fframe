@@ -6,18 +6,20 @@ import 'package:example/models/suggestion.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'swimlanes.dart';
 
-enum SwimlaneQueryStates { active, inactive }
+enum ListGridQueryStates { active, inactive }
 
-class SwimlaneScreen<Suggestion> extends StatefulWidget {
-  const SwimlaneScreen({
+class ListGridScreen<Suggestion> extends StatefulWidget {
+  const ListGridScreen({
     Key? key,
+    required this.listgridQueryState,
   }) : super(key: key);
+  final ListGridQueryStates listgridQueryState;
 
   @override
-  State<SwimlaneScreen> createState() => _SwimlaneScreenState();
+  State<ListGridScreen> createState() => _ListGridScreenState();
 }
 
-class _SwimlaneScreenState extends State<SwimlaneScreen> {
+class _ListGridScreenState extends State<ListGridScreen> {
   @override
   Widget build(BuildContext context) {
     return DocumentScreen<Suggestion>(
@@ -54,8 +56,38 @@ class _SwimlaneScreenState extends State<SwimlaneScreen> {
         );
       },
 
-      // Optional Swimlane widget
-      viewType: ViewType.swimlanes,
+      query: (query) {
+        // return query.where("active", isNull: true);
+        switch (widget.listgridQueryState) {
+          case ListGridQueryStates.active:
+            return query.where("active", isEqualTo: true);
+
+          case ListGridQueryStates.inactive:
+            return query.where("active", isEqualTo: false);
+        }
+      },
+
+      // Optional ListGrid widget
+      viewType: ViewType.listgrid,
+      listGrid: ListGridConfig<Suggestion>(
+        searchHint: "search suggestion names",
+        // widgetBackgroundColor: Colors.amber,
+        // widgetColor: Colors.pink,
+        // widgetTextColor: Colors.pink,
+        // widgetTextSize: 20,
+        // widgetAccentColor: Colors.cyan,
+        // rowBorder: 1,
+        // cellBorder: 1,
+        // cellPadding: const EdgeInsets.all(16),
+        // cellVerticalAlignment: TableCellVerticalAlignment.top,
+        // cellBackgroundColor: Colors.amber,
+        // // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
+        // showHeader: false,
+        // // showFooter: false,
+        rowsSelectable: true,
+        actionBar: sampleActionMenus(),
+        columnSettings: listGridColumns,
+      ),
 
       // Center part, shows a firestore doc. Tabs possible
       document: _document(context),
@@ -73,6 +105,30 @@ class _SwimlaneScreenState extends State<SwimlaneScreen> {
       showDeleteButton: true,
       showSaveButton: true,
       showValidateButton: true,
+      extraActionButtons: (context, suggestion, isReadOnly, isNew, user) {
+        return [
+          if (suggestion.active == false)
+            TextButton.icon(
+              onPressed: () {
+                suggestion.active = true;
+                DocumentScreenConfig.of(context)!
+                    .save<Suggestion>(context: context, closeAfterSave: false);
+              },
+              icon: const Icon(Icons.check, color: Colors.redAccent),
+              label: const Text("Mark as Active"),
+            ),
+          if (suggestion.active == true)
+            TextButton.icon(
+              onPressed: () {
+                suggestion.active = false;
+                DocumentScreenConfig.of(context)!
+                    .save<Suggestion>(context: context, closeAfterSave: false);
+              },
+              icon: const Icon(Icons.close, color: Colors.greenAccent),
+              label: const Text("Mark as Done"),
+            ),
+        ];
+      },
       documentTabsBuilder:
           (context, suggestion, isReadOnly, isNew, fFrameUser) {
         return [
@@ -97,4 +153,123 @@ class _SwimlaneScreenState extends State<SwimlaneScreen> {
       },
     );
   }
+}
+
+List<ListGridActionMenu<T>> sampleActionMenus<T>() {
+  return [
+    ListGridActionMenu(
+      label: "Toggle active",
+      icon: Icons.toggle_off_outlined,
+      menuItems: [
+        ListGridActionMenuItem<T>(
+          label: "Set inactive",
+          icon: Icons.toggle_off_outlined,
+          clickHandler: (context, user, selectedDocumentsById) {
+            selectedDocumentsById.forEach((documentId, currentDocument) {
+              DocumentScreenConfig documentScreenConfig =
+                  DocumentScreenConfig.of(context) as DocumentScreenConfig;
+              DocumentConfig<T> documentConfig =
+                  documentScreenConfig.documentConfig as DocumentConfig<T>;
+              // TODO: Arno, pls hlp...
+              // how do I make this save using the embedded document models?
+              // I can make my own connection to the backend and to a cheap write,
+              // but that is not very clean.
+
+              Suggestion currentSuggestion = currentDocument as Suggestion;
+              currentSuggestion.active = false;
+              documentConfig.toFirestore(
+                  currentDocument, SetOptions(merge: true));
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: ListTile(
+                  leading: Icon(
+                    Icons.toggle_off_outlined,
+                    color: Colors.amber[900],
+                  ),
+                  title: Text(
+                    "Toggled ${selectedDocumentsById.length} documents to the inactive state.",
+                  ),
+                  textColor: Colors.amber[900],
+                ),
+              ),
+            );
+          },
+        ),
+        ListGridActionMenuItem(
+          label: "Set Active",
+          icon: Icons.toggle_on,
+          clickHandler: (context, user, selectedDocumentsById) {
+            selectedDocumentsById.forEach((documentId, currentDocument) {
+              // Suggestion currentSuggestion = currentDocument as Suggestion;
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: ListTile(
+                  leading: Icon(
+                    Icons.toggle_on,
+                    color: Colors.amber[900],
+                  ),
+                  title: Text(
+                    "Toggled ${selectedDocumentsById.length} documents to the active state.",
+                  ),
+                  textColor: Colors.amber[900],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    ),
+    ListGridActionMenu(
+      menuItems: [
+        ListGridActionMenuItem(
+          label: "Delete",
+          icon: Icons.delete_outline,
+          clickHandler: (context, user, selectedDocumentsById) {
+            selectedDocumentsById.forEach((documentId, currentSuggestion) {
+              Console.log(
+                "NOT deleting ${currentSuggestion.name}. Jus' printing this.",
+                scope: "exampleApp.ListGrid.deleteAction",
+                level: LogLevel.prod,
+              );
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: ListTile(
+                  leading: Icon(
+                    Icons.delete_outline,
+                    color: Colors.amber[900],
+                  ),
+                  title: Text(
+                    "NOT deleting ${selectedDocumentsById.length} documents... Jus' giving you this snack.",
+                  ),
+                  textColor: Colors.amber[900],
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    ),
+    ListGridActionMenu(
+      menuItems: [
+        ListGridActionMenuItem(
+          label: "Help...",
+          icon: Icons.help_outline,
+          requireSelection: false,
+          clickHandler: (context, user, selectedDocumentsById) {
+            launchUrl(
+              Uri.parse(
+                  'https://github.com/postmeridiem/fframe/blob/main/fframe/lib/screens/listgrid_screen/listgrid.md'),
+              webOnlyWindowName: "_blank",
+            );
+          },
+        ),
+      ],
+    ),
+  ];
 }

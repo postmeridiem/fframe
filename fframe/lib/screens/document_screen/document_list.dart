@@ -233,6 +233,7 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
                   ),
                 ],
               ),
+              if (widget.documentConfig.dataGrid != null) DataGridToggle<T>(),
             ],
           ),
         ),
@@ -395,4 +396,62 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
             });
           },
         );
+}
+
+class DataGridToggle<T> extends StatelessWidget {
+  const DataGridToggle({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    DocumentConfig<T> documentConfig =
+        DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+    List<ViewType> allowedViewTypes = documentConfig.allowedViewTypes;
+
+    if (allowedViewTypes.isEmpty) {
+      //Cannot toggle if there are no options to choose from
+      return const IgnorePointer();
+    }
+
+    if (allowedViewTypes.length == 1 &&
+        allowedViewTypes.first == documentConfig.currentViewType) {
+      //Cannot toggle if the current option is the only viable option
+      return const IgnorePointer();
+    }
+
+    return Positioned(
+      right: -4,
+      top: 0,
+      // child: Icon(Icons.keyboard_double_arrow_right_rounded),
+      child: IconButton(
+        onPressed: () {
+          documentConfig.currentViewType =
+              (documentConfig.currentViewType == ViewType.list)
+                  ? ViewType.grid
+                  : ViewType.list;
+        },
+        padding:
+            const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0, right: 0),
+        icon: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.secondary,
+            borderRadius: const BorderRadius.only(
+              // topRight: Radius.circular(40.0),
+              // bottomRight: Radius.circular(40.0),
+              topLeft: Radius.circular(4.0),
+              bottomLeft: Radius.circular(4.0),
+            ),
+          ),
+          child: (documentConfig.currentViewType == ViewType.list)
+              ? Icon(
+                  Icons.keyboard_double_arrow_right_rounded,
+                  color: Theme.of(context).indicatorColor,
+                )
+              : Icon(
+                  Icons.keyboard_double_arrow_left_rounded,
+                  color: Theme.of(context).indicatorColor,
+                ),
+        ),
+      ),
+    );
+  }
 }
