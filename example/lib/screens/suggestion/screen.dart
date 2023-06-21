@@ -40,7 +40,9 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         return suggestion;
       },
 
-      viewType: ViewType.list,
+      viewType: widget.suggestionQueryState == SuggestionQueryStates.active
+          ? ViewType.auto
+          : ViewType.grid,
 
       createNew: () => Suggestion(
         active: true,
@@ -166,6 +168,41 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         //     ),
         //   );
         // }),
+      ),
+
+      dataGrid: DataGridConfig<Suggestion>(
+        rowsPerPage: 30,
+        // rowHeight: 200,
+        dataGridConfigColumns: [
+          DataGridConfigColumn(
+            headerBuilder: (() => const DataColumn(
+                  label: Text("Name"),
+                )),
+            dataCellBuilder: ((Suggestion suggestion, Function save) =>
+                DataCell(
+                  Text(suggestion.name ?? "?"),
+                  onTap: () => Console.log("onTap ${suggestion.name}",
+                      scope: "exampleApp.Suggestions", level: LogLevel.dev),
+                  placeholder: false,
+                )),
+          ),
+          DataGridConfigColumn(
+            headerBuilder: (() => const DataColumn(
+                  label: Text("Active"),
+                )),
+            dataCellBuilder: ((Suggestion suggestion, Function save) =>
+                DataCell(
+                  Switch(
+                    value: (suggestion.active ?? false),
+                    onChanged: (bool value) {
+                      suggestion.active = value;
+                      save();
+                      // DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+                    },
+                  ),
+                )),
+          ),
+        ],
       ),
       // Center part, shows a firestore doc. Tabs possible
       document: _document(context),
