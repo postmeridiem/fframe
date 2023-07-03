@@ -119,6 +119,7 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                     thumbVisibility: true,
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
+                                      controller: _horizontal,
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.start,
