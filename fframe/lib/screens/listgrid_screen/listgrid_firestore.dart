@@ -18,7 +18,7 @@ class FirestoreListGrid<T> extends ConsumerStatefulWidget {
 }
 
 class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
-  // final ScrollController _horizontal = ScrollController();
+  final ScrollController _horizontal = ScrollController();
   final ScrollController _vertical = ScrollController();
 
   late List<ListGridColumn<T>> columnSettings;
@@ -92,26 +92,31 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                   )
                                 : const IgnorePointer(),
                             Expanded(
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: listgrid.widgetBackgroundColor,
+                                  border: Border(
+                                    left: BorderSide(
+                                      width: 1,
                                       color: listgrid.widgetBackgroundColor,
-                                      border: Border(
-                                        left: BorderSide(
-                                          width: 1,
-                                          color: listgrid.widgetBackgroundColor,
-                                        ),
-                                        top: BorderSide(
-                                          width: 1,
-                                          color: listgrid.widgetBackgroundColor,
-                                        ),
-                                        right: BorderSide(
-                                          width: 1,
-                                          color: listgrid.widgetBackgroundColor,
-                                        ),
-                                      ),
                                     ),
+                                    top: BorderSide(
+                                      width: 1,
+                                      color: listgrid.widgetBackgroundColor,
+                                    ),
+                                    right: BorderSide(
+                                      width: 1,
+                                      color: listgrid.widgetBackgroundColor,
+                                    ),
+                                  ),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom: listgrid.showFooter ? 38.0 : 0.0,
+                                  ),
+                                  child: Scrollbar(
+                                    controller: _horizontal,
+                                    thumbVisibility: true,
                                     child: SingleChildScrollView(
                                       scrollDirection: Axis.horizontal,
                                       child: Column(
@@ -177,6 +182,7 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                                         )
                                                       : Scrollbar(
                                                           controller: _vertical,
+                                                          thumbVisibility: true,
                                                           child: ListView
                                                               .separated(
                                                             itemCount: snapshot
@@ -293,19 +299,11 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                               ),
                                             ),
                                           ),
-                                          listgrid.showFooter
-                                              ? ListGridFooter(
-                                                  viewportWidth:
-                                                      listgrid.viewportWidth,
-                                                  dataMode:
-                                                      listgrid.dataMode.mode,
-                                                )
-                                              : const IgnorePointer(),
                                         ],
                                       ),
                                     ),
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ],
@@ -326,6 +324,28 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                           documentConfig: documentConfig,
                           documentOpen: documentOpen,
                         ),
+                        // if (listgrid.processing)
+                        //   const Opacity(
+                        //     opacity: 0.8,
+                        //     child: ModalBarrier(
+                        //       dismissible: false,
+                        //       color: Colors.black,
+                        //     ),
+                        //   ),
+                        // if (listgrid.processing)
+                        //   Center(
+                        //     child: Column(
+                        //       mainAxisAlignment: MainAxisAlignment.center,
+                        //       children: [
+                        //         const CircularProgressIndicator(),
+                        //         Padding(
+                        //           padding: const EdgeInsets.all(8.0),
+                        //           child: Text(
+                        //               "${listgrid.processingProgress} documents left to process..."),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //   )
                       ],
                     );
                   },
@@ -415,7 +435,9 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
       if (rowsSelectable) {
         output.add(
           ListGridRowSelector(
-              listgrid: listgrid, documentId: documentId, document: document),
+              listgrid: listgrid,
+              documentId: documentId,
+              document: queryDocumentSnapshot),
         );
       }
       for (ListGridColumn<T> column in columnSettings) {
