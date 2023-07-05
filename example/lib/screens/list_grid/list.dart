@@ -165,7 +165,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
     label: "tab 2",
     columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 80,
+    columnWidth: 100,
     valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.fieldTab2;
     },
@@ -189,7 +189,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
     label: "tab 3",
     columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 200,
+    columnWidth: 230,
     generateTooltip: true,
     valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.fieldTab3;
@@ -215,7 +215,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
     label: "creation date",
     columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 1000,
+    columnWidth: 500,
     valueBuilder: (BuildContext context, Suggestion suggestion) {
       return dateTimeTextTS(suggestion.creationDate as Timestamp);
     },
@@ -239,8 +239,8 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
     label: "saveCount",
     columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 120,
-    alignment: Alignment.bottomRight,
+    columnWidth: 2000,
+    alignment: Alignment.bottomLeft,
     valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.saveCount;
     },
