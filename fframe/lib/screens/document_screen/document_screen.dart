@@ -14,6 +14,7 @@ class DocumentScreen<T> extends StatelessWidget {
       this.documentList,
       this.dataGrid,
       this.listGrid,
+      this.swimlanes,
       this.viewType = ViewType.auto,
       this.autoSelectFirst = false,
       this.query,
@@ -32,6 +33,7 @@ class DocumentScreen<T> extends StatelessWidget {
   final DocumentList<T>? documentList;
   final DataGridConfig<T>? dataGrid;
   final ListGridConfig<T>? listGrid;
+  final SwimlanesConfig<T>? swimlanes;
   final ViewType viewType;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
@@ -83,6 +85,12 @@ class DocumentScreen<T> extends StatelessWidget {
       listGrid!.fromFirestore = fromFirestore;
     }
 
+    //Aply data to listgrid, if any
+    if (swimlanes != null) {
+      swimlanes!.toFirestore = toFirestore;
+      swimlanes!.fromFirestore = fromFirestore;
+    }
+
     return Column(
       children: [
         if (documentScreenHeaderBuilder != null) documentScreenHeaderBuilder!(),
@@ -103,6 +111,7 @@ class DocumentScreen<T> extends StatelessWidget {
                 documentList: documentList,
                 dataGrid: dataGrid,
                 listGrid: listGrid,
+                swimlanes: swimlanes,
                 initialViewType: viewType,
                 autoSelectFirst: autoSelectFirst,
                 queryStringIdParam:
@@ -746,6 +755,14 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>>
                 .currentQuery() as Query<T>;
             return FirestoreListGrid<T>(
               config: documentConfig.listGrid!,
+              query: query,
+            );
+          case ViewType.swimlanes:
+            Query<T> query = DocumentScreenConfig.of(context)!
+                .fireStoreQueryState
+                .currentQuery() as Query<T>;
+            return FirestoreSwimlanes<T>(
+              config: documentConfig.swimlanes!,
               query: query,
             );
           default:

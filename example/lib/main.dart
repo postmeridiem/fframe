@@ -1,3 +1,4 @@
+import 'package:example/screens/swimlanes/swimlanes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
 
@@ -40,6 +41,7 @@ class MainApp extends StatelessWidget {
         usersNavigationTarget,
         userListNavigationTarget,
         listGridNavigationTarget,
+        swimlanesNavigationTarget,
         userProfileNavigationTarget,
       ],
       signInConfig: SignInConfig(signInTarget: signInPageNavigationTarget),

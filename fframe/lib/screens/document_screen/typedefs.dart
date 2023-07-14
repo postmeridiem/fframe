@@ -60,27 +60,3 @@ typedef DocumentHeaderBuilder<T> = Widget Function(
 
 typedef DocumentScreenHeaderBuilder<T> = Widget Function();
 typedef DocumentScreenFooterBuilder<T> = Widget Function();
-
-typedef ListGridActionHandler<T> = void Function(
-  BuildContext context,
-  FFrameUser? user,
-  Map<String, T> selectedDocumentsById,
-);
-
-typedef ListGridValueBuilderFunction<T> = dynamic Function(
-  BuildContext context,
-  T data,
-);
-
-typedef ListGridCellBuilderFunction<T> = Widget Function(
-  BuildContext context,
-  T data,
-  Function save,
-);
-
-typedef ListGridCellControlsBuilderFunction<T> = List<IconButton> Function(
-  BuildContext context,
-  FFrameUser? user,
-  dynamic data,
-  String stringValue,
-);

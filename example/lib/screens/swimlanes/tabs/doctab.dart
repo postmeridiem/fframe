@@ -1,15 +1,13 @@
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
-import 'package:example/models/suggestion.dart';
-
 class DocTab extends StatelessWidget {
   const DocTab({
     Key? key,
-    required this.suggestion,
+    required this.swimlanesTask,
     required this.readOnly,
   }) : super(key: key);
-  final Suggestion suggestion;
+  final SwimlanesTask swimlanesTask;
   final bool readOnly;
 
   @override
@@ -26,7 +24,7 @@ class DocTab extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16.0),
             child: TextFormField(
               readOnly: true,
-              initialValue: suggestion.createdBy ?? "unknown",
+              initialValue: swimlanesTask.createdBy ?? "unknown",
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "Author",
@@ -43,10 +41,10 @@ class DocTab extends StatelessWidget {
                 border: OutlineInputBorder(),
                 labelText: "Name",
               ),
-              initialValue: suggestion.name ?? '',
+              initialValue: swimlanesTask.name ?? '',
               validator: (curValue) {
                 if (validator.validString(curValue)) {
-                  suggestion.name = curValue;
+                  swimlanesTask.name = curValue;
                   return null;
                 } else {
                   return 'Enter a valid name';
@@ -58,14 +56,14 @@ class DocTab extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16.0),
             child: TextFormField(
               onSaved: (String? value) {
-                suggestion.fieldTab1 = value;
+                swimlanesTask.status = value ?? "";
               },
               readOnly: readOnly,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "tab1 value",
               ),
-              initialValue: suggestion.fieldTab1 ?? '',
+              initialValue: swimlanesTask.status ?? '',
               validator: (value) {
                 if (!validator.validString(value)) {
                   return 'Enter a valid value';

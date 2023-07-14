@@ -5,15 +5,15 @@ import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:example/screens/swimlanes/screen.dart';
 
-final listGridNavigationTarget = NavigationTarget(
-  path: "list-grid",
-  title: "List Grid",
-  // contentPane: const ListGridScreen(
-  //   listgridQueryState: ListGridQueryStates.active,
+final swimlanesNavigationTarget = NavigationTarget(
+  path: "swimlanes",
+  title: "Swimlanes",
+  // contentPane: const SwimlanesScreen(
+  //   swimlanesQueryState: SwimlanesQueryStates.active,
   // ),
   destination: Destination(
-    icon: const Icon(Icons.person),
-    navigationLabel: () => const Text('List Grid'),
+    icon: const Icon(Icons.table_chart_outlined),
+    navigationLabel: () => const Text('Swimlanes'),
   ),
   roles: ["User", 'UserAdmin', 'SuperAdmin'],
   private: true,
@@ -21,44 +21,42 @@ final listGridNavigationTarget = NavigationTarget(
     NavigationTab(
       title: "Open",
       path: "open",
-      private: true,
-      contentPane:
-          const ListGridScreen(listgridQueryState: ListGridQueryStates.active),
+      contentPane: const SwimlanesScreen(
+          swimlanesQueryState: SwimlanesQueryStates.active),
       destination: Destination(
         icon: Icon(
-          Icons.toggle_on,
+          Icons.table_chart_outlined,
           color: SignalColors().constAccentColor,
         ),
         navigationLabel: () => Text(L10n.string(
-          'suggestions_tab_active',
-          placeholder: 'Active',
+          'swimlanes_tab_open',
+          placeholder: 'Open',
           namespace: 'global',
         )),
         tabLabel: () => L10n.string(
-          'suggestions_tab_active',
-          placeholder: 'Active',
+          'swimlanes_tab_open',
+          placeholder: 'Open',
           namespace: 'global',
         ),
       ),
     ),
     NavigationTab(
-      title: "Done",
-      path: "done",
-      private: true,
-      contentPane: const ListGridScreen(
-          listgridQueryState: ListGridQueryStates.inactive),
+      title: "Archived",
+      path: "archived",
+      contentPane: const SwimlanesScreen(
+          swimlanesQueryState: SwimlanesQueryStates.inactive),
       destination: Destination(
-        icon: const Icon(Icons.toggle_off_outlined),
+        icon: const Icon(Icons.inventory_2_outlined),
         navigationLabel: () => Text(
           L10n.string(
-            'suggestions_tab_done',
-            placeholder: 'Inactive',
+            'swimlanes_tab_archived',
+            placeholder: 'Archived',
             namespace: 'global',
           ),
         ),
         tabLabel: () => L10n.string(
-          'suggestions_tab_done',
-          placeholder: 'Inactive',
+          'swimlanes_tab_archived',
+          placeholder: 'Archived',
           namespace: 'global',
         ),
       ),

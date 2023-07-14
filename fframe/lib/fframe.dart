@@ -11,6 +11,7 @@ export 'package:flutter_riverpod/flutter_riverpod.dart';
 export 'package:url_launcher/url_launcher_string.dart';
 export 'package:clipboard/clipboard.dart';
 export 'package:shimmer/shimmer.dart';
+export 'package:dotted_border/dotted_border.dart';
 
 import 'dart:async';
 import 'dart:convert';
@@ -33,6 +34,7 @@ import 'package:fframe/helper_widgets/init_l10n.dart';
 
 import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/helpers/console_logger.dart';
+import 'package:fframe/helpers/icons.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfire_ui/auth.dart';
@@ -46,8 +48,8 @@ import 'package:flutterfire_ui/firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:uuid/uuid.dart';
@@ -56,6 +58,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:fframe/extensions/query.dart';
 
 import 'material/paginated_data_table_extended.dart';
+import 'package:dotted_border/dotted_border.dart';
 
 part 'fframe_main.dart';
 part 'frouter/frouter.dart';
@@ -82,6 +85,11 @@ part 'package:fframe/screens/listgrid_screen/listgrid_firestore.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_controller.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_widgets.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_classes.dart';
+part 'package:fframe/screens/swimlanes_screen/swimlanes_firestore.dart';
+part 'package:fframe/screens/swimlanes_screen/swimlanes_controller.dart';
+part 'package:fframe/screens/swimlanes_screen/swimlanes_widgets.dart';
+part 'package:fframe/screens/swimlanes_screen/swimlanes_classes.dart';
+part 'models/swimlanes_task.dart';
 part 'screens/router_page.dart';
 
 part 'helpers/validator.dart';

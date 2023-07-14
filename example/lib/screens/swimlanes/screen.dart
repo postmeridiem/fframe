@@ -1,55 +1,53 @@
-import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
-import 'package:example/models/suggestion.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'swimlanes.dart';
 
-enum ListGridQueryStates { active, inactive }
+enum SwimlanesQueryStates { active, inactive }
 
-class ListGridScreen<Suggestion> extends StatefulWidget {
-  const ListGridScreen({
+class SwimlanesScreen<SwimlanesTask> extends StatefulWidget {
+  const SwimlanesScreen({
     Key? key,
-    required this.listgridQueryState,
+    required this.swimlanesQueryState,
   }) : super(key: key);
-  final ListGridQueryStates listgridQueryState;
+  final SwimlanesQueryStates swimlanesQueryState;
 
   @override
-  State<ListGridScreen> createState() => _ListGridScreenState();
+  State<SwimlanesScreen> createState() => _SwimlanesScreenState();
 }
 
-class _ListGridScreenState extends State<ListGridScreen> {
+class _SwimlanesScreenState extends State<SwimlanesScreen> {
   @override
   Widget build(BuildContext context) {
-    return DocumentScreen<Suggestion>(
+    String trackerId = 'development-tracker';
+    return DocumentScreen<SwimlanesTask>(
       //Indicate where the documents are located and how to convert them to and fromt their models.
       // formKey: GlobalKey<FormState>(),
-      collection: "suggestions",
-      fromFirestore: Suggestion.fromFirestore,
-      toFirestore: (Suggestion suggestion, SetOptions? options) {
-        return suggestion.toFirestore();
+      collection: "/fframe/tasks/trackers/$trackerId/tasks",
+      fromFirestore: SwimlanesTask.fromFirestore,
+      toFirestore: (SwimlanesTask swimlaneTask, SetOptions? options) {
+        return swimlaneTask.toFirestore();
       },
-      createDocumentId: (Suggestion suggestion) {
-        return "${suggestion.name}";
+      createDocumentId: (SwimlanesTask swimlaneTask) {
+        return "${swimlaneTask.name}";
       },
 
-      preSave: (Suggestion suggestion) {
+      preSave: (SwimlanesTask swimlaneTask) {
         //Here you can do presave stuff to the context document.
-        suggestion.saveCount++;
-        return suggestion;
+        swimlaneTask.saveCount++;
+        return swimlaneTask;
       },
 
-      createNew: () => Suggestion(
+      createNew: () => SwimlanesTask(
         active: true,
         createdBy: FirebaseAuth.instance.currentUser?.displayName ??
             "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
-      titleBuilder: (BuildContext context, Suggestion data) {
+      titleBuilder: (BuildContext context, SwimlanesTask data) {
         return Text(
-          data.name ?? "New Suggestion",
+          data.name ?? "New SwimlanesTask",
           style: TextStyle(
             color: Theme.of(context).colorScheme.onBackground,
           ),
@@ -58,35 +56,20 @@ class _ListGridScreenState extends State<ListGridScreen> {
 
       query: (query) {
         // return query.where("active", isNull: true);
-        switch (widget.listgridQueryState) {
-          case ListGridQueryStates.active:
+        switch (widget.swimlanesQueryState) {
+          case SwimlanesQueryStates.active:
             return query.where("active", isEqualTo: true);
 
-          case ListGridQueryStates.inactive:
+          case SwimlanesQueryStates.inactive:
             return query.where("active", isEqualTo: false);
         }
       },
 
-      // Optional ListGrid widget
-      viewType: ViewType.listgrid,
-      listGrid: ListGridConfig<Suggestion>(
-        searchHint: "search suggestion names",
-        // widgetBackgroundColor: Colors.amber,
-        // widgetColor: Colors.pink,
-        // widgetTextColor: Colors.pink,
-        // widgetTextSize: 20,
-        // widgetAccentColor: Colors.cyan,
-        // rowBorder: 1,
-        // cellBorder: 1,
-        // cellPadding: const EdgeInsets.all(16),
-        // cellVerticalAlignment: TableCellVerticalAlignment.top,
-        // cellBackgroundColor: Colors.amber,
-        // // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
-        // showHeader: false,
-        // // showFooter: false,
-        rowsSelectable: true,
-        actionBar: sampleActionMenus(),
-        columnSettings: listGridColumns,
+      // Optional Swimlanes widget
+      viewType: ViewType.swimlanes,
+      swimlanes: SwimlanesConfig<SwimlanesTask>(
+        trackerId: trackerId,
+        swimlaneSettings: swimlanesSettings,
       ),
 
       // Center part, shows a firestore doc. Tabs possible
@@ -95,8 +78,8 @@ class _ListGridScreenState extends State<ListGridScreen> {
     );
   }
 
-  Document<Suggestion> _document(BuildContext context) {
-    return Document<Suggestion>(
+  Document<SwimlanesTask> _document(BuildContext context) {
+    return Document<SwimlanesTask>(
       scrollableHeader: false,
       showCloseButton: true,
       showCopyButton: true,
@@ -105,24 +88,24 @@ class _ListGridScreenState extends State<ListGridScreen> {
       showDeleteButton: true,
       showSaveButton: true,
       showValidateButton: true,
-      extraActionButtons: (context, suggestion, isReadOnly, isNew, user) {
+      extraActionButtons: (context, swimlaneTask, isReadOnly, isNew, user) {
         return [
-          if (suggestion.active == false)
+          if (swimlaneTask.active == false)
             TextButton.icon(
               onPressed: () {
-                suggestion.active = true;
-                DocumentScreenConfig.of(context)!
-                    .save<Suggestion>(context: context, closeAfterSave: false);
+                swimlaneTask.active = true;
+                DocumentScreenConfig.of(context)!.save<SwimlanesTask>(
+                    context: context, closeAfterSave: false);
               },
               icon: const Icon(Icons.check, color: Colors.redAccent),
               label: const Text("Mark as Active"),
             ),
-          if (suggestion.active == true)
+          if (swimlaneTask.active == true)
             TextButton.icon(
               onPressed: () {
-                suggestion.active = false;
-                DocumentScreenConfig.of(context)!
-                    .save<Suggestion>(context: context, closeAfterSave: false);
+                swimlaneTask.active = false;
+                DocumentScreenConfig.of(context)!.save<SwimlanesTask>(
+                    context: context, closeAfterSave: false);
               },
               icon: const Icon(Icons.close, color: Colors.greenAccent),
               label: const Text("Mark as Done"),
@@ -130,20 +113,20 @@ class _ListGridScreenState extends State<ListGridScreen> {
         ];
       },
       documentTabsBuilder:
-          (context, suggestion, isReadOnly, isNew, fFrameUser) {
+          (context, swimlaneTask, isReadOnly, isNew, fFrameUser) {
         return [
-          DocumentTab<Suggestion>(
+          DocumentTab<SwimlanesTask>(
             tabBuilder: (user) {
               return Tab(
-                text: "${suggestion.name}",
+                text: "${swimlaneTask.name}",
                 icon: const Icon(
                   Icons.pest_control,
                 ),
               );
             },
-            childBuilder: (suggestion, readOnly) {
+            childBuilder: (swimlaneTask, readOnly) {
               return DocTab(
-                suggestion: suggestion,
+                swimlanesTask: swimlaneTask,
                 readOnly: readOnly,
                 // user: user,
               );
@@ -153,123 +136,4 @@ class _ListGridScreenState extends State<ListGridScreen> {
       },
     );
   }
-}
-
-List<ListGridActionMenu<T>> sampleActionMenus<T>() {
-  return [
-    ListGridActionMenu(
-      label: "Toggle active",
-      icon: Icons.toggle_off_outlined,
-      menuItems: [
-        ListGridActionMenuItem<T>(
-          label: "Set inactive",
-          icon: Icons.toggle_off_outlined,
-          clickHandler: (context, user, selectedDocumentsById) {
-            selectedDocumentsById.forEach((documentId, currentDocument) {
-              DocumentScreenConfig documentScreenConfig =
-                  DocumentScreenConfig.of(context) as DocumentScreenConfig;
-              DocumentConfig<T> documentConfig =
-                  documentScreenConfig.documentConfig as DocumentConfig<T>;
-              // TODO: Arno, pls hlp...
-              // how do I make this save using the embedded document models?
-              // I can make my own connection to the backend and to a cheap write,
-              // but that is not very clean.
-
-              Suggestion currentSuggestion = currentDocument as Suggestion;
-              currentSuggestion.active = false;
-              documentConfig.toFirestore(
-                  currentDocument, SetOptions(merge: true));
-            });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: ListTile(
-                  leading: Icon(
-                    Icons.toggle_off_outlined,
-                    color: Colors.amber[900],
-                  ),
-                  title: Text(
-                    "Toggled ${selectedDocumentsById.length} documents to the inactive state.",
-                  ),
-                  textColor: Colors.amber[900],
-                ),
-              ),
-            );
-          },
-        ),
-        ListGridActionMenuItem(
-          label: "Set Active",
-          icon: Icons.toggle_on,
-          clickHandler: (context, user, selectedDocumentsById) {
-            selectedDocumentsById.forEach((documentId, currentDocument) {
-              // Suggestion currentSuggestion = currentDocument as Suggestion;
-            });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: ListTile(
-                  leading: Icon(
-                    Icons.toggle_on,
-                    color: Colors.amber[900],
-                  ),
-                  title: Text(
-                    "Toggled ${selectedDocumentsById.length} documents to the active state.",
-                  ),
-                  textColor: Colors.amber[900],
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-    ListGridActionMenu(
-      menuItems: [
-        ListGridActionMenuItem(
-          label: "Delete",
-          icon: Icons.delete_outline,
-          clickHandler: (context, user, selectedDocumentsById) {
-            selectedDocumentsById.forEach((documentId, currentSuggestion) {
-              Console.log(
-                "NOT deleting ${currentSuggestion.name}. Jus' printing this.",
-                scope: "exampleApp.ListGrid.deleteAction",
-                level: LogLevel.prod,
-              );
-            });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: ListTile(
-                  leading: Icon(
-                    Icons.delete_outline,
-                    color: Colors.amber[900],
-                  ),
-                  title: Text(
-                    "NOT deleting ${selectedDocumentsById.length} documents... Jus' giving you this snack.",
-                  ),
-                  textColor: Colors.amber[900],
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-    ListGridActionMenu(
-      menuItems: [
-        ListGridActionMenuItem(
-          label: "Help...",
-          icon: Icons.help_outline,
-          requireSelection: false,
-          clickHandler: (context, user, selectedDocumentsById) {
-            launchUrl(
-              Uri.parse(
-                  'https://github.com/postmeridiem/fframe/blob/main/fframe/lib/screens/listgrid_screen/listgrid.md'),
-              webOnlyWindowName: "_blank",
-            );
-          },
-        ),
-      ],
-    ),
-  ];
 }

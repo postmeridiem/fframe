@@ -120,7 +120,7 @@ class ListGridHeader extends StatelessWidget {
                   ),
                 ),
               ),
-              HeaderSortingWidget(
+              ListGridHeaderSortingWidget(
                 column: column,
                 columnIndex: i,
                 widgetColor: widgetColor,
@@ -194,7 +194,7 @@ class ListGridSearchWidget extends StatelessWidget {
     return Theme(
       data: ThemeData(
         textSelectionTheme: TextSelectionThemeData(
-          cursorColor: Theme.of(context).colorScheme.onSurfaceVariant,
+          cursorColor: Theme.of(context).colorScheme.onPrimary,
           selectionColor: Colors.grey.shade400,
           selectionHandleColor: widgetColor,
         ),
@@ -205,7 +205,7 @@ class ListGridSearchWidget extends StatelessWidget {
         width: calculatedWidth,
         child: Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceVariant,
+            color: Theme.of(context).colorScheme.primary,
             // border: Border(
             //   bottom: BorderSide(
             //     color: widgetColor,
@@ -656,8 +656,8 @@ class _ListGridActionMenuItemWIdgetState
   }
 }
 
-class HeaderSortingWidget extends StatelessWidget {
-  const HeaderSortingWidget(
+class ListGridHeaderSortingWidget extends StatelessWidget {
+  const ListGridHeaderSortingWidget(
       {super.key,
       required this.column,
       required this.columnIndex,

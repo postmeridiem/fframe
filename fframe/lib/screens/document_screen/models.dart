@@ -17,6 +17,7 @@ class DocumentConfig<T> extends ChangeNotifier {
     this.documentList,
     this.dataGrid,
     this.listGrid,
+    this.swimlanes,
     this.titleBuilder,
     required this.autoSelectFirst,
     required this.document,
@@ -29,6 +30,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   final DocumentList<T>? documentList;
   final DataGridConfig<T>? dataGrid;
   final ListGridConfig<T>? listGrid;
+  final SwimlanesConfig<T>? swimlanes;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
   final String queryStringIdParam;
@@ -54,6 +56,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   ViewType? _viewType;
 
   List<ViewType> get allowedViewTypes {
+    //TODO: this needs to be cleaned up after listgrid is mature
     switch (initialViewType) {
       case ViewType.auto:
         List<ViewType> returnValue = [];
@@ -68,6 +71,8 @@ class DocumentConfig<T> extends ChangeNotifier {
         return [ViewType.list];
       case ViewType.grid:
         return [ViewType.grid];
+      case ViewType.swimlanes:
+        return [ViewType.swimlanes];
       case ViewType.none:
         return [];
     }
@@ -88,7 +93,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   }
 }
 
-enum ViewType { auto, list, grid, listgrid, none }
+enum ViewType { auto, list, grid, listgrid, swimlanes, none }
 
 class Document<T> {
   Document({
