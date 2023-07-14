@@ -26,7 +26,7 @@ class DarkModeThemeConfig {
 
   // color that sets 'secondary' level control widgets
   // (application surfaces and things that are not navrail, contextwidgets, FAB or appbar...)
-  Color constSecondaryColor = const Color.fromARGB(255, 49, 4, 20);
+  Color constSecondaryColor = const Color.fromARGB(255, 33, 33, 33);
   Color constOnSecondaryColor = const Color.fromARGB(255, 238, 238, 238);
 
   // color that sets 'tertiary' level control widgets
@@ -41,8 +41,8 @@ class DarkModeThemeConfig {
 
   // color that sets the secondary surface of the app
   // (field backgrounds)
-  Color constSurfaceVariantColor = const Color.fromARGB(255, 255, 255, 255);
-  Color constOnSurfaceVariantColor = const Color.fromARGB(255, 49, 4, 20);
+  Color constSurfaceVariantColor = const Color.fromARGB(255, 71, 71, 71);
+  Color constOnSurfaceVariantColor = const Color.fromARGB(255, 238, 238, 238);
 
   // color that sets the primary accent color
   Color constPrimaryAccentColor = const Color.fromARGB(255, 5, 202, 198);
