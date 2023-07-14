@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
 
 class L10n {
@@ -71,6 +73,23 @@ class L10n {
 
   static Iterable<Locale> getLocales() {
     return L10n.instance.config.supportedLocales;
+  }
+
+  static DateTime dateTimeFromTimestamp({required Timestamp timestamp}) {
+    return DateTime.fromMillisecondsSinceEpoch(
+        timestamp.millisecondsSinceEpoch);
+  }
+
+  static String stringFromDateTime(
+      {required DateTime datetime, String? formatMask}) {
+    String mask = formatMask ?? 'yyyy-MM-dd  HH:mm';
+    final DateFormat _formatter = DateFormat(mask);
+    return _formatter.format(datetime);
+  }
+
+  static String stringFromTimestamp({required Timestamp timestamp}) {
+    return stringFromDateTime(
+        datetime: dateTimeFromTimestamp(timestamp: timestamp));
   }
 }
 
