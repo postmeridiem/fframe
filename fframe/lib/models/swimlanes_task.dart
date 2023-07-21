@@ -16,7 +16,7 @@ class SwimlanesTask extends ChangeNotifier {
     this.assignmentTime,
     this.dueTime,
     this.saveCount = 0,
-    this.changeHistory,
+    // this.changeHistory,
   });
 
   /// SwimlanesTask class
@@ -83,9 +83,9 @@ class SwimlanesTask extends ChangeNotifier {
           : null,
       dueTime: json['dueTime'] != null ? json['dueTime'] as Timestamp : null,
       saveCount: json['saveCount'] != null ? json['saveCount'] as double : 0,
-      changeHistory: json['changeHistory'] != null
-          ? json['changeHistory'] as Map<String, Timestamp>
-          : {},
+      // changeHistory: json['changeHistory'] != null
+      //     ? json['changeHistory'] as Map<String, Timestamp>
+      //     : {},
     );
 
     return swimlaneTask;
@@ -105,7 +105,7 @@ class SwimlanesTask extends ChangeNotifier {
   Timestamp? assignmentTime;
   Timestamp? dueTime;
   double saveCount;
-  Map<String, Timestamp>? changeHistory;
+  // Map<String, Timestamp>? changeHistory;
 
   Map<String, Object?> toFirestore() {
     String updatedBy =
@@ -117,7 +117,6 @@ class SwimlanesTask extends ChangeNotifier {
       "active": active,
       "name": name,
       "priority": priority,
-      "icon": icon,
       "status": status,
       "description": description,
       "creationDate": creationDate ?? Timestamp.now(),
@@ -128,7 +127,7 @@ class SwimlanesTask extends ChangeNotifier {
       "assignmentTime": assignmentTime,
       "dueTime": creationDate ?? Timestamp.now(),
       "saveCount": saveCount,
-      "changeHistory": FieldValue.arrayUnion([changeHistory]),
+      // "changeHistory": FieldValue.arrayUnion([changeHistory]),
     };
   }
 }
@@ -138,7 +137,7 @@ IconData getSwimLaneTaskIcon({required String iconName}) {
     IconData iconData = iconMap[iconName] as IconData;
     return iconData;
   } else {
-    return iconMap["broken_image"] as IconData;
+    return iconMap["assignment"] as IconData;
   }
 }
 

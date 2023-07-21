@@ -114,13 +114,13 @@ class SwimlaneTaskDatabase {
   SwimlaneTaskDatabase({
     required this.currentUser,
   });
-  final String currentUser;
+  final FFrameUser currentUser;
 
   late Map<int, String> statusList = {};
 
   late Map<String, SwimlanesTask> taskDb = {};
   late Map<String, SwimlanesDbStatusSet> statusDb = {};
-  late Map<String, SwimlanesDbStatusSetByUser> assignedStatusDb = {};
+  late Map<String, int> swimlaneCount = {};
 
   void registerStatus({required int index, required String status}) {
     // add the new status to the status list
@@ -135,23 +135,20 @@ class SwimlaneTaskDatabase {
     // add the data to the index tables
     if (!statusDb.containsKey(currentStatus)) {
       statusDb[currentStatus] = SwimlanesDbStatusSet(status: currentStatus);
-      assignedStatusDb[currentStatus] =
-          SwimlanesDbStatusSetByUser(status: currentStatus);
     }
     SwimlanesDbStatusSet db = statusDb[currentStatus] as SwimlanesDbStatusSet;
     db.registerTask(task);
+    int currentCount = swimlaneCount[currentStatus] ?? 0;
+    swimlaneCount[currentStatus] = currentCount;
+  }
 
-    if (task.assignedTo == currentUser) {
-      SwimlanesDbStatusSet currentSetByUser =
-          statusDb[currentStatus] as SwimlanesDbStatusSet;
-      currentSetByUser.registerTask(task);
-    }
+  int getSwimlaneCount({required String swimlaneStatus}) {
+    return swimlaneCount[swimlaneStatus] ?? 0;
   }
 
   List<SwimlanesTask> getSwimlaneTasks({
+    required SwimlanesController swimlanes,
     required SwimlaneSetting swimlane,
-    String? assignedTo,
-    int? priorityFilter,
   }) {
     List<SwimlanesTask> output = [];
 
@@ -168,39 +165,81 @@ class SwimlaneTaskDatabase {
     for (MapEntry<String, SwimlanesTask> curRecord in taskDb.entries) {
       SwimlanesTask task = curRecord.value;
       if (task.status == swimlane.status) {
-        switch (task.priority) {
-          case 1:
-            prio1Tasks.add(task);
+        bool filterPassed = false;
+        switch (swimlanes.filter) {
+          case SwimlanesFilterType.unfiltered:
+            filterPassed = true;
             break;
-          case 2:
-            prio2Tasks.add(task);
+          case SwimlanesFilterType.assignedToMe:
+            if (swimlanes.database.currentUser.email == task.assignedTo) {
+              filterPassed = true;
+            }
             break;
-          case 3:
-            prio3Tasks.add(task);
+          case SwimlanesFilterType.followedTasks:
+            // filterPassed = true;
             break;
-          case 4:
-            prio4Tasks.add(task);
+          case SwimlanesFilterType.prioHigh:
+            if (task.priority == 1 ||
+                task.priority == 2 ||
+                task.priority == 3) {
+              filterPassed = true;
+            }
             break;
-          case 5:
-            prio5Tasks.add(task);
+          case SwimlanesFilterType.prioNormal:
+            if (task.priority == 4 ||
+                task.priority == 5 ||
+                task.priority == 6) {
+              filterPassed = true;
+            }
             break;
-          case 6:
-            prio6Tasks.add(task);
+          case SwimlanesFilterType.prioLow:
+            if (task.priority == 7 ||
+                task.priority == 8 ||
+                task.priority == 9) {
+              filterPassed = true;
+            }
             break;
-          case 7:
-            prio7Tasks.add(task);
-            break;
-          case 8:
-            prio8Tasks.add(task);
-            break;
-          case 9:
-            prio9Tasks.add(task);
+          case SwimlanesFilterType.assignedTo:
+            // filterPassed = true;
             break;
           default:
         }
+
+        if (filterPassed) {
+          switch (task.priority) {
+            case 1:
+              prio1Tasks.add(task);
+              break;
+            case 2:
+              prio2Tasks.add(task);
+              break;
+            case 3:
+              prio3Tasks.add(task);
+              break;
+            case 4:
+              prio4Tasks.add(task);
+              break;
+            case 5:
+              prio5Tasks.add(task);
+              break;
+            case 6:
+              prio6Tasks.add(task);
+              break;
+            case 7:
+              prio7Tasks.add(task);
+              break;
+            case 8:
+              prio8Tasks.add(task);
+              break;
+            case 9:
+              prio9Tasks.add(task);
+              break;
+            default:
+          }
+        }
       }
     }
-    ;
+
     output = [
       ...prio1Tasks,
       ...prio2Tasks,
@@ -212,6 +251,7 @@ class SwimlaneTaskDatabase {
       ...prio8Tasks,
       ...prio9Tasks,
     ];
+
     // if (_statusDb.containsKey(currentStatus)) {
     //   SwimlanesDbStatusSet db =
     //       _statusDb[currentStatus] as SwimlanesDbStatusSet;
@@ -310,6 +350,25 @@ enum SwimlanesSearchMode {
   singleFieldString,
   multiFieldString,
   underscoreTypeAhead,
+}
+
+enum SwimlanesFilterType {
+  unfiltered,
+  assignedToMe,
+  followedTasks,
+  assignedTo,
+  prioHigh,
+  prioNormal,
+  prioLow,
+  prio1,
+  prio2,
+  prio3,
+  prio4,
+  prio5,
+  prio6,
+  prio7,
+  prio8,
+  prio9,
 }
 
 typedef SwimlanesActionHandler<T> = void Function(

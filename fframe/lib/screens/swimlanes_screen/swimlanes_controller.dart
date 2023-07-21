@@ -19,9 +19,9 @@ class SwimlanesController extends InheritedModel {
     if (currentUser.roles != null) {
       currentRoles = currentUser.roles as List<String>;
     }
-    debugPrint(currentRoles.toString());
+
     // initialize the tasks database
-    database = SwimlaneTaskDatabase(currentUser: currentUser.email ?? "unkown");
+    database = SwimlaneTaskDatabase(currentUser: currentUser);
     double calculatedMinWidth = 0;
 
     for (var i = 0; i < (config.swimlaneSettings.length); i++) {
@@ -136,6 +136,10 @@ class SwimlanesController extends InheritedModel {
     return notifier._currentQuery;
   }
 
+  SwimlanesFilterType get filter {
+    return notifier.filter;
+  }
+
   bool get isDragging {
     return notifier.isDragging;
   }
@@ -210,11 +214,14 @@ class SwimlanesNotifier<T> extends ChangeNotifier {
     _collectionCount = 0;
 
     // initialize the row selections
-    _selectedDocuments = {};
+    // _selectedDocuments = {};
 
     // initialize the current query, based on sorting and settings
     _currentQuery = sourceQuery;
     _queryBuilder();
+
+    // initial filter: unfiltered
+    _filter = SwimlanesFilterType.unfiltered;
 
     // initial load: no task is dragging
     _taskDragging = false;
@@ -223,14 +230,13 @@ class SwimlanesNotifier<T> extends ChangeNotifier {
     _updateCollectionCount(query: _currentQuery);
   }
   final Query sourceQuery;
-  // final SwimlanesSearchConfig? searchConfig;
   final List<SwimlaneSetting> swimlaneSettings;
+
   late String? _searchString;
   late int _collectionCount;
   late Query _currentQuery;
   late bool _taskDragging;
-
-  late Map<String, T> _selectedDocuments;
+  late SwimlanesFilterType _filter;
 
   String? get searchString {
     return _searchString;
@@ -263,14 +269,6 @@ class SwimlanesNotifier<T> extends ChangeNotifier {
     return _collectionCount;
   }
 
-  Map<String, T> get selectedDocuments {
-    return _selectedDocuments;
-  }
-
-  int get selectionCount {
-    return _selectedDocuments.isNotEmpty ? _selectedDocuments.length : 0;
-  }
-
   set collectionCount(int collectionCount) {
     _collectionCount = collectionCount;
     notifyListeners();
@@ -278,6 +276,15 @@ class SwimlanesNotifier<T> extends ChangeNotifier {
 
   bool get isDragging {
     return _taskDragging;
+  }
+
+  SwimlanesFilterType get filter {
+    return _filter;
+  }
+
+  void setFilter(SwimlanesFilterType filter) {
+    _filter = filter;
+    notifyListeners();
   }
 
   void setDraggingMode(bool isDragging) {

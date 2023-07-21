@@ -1,38 +1,451 @@
 part of fframe;
 
-class SwimlaneHeaders extends StatelessWidget {
-  SwimlaneHeaders({
+class SwimlaneHeaders extends StatefulWidget {
+  const SwimlaneHeaders({
     super.key,
     required this.swimlanes,
   });
 
   final SwimlanesController swimlanes;
-  final List<SwimlaneHeader> swimlaneHeaders = [];
+
+  @override
+  State<SwimlaneHeaders> createState() => _SwimlaneHeadersState();
+}
+
+class _SwimlaneHeadersState extends State<SwimlaneHeaders> {
+  final List<Widget> swimlaneHeaders = [];
+  bool filterMenuOpen = false;
+  bool filterMenuHover = false;
 
   @override
   Widget build(BuildContext context) {
-    for (SwimlaneSetting swimlane in swimlanes.swimlaneSettings) {
-      if (swimlane.hasAccess) {
-        swimlaneHeaders.add(
-          SwimlaneHeader(
-            swimlanes: swimlanes,
-            swimlane: swimlane,
-          ),
-        );
+    SwimlanesController swimlanes = widget.swimlanes;
+    void headerMouseIn(PointerEvent details) {
+      setState(() {
+        filterMenuOpen = true;
+      });
+    }
+
+    void headerMouseOut(PointerEvent details) {
+      setState(() {
+        filterMenuOpen = false;
+      });
+    }
+
+    void buttonBarMouseIn(PointerEvent details) {
+      setState(() {
+        filterMenuOpen = true;
+        filterMenuHover = true;
+      });
+    }
+
+    void buttonBarMouseOut(PointerEvent details) {
+      setState(() {
+        if (filterMenuOpen) {
+          filterMenuOpen = false;
+        }
+        filterMenuHover = false;
+      });
+    }
+
+    // check if the swimlane headers have already been processed
+    if (swimlaneHeaders.isEmpty) {
+      // process all swimlanes into swimlane settings
+      for (SwimlaneSetting swimlane in swimlanes.swimlaneSettings) {
+        // check role access to the swimlane
+        if (swimlane.hasAccess) {
+          swimlaneHeaders.add(
+            SwimlaneHeader(
+              swimlanes: swimlanes,
+              swimlane: swimlane,
+            ),
+          );
+        }
       }
+    }
+    double filterOpacity = 0.2;
+    if ((swimlanes.notifier.filter != SwimlanesFilterType.unfiltered) ||
+        filterMenuOpen) {
+      filterOpacity = 1;
     }
     return SizedBox(
       height: swimlanes.headerHeight,
-      child: Container(
-          color: swimlanes.swimlaneHeaderColor,
-          child: Row(
-            children: swimlaneHeaders,
-          )
-          // child: Row(
-          //   children: swimlaneWidgets,
-          // ),
+      child: Stack(
+        children: [
+          MouseRegion(
+            onEnter: headerMouseIn,
+            onExit: headerMouseOut,
+            child: Container(
+              color: swimlanes.swimlaneHeaderColor,
+              child: Row(
+                children: swimlaneHeaders,
+              ),
+            ),
           ),
+          Positioned(
+            child: Opacity(
+              opacity: filterOpacity,
+              // opacity: 1,
+              child: MouseRegion(
+                cursor: MaterialStateMouseCursor.clickable,
+                onEnter: buttonBarMouseIn,
+                onExit: buttonBarMouseOut,
+                child: Card(
+                  color: swimlanes.config.taskCardColor,
+                  child: Row(
+                    children: !filterMenuOpen
+                        ? [
+                            SwimlaneHeaderFilterButton(
+                              swimlanes: swimlanes,
+                            )
+                          ]
+                        : [
+                            SwimlaneHeaderFilterButton(
+                              swimlanes: swimlanes,
+                            ),
+                            SwimlanesFilterBar(swimlanes: swimlanes),
+                          ],
+
+                    // children: [],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
+  }
+}
+
+class SwimlaneHeaderFilterButton extends StatelessWidget {
+  const SwimlaneHeaderFilterButton({
+    super.key,
+    required this.swimlanes,
+  });
+
+  final SwimlanesController swimlanes;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 64,
+      child: Center(
+        child: Icon(
+          Icons.filter_alt_outlined,
+          color: swimlanes.notifier.filter == SwimlanesFilterType.unfiltered
+              ? swimlanes.taskCardTextColor
+              : Theme.of(context).colorScheme.onBackground,
+        ),
+      ),
+    );
+  }
+}
+
+class SwimlanesFilterBar extends StatelessWidget {
+  const SwimlanesFilterBar({
+    super.key,
+    required this.swimlanes,
+  });
+
+  final SwimlanesController swimlanes;
+
+  @override
+  Widget build(BuildContext context) {
+    SwimlanesFilterType curFilter = swimlanes.notifier.filter;
+    Color inactive = swimlanes.taskCardTextColor;
+    Color active = Theme.of(context).colorScheme.onBackground;
+
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+      child: SizedBox(
+        height: 200,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  OutlinedButton(
+                    onPressed: () {
+                      toggleFilter(SwimlanesFilterType.assignedToMe);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                        color: (curFilter == SwimlanesFilterType.assignedToMe)
+                            ? active
+                            : Theme.of(context).disabledColor,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4, bottom: 4),
+                      child: Icon(
+                        Icons.person_outline,
+                        size: 16,
+                        color: (curFilter == SwimlanesFilterType.assignedToMe)
+                            ? active
+                            : inactive,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      "assigned to me",
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: swimlanes.taskCardTextColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(right: 16.0),
+            //   child: Column(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     crossAxisAlignment: CrossAxisAlignment.center,
+            //     children: [
+            //       OutlinedButton(
+            //         onPressed: () {
+            //           toggleFilter(SwimlanesFilterType.followedTasks);
+            //         },
+            //         style: OutlinedButton.styleFrom(
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(28),
+            //           ),
+            //           side: BorderSide(
+            //             width: 2,
+            //             color: (curFilter == SwimlanesFilterType.followedTasks)
+            //                 ? active
+            //                 : Theme.of(context).disabledColor,
+            //           ),
+            //         ),
+            //         child: Padding(
+            //           padding: const EdgeInsets.only(top: 4, bottom: 4),
+            //           child: Icon(
+            //             Icons.visibility_outlined,
+            //             size: 16,
+            //             color: (curFilter == SwimlanesFilterType.followedTasks)
+            //                 ? active
+            //                 : inactive,
+            //           ),
+            //         ),
+            //       ),
+            //       Padding(
+            //         padding: const EdgeInsets.only(top: 4.0),
+            //         child: Text(
+            //           "following",
+            //           style: TextStyle(
+            //             color: swimlanes.taskCardTextColor,
+            //             fontSize: 11,
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  OutlinedButton(
+                    onPressed: () {
+                      toggleFilter(SwimlanesFilterType.prioHigh);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                        color: (curFilter == SwimlanesFilterType.prioHigh)
+                            ? active
+                            : Theme.of(context).disabledColor,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4, bottom: 4),
+                      child: Icon(
+                        Icons.priority_high_outlined,
+                        size: 16,
+                        color: (curFilter == SwimlanesFilterType.prioHigh)
+                            ? active
+                            : inactive,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      "high (1-3)",
+                      style: TextStyle(
+                        color: swimlanes.taskCardTextColor,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  OutlinedButton(
+                    onPressed: () {
+                      toggleFilter(SwimlanesFilterType.prioNormal);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                        color: (curFilter == SwimlanesFilterType.prioNormal)
+                            ? active
+                            : Theme.of(context).disabledColor,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4, bottom: 4),
+                      child: Icon(
+                        Icons.task_outlined,
+                        size: 16,
+                        color: (curFilter == SwimlanesFilterType.prioNormal)
+                            ? active
+                            : inactive,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      "normal (4-6)",
+                      style: TextStyle(
+                        color: swimlanes.taskCardTextColor,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  OutlinedButton(
+                    onPressed: () {
+                      toggleFilter(SwimlanesFilterType.prioLow);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                        color: (curFilter == SwimlanesFilterType.prioLow)
+                            ? active
+                            : Theme.of(context).disabledColor,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4, bottom: 4),
+                      child: Icon(
+                        Icons.low_priority_outlined,
+                        size: 16,
+                        color: (curFilter == SwimlanesFilterType.prioLow)
+                            ? active
+                            : inactive,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      "low (7-9)",
+                      style: TextStyle(
+                        color: swimlanes.taskCardTextColor,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(right: 16.0),
+            //   child: Column(
+            //     mainAxisAlignment: MainAxisAlignment.center,
+            //     crossAxisAlignment: CrossAxisAlignment.center,
+            //     children: [
+            //       OutlinedButton(
+            //         onPressed: () {
+            //           toggleFilter(SwimlanesFilterType.assignedTo);
+            //         },
+            //         style: OutlinedButton.styleFrom(
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(28),
+            //           ),
+            //           side: BorderSide(
+            //             width: 2,
+            //             color: (curFilter == SwimlanesFilterType.assignedTo)
+            //                 ? active
+            //                 : Theme.of(context).disabledColor,
+            //           ),
+            //         ),
+            //         child: Padding(
+            //           padding: const EdgeInsets.only(top: 4, bottom: 4),
+            //           child: Icon(
+            //             Icons.person_search_outlined,
+            //             size: 16,
+            //             color: (curFilter == SwimlanesFilterType.assignedTo)
+            //                 ? active
+            //                 : inactive,
+            //           ),
+            //         ),
+            //       ),
+            //       Padding(
+            //         padding: const EdgeInsets.only(top: 4.0),
+            //         child: Text(
+            //           "assigned to...",
+            //           style: TextStyle(
+            //             color: swimlanes.taskCardTextColor,
+            //             fontSize: 11,
+            //           ),
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void toggleFilter(SwimlanesFilterType filter) {
+    if (swimlanes.filter != filter) {
+      swimlanes.notifier.setFilter(filter);
+    } else {
+      swimlanes.notifier.setFilter(SwimlanesFilterType.unfiltered);
+    }
   }
 }
 
@@ -48,8 +461,19 @@ class SwimlaneHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    int swimlaneTaskCount =
-        swimlanes.database.getSwimlaneTasks(swimlane: swimlane).length;
+    // int swimlaneTaskCount =
+    //     swimlanes.database.getSwimlaneCount(swimlaneStatus: swimlane.status);
+    // int swimlaneTaskCountFiltered =
+    //     swimlanes.getSwimlaneCountFiltered(swimlaneStatus: swimlane.status);
+
+    int swimlaneTaskCount = swimlanes.database
+        .getSwimlaneTasks(swimlanes: swimlanes, swimlane: swimlane)
+        .length;
+
+    String lanecountMessage = "$swimlaneTaskCount tasks";
+    // if (swimlaneTaskCount != swimlaneTaskCountFiltered) {
+    //   lanecountMessage = "$swimlaneTaskCount tasks";
+    // }
     return Container(
       decoration: BoxDecoration(
         // color: Colors.yellowAccent,
@@ -78,7 +502,7 @@ class SwimlaneHeader extends StatelessWidget {
                 ),
               ),
               Text(
-                "$swimlaneTaskCount tasks",
+                lanecountMessage,
                 style: TextStyle(
                   fontSize: 10,
                   color: swimlanes.swimlaneHeaderTextColor,
@@ -176,38 +600,122 @@ class _SwimlanesDocumentState<SwimlanesTask>
     return widget.documentOpen
         ? Row(
             children: [
-              const SizedBox(
-                width: 300,
-                child: IgnorePointer(),
-              ),
+              SwimlanesDocumentTaskCard(widget: widget),
               Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: widget.swimlanes.swimlaneSeparatorColor,
-                    // color: Colors.cyan,
-                    border: Border(
-                      left: BorderSide(
-                        width: 1,
-                        color: widget.swimlanes.swimlaneSeparatorColor,
-                      ),
-                      top: BorderSide(
-                        width: 1,
-                        color: widget.swimlanes.swimlaneSeparatorColor,
-                      ),
-                      right: BorderSide(
-                        width: 1,
-                        color: widget.swimlanes.swimlaneSeparatorColor,
-                      ),
-                    ),
-                  ),
-                  child: ScreenBody<SwimlanesTask>(
-                    key: ValueKey("ScreenBody_${documentConfig.collection}"),
-                  ),
+                child: ScreenBody<SwimlanesTask>(
+                  key: ValueKey("ScreenBody_${documentConfig.collection}"),
                 ),
               ),
             ],
           )
         : const IgnorePointer();
+  }
+}
+
+class SwimlanesDocumentTaskCard extends StatelessWidget {
+  const SwimlanesDocumentTaskCard({
+    super.key,
+    required this.widget,
+  });
+
+  final SwimlanesDocument widget;
+
+  Widget build(BuildContext context) {
+    // register shared validator class for common patterns
+    Validator validator = Validator();
+    bool readOnly = true;
+
+    return Container(
+      color: Colors.black,
+      child: SizedBox(
+        width: widget.swimlanes.config.swimlaneWidth,
+        child: const Placeholder(),
+        // child: Card(
+        //   child: Padding(
+        //     padding: const EdgeInsets.all(8.0),
+        //     child: Column(
+        //       crossAxisAlignment: CrossAxisAlignment.start,
+        //       children: [
+        //         Padding(
+        //           padding: const EdgeInsets.only(bottom: 16.0),
+        //           child: TextFormField(
+        //             readOnly: readOnly,
+        //             decoration: const InputDecoration(
+        //               // hoverColor: Color(0xFFFF00C8),
+        //               // hoverColor: Theme.of(context).indicatorColor,
+        //               border: OutlineInputBorder(),
+        //               labelText: "Name",
+        //             ),
+        //             initialValue: swimlanesTask.name ?? '',
+        //             validator: (curValue) {
+        //               if (validator.validString(curValue)) {
+        //                 swimlanesTask.name = curValue;
+        //                 return null;
+        //               } else {
+        //                 return 'Enter a valid name';
+        //               }
+        //             },
+        //           ),
+        //         ),
+        //         Padding(
+        //           padding: const EdgeInsets.only(bottom: 16.0),
+        //           child: TextFormField(
+        //             readOnly: true,
+        //             onSaved: (String? value) {
+        //               swimlanesTask.status = value ?? "";
+        //             },
+        //             decoration: const InputDecoration(
+        //               border: OutlineInputBorder(),
+        //               labelText: "Status",
+        //             ),
+        //             initialValue: swimlanesTask.status ?? '',
+        //             validator: (value) {
+        //               if (!validator.validString(value)) {
+        //                 return 'Enter a valid value';
+        //               }
+        //               return null;
+        //             },
+        //           ),
+        //         ),
+        //         Padding(
+        //           padding: const EdgeInsets.only(bottom: 16.0),
+        //           child: TextFormField(
+        //             minLines: 5,
+        //             maxLines: 10,
+        //             onSaved: (String? value) {
+        //               swimlanesTask.description = value ?? "";
+        //             },
+        //             readOnly: readOnly,
+        //             decoration: const InputDecoration(
+        //               border: OutlineInputBorder(),
+        //               labelText: "Description",
+        //             ),
+        //             initialValue: swimlanesTask.description ?? '',
+        //             validator: (value) {
+        //               if (!validator.validString(value)) {
+        //                 return 'Enter a valid value';
+        //               }
+        //               return null;
+        //             },
+        //           ),
+        //         ),
+        //         Padding(
+        //           padding: const EdgeInsets.only(bottom: 16.0),
+        //           child: TextFormField(
+        //             readOnly: true,
+        //             initialValue: swimlanesTask.createdBy ?? "unknown",
+        //             decoration: const InputDecoration(
+        //               border: OutlineInputBorder(),
+        //               labelText: "Author",
+        //             ),
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+      ),
+    );
   }
 }
 
@@ -218,10 +726,13 @@ class Swimlanes<SwimlanesTask> extends StatelessWidget {
   });
 
   final SwimlanesController swimlanes;
-  final List<Swimlane> swimlanesList = [];
+  final List<Widget> swimlanesList = [];
 
   @override
   Widget build(BuildContext context) {
+    // swimlanesList.add(
+    //   SwimlanesFilterBar(swimlanes: swimlanes),
+    // );
     for (SwimlaneSetting swimlane in swimlanes.swimlaneSettings) {
       if (swimlane.hasAccess) {
         swimlanesList.add(
@@ -257,12 +768,15 @@ class Swimlane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<SwimlanesTask> currentTasks =
-        swimlanes.database.getSwimlaneTasks(swimlane: swimlane);
+    List<SwimlanesTask> currentTasks = swimlanes.database.getSwimlaneTasks(
+      swimlanes: swimlanes,
+      swimlane: swimlane,
+    );
     List<Widget> taskCards = [];
     for (SwimlanesTask currentTask in currentTasks) {
       taskCards.add(
-        Draggable(
+        LongPressDraggable(
+          delay: const Duration(milliseconds: 200),
           data: currentTask,
           dragAnchorStrategy: childDragAnchorStrategy,
           onDragStarted: () {
@@ -308,6 +822,7 @@ class Swimlane extends StatelessWidget {
               controller: _vertical,
               thumbVisibility: true,
               child: SingleChildScrollView(
+                controller: _vertical,
                 scrollDirection: Axis.vertical,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 6.0, right: 6.0),
@@ -322,8 +837,18 @@ class Swimlane extends StatelessWidget {
           swimlanes.isDragging
               ? DragTarget<SwimlanesTask>(
                   onAccept: (SwimlanesTask droppedTask) {
-                  debugPrint(
-                      "dropped ${droppedTask.name} on ${swimlane.header}");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: ListTile(
+                        leading: const Icon(
+                          Icons.move_to_inbox_outlined,
+                        ),
+                        title: Text(
+                            "Moved '${droppedTask.name}' to [${swimlane.header}]"),
+                        textColor: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                  );
                 }, builder: (context, candidateData, rejectedData) {
                   return Stack(
                     children: [
@@ -369,7 +894,7 @@ class Swimlane extends StatelessWidget {
                                       Opacity(
                                         opacity: 0.6,
                                         child: Icon(
-                                          Icons.playlist_add,
+                                          Icons.move_to_inbox_outlined,
                                           size: 48,
                                           color:
                                               swimlanes.swimlaneSeparatorColor,
@@ -422,164 +947,258 @@ class _SwimlanesTaskCardState extends State<SwimlanesTaskCard> {
 
     return Padding(
       padding: const EdgeInsets.all(6.0),
-      child: Card(
-        color: swimlanes.taskCardColor,
-        elevation: 4,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(0),
-        ),
-        child: SizedBox(
-          width: swimlanes.config.swimlaneWidth,
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 0,
-                    bottom: 8.0,
-                    left: 4.0,
-                    right: 70.0,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Card(
-                        child: SizedBox(
-                          width: swimlanes.config.swimlaneWidth,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              "${currentTask.name ?? ""}-${currentTask.id ?? ""}",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: swimlanes.taskCardHeaderTextColor,
+      child: GestureDetector(
+        onTap: () {},
+        child: Card(
+          color: swimlanes.taskCardColor,
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
+          child: SizedBox(
+            width: swimlanes.config.swimlaneWidth - 40,
+            child: Stack(
+              children: [
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      top: 0,
+                      bottom: 8.0,
+                      left: 4.0,
+                      right: 70.0,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Card(
+                          child: SizedBox(
+                            width: swimlanes.config.swimlaneWidth,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                "${currentTask.name ?? ""}-${currentTask.id ?? ""}",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: swimlanes.taskCardHeaderTextColor,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      widget.condensed
-                          ? const IgnorePointer()
-                          : Container(
-                              color: swimlanes.taskCardColor,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SwimlanesTaskCardContent(
-                                      currentTask: currentTask,
-                                      swimlanes: swimlanes),
-                                  const SizedBox(
-                                    width: 1,
-                                    height: 0,
-                                    child: IgnorePointer(),
-                                  )
-                                ],
-                              ),
-                            ),
-                      Divider(
-                        color: swimlanes.taskCardHeaderColor,
-                      ),
-                      widget.condensed
-                          ? const IgnorePointer()
-                          : const Padding(
-                              padding: EdgeInsets.all(8.0),
-                              child: Text(
-                                "comments: 0",
-                                style: TextStyle(fontSize: 10),
-                              ),
-                            ),
-                      Divider(
-                        color: swimlanes.taskCardHeaderColor,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              currentTask.dueTime != null
-                                  ? Text(
-                                      "due: ${L10n.stringFromTimestamp(
-                                        timestamp:
-                                            currentTask.dueTime as Timestamp,
-                                      )}",
-                                      style: const TextStyle(fontSize: 9),
+                        widget.condensed
+                            ? const IgnorePointer()
+                            : Container(
+                                color: swimlanes.taskCardColor,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SwimlanesTaskCardContent(
+                                        currentTask: currentTask,
+                                        swimlanes: swimlanes),
+                                    const SizedBox(
+                                      width: 1,
+                                      height: 0,
+                                      child: IgnorePointer(),
                                     )
-                                  : const IgnorePointer(),
-                              Text(
-                                "created: ${L10n.stringFromTimestamp(
-                                  timestamp:
-                                      currentTask.creationDate as Timestamp,
-                                )}",
-                                style: const TextStyle(fontSize: 9),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Opacity(
-                  opacity: 0.5,
-                  child: SizedBox(
-                    width: 72,
-                    height: 72,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Text(
-                            "${currentTask.priority}",
-                            style: TextStyle(
-                              color: currentTask.color,
-                              fontSize: 48,
+                        Divider(
+                          color: swimlanes.taskCardHeaderColor,
+                        ),
+                        widget.condensed
+                            ? const IgnorePointer()
+                            : const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(
+                                  "comments: 0",
+                                  style: TextStyle(fontSize: 10),
+                                ),
+                              ),
+                        Divider(
+                          color: swimlanes.taskCardHeaderColor,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                currentTask.dueTime != null
+                                    ? Text(
+                                        "due: ${L10n.stringFromTimestamp(
+                                          timestamp:
+                                              currentTask.dueTime as Timestamp,
+                                        )}",
+                                        style: const TextStyle(fontSize: 9),
+                                      )
+                                    : const IgnorePointer(),
+                                Text(
+                                  "created: ${L10n.stringFromTimestamp(
+                                    timestamp:
+                                        currentTask.creationDate as Timestamp,
+                                  )}",
+                                  style: const TextStyle(fontSize: 9),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Opacity(
+                    opacity: 0.5,
+                    child: SizedBox(
+                      width: 72,
+                      height: 72,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text(
+                              "${currentTask.priority}",
+                              style: TextStyle(
+                                color: currentTask.color,
+                                fontSize: 48,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                right: 0,
-                bottom: 0,
-                child: Opacity(
-                  opacity: 0.5,
-                  child: SizedBox(
-                    width: 72,
-                    height: 54,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Icon(
-                            currentTask.icon,
-                            color: currentTask.color,
-                            size: 48,
-                          ),
-                        ],
+                Positioned(
+                  right: 0,
+                  bottom: 48,
+                  child: Opacity(
+                    opacity: 0.6,
+                    child: SizedBox(
+                      width: 60,
+                      height: 54,
+                      child: AssignedAvatar(
+                        assignedTo: currentTask.assignedTo,
+                        swimlanes: swimlanes,
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: Opacity(
+                    opacity: 0.5,
+                    child: SizedBox(
+                      width: 72,
+                      height: 54,
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              currentTask.icon,
+                              color: currentTask.color,
+                              size: 48,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+}
+
+class AssignedAvatar extends StatefulWidget {
+  const AssignedAvatar({
+    super.key,
+    required this.swimlanes,
+    required this.assignedTo,
+  });
+
+  final SwimlanesController swimlanes;
+  final String? assignedTo;
+
+  @override
+  State<AssignedAvatar> createState() => _AssignedAvatarState();
+}
+
+class _AssignedAvatarState extends State<AssignedAvatar> {
+  @override
+  Widget build(BuildContext context) {
+    if (widget.assignedTo == null) {
+      return const IgnorePointer();
+    }
+
+    final Stream<QuerySnapshot> userLookup = FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: widget.assignedTo)
+        .snapshots();
+
+    return StreamBuilder<QuerySnapshot>(
+        stream: userLookup,
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return const Icon(Icons.no_accounts_outlined);
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          }
+
+          FFrameUser assignedUser = FFrameUser.fromFirestore(
+              snapshot: snapshot.data!.docs.first
+                  as DocumentSnapshot<Map<String, dynamic>>);
+          List<String>? avatarText = assignedUser.displayName
+              ?.split(' ')
+              .map((part) => part.trim().substring(0, 1))
+              .toList();
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                (avatarText != null || assignedUser.photoUrl != null)
+                    ? CircleAvatar(
+                        radius: 18.0,
+                        backgroundImage: (assignedUser.photoUrl == null)
+                            ? null
+                            : NetworkImage(assignedUser.photoUrl!),
+                        backgroundColor: (assignedUser.photoUrl == null)
+                            ? Colors.amber
+                            : Colors.transparent,
+                        child: (assignedUser.photoUrl == null &&
+                                avatarText != null)
+                            ? Text(
+                                "${avatarText.first}${avatarText.last}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.bold),
+                              )
+                            : null,
+                      )
+                    : const IgnorePointer(),
+              ],
+            ),
+          );
+        });
   }
 }
 
