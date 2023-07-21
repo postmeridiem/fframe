@@ -1089,6 +1089,9 @@ class _SwimlanesTaskCardState extends State<SwimlanesTaskCard> {
                       height: 54,
                       child: AssignedAvatar(
                         assignedTo: currentTask.assignedTo,
+                        assignmentTime: L10n.stringFromTimestamp(
+                            timestamp:
+                                currentTask.assignmentTime ?? Timestamp.now()),
                         swimlanes: swimlanes,
                       ),
                     ),
@@ -1132,10 +1135,12 @@ class AssignedAvatar extends StatefulWidget {
     super.key,
     required this.swimlanes,
     required this.assignedTo,
+    required this.assignmentTime,
   });
 
   final SwimlanesController swimlanes;
   final String? assignedTo;
+  final String? assignmentTime;
 
   @override
   State<AssignedAvatar> createState() => _AssignedAvatarState();
@@ -1167,35 +1172,50 @@ class _AssignedAvatarState extends State<AssignedAvatar> {
           FFrameUser assignedUser = FFrameUser.fromFirestore(
               snapshot: snapshot.data!.docs.first
                   as DocumentSnapshot<Map<String, dynamic>>);
-          List<String>? avatarText = assignedUser.displayName
-              ?.split(' ')
-              .map((part) => part.trim().substring(0, 1))
-              .toList();
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                (avatarText != null || assignedUser.photoUrl != null)
-                    ? CircleAvatar(
-                        radius: 18.0,
-                        backgroundImage: (assignedUser.photoUrl == null)
-                            ? null
-                            : NetworkImage(assignedUser.photoUrl!),
-                        backgroundColor: (assignedUser.photoUrl == null)
-                            ? Colors.amber
-                            : Colors.transparent,
-                        child: (assignedUser.photoUrl == null &&
-                                avatarText != null)
-                            ? Text(
-                                "${avatarText.first}${avatarText.last}",
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.bold),
-                              )
-                            : null,
+
+          Widget avatar = const Icon(
+            Icons.account_circle_outlined,
+            size: 36,
+          );
+
+          if (assignedUser.photoURL != null) {
+            try {
+              NetworkImage networkImage = NetworkImage(assignedUser.photoURL!);
+              avatar = CircleAvatar(
+                radius: 18.0,
+                backgroundImage:
+                    (assignedUser.photoURL == null) ? null : networkImage,
+                backgroundColor: (assignedUser.photoURL == null)
+                    ? Colors.amber
+                    : Colors.transparent,
+                child: (assignedUser.photoURL == null)
+                    ? Text(
+                        "${assignedUser.displayName}",
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       )
-                    : const IgnorePointer(),
-              ],
+                    : null,
+              );
+            } catch (e) {
+              Console.log("profile image could not be fetched",
+                  level: LogLevel.dev);
+            }
+          }
+          String tooltipMessage =
+              "Assigned to: \t\t\t${assignedUser.displayName ?? ""}\nOn: \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t${widget.assignmentTime}";
+          return Tooltip(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              color: widget.swimlanes.swimlaneBackgroundColor,
+            ),
+            richMessage: WidgetSpan(
+              child: Text(tooltipMessage),
+            ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [avatar],
+              ),
             ),
           );
         });
@@ -1326,17 +1346,14 @@ class SwimlanesTaskDescription extends StatelessWidget {
                 ),
               ),
             ),
-            child: Container(
-              // color: Colors.grey.shade700,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    top: 8.0, bottom: 8.0, left: 2, right: 2),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: descriptionParagraphs,
-                  // children: [
-                  // ],
-                ),
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  top: 8.0, bottom: 8.0, left: 2, right: 2),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: descriptionParagraphs,
+                // children: [
+                // ],
               ),
             ),
           )

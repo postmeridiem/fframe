@@ -12,6 +12,9 @@ class SwimlanesController extends InheritedModel {
     required this.viewportSize,
     required this.documentOpen,
   }) : super(child: child) {
+    // initialize the total width tracker
+    double calculatedMinWidth = 0;
+
     // get a handle to the current user
     FFrameUser currentUser = Fframe.of(context)!.user as FFrameUser;
     List<String> currentRoles = [];
@@ -22,7 +25,6 @@ class SwimlanesController extends InheritedModel {
 
     // initialize the tasks database
     database = SwimlaneTaskDatabase(currentUser: currentUser);
-    double calculatedMinWidth = 0;
 
     for (var i = 0; i < (config.swimlaneSettings.length); i++) {
       // get the settings for the current swimlane

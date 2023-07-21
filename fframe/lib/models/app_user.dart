@@ -6,7 +6,7 @@ class FFrameUser extends StateNotifier {
     this.uid,
     this.displayName,
     this.email,
-    this.photoUrl,
+    this.photoURL,
     this.metaData,
     this.roles,
     this.firebaseUser,
@@ -18,7 +18,7 @@ class FFrameUser extends StateNotifier {
   final String? displayName;
   final String? uid;
   final String? email;
-  final String? photoUrl;
+  final String? photoURL;
   final UserMetadata? metaData;
   late List<String>? roles;
   final User? firebaseUser;
@@ -29,13 +29,12 @@ class FFrameUser extends StateNotifier {
     SnapshotOptions? snapshotOptions,
   }) {
     Map<String, dynamic> json = snapshot.data()!;
-
     FFrameUser user = FFrameUser(
       id: snapshot.id,
-      displayName: json['uid']! as String,
-      uid: json['uid']! as String,
-      email: json['email']! as String,
-      photoUrl: json['photoUrl']! as String,
+      displayName: json['displayName'] ?? "",
+      uid: json['uid'] ?? "",
+      email: json['email'] ?? "",
+      photoURL: json['photoURL'] ?? "",
     );
 
     return user;
@@ -47,7 +46,7 @@ class FFrameUser extends StateNotifier {
       uid: firebaseUser.uid,
       displayName: firebaseUser.displayName,
       email: firebaseUser.email,
-      photoUrl: firebaseUser.photoURL,
+      photoURL: firebaseUser.photoURL,
       metaData: firebaseUser.metadata,
       roles: roles,
       firebaseUser: firebaseUser,
