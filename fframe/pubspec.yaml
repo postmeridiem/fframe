@@ -13,14 +13,11 @@ dependencies:
   flutter:
     sdk: flutter
   intl:
-  # firebase_core:
   cloud_firestore: ^4.4.2
   firebase_storage:
   uuid: #to generate uids
   flutter_signin_button:
   google_sign_in:
-  # googleapis:
-  # googleapis_auth:
   flutterfire_ui: ^0.4.3+20
   file_picker:
   firebase_analytics:
@@ -33,6 +30,7 @@ dependencies:
   shared_preferences:
   horizontal_data_table: ^4.1.4
   dotted_border: 
+  flutter_quill: 
 
 dev_dependencies:
   flutter_test:
