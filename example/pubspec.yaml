@@ -22,12 +22,6 @@ dependencies:
   #Remove this fframe reference
   fframe:
     path: ../fframe
-  intl: ^0.18.0
-  flutter_signin_button: 
-  google_sign_in:
-  flutterfire_ui:
-  clipboard:
-  url_launcher:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
