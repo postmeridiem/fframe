@@ -12,6 +12,7 @@ export 'package:url_launcher/url_launcher_string.dart';
 export 'package:clipboard/clipboard.dart';
 export 'package:shimmer/shimmer.dart';
 export 'package:dotted_border/dotted_border.dart';
+export 'package:flutter_quill/flutter_quill.dart' hide Text;
 
 import 'dart:async';
 import 'dart:convert';
@@ -59,6 +60,7 @@ import 'package:fframe/extensions/query.dart';
 
 import 'material/paginated_data_table_extended.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide Text;
 
 part 'fframe_main.dart';
 part 'frouter/frouter.dart';
@@ -70,6 +72,7 @@ part 'package:fframe/models/sign_in_config.dart';
 part 'package:fframe/models/router_config.dart';
 part 'package:fframe/models/navigation_config.dart';
 part 'package:fframe/providers/global_providers.dart';
+part 'models/swimlanes_task.dart';
 
 part 'package:fframe/services/target_state.dart';
 part 'package:fframe/services/query_state.dart';
@@ -89,7 +92,6 @@ part 'package:fframe/screens/swimlanes_screen/swimlanes_firestore.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_controller.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_widgets.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_classes.dart';
-part 'models/swimlanes_task.dart';
 part 'screens/router_page.dart';
 
 part 'helpers/validator.dart';

@@ -107,6 +107,7 @@ class FirestoreSwimlanesState<T> extends ConsumerState<FirestoreSwimlanes<T>> {
 
                           for (var i = 0; i < taskCount; i++) {
                             SwimlanesTask currentTask = snapshot.docs[i].data();
+                            currentTask.snapshot = snapshot.docs[i];
                             swimlanes.database.registerTask(currentTask);
                           }
                           return Stack(

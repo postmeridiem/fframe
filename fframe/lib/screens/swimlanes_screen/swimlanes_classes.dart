@@ -176,7 +176,9 @@ class SwimlaneTaskDatabase {
             }
             break;
           case SwimlanesFilterType.followedTasks:
-            // filterPassed = true;
+            if (task.followers.contains(swimlanes.database.currentUser.email)) {
+              filterPassed = true;
+            }
             break;
           case SwimlanesFilterType.prioHigh:
             if (task.priority == 1 ||
@@ -328,14 +330,6 @@ class SwimlanesDbStatusSet {
       ...prio9Tasks,
     ];
   }
-}
-
-class SwimlanesDbStatusSetByUser {
-  const SwimlanesDbStatusSetByUser({
-    required this.status,
-  });
-  final String status;
-  void registerTask(SwimlanesTask task) {}
 }
 
 enum SwimlanesDataMode {

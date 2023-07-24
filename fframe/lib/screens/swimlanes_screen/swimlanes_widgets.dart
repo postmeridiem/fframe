@@ -209,51 +209,51 @@ class SwimlanesFilterBar extends StatelessWidget {
                 ],
               ),
             ),
-            // Padding(
-            //   padding: const EdgeInsets.only(right: 16.0),
-            //   child: Column(
-            //     mainAxisAlignment: MainAxisAlignment.center,
-            //     crossAxisAlignment: CrossAxisAlignment.center,
-            //     children: [
-            //       OutlinedButton(
-            //         onPressed: () {
-            //           toggleFilter(SwimlanesFilterType.followedTasks);
-            //         },
-            //         style: OutlinedButton.styleFrom(
-            //           shape: RoundedRectangleBorder(
-            //             borderRadius: BorderRadius.circular(28),
-            //           ),
-            //           side: BorderSide(
-            //             width: 2,
-            //             color: (curFilter == SwimlanesFilterType.followedTasks)
-            //                 ? active
-            //                 : Theme.of(context).disabledColor,
-            //           ),
-            //         ),
-            //         child: Padding(
-            //           padding: const EdgeInsets.only(top: 4, bottom: 4),
-            //           child: Icon(
-            //             Icons.visibility_outlined,
-            //             size: 16,
-            //             color: (curFilter == SwimlanesFilterType.followedTasks)
-            //                 ? active
-            //                 : inactive,
-            //           ),
-            //         ),
-            //       ),
-            //       Padding(
-            //         padding: const EdgeInsets.only(top: 4.0),
-            //         child: Text(
-            //           "following",
-            //           style: TextStyle(
-            //             color: swimlanes.taskCardTextColor,
-            //             fontSize: 11,
-            //           ),
-            //         ),
-            //       ),
-            //     ],
-            //   ),
-            // ),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  OutlinedButton(
+                    onPressed: () {
+                      toggleFilter(SwimlanesFilterType.followedTasks);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(28),
+                      ),
+                      side: BorderSide(
+                        width: 2,
+                        color: (curFilter == SwimlanesFilterType.followedTasks)
+                            ? active
+                            : Theme.of(context).disabledColor,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 4, bottom: 4),
+                      child: Icon(
+                        Icons.visibility_outlined,
+                        size: 16,
+                        color: (curFilter == SwimlanesFilterType.followedTasks)
+                            ? active
+                            : inactive,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      "following",
+                      style: TextStyle(
+                        color: swimlanes.taskCardTextColor,
+                        fontSize: 11,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.only(right: 16.0),
               child: Column(
@@ -600,12 +600,12 @@ class _SwimlanesDocumentState<SwimlanesTask>
     return widget.documentOpen
         ? Row(
             children: [
-              SwimlanesDocumentTaskCard(widget: widget),
               Expanded(
                 child: ScreenBody<SwimlanesTask>(
                   key: ValueKey("ScreenBody_${documentConfig.collection}"),
                 ),
               ),
+              SwimlanesDocumentTaskCard(swimlanes: widget.swimlanes),
             ],
           )
         : const IgnorePointer();
@@ -613,109 +613,420 @@ class _SwimlanesDocumentState<SwimlanesTask>
 }
 
 class SwimlanesDocumentTaskCard extends StatelessWidget {
-  const SwimlanesDocumentTaskCard({
+  SwimlanesDocumentTaskCard({
     super.key,
-    required this.widget,
+    required this.swimlanes,
   });
 
-  final SwimlanesDocument widget;
+  final SwimlanesController swimlanes;
+  final QuillController _controller = QuillController.basic();
 
+  @override
   Widget build(BuildContext context) {
     // register shared validator class for common patterns
     Validator validator = Validator();
     bool readOnly = true;
 
     return Container(
-      color: Colors.black,
+      color: swimlanes.swimlaneBackgroundColor,
       child: SizedBox(
-        width: widget.swimlanes.config.swimlaneWidth,
-        child: const Placeholder(),
-        // child: Card(
-        //   child: Padding(
-        //     padding: const EdgeInsets.all(8.0),
-        //     child: Column(
-        //       crossAxisAlignment: CrossAxisAlignment.start,
-        //       children: [
-        //         Padding(
-        //           padding: const EdgeInsets.only(bottom: 16.0),
-        //           child: TextFormField(
-        //             readOnly: readOnly,
-        //             decoration: const InputDecoration(
-        //               // hoverColor: Color(0xFFFF00C8),
-        //               // hoverColor: Theme.of(context).indicatorColor,
-        //               border: OutlineInputBorder(),
-        //               labelText: "Name",
-        //             ),
-        //             initialValue: swimlanesTask.name ?? '',
-        //             validator: (curValue) {
-        //               if (validator.validString(curValue)) {
-        //                 swimlanesTask.name = curValue;
-        //                 return null;
-        //               } else {
-        //                 return 'Enter a valid name';
-        //               }
-        //             },
-        //           ),
-        //         ),
-        //         Padding(
-        //           padding: const EdgeInsets.only(bottom: 16.0),
-        //           child: TextFormField(
-        //             readOnly: true,
-        //             onSaved: (String? value) {
-        //               swimlanesTask.status = value ?? "";
-        //             },
-        //             decoration: const InputDecoration(
-        //               border: OutlineInputBorder(),
-        //               labelText: "Status",
-        //             ),
-        //             initialValue: swimlanesTask.status ?? '',
-        //             validator: (value) {
-        //               if (!validator.validString(value)) {
-        //                 return 'Enter a valid value';
-        //               }
-        //               return null;
-        //             },
-        //           ),
-        //         ),
-        //         Padding(
-        //           padding: const EdgeInsets.only(bottom: 16.0),
-        //           child: TextFormField(
-        //             minLines: 5,
-        //             maxLines: 10,
-        //             onSaved: (String? value) {
-        //               swimlanesTask.description = value ?? "";
-        //             },
-        //             readOnly: readOnly,
-        //             decoration: const InputDecoration(
-        //               border: OutlineInputBorder(),
-        //               labelText: "Description",
-        //             ),
-        //             initialValue: swimlanesTask.description ?? '',
-        //             validator: (value) {
-        //               if (!validator.validString(value)) {
-        //                 return 'Enter a valid value';
-        //               }
-        //               return null;
-        //             },
-        //           ),
-        //         ),
-        //         Padding(
-        //           padding: const EdgeInsets.only(bottom: 16.0),
-        //           child: TextFormField(
-        //             readOnly: true,
-        //             initialValue: swimlanesTask.createdBy ?? "unknown",
-        //             decoration: const InputDecoration(
-        //               border: OutlineInputBorder(),
-        //               labelText: "Author",
-        //             ),
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
+        width: swimlanes.config.swimlaneWidth,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GestureDetector(
+            onTap: () {},
+            child: Card(
+              color: swimlanes.taskCardColor,
+              elevation: 4,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0),
+              ),
+              child: Stack(
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 0,
+                        bottom: 8.0,
+                        left: 4.0,
+                        right: 70.0,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            children: [
+                              Card(
+                                child: SizedBox(
+                                  width: swimlanes.config.swimlaneWidth,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      "currentTask.name",
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color:
+                                            swimlanes.taskCardHeaderTextColor,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Divider(
+                                color: swimlanes.taskCardHeaderColor,
+                              ),
+                            ],
+                          ),
+                          Expanded(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  color: swimlanes.swimlaneBackgroundColor,
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        width: swimlanes.config.swimlaneWidth -
+                                            115,
+                                        height: 600,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Padding(
+                                                padding:
+                                                    EdgeInsets.only(left: 32.0),
+                                                child: Text("Description"),
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: QuillEditor.basic(
+                                                  controller: _controller,
+                                                  readOnly:
+                                                      false, // true for view only mode
+                                                ),
+                                              ),
+                                            ),
+                                            QuillToolbar.basic(
+                                              controller: _controller,
+                                              toolbarIconAlignment:
+                                                  WrapAlignment.start,
+                                              toolbarIconSize: 14,
+                                              multiRowsDisplay: true,
+                                              showDividers: true,
+                                              showFontFamily: false,
+                                              showFontSize: true,
+                                              showBoldButton: true,
+                                              showItalicButton: true,
+                                              showSmallButton: false,
+                                              showUnderLineButton: true,
+                                              showStrikeThrough: false,
+                                              showInlineCode: false,
+                                              showColorButton: false,
+                                              showBackgroundColorButton: false,
+                                              showClearFormat: true,
+                                              showAlignmentButtons: false,
+                                              showLeftAlignment: false,
+                                              showCenterAlignment: false,
+                                              showRightAlignment: false,
+                                              showJustifyAlignment: false,
+                                              showHeaderStyle: false,
+                                              showListNumbers: false,
+                                              showListBullets: true,
+                                              showListCheck: false,
+                                              showCodeBlock: true,
+                                              showQuote: false,
+                                              showIndent: false,
+                                              showLink: true,
+                                              showUndo: false,
+                                              showRedo: false,
+                                              showDirection: false,
+                                              showSearchButton: false,
+                                              showSubscript: false,
+                                              showSuperscript: false,
+                                              fontSizeValues: const {
+                                                "Small": "10",
+                                                "Medium": "12",
+                                                "Large": "16"
+                                              },
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              Divider(
+                                color: swimlanes.taskCardHeaderColor,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text("created by bla"),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Opacity(
+                      opacity: 0.5,
+                      child: SizedBox(
+                        width: 72,
+                        height: 72,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "0",
+                                style: TextStyle(
+                                  color: Colors.cyan,
+                                  fontSize: 48,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 48,
+                    child: Opacity(
+                      opacity: 0.6,
+                      child: SizedBox(
+                        width: 60,
+                        height: 54,
+                        child: IgnorePointer(),
+                        // child: AssignedAvatar(
+                        //   assignedTo: currentTask.assignedTo,
+                        //   assignmentTime: L10n.stringFromTimestamp(
+                        //       timestamp:
+                        //           currentTask.assignmentTime ?? Timestamp.now()),
+                        //   swimlanes: swimlanes,
+                        // ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    bottom: 0,
+                    child: Opacity(
+                      opacity: 0.5,
+                      child: SizedBox(
+                        width: 72,
+                        height: 54,
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Icon(
+                              //   currentTask.icon,
+                              //   color: currentTask.color,
+                              //   size: 48,
+                              // ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
+
+    // return Container(
+    //   color: swimlanes.swimlaneBackgroundColor,
+    //   child: SizedBox(
+    //       width: swimlanes.config.swimlaneWidth,
+    //       // child: const Placeholder(),
+    //       child: Padding(
+    //         padding: const EdgeInsets.all(8.0),
+    //         child: Card(
+    //           color: swimlanes.taskCardColor,
+    //           child: Column(
+    //             children: [
+    //               Card(
+    //                 child: SizedBox(
+    //                   width: swimlanes.config.swimlaneWidth,
+    //                   child: Padding(
+    //                     padding: const EdgeInsets.all(8.0),
+    //                     child: Text(
+    //                       "title",
+    //                       style: TextStyle(
+    //                         fontSize: 16,
+    //                         color: swimlanes.taskCardHeaderTextColor,
+    //                       ),
+    //                     ),
+    //                   ),
+    //                 ),
+    //               ),
+    // QuillToolbar.basic(
+    //   controller: _controller,
+    //   toolbarIconAlignment: WrapAlignment.start,
+    //   multiRowsDisplay: true,
+    //   showDividers: true,
+    //   showFontFamily: false,
+    //   showFontSize: false,
+    //   showBoldButton: true,
+    //   showItalicButton: true,
+    //   showSmallButton: false,
+    //   showUnderLineButton: true,
+    //   showStrikeThrough: false,
+    //   showInlineCode: false,
+    //   showColorButton: false,
+    //   showBackgroundColorButton: false,
+    //   showClearFormat: true,
+    //   showAlignmentButtons: false,
+    //   showLeftAlignment: false,
+    //   showCenterAlignment: false,
+    //   showRightAlignment: false,
+    //   showJustifyAlignment: false,
+    //   showHeaderStyle: false,
+    //   showListNumbers: false,
+    //   showListBullets: true,
+    //   showListCheck: false,
+    //   showCodeBlock: true,
+    //   showQuote: false,
+    //   showIndent: false,
+    //   showLink: true,
+    //   showUndo: false,
+    //   showRedo: false,
+    //   showDirection: false,
+    //   showSearchButton: false,
+    //   showSubscript: false,
+    //   showSuperscript: false,
+    // ),
+    // Expanded(
+    //   child: QuillEditor.basic(
+    //     controller: _controller,
+    //     readOnly: false, // true for view only mode
+    //   ),
+    // )
+    //             ],
+    //           ),
+    //         ),
+    //       )
+    //       // child: Card(
+    //       //   child: Padding(
+    //       //     padding: const EdgeInsets.all(8.0),
+    //       //     child: Column(
+    //       //       crossAxisAlignment: CrossAxisAlignment.start,
+    //       //       children: [
+    //       //         Padding(
+    //       //           padding: const EdgeInsets.only(bottom: 16.0),
+    //       //           child: TextFormField(
+    //       //             readOnly: readOnly,
+    //       //             decoration: const InputDecoration(
+    //       //               // hoverColor: Color(0xFFFF00C8),
+    //       //               // hoverColor: Theme.of(context).indicatorColor,
+    //       //               border: OutlineInputBorder(),
+    //       //               labelText: "Name",
+    //       //             ),
+    //       //             initialValue: swimlanesTask.name ?? '',
+    //       //             validator: (curValue) {
+    //       //               if (validator.validString(curValue)) {
+    //       //                 swimlanesTask.name = curValue;
+    //       //                 return null;
+    //       //               } else {
+    //       //                 return 'Enter a valid name';
+    //       //               }
+    //       //             },
+    //       //           ),
+    //       //         ),
+    //       //         Padding(
+    //       //           padding: const EdgeInsets.only(bottom: 16.0),
+    //       //           child: TextFormField(
+    //       //             readOnly: true,
+    //       //             onSaved: (String? value) {
+    //       //               swimlanesTask.status = value ?? "";
+    //       //             },
+    //       //             decoration: const InputDecoration(
+    //       //               border: OutlineInputBorder(),
+    //       //               labelText: "Status",
+    //       //             ),
+    //       //             initialValue: swimlanesTask.status ?? '',
+    //       //             validator: (value) {
+    //       //               if (!validator.validString(value)) {
+    //       //                 return 'Enter a valid value';
+    //       //               }
+    //       //               return null;
+    //       //             },
+    //       //           ),
+    //       //         ),
+    //       //         Padding(
+    //       //           padding: const EdgeInsets.only(bottom: 16.0),
+    //       //           child: TextFormField(
+    //       //             minLines: 5,
+    //       //             maxLines: 10,
+    //       //             onSaved: (String? value) {
+    //       //               swimlanesTask.description = value ?? "";
+    //       //             },
+    //       //             readOnly: readOnly,
+    //       //             decoration: const InputDecoration(
+    //       //               border: OutlineInputBorder(),
+    //       //               labelText: "Description",
+    //       //             ),
+    //       //             initialValue: swimlanesTask.description ?? '',
+    //       //             validator: (value) {
+    //       //               if (!validator.validString(value)) {
+    //       //                 return 'Enter a valid value';
+    //       //               }
+    //       //               return null;
+    //       //             },
+    //       //           ),
+    //       //         ),
+    //       //         Padding(
+    //       //           padding: const EdgeInsets.only(bottom: 16.0),
+    //       //           child: TextFormField(
+    //       //             readOnly: true,
+    //       //             initialValue: swimlanesTask.createdBy ?? "unknown",
+    //       //             decoration: const InputDecoration(
+    //       //               border: OutlineInputBorder(),
+    //       //               labelText: "Author",
+    //       //             ),
+    //       //           ),
+    //       //         ),
+    //       //       ],
+    //       //     ),
+    //       //   ),
+    //       // ),
+    //       ),
+    // );
   }
 }
 
@@ -792,9 +1103,11 @@ class Swimlane extends StatelessWidget {
               currentTask: currentTask,
             ),
           ),
+          // feedback: Text("card"),
           feedback: SwimlanesTaskCard(
             swimlanes: swimlanes,
             currentTask: currentTask,
+            dragging: true,
           ),
           child: SwimlanesTaskCard(
             swimlanes: swimlanes,
@@ -803,6 +1116,7 @@ class Swimlane extends StatelessWidget {
         ),
       );
     }
+
     return Container(
       decoration: BoxDecoration(
         border: Border(
@@ -837,17 +1151,11 @@ class Swimlane extends StatelessWidget {
           swimlanes.isDragging
               ? DragTarget<SwimlanesTask>(
                   onAccept: (SwimlanesTask droppedTask) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: ListTile(
-                        leading: const Icon(
-                          Icons.move_to_inbox_outlined,
-                        ),
-                        title: Text(
-                            "Moved '${droppedTask.name}' to [${swimlane.header}]"),
-                        textColor: Theme.of(context).colorScheme.onPrimary,
-                      ),
-                    ),
+                  swimlaneDrop(
+                    swimlanes: swimlanes,
+                    context: context,
+                    targetStatus: swimlane.status,
+                    task: droppedTask,
                   );
                 }, builder: (context, candidateData, rejectedData) {
                   return Stack(
@@ -921,6 +1229,43 @@ class Swimlane extends StatelessWidget {
       ),
     );
   }
+
+  void swimlaneDrop({
+    required BuildContext context,
+    required SwimlanesController swimlanes,
+    required String targetStatus,
+    required SwimlanesTask task,
+  }) {
+    // void drop when status was not changed
+    if (task.status != targetStatus && task.snapshot != null) {
+      task.status = targetStatus;
+      DocumentConfig<SwimlanesTask> documentConfig =
+          DocumentScreenConfig.of(context)?.documentConfig
+              as DocumentConfig<SwimlanesTask>;
+      QueryDocumentSnapshot snapshot = task.snapshot as QueryDocumentSnapshot;
+
+      DatabaseService<SwimlanesTask>().updateDocument(
+        collection: snapshot.reference.parent.path,
+        documentId: snapshot.id,
+        data: task,
+        fromFirestore: documentConfig.fromFirestore,
+        toFirestore: documentConfig.toFirestore,
+      );
+
+      // show snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: ListTile(
+            leading: const Icon(
+              Icons.move_to_inbox_outlined,
+            ),
+            title: Text("Moved '${task.name}' to [${swimlane.header}]"),
+            textColor: Theme.of(context).colorScheme.onPrimary,
+          ),
+        ),
+      );
+    }
+  }
 }
 
 class SwimlanesTaskCard extends StatefulWidget {
@@ -929,11 +1274,13 @@ class SwimlanesTaskCard extends StatefulWidget {
     required this.swimlanes,
     required this.currentTask,
     this.condensed = false,
+    this.dragging = false,
   });
 
   final SwimlanesController swimlanes;
   final SwimlanesTask currentTask;
   final bool condensed;
+  final bool dragging;
 
   @override
   State<SwimlanesTaskCard> createState() => _SwimlanesTaskCardState();
@@ -948,7 +1295,18 @@ class _SwimlanesTaskCardState extends State<SwimlanesTaskCard> {
     return Padding(
       padding: const EdgeInsets.all(6.0),
       child: GestureDetector(
-        onTap: () {},
+        onTap: () {
+          if (!widget.dragging) {
+            DocumentScreenConfig documentScreenConfig =
+                DocumentScreenConfig.of(context)!;
+            if (widget.currentTask.snapshot != null) {
+              documentScreenConfig.selectDocument(
+                  context,
+                  widget.currentTask.snapshot
+                      as QueryDocumentSnapshot<SwimlanesTask>);
+            }
+          }
+        },
         child: Card(
           color: swimlanes.taskCardColor,
           elevation: 4,
@@ -1013,11 +1371,11 @@ class _SwimlanesTaskCardState extends State<SwimlanesTaskCard> {
                         ),
                         widget.condensed
                             ? const IgnorePointer()
-                            : const Padding(
-                                padding: EdgeInsets.all(8.0),
+                            : Padding(
+                                padding: const EdgeInsets.all(8.0),
                                 child: Text(
-                                  "comments: 0",
-                                  style: TextStyle(fontSize: 10),
+                                  "comments: ${currentTask.commentCount}",
+                                  style: const TextStyle(fontSize: 10),
                                 ),
                               ),
                         Divider(
@@ -1083,7 +1441,7 @@ class _SwimlanesTaskCardState extends State<SwimlanesTaskCard> {
                   right: 0,
                   bottom: 48,
                   child: Opacity(
-                    opacity: 0.6,
+                    opacity: 0.7,
                     child: SizedBox(
                       width: 60,
                       height: 54,
@@ -1130,7 +1488,7 @@ class _SwimlanesTaskCardState extends State<SwimlanesTaskCard> {
   }
 }
 
-class AssignedAvatar extends StatefulWidget {
+class AssignedAvatar extends StatelessWidget {
   const AssignedAvatar({
     super.key,
     required this.swimlanes,
@@ -1143,31 +1501,50 @@ class AssignedAvatar extends StatefulWidget {
   final String? assignmentTime;
 
   @override
-  State<AssignedAvatar> createState() => _AssignedAvatarState();
-}
-
-class _AssignedAvatarState extends State<AssignedAvatar> {
-  @override
   Widget build(BuildContext context) {
-    if (widget.assignedTo == null) {
+    if (assignedTo == null) {
       return const IgnorePointer();
     }
 
-    final Stream<QuerySnapshot> userLookup = FirebaseFirestore.instance
+    final Future<QuerySnapshot> userLookup = FirebaseFirestore.instance
         .collection('users')
-        .where('email', isEqualTo: widget.assignedTo)
-        .snapshots();
+        .where('email', isEqualTo: assignedTo)
+        .snapshots()
+        .first;
 
-    return StreamBuilder<QuerySnapshot>(
-        stream: userLookup,
+    return FutureBuilder<QuerySnapshot>(
+        future: userLookup,
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.hasError) {
             return const Icon(Icons.no_accounts_outlined);
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const Center(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: 20.0),
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
+                ),
+              ),
+            );
           }
+          // return const Center(
+          //   child: Padding(
+          //     padding: EdgeInsets.only(bottom: 8.0),
+          //     child: SizedBox(
+          //       width: 24,
+          //       height: 24,
+          //       child: CircularProgressIndicator(
+          //         strokeWidth: 2,
+          //       ),
+          //     ),
+          //   ),
+          // );
 
           FFrameUser assignedUser = FFrameUser.fromFirestore(
               snapshot: snapshot.data!.docs.first
@@ -1201,11 +1578,11 @@ class _AssignedAvatarState extends State<AssignedAvatar> {
             }
           }
           String tooltipMessage =
-              "Assigned to: \t\t\t${assignedUser.displayName ?? ""}\nOn: \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t${widget.assignmentTime}";
+              "Assigned to: \t\t\t${assignedUser.displayName ?? ""}\nOn: \t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t$assignmentTime UTC";
           return Tooltip(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
-              color: widget.swimlanes.swimlaneBackgroundColor,
+              color: swimlanes.swimlaneBackgroundColor,
             ),
             richMessage: WidgetSpan(
               child: Text(tooltipMessage),

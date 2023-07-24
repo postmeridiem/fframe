@@ -3,6 +3,7 @@ part of fframe;
 class SwimlanesTask extends ChangeNotifier {
   SwimlanesTask({
     this.id,
+    this.snapshot,
     this.name,
     this.priority = 5,
     this.active,
@@ -14,6 +15,8 @@ class SwimlanesTask extends ChangeNotifier {
     this.createdBy,
     this.assignedTo,
     this.assignmentTime,
+    this.comments = const {},
+    this.followers = const [],
     this.dueTime,
     this.saveCount = 0,
     // this.changeHistory,
@@ -48,6 +51,8 @@ class SwimlanesTask extends ChangeNotifier {
   ///
   /// [String] assignmentTime - the moment this task was assigned
   ///
+  /// [List<dynamic>] comments - list of comments for this task
+  ///
   /// [Timestamp] dueTime - date this task is flagged as due
   ///
 
@@ -81,6 +86,8 @@ class SwimlanesTask extends ChangeNotifier {
       assignmentTime: json['assignmentTime'] != null
           ? json['assignmentTime'] as Timestamp
           : null,
+      comments: json['zzComments'] ?? {},
+      followers: json['zzFollowers'] ?? [],
       dueTime: json['dueTime'] != null ? json['dueTime'] as Timestamp : null,
       saveCount: json['saveCount'] != null ? json['saveCount'] as double : 0,
       // changeHistory: json['changeHistory'] != null
@@ -92,6 +99,7 @@ class SwimlanesTask extends ChangeNotifier {
   }
 
   String? id;
+  QueryDocumentSnapshot? snapshot;
   String? name;
   int priority;
   bool? active;
@@ -104,6 +112,13 @@ class SwimlanesTask extends ChangeNotifier {
   String? assignedTo;
   Timestamp? assignmentTime;
   Timestamp? dueTime;
+  Map<String, dynamic> comments;
+  List followers;
+
+  int get commentCount {
+    return comments.length;
+  }
+
   double saveCount;
   // Map<String, Timestamp>? changeHistory;
 
@@ -127,7 +142,7 @@ class SwimlanesTask extends ChangeNotifier {
       "assignmentTime": assignmentTime,
       "dueTime": creationDate ?? Timestamp.now(),
       "saveCount": saveCount,
-      // "changeHistory": FieldValue.arrayUnion([changeHistory]),
+      "changeHistory": FieldValue.arrayUnion([changeHistory]),
     };
   }
 }

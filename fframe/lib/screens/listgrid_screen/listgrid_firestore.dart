@@ -527,7 +527,9 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
   }
 
   Future<int> countQueryResult({required Query<T> query}) async {
-    AggregateQuerySnapshot snaphot = await query.count().get();
-    return snaphot.count;
+    // TODO: fix this properly, it's spammy on the network
+    return 0;
+    // AggregateQuerySnapshot snaphot = await query.count().get();
+    // return snaphot.count;
   }
 }
