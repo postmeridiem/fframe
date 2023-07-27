@@ -13,6 +13,8 @@ class SwimlanesTask extends ChangeNotifier {
     this.description,
     this.creationDate,
     this.createdBy,
+    this.linkedPath,
+    this.linkedDocumentId,
     this.assignedTo,
     this.assignmentTime,
     this.comments = const {},
@@ -68,24 +70,19 @@ class SwimlanesTask extends ChangeNotifier {
 
     SwimlanesTask swimlaneTask = SwimlanesTask(
       id: snapshot.id,
-      name: json['name']! as String,
-      priority: json['priority'] == null ? 5 : json['priority'] as int,
-      active: json['active'] == null ? true : json['active'] as bool,
+      name: json['name'],
+      priority: json['priority'] ?? 5,
+      active: json['active'] ?? true,
       icon: getSwimLaneTaskIcon(iconName: iconName),
       color: getSwimLaneTaskColor(hexColor: hexColor),
-      status: json['status'] == null ? "new" : json['status'] as String,
-      description: json['description'] == null
-          ? '<no description>'
-          : json['description'] as String,
-      creationDate: json['creationDate'] != null
-          ? json['creationDate'] as Timestamp
-          : null,
+      status: json['status'] ?? "new",
+      description: json['description'] ?? '<no description>',
+      creationDate: json['creationDate'],
       createdBy: json['createdBy'] != null ? json['createdBy'] as String : null,
-      assignedTo:
-          json['assignedTo'] != null ? json['assignedTo'] as String : null,
-      assignmentTime: json['assignmentTime'] != null
-          ? json['assignmentTime'] as Timestamp
-          : null,
+      linkedPath: json['linkedPath'],
+      linkedDocumentId: json['linkedDocumentId'],
+      assignedTo: json['assignedTo'],
+      assignmentTime: json['assignmentTime'],
       comments: json['zzComments'] ?? {},
       followers: json['zzFollowers'] ?? [],
       dueTime: json['dueTime'] != null ? json['dueTime'] as Timestamp : null,
@@ -109,6 +106,8 @@ class SwimlanesTask extends ChangeNotifier {
   String? description;
   Timestamp? creationDate;
   String? createdBy;
+  String? linkedPath;
+  String? linkedDocumentId;
   String? assignedTo;
   Timestamp? assignmentTime;
   Timestamp? dueTime;
