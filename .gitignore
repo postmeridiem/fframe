@@ -50,3 +50,8 @@ example/ios/firebase_app_id_file.json
 example/macos/Podfile.lock
 example/lib/firebase_options.dart
 example/lib/generated_plugin_registrant.dart
+example/linux/flutter/generated_plugin_registrant.cc
+example/linux/flutter/generated_plugins.cmake
+example/macos/Flutter/GeneratedPluginRegistrant.swift
+example/windows/flutter/generated_plugin_registrant.cc
+example/windows/flutter/generated_plugins.cmake
