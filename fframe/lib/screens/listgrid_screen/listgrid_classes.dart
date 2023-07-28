@@ -44,8 +44,7 @@ class ListGridConfig<T> {
   final String? searchHint;
   final List<ListGridActionMenu<T>> actionBar;
 
-  late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
+  late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   late Map<String, Object?> Function(T, SetOptions?) toFirestore;
 }
 
@@ -70,7 +69,7 @@ class ListGridActionMenuItem<T> {
   final String label;
   final IconData icon;
   final bool requireSelection;
-  final ListGridActionHandler<T> clickHandler;
+  final ListGridActionHandler clickHandler;
 }
 
 class ListGridColumn<T> {
@@ -153,6 +152,18 @@ class ListGridSearchMask {
   final bool toLowerCase;
 }
 
+class SelectedDocument<T> {
+  final String id;
+  final T document;
+  final QueryDocumentSnapshot? snapshot;
+
+  SelectedDocument({
+    required this.id,
+    required this.document,
+    this.snapshot,
+  });
+}
+
 enum ListGridColumnSizingMode {
   flex,
   fixed,
@@ -172,10 +183,10 @@ enum ListGridSearchMode {
   underscoreTypeAhead,
 }
 
-typedef ListGridActionHandler<T> = void Function(
+typedef ListGridActionHandler = void Function(
   BuildContext context,
   FFrameUser? user,
-  Map<String, T> selectedDocumentsById,
+  List<SelectedDocument> selectedDocuments,
 );
 
 typedef ListGridValueBuilderFunction<T> = dynamic Function(
