@@ -1,11 +1,8 @@
-import 'dart:developer';
-
-import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:example/models/suggestion.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'list_grid.dart';
 
 enum ListGridQueryStates { active, inactive }
@@ -44,7 +41,8 @@ class _ListGridScreenState extends State<ListGridScreen> {
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
+            "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -86,7 +84,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
         // showHeader: false,
         // // showFooter: false,
         rowsSelectable: true,
-        actionBar: sampleActionMenus(),
+        actionBar: listgridActionMenu<Suggestion>(),
         columnSettings: listGridColumns,
       ),
 
@@ -100,35 +98,36 @@ class _ListGridScreenState extends State<ListGridScreen> {
     return Document<Suggestion>(
       scrollableHeader: false,
       showCloseButton: true,
-      showCopyButton: true,
       showEditToggleButton: true,
-      showCreateButton: true,
       showDeleteButton: true,
       showSaveButton: true,
-      showValidateButton: true,
       extraActionButtons: (context, suggestion, isReadOnly, isNew, user) {
         return [
-          if (suggestion.active == false)
-            TextButton.icon(
+          if (user != null &&
+              user.roles != null &&
+              user.roles!.contains("firestoreaccess"))
+            IconButton(
+              tooltip: "Open Firestore Document",
               onPressed: () {
-                suggestion.active = true;
-                DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+                String domain = "https://console.cloud.google.com";
+                String application = "firestore/databases/-default-/data/panel";
+                String collection = "suggestions";
+                String docId = suggestion.id ?? "";
+                String gcpProject =
+                    Fframe.of(context)!.firebaseOptions.projectId;
+                Uri url = Uri.parse(
+                    "$domain/$application/$collection/$docId?&project=$gcpProject");
+                launchUrl(url);
               },
-              icon: const Icon(Icons.check, color: Colors.redAccent),
-              label: const Text("Mark as Active"),
-            ),
-          if (suggestion.active == true)
-            TextButton.icon(
-              onPressed: () {
-                suggestion.active = false;
-                DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
-              },
-              icon: const Icon(Icons.close, color: Colors.greenAccent),
-              label: const Text("Mark as Done"),
+              icon: Icon(
+                Icons.table_chart_outlined,
+                color: Theme.of(context).colorScheme.onBackground,
+              ),
             ),
         ];
       },
-      documentTabsBuilder: (context, suggestion, isReadOnly, isNew, fFrameUser) {
+      documentTabsBuilder:
+          (context, suggestion, isReadOnly, isNew, fFrameUser) {
         return [
           DocumentTab<Suggestion>(
             tabBuilder: (user) {
@@ -151,156 +150,4 @@ class _ListGridScreenState extends State<ListGridScreen> {
       },
     );
   }
-}
-
-List<ListGridActionMenu<T>> sampleActionMenus<T>() {
-  return [
-    ListGridActionMenu(
-      label: "Create new...",
-      icon: Icons.new_label,
-      menuItems: [
-        ListGridActionMenuItem<T>(
-          label: "Create new...",
-          icon: Icons.new_label,
-          requireSelection: false,
-          clickHandler: (context, user, selectedDocuments) {
-            debugPrint("clickHandler with type $T");
-            // selectedDocuments.forEach((documentId, currentDocument) {
-
-            DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context) as DocumentScreenConfig;
-            DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
-            T newDocument = documentConfig.createNew();
-
-            //ToDo: Show new document on interface
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: ListTile(
-                  leading: Icon(
-                    Icons.toggle_off_outlined,
-                    color: Colors.amber[900],
-                  ),
-                  title: Text(
-                    "You clicked new $T",
-                  ),
-                  textColor: Colors.amber[900],
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-    ListGridActionMenu(
-      label: "Toggle active",
-      icon: Icons.toggle_off_outlined,
-      menuItems: [
-        ListGridActionMenuItem<T>(
-          label: "Set inactive",
-          icon: Icons.toggle_off_outlined,
-          clickHandler: (context, user, selectedDocuments) {
-            selectedDocuments.map((selectedDocument) {
-              // DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context) as DocumentScreenConfig;
-              // DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
-              // // TODO: Arno, pls hlp...
-              // // how do I make this save using the embedded document models?
-              // // I can make my own connection to the backend and to a cheap write,
-              // // but that is not very clean.
-
-              // Suggestion currentSuggestion = currentDocument as Suggestion;
-              // currentSuggestion.active = false;
-              // documentConfig.toFirestore(currentDocument, SetOptions(merge: true));
-            });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: ListTile(
-                  leading: Icon(
-                    Icons.toggle_off_outlined,
-                    color: Colors.amber[900],
-                  ),
-                  title: Text(
-                    "Toggled ${selectedDocuments.length} documents to the inactive state.",
-                  ),
-                  textColor: Colors.amber[900],
-                ),
-              ),
-            );
-          },
-        ),
-        ListGridActionMenuItem(
-          label: "Set Active",
-          icon: Icons.toggle_on,
-          clickHandler: (context, user, selectedDocuments) {
-            selectedDocuments.map((selectedDocument) {
-              Suggestion currentDocument = selectedDocument.document as Suggestion;
-              currentDocument.active = false;
-            });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: ListTile(
-                  leading: Icon(
-                    Icons.toggle_on,
-                    color: Colors.amber[900],
-                  ),
-                  title: Text(
-                    "Toggled ${selectedDocuments.length} documents to the active state.",
-                  ),
-                  textColor: Colors.amber[900],
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-    ListGridActionMenu(
-      menuItems: [
-        ListGridActionMenuItem<Suggestion>(
-          label: "Delete",
-          icon: Icons.delete_outline,
-          clickHandler: (context, user, selectedDocuments) {
-            selectedDocuments.map((selectedDocument) {
-              Console.log(
-                "NOT deleting ${selectedDocument.document.name}. Jus' printing this.",
-                scope: "exampleApp.ListGrid.deleteAction",
-                level: LogLevel.prod,
-              );
-            });
-
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: ListTile(
-                  leading: Icon(
-                    Icons.delete_outline,
-                    color: Colors.amber[900],
-                  ),
-                  title: Text(
-                    "NOT deleting ${selectedDocuments.length} documents... Jus' giving you this snack.",
-                  ),
-                  textColor: Colors.amber[900],
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-    ListGridActionMenu(
-      menuItems: [
-        ListGridActionMenuItem(
-          label: "Help...",
-          icon: Icons.help_outline,
-          requireSelection: false,
-          clickHandler: (context, user, selectedDocumentsById) {
-            launchUrl(
-              Uri.parse('https://github.com/postmeridiem/fframe/blob/main/fframe/lib/screens/listgrid_screen/listgrid.md'),
-              webOnlyWindowName: "_blank",
-            );
-          },
-        ),
-      ],
-    ),
-  ];
 }
