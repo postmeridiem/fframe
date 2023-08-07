@@ -2,7 +2,6 @@ import 'dart:async';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
-
 class ErrorPage extends StatefulWidget {
   const ErrorPage({Key? key}) : super(key: key);
 
@@ -34,9 +33,12 @@ class _ErrorPageState extends State<ErrorPage> {
 
   @override
   Widget build(BuildContext context) {
-    String errorText = Fframe.of(context)?.errorText ?? "Something failed succesfully";
+    String errorText =
+        Fframe.of(context)?.errorText ?? "Something failed succesfully";
     String? httpLink;
-    int linkIndex = errorText.toLowerCase().split(" ").indexWhere((String word) => word.startsWith("http://") || word.startsWith("https://"));
+    int linkIndex = errorText.toLowerCase().split(" ").indexWhere(
+        (String word) =>
+            word.startsWith("http://") || word.startsWith("https://"));
     if (linkIndex != -1) {
       List<String> errorArray = errorText.split(" ");
       httpLink = errorArray.elementAt(linkIndex);
@@ -64,7 +66,8 @@ class _ErrorPageState extends State<ErrorPage> {
               color: Theme.of(context).colorScheme.error,
               key: const ValueKey("error_icon_red"),
             ),
-            crossFadeState: _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+            crossFadeState:
+                _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -81,7 +84,7 @@ class _ErrorPageState extends State<ErrorPage> {
           if (httpLink != null)
             TextButton(
               onPressed: () {
-                launchUrlString(httpLink!);
+                launchUrl(Uri.parse(httpLink!));
               },
               child: Text(
                 "link",

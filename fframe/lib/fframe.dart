@@ -8,7 +8,7 @@ export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:firebase_storage/firebase_storage.dart';
 export 'package:flutterfire_ui/firestore.dart';
 export 'package:flutter_riverpod/flutter_riverpod.dart';
-export 'package:url_launcher/url_launcher_string.dart';
+export 'package:url_launcher/url_launcher.dart';
 export 'package:clipboard/clipboard.dart';
 export 'package:shimmer/shimmer.dart';
 export 'package:dotted_border/dotted_border.dart';
@@ -50,7 +50,7 @@ import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:url_launcher/url_launcher_string.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'package:preload_page_view/preload_page_view.dart';
 import 'package:uuid/uuid.dart';
