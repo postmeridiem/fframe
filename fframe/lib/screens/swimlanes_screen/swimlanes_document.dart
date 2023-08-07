@@ -18,49 +18,66 @@ class SwimlanesDocument extends ConsumerStatefulWidget {
 class _SwimlanesDocumentState extends ConsumerState<SwimlanesDocument> {
   @override
   Widget build(BuildContext context) {
-    DocumentScreenConfig documentScreenConfig =
-        DocumentScreenConfig.of(context)!;
-    DocumentConfig<SwimlanesTask> documentConfig =
-        documentScreenConfig.documentConfig as DocumentConfig<SwimlanesTask>;
+    if (widget.documentOpen) {
+      DocumentScreenConfig documentScreenConfig =
+          DocumentScreenConfig.of(context)!;
 
-    QueryState queryState = ref.watch(queryStateProvider);
-    SwimlanesTask currentTask = documentScreenConfig.load<SwimlanesTask>(
-        context: context,
-        docId: queryState.queryParameters![
-            documentScreenConfig.documentConfig.queryStringIdParam]!);
+      QueryState queryState = ref.watch(queryStateProvider);
+      String taskId = queryState.queryParameters![
+          documentScreenConfig.documentConfig.queryStringIdParam]!;
+      String taskCollection = documentScreenConfig.documentConfig.collection;
+      Future<DocumentSnapshot> fsTask = FirebaseFirestore.instance
+          .collection(taskCollection)
+          .doc(taskId)
+          .get();
 
-    return widget.documentOpen
-        ? Row(
-            children: [
-              Expanded(
-                child: ScreenBody<SwimlanesTask>(
-                  key: ValueKey("ScreenBody_${documentConfig.collection}"),
-                ),
-              ),
-              SwimlanesDocumentTaskCard(
-                  swimlanes: widget.swimlanes, documentTask: currentTask),
-            ],
-          )
-        : const IgnorePointer();
+      return FutureBuilder(
+          future: fsTask,
+          builder: (BuildContext context, AsyncSnapshot asyncSnap) {
+            SwimlanesTask currentTask =
+                SwimlanesTask.fromFirestore(asyncSnap.data, null);
+            if (asyncSnap.hasData) {
+              return Row(
+                children: [
+                  const Expanded(
+                    child: Text("lazy loaded content"),
+                  ),
+                  SwimlanesDocumentTaskCard(
+                    swimlanes: widget.swimlanes,
+                    currentTask: currentTask,
+                  ),
+                ],
+              );
+            } else if (asyncSnap.hasError) {
+              return Text("error: ${asyncSnap.error}");
+            } else {
+              return const Text("loading...");
+            }
+          });
+    } else {
+      return const IgnorePointer();
+    }
   }
 }
 
 class SwimlanesDocumentTaskCard extends StatelessWidget {
-  SwimlanesDocumentTaskCard({
+  const SwimlanesDocumentTaskCard({
     super.key,
     required this.swimlanes,
-    required this.documentTask,
+    required this.currentTask,
   });
 
   final SwimlanesController swimlanes;
-  final SwimlanesTask documentTask;
-  final QuillController _controller = QuillController.basic();
+  final SwimlanesTask currentTask;
 
   @override
   Widget build(BuildContext context) {
     // register shared validator class for common patterns
     Validator validator = Validator();
     bool readOnly = true;
+    // debugPrint(asyncSnap.data.toString());
+    // DocumentSnapshot<Map<String, dynamic>> snapshot =
+    //     asyncSnap as DocumentSnapshot<Map<String, dynamic>>;
 
     return Container(
       color: swimlanes.swimlaneBackgroundColor,
@@ -100,7 +117,7 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
-                                      documentTask.name ?? "",
+                                      currentTask.name ?? "",
                                       style: TextStyle(
                                         fontSize: 16,
                                         color:
@@ -117,8 +134,8 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                           ),
                           Column(
                             children: [
-                              Text("currentTask.linkedPath"),
-                              Text("currentTask.linkedDocumentId"),
+                              Text(currentTask.linkedPath ?? ""),
+                              Text(currentTask.linkedDocumentId ?? ""),
                             ],
                           ),
                           Expanded(
@@ -133,7 +150,7 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                                       SizedBox(
                                         width: swimlanes.config.swimlaneWidth -
                                             115,
-                                        height: 600,
+                                        // height: 600,
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.start,
@@ -148,59 +165,19 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                                                 child: Text("Description"),
                                               ),
                                             ),
-                                            Expanded(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(8.0),
-                                                child: QuillEditor.basic(
-                                                  controller: _controller,
-                                                  readOnly:
-                                                      false, // true for view only mode
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(4.0),
+                                              child: TextField(
+                                                style: const TextStyle(
+                                                    fontSize: 14),
+                                                controller:
+                                                    TextEditingController(
+                                                  text: currentTask.description,
                                                 ),
+                                                maxLines: 30,
+                                                minLines: 6,
                                               ),
-                                            ),
-                                            QuillToolbar.basic(
-                                              controller: _controller,
-                                              toolbarIconAlignment:
-                                                  WrapAlignment.start,
-                                              toolbarIconSize: 14,
-                                              multiRowsDisplay: true,
-                                              showDividers: true,
-                                              showFontFamily: false,
-                                              showFontSize: true,
-                                              showBoldButton: true,
-                                              showItalicButton: true,
-                                              showSmallButton: false,
-                                              showUnderLineButton: true,
-                                              showStrikeThrough: false,
-                                              showInlineCode: false,
-                                              showColorButton: false,
-                                              showBackgroundColorButton: false,
-                                              showClearFormat: true,
-                                              showAlignmentButtons: false,
-                                              showLeftAlignment: false,
-                                              showCenterAlignment: false,
-                                              showRightAlignment: false,
-                                              showJustifyAlignment: false,
-                                              showHeaderStyle: false,
-                                              showListNumbers: false,
-                                              showListBullets: true,
-                                              showListCheck: false,
-                                              showCodeBlock: true,
-                                              showQuote: false,
-                                              showIndent: false,
-                                              showLink: true,
-                                              showUndo: false,
-                                              showRedo: false,
-                                              showDirection: false,
-                                              showSearchButton: false,
-                                              showSubscript: false,
-                                              showSuperscript: false,
-                                              fontSizeValues: const {
-                                                "Small": "10",
-                                                "Medium": "12",
-                                                "Large": "16"
-                                              },
                                             ),
                                           ],
                                         ),

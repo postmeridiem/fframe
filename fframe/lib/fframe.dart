@@ -12,7 +12,6 @@ export 'package:url_launcher/url_launcher_string.dart';
 export 'package:clipboard/clipboard.dart';
 export 'package:shimmer/shimmer.dart';
 export 'package:dotted_border/dotted_border.dart';
-export 'package:flutter_quill/flutter_quill.dart' hide Text;
 
 import 'dart:async';
 import 'dart:convert';
@@ -61,7 +60,6 @@ import 'package:fframe/extensions/query.dart';
 
 import 'material/paginated_data_table_extended.dart';
 import 'package:dotted_border/dotted_border.dart';
-import 'package:flutter_quill/flutter_quill.dart' hide Text;
 
 part 'fframe_main.dart';
 part 'frouter/frouter.dart';
