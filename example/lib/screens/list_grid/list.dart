@@ -1,6 +1,5 @@
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterfire_ui/auth.dart';
 
 import 'package:example/models/suggestion.dart';
 import 'package:example/themes/config.dart';
@@ -37,8 +36,11 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 60,
-    cellBuilder:
-        (BuildContext context, Suggestion suggestion, Function saveDocument) {
+    cellBuilder: (
+      BuildContext context,
+      Suggestion suggestion,
+      Function saveDocument,
+    ) {
       return Switch(
         value: (suggestion.active ?? false),
         activeColor: SignalColors().constAccentColor,
@@ -111,10 +113,15 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
                 color: SignalColors().constSuccessColor,
               );
             default:
-              return LoadingIndicator(
-                size: 10,
-                borderWidth: 1,
-                color: SignalColors().constRunningColor,
+              return Center(
+                child: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: SignalColors().constRunningColor,
+                  ),
+                ),
               );
           }
         },
