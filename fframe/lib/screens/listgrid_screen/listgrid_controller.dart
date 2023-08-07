@@ -32,7 +32,8 @@ class ListGridController<T> extends InheritedModel {
       // draw an extra column for the check box
       double selectionColumnWidth = 40;
       calculatedMinWidth += selectionColumnWidth;
-      _columnWidths.addAll({columnCount: FixedColumnWidth(selectionColumnWidth)});
+      _columnWidths
+          .addAll({columnCount: FixedColumnWidth(selectionColumnWidth)});
       columnCount += 1;
     }
 
@@ -53,7 +54,8 @@ class ListGridController<T> extends InheritedModel {
           _addEndFlex = false;
           _columnWidths.addAll({columnCount: const FlexColumnWidth(1)});
         } else {
-          _columnWidths.addAll({columnCount: FixedColumnWidth(columnSetting.columnWidth)});
+          _columnWidths.addAll(
+              {columnCount: FixedColumnWidth(columnSetting.columnWidth)});
         }
         columnCount += 1;
       }
@@ -180,7 +182,6 @@ class ListGridController<T> extends InheritedModel {
   }
 
   List<SelectedDocument> get selectedDocuments {
-    debugPrint("get selectedDocuments with type $T");
     return notifier.selectedDocuments;
   }
 
@@ -241,12 +242,15 @@ class ListGridController<T> extends InheritedModel {
   }
 
   double _calculateWidth(double calculatedMinWidth, double viewportWidth) {
-    double calculatedWidth = calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
+    double calculatedWidth =
+        calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
     return calculatedWidth;
   }
 
   double _getViewportWidth({required Size viewportSize}) {
-    double viewportWidth = ((viewportSize.width > 1000) ? (viewportSize).width - 100 : (viewportSize.width + 0));
+    double viewportWidth = ((viewportSize.width > 1000)
+        ? (viewportSize).width - 100
+        : (viewportSize.width + 0));
     return viewportWidth;
   }
 
@@ -344,7 +348,8 @@ class ListGridNotifier<T> extends ChangeNotifier {
     if (sortedColumnIndex != null) {
       ListGridColumn sortedColumn = columnSettings[sortedColumnIndex!];
 
-      outputQuery = outputQuery.orderBy(sortedColumn.fieldName!, descending: sortedColumn.descending);
+      outputQuery = outputQuery.orderBy(sortedColumn.fieldName!,
+          descending: sortedColumn.descending);
 
       if (columnSettings[sortedColumnIndex!].fieldName != null) {
         String fieldName = columnSettings[sortedColumnIndex!].fieldName!;
@@ -363,7 +368,8 @@ class ListGridNotifier<T> extends ChangeNotifier {
               ListGridColumn curColumn = columnSettings[searchableColumnIndex];
               if (curColumn.fieldName != null) {
                 String fieldName = curColumn.fieldName!;
-                outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
+                outputQuery = outputQuery.orderBy(fieldName,
+                    descending: curColumn.descending);
                 if (curColumn.searchMask != null) {
                   if (curColumn.searchMask!.toLowerCase) {
                     curSearch = curSearch.toLowerCase();
@@ -385,13 +391,14 @@ class ListGridNotifier<T> extends ChangeNotifier {
           } else {
             if (columnSettings[searchableColumns.first].fieldName != null) {
               String curSearch = searchString!;
-              ListGridColumn curColumn = columnSettings[searchableColumns.first];
+              ListGridColumn curColumn =
+                  columnSettings[searchableColumns.first];
               String fieldName = curColumn.fieldName!;
-              outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
+              outputQuery = outputQuery.orderBy(fieldName,
+                  descending: curColumn.descending);
               if (curColumn.searchMask == null) {
                 outputQuery = outputQuery.startsWith(fieldName, curSearch);
               } else {
-                debugPrint("applying search mask");
                 if (curColumn.searchMask!.toLowerCase) {
                   curSearch = curSearch.toLowerCase();
                 }
@@ -411,7 +418,8 @@ class ListGridNotifier<T> extends ChangeNotifier {
           if (columnSettings[searchableColumns.first].fieldName != null) {
             ListGridColumn curColumn = columnSettings[searchableColumns.first];
             String fieldName = curColumn.fieldName!;
-            outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
+            outputQuery = outputQuery.orderBy(fieldName,
+                descending: curColumn.descending);
           }
         }
       }
@@ -429,12 +437,14 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
   void sortColumn({required int columnIndex, bool descending = false}) {
     // get the config for the selected column
-    ListGridColumn selectedColumn = columnSettings.where((element) => element.columnIndex == columnIndex).first;
+    ListGridColumn selectedColumn = columnSettings
+        .where((element) => element.columnIndex == columnIndex)
+        .first;
 
-    if (columnIndex == _sortedColumnIndex && descending == selectedColumn.descending) {
+    if (columnIndex == _sortedColumnIndex &&
+        descending == selectedColumn.descending) {
       // this column and sort direction were already selected. user is deselecting sort
       _sortedColumnIndex = null;
-      debugPrint("deselecting column: ${selectedColumn.fieldName}($columnIndex)");
     } else {
       // change the sort to the selected state
       // set the currently sorted column to this one
@@ -481,7 +491,8 @@ class ListGridNotifier<T> extends ChangeNotifier {
   }
 
   void unselectRow({required String documentId}) {
-    _selectedDocuments.removeWhere((selectedDocument) => selectedDocument.id == documentId);
+    _selectedDocuments
+        .removeWhere((selectedDocument) => selectedDocument.id == documentId);
     notifyListeners();
   }
 
