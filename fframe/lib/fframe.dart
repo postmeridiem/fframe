@@ -89,6 +89,7 @@ part 'package:fframe/screens/listgrid_screen/listgrid_firestore.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_controller.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_widgets.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_classes.dart';
+part 'package:fframe/screens/listgrid_screen/listgrid_document.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_firestore.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_controller.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_document.dart';
