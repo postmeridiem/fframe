@@ -34,21 +34,14 @@ class _SwimlanesDocumentState extends ConsumerState<SwimlanesDocument> {
       return FutureBuilder(
           future: fsTask,
           builder: (BuildContext context, AsyncSnapshot asyncSnap) {
-            SwimlanesTask currentTask =
-                SwimlanesTask.fromFirestore(asyncSnap.data, null);
             if (asyncSnap.hasData) {
+              SwimlanesTask currentTask =
+                  SwimlanesTask.fromFirestore(asyncSnap.data, null);
               return Row(
                 children: [
-                  Expanded(
-                    child: Container(
-                        color: Colors.blueGrey.shade900,
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: Text("lazy loaded content"),
-                            ),
-                          ],
-                        )),
+                  SwimlanesDocumentContentPane(
+                    swimlanes: widget.swimlanes,
+                    currentTask: currentTask,
                   ),
                   SwimlanesDocumentTaskCard(
                     swimlanes: widget.swimlanes,
@@ -65,6 +58,75 @@ class _SwimlanesDocumentState extends ConsumerState<SwimlanesDocument> {
           });
     } else {
       return const IgnorePointer();
+    }
+  }
+}
+
+class SwimlanesDocumentContentPane extends StatelessWidget {
+  const SwimlanesDocumentContentPane({
+    super.key,
+    required this.swimlanes,
+    required this.currentTask,
+  });
+  final SwimlanesController swimlanes;
+  final SwimlanesTask currentTask;
+
+  @override
+  Widget build(BuildContext context) {
+    if (currentTask.linkedDocumentId != null) {
+      return Expanded(
+        child: Container(
+          color: swimlanes.swimlaneBackgroundColor,
+          child: Column(
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(2.0),
+                  child: Card(
+                    color: swimlanes.taskCardColor,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text("lazy loading linked content"),
+                          Text("from collection: ${currentTask.linkedPath}"),
+                          Text("with id: ${currentTask.linkedDocumentId}"),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return Expanded(
+        child: Container(
+          color: swimlanes.swimlaneBackgroundColor,
+          child: Column(
+            children: [
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Card(
+                        color: swimlanes.taskCardColor,
+                        child: const Padding(
+                          padding: EdgeInsets.all(24.0),
+                          child: Text("No linked content specified."),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
   }
 }
@@ -162,14 +224,64 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                             ],
                           ),
                           Table(
-                            children: [],
-                          ),
-                          Column(
+                            columnWidths: const {
+                              0: FixedColumnWidth(100),
+                              1: FlexColumnWidth(),
+                            },
                             children: [
-                              Text(currentTask.linkedPath ?? ""),
-                              Text(currentTask.linkedDocumentId ?? ""),
+                              TableRow(
+                                children: [
+                                  const Text("path: "),
+                                  Text(currentTask.linkedPath ?? "path-empty"),
+                                ],
+                              ),
+                              TableRow(
+                                children: [
+                                  const Text("id: "),
+                                  Text(currentTask.linkedDocumentId ??
+                                      "id-empty"),
+                                ],
+                              ),
+                              TableRow(
+                                children: [
+                                  const Text("prio: "),
+                                  Text("${currentTask.priority}"),
+                                ],
+                              ),
+                              if (currentTask.assignedTo != null)
+                                TableRow(
+                                  children: [
+                                    const Text("assigned to: "),
+                                    Text(currentTask.assignedTo as String),
+                                  ],
+                                ),
+                              if (currentTask.assignmentTime != null)
+                                TableRow(
+                                  children: [
+                                    const Text("assigned on: "),
+                                    Text(L10n.stringFromTimestamp(
+                                        timestamp: currentTask.assignmentTime
+                                            as Timestamp)),
+                                  ],
+                                ),
+                              if (currentTask.dueTime != null)
+                                TableRow(
+                                  children: [
+                                    const Text("due: "),
+                                    Text(L10n.stringFromTimestamp(
+                                        timestamp:
+                                            currentTask.dueTime as Timestamp)),
+                                  ],
+                                ),
+                              TableRow(
+                                children: [
+                                  const Text("save count: "),
+                                  Text("${currentTask.saveCount}"),
+                                ],
+                              ),
                             ],
                           ),
+                          const Divider(),
                           Expanded(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
