@@ -23,7 +23,7 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
     return DocumentScreen<SwimlanesTask>(
       //Indicate where the documents are located and how to convert them to and fromt their models.
       // formKey: GlobalKey<FormState>(),
-      collection: "/fframe/tasks/trackers/$trackerId/tasks",
+      collection: "fframe/tasks/trackers/$trackerId/tasks",
       fromFirestore: SwimlanesTask.fromFirestore,
       toFirestore: (SwimlanesTask swimlaneTask, SetOptions? options) {
         return swimlaneTask.toFirestore();
