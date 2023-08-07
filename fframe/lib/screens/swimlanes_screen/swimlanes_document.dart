@@ -39,12 +39,21 @@ class _SwimlanesDocumentState extends ConsumerState<SwimlanesDocument> {
             if (asyncSnap.hasData) {
               return Row(
                 children: [
-                  const Expanded(
-                    child: Text("lazy loaded content"),
+                  Expanded(
+                    child: Container(
+                        color: Colors.blueGrey.shade900,
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Text("lazy loaded content"),
+                            ),
+                          ],
+                        )),
                   ),
                   SwimlanesDocumentTaskCard(
                     swimlanes: widget.swimlanes,
                     currentTask: currentTask,
+                    taskCollection: taskCollection,
                   ),
                 ],
               );
@@ -65,10 +74,12 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
     super.key,
     required this.swimlanes,
     required this.currentTask,
+    required this.taskCollection,
   });
 
   final SwimlanesController swimlanes;
   final SwimlanesTask currentTask;
+  final String taskCollection;
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +143,9 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                               ),
                             ],
                           ),
+                          Table(
+                            children: [],
+                          ),
                           Column(
                             children: [
                               Text(currentTask.linkedPath ?? ""),
@@ -179,6 +193,23 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                                                 minLines: 6,
                                               ),
                                             ),
+                                            // SizedBox(
+                                            //   height: 500,
+                                            //   child: MarkdownFormField(
+                                            //     enableToolBar: true,
+                                            //     emojiConvert: true,
+                                            //     autoCloseAfterSelectEmoji: true,
+                                            //     readOnly: false,
+                                            //     // style: const TextStyle(
+                                            //     //   fontSize: 14,
+                                            //     // ),
+                                            //     controller:
+                                            //         TextEditingController(
+                                            //       text: currentTask.description,
+                                            //     ),
+                                            //     focusNode: FocusNode(),
+                                            //   ),
+                                            // ),
                                           ],
                                         ),
                                       ),
@@ -206,6 +237,38 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                               ),
                             ],
                           ),
+                          Row(
+                            children: [
+                              if (swimlanes.database.currentUser.roles !=
+                                      null &&
+                                  swimlanes.database.currentUser.roles!
+                                      .contains("firestoreaccess"))
+                                IconButton(
+                                  tooltip: "Open Firestore Document",
+                                  onPressed: () {
+                                    String domain =
+                                        "https://console.cloud.google.com";
+                                    String application =
+                                        "firestore/databases/-default-/data/panel";
+                                    String collection = taskCollection;
+                                    debugPrint(taskCollection);
+                                    String docId = currentTask.id ?? "";
+                                    String gcpProject = Fframe.of(context)!
+                                        .firebaseOptions
+                                        .projectId;
+                                    Uri url = Uri.parse(
+                                        "$domain/$application/$collection/$docId?&project=$gcpProject");
+                                    launchUrl(url);
+                                  },
+                                  icon: Icon(
+                                    Icons.table_chart_outlined,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onBackground,
+                                  ),
+                                ),
+                            ],
+                          )
                         ],
                       ),
                     ),
@@ -224,7 +287,7 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               Text(
-                                "0",
+                                "${currentTask.priority}",
                                 style: TextStyle(
                                   color: Colors.cyan,
                                   fontSize: 48,
@@ -244,14 +307,14 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                       child: SizedBox(
                         width: 60,
                         height: 54,
-                        child: IgnorePointer(),
-                        // child: AssignedAvatar(
-                        //   assignedTo: currentTask.assignedTo,
-                        //   assignmentTime: L10n.stringFromTimestamp(
-                        //       timestamp:
-                        //           currentTask.assignmentTime ?? Timestamp.now()),
-                        //   swimlanes: swimlanes,
-                        // ),
+                        // child: IgnorePointer(),
+                        child: AssignedAvatar(
+                          assignedTo: currentTask.assignedTo,
+                          assignmentTime: L10n.stringFromTimestamp(
+                              timestamp: currentTask.assignmentTime ??
+                                  Timestamp.now()),
+                          swimlanes: swimlanes,
+                        ),
                       ),
                     ),
                   ),
@@ -268,11 +331,11 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              // Icon(
-                              //   currentTask.icon,
-                              //   color: currentTask.color,
-                              //   size: 48,
-                              // ),
+                              Icon(
+                                currentTask.icon,
+                                color: currentTask.color,
+                                size: 48,
+                              ),
                             ],
                           ),
                         ),
