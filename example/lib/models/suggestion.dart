@@ -52,10 +52,10 @@ class Suggestion extends ChangeNotifier {
     Map<String, dynamic> json = snapshot.data()!;
     Suggestion suggestion = Suggestion(
       id: snapshot.id,
-      name: json['name']! as String,
-      fieldTab1: json['fieldTab1'] as String?,
-      fieldTab2: json['fieldTab2'] as String?,
-      fieldTab3: json['fieldTab3'] as String?,
+      name: json['name'],
+      fieldTab1: json['fieldTab1'],
+      fieldTab2: json['fieldTab2'],
+      fieldTab3: json['fieldTab3'],
       active: json['active'] == null ? true : json['active'] as bool,
       icon: json['icon'] == null ? 'question_mark' : json['icon'] as String,
       creationDate: json['creationDate'] != null
