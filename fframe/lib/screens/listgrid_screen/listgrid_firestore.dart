@@ -50,6 +50,10 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
     Map<String, String> params = queryState.queryParameters ?? {};
     bool documentOpen = params.containsKey("id");
 
+    if (params.containsKey("new") && params["new"] == "true") {
+      documentOpen = true;
+    }
+
     return ListGridController(
       context: context,
       sourceQuery: widget.query,
@@ -62,7 +66,9 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
           return AnimatedBuilder(
               animation: ListGridController.of(context).notifier,
               builder: (context, child) {
-                DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
+                DocumentConfig<T> documentConfig =
+                    DocumentScreenConfig.of(context)?.documentConfig
+                        as DocumentConfig<T>;
                 var listGrid = ListGridController.of(context);
                 ListGridController listgrid = listGrid;
 
@@ -120,20 +126,26 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                       scrollDirection: Axis.horizontal,
                                       controller: _horizontal,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           listgrid.showHeader
                                               ? ListGridHeader(
-                                                  calculatedWidth: listgrid.calculatedWidth,
-                                                  addEndFlex: listgrid.addEndFlex,
-                                                  rowsSelectable: listgrid.config.rowsSelectable,
+                                                  calculatedWidth:
+                                                      listgrid.calculatedWidth,
+                                                  addEndFlex:
+                                                      listgrid.addEndFlex,
+                                                  rowsSelectable: listgrid
+                                                      .config.rowsSelectable,
                                                 )
                                               : const IgnorePointer(),
                                           Expanded(
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: listgrid.widgetBackgroundColor,
+                                                color: listgrid
+                                                    .widgetBackgroundColor,
                                                 border: Border(
                                                   top: BorderSide(
                                                     width: 1,
@@ -142,18 +154,32 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                                 ),
                                               ),
                                               child: Container(
-                                                color: (Fframe.of(context)!.getSystemThemeMode == ThemeMode.dark) ? Colors.black.withOpacity(0.2) : Colors.white.withOpacity(0.2),
+                                                color: (Fframe.of(context)!
+                                                            .getSystemThemeMode ==
+                                                        ThemeMode.dark)
+                                                    ? Colors.black
+                                                        .withOpacity(0.2)
+                                                    : Colors.white
+                                                        .withOpacity(0.2),
                                                 child: SizedBox(
-                                                  width: documentOpen ? 300 : listgrid.calculatedWidth,
+                                                  width: documentOpen
+                                                      ? 300
+                                                      : listgrid
+                                                          .calculatedWidth,
                                                   child: snapshot.hasError
                                                       ? Card(
                                                           child: Center(
                                                             child: SizedBox(
                                                               width: 500,
-                                                              height: double.infinity,
+                                                              height: double
+                                                                  .infinity,
                                                               child: Padding(
-                                                                padding: const EdgeInsets.all(40.0),
-                                                                child: SelectableText(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .all(
+                                                                        40.0),
+                                                                child:
+                                                                    SelectableText(
                                                                   "error ${snapshot.error}",
                                                                 ),
                                                               ),
@@ -163,30 +189,58 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                                       : Scrollbar(
                                                           controller: _vertical,
                                                           thumbVisibility: true,
-                                                          child: ListView.separated(
-                                                            itemCount: snapshot.docs.length,
-                                                            separatorBuilder: (context, index) {
+                                                          child: ListView
+                                                              .separated(
+                                                            itemCount: snapshot
+                                                                .docs.length,
+                                                            separatorBuilder:
+                                                                (context,
+                                                                    index) {
                                                               return const IgnorePointer();
                                                             },
-                                                            itemBuilder: (context, index) {
-                                                              final isLastItem = index + 1 == snapshot.docs.length;
-                                                              if (isLastItem && snapshot.hasMore) {
-                                                                snapshot.fetchMore();
+                                                            itemBuilder:
+                                                                (context,
+                                                                    index) {
+                                                              final isLastItem =
+                                                                  index + 1 ==
+                                                                      snapshot
+                                                                          .docs
+                                                                          .length;
+                                                              if (isLastItem &&
+                                                                  snapshot
+                                                                      .hasMore) {
+                                                                snapshot
+                                                                    .fetchMore();
                                                               }
 
-                                                              final queryDocumentSnapshot = snapshot.docs[index];
-                                                              final String documentId = queryDocumentSnapshot.id;
-                                                              final T document = queryDocumentSnapshot.data();
+                                                              final queryDocumentSnapshot =
+                                                                  snapshot.docs[
+                                                                      index];
+                                                              final String
+                                                                  documentId =
+                                                                  queryDocumentSnapshot
+                                                                      .id;
+                                                              final T document =
+                                                                  queryDocumentSnapshot
+                                                                      .data();
 
                                                               return Table(
-                                                                  columnWidths: listgrid.columnWidths,
+                                                                  columnWidths:
+                                                                      listgrid
+                                                                          .columnWidths,
                                                                   // defaultColumnWidth: const FlexColumnWidth(),
-                                                                  defaultVerticalAlignment: listgrid.cellVerticalAlignment,
-                                                                  textBaseline: TextBaseline.alphabetic,
+                                                                  defaultVerticalAlignment:
+                                                                      listgrid
+                                                                          .cellVerticalAlignment,
+                                                                  textBaseline:
+                                                                      TextBaseline
+                                                                          .alphabetic,
                                                                   children: [
                                                                     TableRow(
-                                                                      decoration: BoxDecoration(
-                                                                        color: listgrid.cellBackgroundColor,
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: listgrid
+                                                                            .cellBackgroundColor,
                                                                         // border: Border(
                                                                         //   bottom: BorderSide(
                                                                         //     color: widgetBackgroundColor,
@@ -194,36 +248,57 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                                                         //   ),
                                                                         // ),
                                                                       ),
-                                                                      children: renderRow(
-                                                                        context: context,
-                                                                        documentId: documentId,
-                                                                        queryDocumentSnapshot: queryDocumentSnapshot,
-                                                                        document: document,
-                                                                        columnSettings: listgrid.columnSettings as List<ListGridColumn<T>>,
-                                                                        addEndFlex: listgrid.addEndFlex,
-                                                                        rowsSelectable: listgrid.config.rowsSelectable,
+                                                                      children:
+                                                                          renderRow(
+                                                                        context:
+                                                                            context,
+                                                                        documentId:
+                                                                            documentId,
+                                                                        queryDocumentSnapshot:
+                                                                            queryDocumentSnapshot,
+                                                                        document:
+                                                                            document,
+                                                                        columnSettings:
+                                                                            listgrid.columnSettings
+                                                                                as List<ListGridColumn<T>>,
+                                                                        addEndFlex:
+                                                                            listgrid.addEndFlex,
+                                                                        rowsSelectable: listgrid
+                                                                            .config
+                                                                            .rowsSelectable,
                                                                       ),
                                                                     ),
                                                                   ]);
                                                             },
-                                                            scrollDirection: Axis.vertical,
+                                                            scrollDirection:
+                                                                Axis.vertical,
                                                             reverse: false,
-                                                            controller: _vertical,
+                                                            controller:
+                                                                _vertical,
                                                             // primary: primary,
-                                                            physics: const BouncingScrollPhysics(),
+                                                            physics:
+                                                                const BouncingScrollPhysics(),
                                                             shrinkWrap: false,
                                                             // itemExtent: itemExtent,
                                                             // prototypeItem: prototypeItem,
-                                                            addAutomaticKeepAlives: true,
-                                                            addRepaintBoundaries: true,
-                                                            addSemanticIndexes: true,
+                                                            addAutomaticKeepAlives:
+                                                                true,
+                                                            addRepaintBoundaries:
+                                                                true,
+                                                            addSemanticIndexes:
+                                                                true,
                                                             // cacheExtent: cacheExtent,
                                                             // cacheExtent: 1000,
                                                             // semanticChildCount: semanticChildCount,
-                                                            dragStartBehavior: DragStartBehavior.start,
-                                                            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
+                                                            dragStartBehavior:
+                                                                DragStartBehavior
+                                                                    .start,
+                                                            keyboardDismissBehavior:
+                                                                ScrollViewKeyboardDismissBehavior
+                                                                    .manual,
                                                             // restorationId: restorationId,
-                                                            clipBehavior: Clip.hardEdge,
+                                                            clipBehavior:
+                                                                Clip.hardEdge,
                                                           ),
                                                         ),
                                                 ),
@@ -288,12 +363,15 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
   }
 
   double calculateWidth(double calculatedMinWidth, double viewportWidth) {
-    double calculatedWidth = calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
+    double calculatedWidth =
+        calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
     return calculatedWidth;
   }
 
   double getViewportWidth(BuildContext context) {
-    double viewportWidth = ((MediaQuery.of(context).size.width > 1000) ? (MediaQuery.of(context).size.width - 100) : (MediaQuery.of(context).size.width + 0));
+    double viewportWidth = ((MediaQuery.of(context).size.width > 1000)
+        ? (MediaQuery.of(context).size.width - 100)
+        : (MediaQuery.of(context).size.width + 0));
     return viewportWidth;
   }
 
@@ -320,7 +398,8 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
               collection: queryDocumentSnapshot.reference.parent.path,
               documentId: queryDocumentSnapshot.id,
               data: document,
-              fromFirestore: listgrid.config.fromFirestore as T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?),
+              fromFirestore: listgrid.config.fromFirestore as T Function(
+                  DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?),
               toFirestore: listgrid.config.toFirestore,
             );
           },
@@ -375,7 +454,9 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
               context,
               document,
               () {
-                DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
+                DocumentConfig<T> documentConfig =
+                    DocumentScreenConfig.of(context)?.documentConfig
+                        as DocumentConfig<T>;
 
                 return DatabaseService<T>().updateDocument(
                   collection: queryDocumentSnapshot.reference.parent.path,
