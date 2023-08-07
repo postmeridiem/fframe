@@ -44,9 +44,9 @@ class DocTab extends StatelessWidget {
                 labelText: "Name",
               ),
               initialValue: suggestion.name ?? '',
-              validator: (curValue) {
-                if (validator.validString(curValue)) {
-                  suggestion.name = curValue;
+              validator: (newValue) {
+                if (validator.validString(newValue)) {
+                  suggestion.name = newValue;
                   return null;
                 } else {
                   return 'Enter a valid name';
@@ -57,20 +57,66 @@ class DocTab extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: TextFormField(
-              onSaved: (String? value) {
-                suggestion.fieldTab1 = value;
-              },
+              // onSaved: (String? value) {
+              //   suggestion.fieldTab1 = value;
+              // },
               readOnly: readOnly,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "tab1 value",
               ),
               initialValue: suggestion.fieldTab1 ?? '',
-              validator: (value) {
-                if (!validator.validString(value)) {
+              validator: (newValue) {
+                if (validator.validString(newValue)) {
+                  suggestion.fieldTab1 = newValue;
+                  return null;
+                } else {
                   return 'Enter a valid value';
                 }
-                return null;
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: TextFormField(
+              // onSaved: (String? value) {
+              //   suggestion.fieldTab1 = value;
+              // },
+              readOnly: readOnly,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: "tab2 value",
+              ),
+              initialValue: suggestion.fieldTab2 ?? '',
+              validator: (newValue) {
+                if (validator.validString(newValue)) {
+                  suggestion.fieldTab2 = newValue;
+                  return null;
+                } else {
+                  return 'Enter a valid value';
+                }
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: TextFormField(
+              // onSaved: (String? value) {
+              //   suggestion.fieldTab1 = value;
+              // },
+              readOnly: readOnly,
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: "tab3 value",
+              ),
+              initialValue: suggestion.fieldTab3 ?? '',
+              validator: (newValue) {
+                if (validator.validString(newValue)) {
+                  suggestion.fieldTab3 = newValue;
+                  return null;
+                } else {
+                  return 'Enter a valid value';
+                }
               },
             ),
           ),
