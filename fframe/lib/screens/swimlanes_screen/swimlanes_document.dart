@@ -90,6 +90,24 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
     // DocumentSnapshot<Map<String, dynamic>> snapshot =
     //     asyncSnap as DocumentSnapshot<Map<String, dynamic>>;
 
+    String createdBy = currentTask.createdBy ?? "unknown";
+    String creationDate = L10n.stringFromTimestamp(
+        timestamp: currentTask.creationDate ??
+            Timestamp.fromMicrosecondsSinceEpoch(0));
+
+    String lastUpdatedBy = currentTask.createdBy ?? "unknown";
+    String lastUpdatedOn = L10n.stringFromTimestamp(
+        timestamp: currentTask.creationDate ??
+            Timestamp.fromMicrosecondsSinceEpoch(0));
+    if (currentTask.changeHistory.isNotEmpty &&
+        currentTask.changeHistory.last.isNotEmpty) {
+      lastUpdatedBy = currentTask.changeHistory.last.entries.first.key;
+      Timestamp lastUpdatedTS =
+          currentTask.changeHistory.last.entries.first.value as Timestamp;
+      lastUpdatedOn = L10n.stringFromTimestamp(timestamp: lastUpdatedTS);
+      // lastUpdatedOn = "${currentTask.changeHistory.last.entries.first.value}";
+    }
+
     return Container(
       color: swimlanes.swimlaneBackgroundColor,
       child: SizedBox(
@@ -230,7 +248,49 @@ class SwimlanesDocumentTaskCard extends StatelessWidget {
                                   Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
-                                      Text("created by bla"),
+                                      const Text(
+                                        textAlign: TextAlign.end,
+                                        "last update",
+                                        style: const TextStyle(
+                                          fontSize: 9,
+                                        ),
+                                      ),
+                                      Text(
+                                        textAlign: TextAlign.end,
+                                        lastUpdatedBy,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Text(
+                                        textAlign: TextAlign.end,
+                                        lastUpdatedOn,
+                                        style: const TextStyle(
+                                          fontSize: 9,
+                                        ),
+                                      ),
+                                      const Divider(),
+                                      const Text(
+                                        textAlign: TextAlign.end,
+                                        "created",
+                                        style: const TextStyle(
+                                          fontSize: 9,
+                                        ),
+                                      ),
+                                      Text(
+                                        textAlign: TextAlign.end,
+                                        createdBy,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Text(
+                                        textAlign: TextAlign.end,
+                                        creationDate,
+                                        style: const TextStyle(
+                                          fontSize: 9,
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],

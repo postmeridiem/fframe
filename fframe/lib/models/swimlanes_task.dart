@@ -21,7 +21,7 @@ class SwimlanesTask extends ChangeNotifier {
     this.followers = const [],
     this.dueTime,
     this.saveCount = 0,
-    // this.changeHistory,
+    this.changeHistory = const [],
   });
 
   /// SwimlanesTask class
@@ -87,9 +87,7 @@ class SwimlanesTask extends ChangeNotifier {
       followers: json['zzFollowers'] ?? [],
       dueTime: json['dueTime'] != null ? json['dueTime'] as Timestamp : null,
       saveCount: json['saveCount'] != null ? json['saveCount'] as double : 0,
-      // changeHistory: json['changeHistory'] != null
-      //     ? json['changeHistory'] as Map<String, Timestamp>
-      //     : {},
+      changeHistory: json['changeHistory'] ?? [],
     );
 
     return swimlaneTask;
@@ -113,6 +111,7 @@ class SwimlanesTask extends ChangeNotifier {
   Timestamp? dueTime;
   Map<String, dynamic> comments;
   List followers;
+  List<dynamic> changeHistory;
 
   int get commentCount {
     return comments.length;
@@ -122,8 +121,7 @@ class SwimlanesTask extends ChangeNotifier {
   // Map<String, Timestamp>? changeHistory;
 
   Map<String, Object?> toFirestore() {
-    String updatedBy =
-        FirebaseAuth.instance.currentUser?.displayName ?? "Anonymous";
+    String updatedBy = FirebaseAuth.instance.currentUser?.email ?? "Anonymous";
 
     final Map<String, Timestamp> changeHistory = {updatedBy: Timestamp.now()};
 
@@ -134,9 +132,8 @@ class SwimlanesTask extends ChangeNotifier {
       "status": status,
       "description": description,
       "creationDate": creationDate ?? Timestamp.now(),
-      "createdBy": createdBy ??
-          FirebaseAuth.instance.currentUser?.displayName ??
-          "Anonymous",
+      "createdBy":
+          createdBy ?? FirebaseAuth.instance.currentUser?.email ?? "Anonymous",
       "assignedTo": assignedTo,
       "assignmentTime": assignmentTime,
       "dueTime": creationDate ?? Timestamp.now(),
