@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // import 'package:example/services/suggestion_service.dart';
 import 'package:example/models/suggestion.dart';
@@ -241,6 +242,27 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
               },
               icon: const Icon(Icons.close, color: Colors.greenAccent),
               label: const Text("Mark as Done"),
+            ),
+          if (user != null &&
+              user.roles != null &&
+              user.roles!.contains("firestoreaccess"))
+            IconButton(
+              tooltip: "Open Firestore Document",
+              onPressed: () {
+                String domain = "https://console.cloud.google.com";
+                String application = "firestore/databases/-default-/data/panel";
+                String collection = "suggestions";
+                String docId = suggestion.id ?? "";
+                String gcpProject =
+                    Fframe.of(context)!.firebaseOptions.projectId;
+                Uri url = Uri.parse(
+                    "$domain/$application/$collection/$docId?&project=$gcpProject");
+                launchUrl(url);
+              },
+              icon: Icon(
+                Icons.table_chart_outlined,
+                color: Theme.of(context).colorScheme.onBackground,
+              ),
             ),
         ];
       },
