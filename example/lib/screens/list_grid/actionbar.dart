@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
 import 'package:example/models/suggestion.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 List<ListGridActionMenu<Suggestion>> listgridActionMenu<Suggestion>() {
   return [
@@ -14,17 +13,13 @@ List<ListGridActionMenu<Suggestion>> listgridActionMenu<Suggestion>() {
           label: "Create new...",
           icon: Icons.new_label,
           requireSelection: false,
-          clickHandler: (context, user, selectedDocuments) {
-            debugPrint("clickHandler with type $Suggestion");
-            // selectedDocuments.forEach((documentId, currentDocument) {
-
-            DocumentScreenConfig documentScreenConfig =
-                DocumentScreenConfig.of(context) as DocumentScreenConfig;
-            DocumentConfig<Suggestion> documentConfig = documentScreenConfig
-                .documentConfig as DocumentConfig<Suggestion>;
-            Suggestion newDocument = documentConfig.createNew();
-
-            //ToDo: Show new document on interface
+          clickHandler: (
+            BuildContext context,
+            FFrameUser? user,
+            List<SelectedDocument> selectedDocuments,
+            Function createDocument,
+          ) {
+            createDocument();
 
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -51,7 +46,12 @@ List<ListGridActionMenu<Suggestion>> listgridActionMenu<Suggestion>() {
         ListGridActionMenuItem<Suggestion>(
           label: "Set inactive",
           icon: Icons.toggle_off_outlined,
-          clickHandler: (context, user, selectedDocuments) {
+          clickHandler: (
+            BuildContext context,
+            FFrameUser? user,
+            List<SelectedDocument> selectedDocuments,
+            Function createDocument,
+          ) {
             selectedDocuments.map((selectedDocument) {
               // DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context) as DocumentScreenConfig;
               // DocumentConfig<Suggestion> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<Suggestion>;
@@ -84,7 +84,12 @@ List<ListGridActionMenu<Suggestion>> listgridActionMenu<Suggestion>() {
         ListGridActionMenuItem(
           label: "Set Active",
           icon: Icons.toggle_on,
-          clickHandler: (context, user, selectedDocuments) {
+          clickHandler: (
+            BuildContext context,
+            FFrameUser? user,
+            List<SelectedDocument> selectedDocuments,
+            Function createDocument,
+          ) {
             selectedDocuments.map((selectedDocument) {
               Suggestion currentDocument =
                   selectedDocument.document as Suggestion;
@@ -114,7 +119,12 @@ List<ListGridActionMenu<Suggestion>> listgridActionMenu<Suggestion>() {
         ListGridActionMenuItem<Suggestion>(
           label: "Delete",
           icon: Icons.delete_outline,
-          clickHandler: (context, user, selectedDocuments) {
+          clickHandler: (
+            BuildContext context,
+            FFrameUser? user,
+            List<SelectedDocument> selectedDocuments,
+            Function createDocument,
+          ) {
             selectedDocuments.map((selectedDocument) {
               debugPrint(
                   "NOT deleting ${selectedDocument.document.name}. Jus' printing this.");
@@ -144,7 +154,12 @@ List<ListGridActionMenu<Suggestion>> listgridActionMenu<Suggestion>() {
           label: "Help...",
           icon: Icons.help_outline,
           requireSelection: false,
-          clickHandler: (context, user, selectedDocumentsById) {
+          clickHandler: (
+            BuildContext context,
+            FFrameUser? user,
+            List<SelectedDocument> selectedDocuments,
+            Function createDocument,
+          ) {
             launchUrl(
               Uri.parse(
                   'https://github.com/postmeridiem/fframe/blob/main/fframe/lib/screens/listgrid_screen/listgrid.md'),
