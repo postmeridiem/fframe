@@ -44,7 +44,8 @@ class ListGridConfig<T> {
   final String? searchHint;
   final List<ListGridActionMenu<T>> actionBar;
 
-  late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
+  late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
+      fromFirestore;
   late Map<String, Object?> Function(T, SetOptions?) toFirestore;
 }
 
@@ -187,6 +188,7 @@ typedef ListGridActionHandler = void Function(
   BuildContext context,
   FFrameUser? user,
   List<SelectedDocument> selectedDocuments,
+  Function createDocument,
 );
 
 typedef ListGridValueBuilderFunction<T> = dynamic Function(
@@ -197,7 +199,7 @@ typedef ListGridValueBuilderFunction<T> = dynamic Function(
 typedef ListGridCellBuilderFunction<T> = Widget Function(
   BuildContext context,
   T data,
-  Function save,
+  Function saveDocument,
 );
 
 typedef ListGridCellControlsBuilderFunction<T> = List<IconButton> Function(

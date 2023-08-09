@@ -530,6 +530,7 @@ class _ListGridActionMenuWidgetState<T>
                       listgrid.context,
                       Fframe.of(context)!.user,
                       selectedDocuments,
+                      createDocument,
                     );
                     setState(() {
                       mouseOver = false;
@@ -574,6 +575,19 @@ class _ListGridActionMenuWidgetState<T>
             ),
           ),
         ),
+      );
+    }
+  }
+
+  void createDocument() {
+    FRouter router = FRouter.of(context);
+    if (router.queryStringParam("id") == null) {
+      router.updateQueryString(queryParameters: {"new": "true"});
+    } else {
+      Console.log(
+        "Cannot create new with a document already in scope",
+        scope: "fframeLog.listgrid",
+        level: LogLevel.prod,
       );
     }
   }
@@ -624,6 +638,7 @@ class _ListGridActionMenuItemWidgetState<T>
                     listgrid.context,
                     Fframe.of(context)!.user,
                     selectedDocuments,
+                    createDocument,
                   );
                   setState(() {
                     mouseOver = false;
@@ -657,6 +672,19 @@ class _ListGridActionMenuItemWidgetState<T>
         ),
       ),
     );
+  }
+
+  void createDocument() {
+    FRouter router = FRouter.of(context);
+    if (router.queryStringParam("id") == null) {
+      router.updateQueryString(queryParameters: {"new": "true"});
+    } else {
+      Console.log(
+        "Cannot create new with a document already in scope",
+        scope: "fframeLog.listgrid",
+        level: LogLevel.prod,
+      );
+    }
   }
 }
 
