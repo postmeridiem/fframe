@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:example/models/suggestion.dart';
 import 'list_grid.dart';
