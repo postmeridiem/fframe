@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
-import 'package:example/models/suggestion.dart';
+// import 'package:example/models/suggestion.dart';
 
 List<ListGridActionMenu<Suggestion>> listgridActionMenu<Suggestion>() {
   return [
@@ -11,7 +11,7 @@ List<ListGridActionMenu<Suggestion>> listgridActionMenu<Suggestion>() {
       menuItems: [
         ListGridActionMenuItem<Suggestion>(
           label: "Create new...",
-          icon: Icons.new_label,
+          icon: Icons.playlist_add_outlined,
           requireSelection: false,
           clickHandler: (
             BuildContext context,
