@@ -55,6 +55,7 @@ class ListGridActionMenu<T> {
     this.label,
     this.icon,
   });
+
   final List<ListGridActionMenuItem> menuItems;
   final String? label;
   final IconData? icon;
@@ -67,6 +68,7 @@ class ListGridActionMenuItem<T> {
     this.requireSelection = true,
     required this.clickHandler,
   });
+
   final String label;
   final IconData icon;
   final bool requireSelection;
@@ -91,10 +93,11 @@ class ListGridColumn<T> {
     this.textSelectable = false,
     this.generateTooltip = false,
     this.cellControlsBuilder,
-
+    this.onTableCellClick,
     // this.dynamicTextStyle,
     // this.dynamicBackgroundColor,
   });
+
   String label;
   bool visible;
   String? fieldName;
@@ -111,6 +114,7 @@ class ListGridColumn<T> {
   ListGridValueBuilderFunction<T>? valueBuilder;
   ListGridCellBuilderFunction<T>? cellBuilder;
   ListGridCellControlsBuilderFunction<T>? cellControlsBuilder;
+
   // List<IconButton>? cellControls;
 
   bool textSelectable;
@@ -118,6 +122,8 @@ class ListGridColumn<T> {
 
   late int? columnIndex;
   late bool sortedColumn = false;
+
+  OnTableCellClick? onTableCellClick;
 }
 
 class ListGridDataModeConfig {
@@ -126,9 +132,10 @@ class ListGridDataModeConfig {
     this.limit = 100,
     // this.autopagerRowHeight,
   });
+
   final ListGridDataMode mode;
   final int limit;
-  // final double? autopagerRowHeight;
+// final double? autopagerRowHeight;
 }
 
 class ListGridSearchConfig {
@@ -137,6 +144,7 @@ class ListGridSearchConfig {
     this.field,
     this.multiFields,
   });
+
   final ListGridSearchMode mode;
   final String? field;
   final List<String>? multiFields;
@@ -148,6 +156,7 @@ class ListGridSearchMask {
     required this.to,
     this.toLowerCase = false,
   });
+
   final String from;
   final String to;
   final bool toLowerCase;
@@ -207,4 +216,9 @@ typedef ListGridCellControlsBuilderFunction<T> = List<IconButton> Function(
   FFrameUser? user,
   dynamic data,
   String stringValue,
+);
+
+typedef OnTableCellClick = void Function(
+    BuildContext context,
+    QueryDocumentSnapshot snapshot
 );
