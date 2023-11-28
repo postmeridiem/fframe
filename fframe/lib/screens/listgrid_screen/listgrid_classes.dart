@@ -18,6 +18,7 @@ class ListGridConfig<T> {
     this.showHeader = true,
     this.showFooter = true,
     this.rowsSelectable = false,
+    this.hideListOnDocumentOpen = false,
     this.searchHint,
     this.actionBar = const [],
   });
@@ -41,6 +42,7 @@ class ListGridConfig<T> {
   final bool showHeader;
   final bool showFooter;
   final bool rowsSelectable;
+  final bool hideListOnDocumentOpen;
   final String? searchHint;
   final List<ListGridActionMenu<T>> actionBar;
 
@@ -219,6 +221,4 @@ typedef ListGridCellControlsBuilderFunction<T> = List<IconButton> Function(
 );
 
 typedef OnTableCellClick = void Function(
-    BuildContext context,
-    QueryDocumentSnapshot snapshot
-);
+    BuildContext context, QueryDocumentSnapshot snapshot);

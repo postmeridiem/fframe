@@ -26,10 +26,12 @@ class _ListGridDocumentState<T> extends ConsumerState<ListGridDocument<T>> {
     return widget.documentOpen
         ? Row(
             children: [
-              const SizedBox(
-                width: 300,
-                child: IgnorePointer(),
-              ),
+              widget.listgrid.config.hideListOnDocumentOpen
+                  ? const IgnorePointer()
+                  : const SizedBox(
+                      width: 300,
+                      child: IgnorePointer(),
+                    ),
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
