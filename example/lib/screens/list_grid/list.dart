@@ -80,6 +80,9 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.createdBy;
     },
+    onTableCellClick: (context, snapshot) {
+      debugPrint("table cell override");
+    },
     cellControlsBuilder: (
       context,
       user,
