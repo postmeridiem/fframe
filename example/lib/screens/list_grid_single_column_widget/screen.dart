@@ -69,6 +69,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
       viewType: ViewType.listgrid,
       listGrid: ListGridConfig<Suggestion>(
         hideListOnDocumentOpen: true,
+        openDocumentOnClick: false,
         rowsSelectable: false,
         actionBar: listgridActionMenu<Suggestion>(),
         columnSettings: listGridColumns,

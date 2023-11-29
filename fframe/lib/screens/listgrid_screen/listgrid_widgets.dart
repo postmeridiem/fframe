@@ -1026,14 +1026,13 @@ class _ListGridRowSelectorState<T> extends State<ListGridRowSelector<T>> {
 }
 
 class ListGridBuilderCell<T> extends StatefulWidget {
-  ListGridBuilderCell({
+  const ListGridBuilderCell({
     super.key,
     required this.listgrid,
     required this.column,
     required this.queryDocumentSnapshot,
     required this.document,
     required this.cellWidget,
-    this.onTableCellClick,
   });
 
   final ListGridController listgrid;
@@ -1041,7 +1040,6 @@ class ListGridBuilderCell<T> extends StatefulWidget {
   final QueryDocumentSnapshot<T> queryDocumentSnapshot;
   final T document;
   final Widget cellWidget;
-  OnTableCellClick? onTableCellClick;
 
   @override
   State<ListGridBuilderCell<T>> createState() => _ListGridBuilderCellState<T>();
@@ -1064,6 +1062,7 @@ class _ListGridBuilderCellState<T> extends State<ListGridBuilderCell<T>> {
 
   @override
   Widget build(BuildContext context) {
+    ListGridController listgrid = widget.listgrid;
     DocumentScreenConfig documentScreenConfig =
         DocumentScreenConfig.of(context)!;
     return TableCell(
@@ -1072,11 +1071,18 @@ class _ListGridBuilderCellState<T> extends State<ListGridBuilderCell<T>> {
         cursor: MaterialStateMouseCursor.clickable,
         child: GestureDetector(
           onTap: () {
-            if (widget.onTableCellClick != null) {
-                widget.onTableCellClick?.call(context, widget.queryDocumentSnapshot);
+            if (widget.column.onTableCellClick != null) {
+              widget.column.onTableCellClick?.call(
+                context,
+                widget.queryDocumentSnapshot,
+              );
             } else {
-              documentScreenConfig.selectDocument(
-                  context, widget.queryDocumentSnapshot);
+              if (listgrid.config.openDocumentOnClick) {
+                documentScreenConfig.selectDocument(
+                  context,
+                  widget.queryDocumentSnapshot,
+                );
+              }
             }
           },
           child: Container(
@@ -1104,14 +1110,13 @@ class _ListGridBuilderCellState<T> extends State<ListGridBuilderCell<T>> {
 }
 
 class ListGridDataCell<T> extends StatefulWidget {
-  ListGridDataCell({
+  const ListGridDataCell({
     super.key,
     required this.listgrid,
     required this.column,
     required this.dynValue,
     required this.queryDocumentSnapshot,
     required this.document,
-    this.onTableCellClick
   });
 
   final ListGridController listgrid;
@@ -1119,7 +1124,6 @@ class ListGridDataCell<T> extends StatefulWidget {
   final dynamic dynValue;
   final QueryDocumentSnapshot<T> queryDocumentSnapshot;
   final T document;
-  OnTableCellClick? onTableCellClick;
 
   @override
   State<ListGridDataCell> createState() => _ListGridDataCellState<T>();
@@ -1176,12 +1180,18 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
         onExit: cellMouseOut,
         child: GestureDetector(
           onTap: () {
-            if (widget.onTableCellClick != null) {
-              widget.onTableCellClick?.call(context, widget.queryDocumentSnapshot);
-            }
-            else {
-              documentScreenConfig.selectDocument(
-                  context, widget.queryDocumentSnapshot);
+            if (widget.column.onTableCellClick != null) {
+              widget.column.onTableCellClick!.call(
+                context,
+                widget.queryDocumentSnapshot,
+              );
+            } else {
+              if (listgrid.config.openDocumentOnClick) {
+                documentScreenConfig.selectDocument(
+                  context,
+                  widget.queryDocumentSnapshot,
+                );
+              }
             }
           },
           child: Container(

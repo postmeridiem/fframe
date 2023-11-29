@@ -19,6 +19,7 @@ class ListGridConfig<T> {
     this.showFooter = true,
     this.rowsSelectable = false,
     this.hideListOnDocumentOpen = false,
+    this.openDocumentOnClick = true,
     this.searchHint,
     this.actionBar = const [],
   });
@@ -43,6 +44,7 @@ class ListGridConfig<T> {
   final bool showFooter;
   final bool rowsSelectable;
   final bool hideListOnDocumentOpen;
+  final bool openDocumentOnClick;
   final String? searchHint;
   final List<ListGridActionMenu<T>> actionBar;
 

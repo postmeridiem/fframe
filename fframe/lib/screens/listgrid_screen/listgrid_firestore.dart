@@ -411,14 +411,12 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
             queryDocumentSnapshot: queryDocumentSnapshot,
             document: document,
             cellWidget: cellWidget,
-            onTableCellClick: column.onTableCellClick,
           ),
         );
       } else if (column.valueBuilder != null) {
         dynamic dynValue = column.valueBuilder!(context, document);
         output.add(
           ListGridDataCell<T>(
-            onTableCellClick: column.onTableCellClick,
             listgrid: listgrid,
             column: column,
             queryDocumentSnapshot: queryDocumentSnapshot,
@@ -430,7 +428,6 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
         dynamic dynValue = "undefined";
         output.add(
           ListGridDataCell<T>(
-            onTableCellClick: column.onTableCellClick,
             listgrid: listgrid,
             column: column,
             queryDocumentSnapshot: queryDocumentSnapshot,
@@ -477,7 +474,6 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                 queryDocumentSnapshot: queryDocumentSnapshot,
                 document: document,
                 cellWidget: cellWidget,
-                onTableCellClick: column.onTableCellClick,
               ),
             );
           } else if (column.valueBuilder != null) {
@@ -489,7 +485,6 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                 queryDocumentSnapshot: queryDocumentSnapshot,
                 document: document,
                 dynValue: dynValue,
-                onTableCellClick: column.onTableCellClick,
               ),
             );
           } else {
@@ -501,7 +496,6 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                 queryDocumentSnapshot: queryDocumentSnapshot,
                 document: document,
                 dynValue: dynValue,
-                onTableCellClick: column.onTableCellClick,
               ),
             );
           }
