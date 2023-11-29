@@ -2,17 +2,16 @@ import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
 import 'package:example/models/suggestion.dart';
-import 'package:example/themes/config.dart';
-import 'package:example/helpers/icons.dart';
 import 'package:example/helpers/strings.dart';
 
 List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
+    alignment: Alignment.bottomLeft,
     columnSizing: ListGridColumnSizingMode.flex,
     cellBuilder:
         (BuildContext context, Suggestion suggestion, Function saveDocument) {
       return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           renderButtons(
             context: context,
@@ -133,4 +132,3 @@ List<IconButton> renderCreatedByCellIcons({
     ),
   ];
 }
-
