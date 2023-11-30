@@ -294,6 +294,24 @@ class ListGridEndless<T> extends StatelessWidget {
       thumbVisibility: true,
       child: ListView.separated(
         itemCount: snapshot.docs.length,
+        scrollDirection: Axis.vertical,
+        reverse: false,
+        controller: verticalScroll,
+        // primary: primary,
+        physics: const BouncingScrollPhysics(),
+        shrinkWrap: false,
+        // itemExtent: itemExtent,
+        // prototypeItem: prototypeItem,
+        addAutomaticKeepAlives: true,
+        addRepaintBoundaries: true,
+        addSemanticIndexes: true,
+        // cacheExtent: cacheExtent,
+        // cacheExtent: 1000,
+        // semanticChildCount: semanticChildCount,
+        dragStartBehavior: DragStartBehavior.start,
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
+        // restorationId: restorationId,
+        clipBehavior: Clip.hardEdge,
         separatorBuilder: (context, index) {
           return const IgnorePointer();
         },
@@ -336,181 +354,163 @@ class ListGridEndless<T> extends StatelessWidget {
                 ),
               ]);
         },
-        scrollDirection: Axis.vertical,
-        reverse: false,
-        controller: verticalScroll,
-        // primary: primary,
-        physics: const BouncingScrollPhysics(),
-        shrinkWrap: false,
-        // itemExtent: itemExtent,
-        // prototypeItem: prototypeItem,
-        addAutomaticKeepAlives: true,
-        addRepaintBoundaries: true,
-        addSemanticIndexes: true,
-        // cacheExtent: cacheExtent,
-        // cacheExtent: 1000,
-        // semanticChildCount: semanticChildCount,
-        dragStartBehavior: DragStartBehavior.start,
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
-        // restorationId: restorationId,
-        clipBehavior: Clip.hardEdge,
       ),
     );
   }
+}
 
-  List<Widget> renderRow({
-    required BuildContext context,
-    required List<ListGridColumn<T>> columnSettings,
-    required bool addEndFlex,
-    required bool rowsSelectable,
-    required String documentId,
-    required QueryDocumentSnapshot<T> queryDocumentSnapshot,
-    required T document,
-  }) {
-    List<Widget> output = [];
+List<Widget> renderRow<T>({
+  required BuildContext context,
+  required List<ListGridColumn<T>> columnSettings,
+  required bool addEndFlex,
+  required bool rowsSelectable,
+  required String documentId,
+  required QueryDocumentSnapshot<T> queryDocumentSnapshot,
+  required T document,
+}) {
+  List<Widget> output = [];
 
-    ListGridController listgrid = ListGridController.of(context);
-    if (listgrid.documentOpen) {
-      ListGridColumn<T> column = columnSettings[0];
-      if (column.cellBuilder != null) {
-        Widget cellWidget = column.cellBuilder!(
-          context,
-          document,
-          () {
-            return DatabaseService<T>().updateDocument(
-              collection: queryDocumentSnapshot.reference.parent.path,
-              documentId: queryDocumentSnapshot.id,
-              data: document,
-              fromFirestore: listgrid.config.fromFirestore as T Function(
-                  DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?),
-              toFirestore: listgrid.config.toFirestore,
-            );
-          },
-        );
-        output.add(
-          ListGridBuilderCell<T>(
-            listgrid: listgrid,
-            column: column,
-            queryDocumentSnapshot: queryDocumentSnapshot,
-            document: document,
-            cellWidget: cellWidget,
-          ),
-        );
-      } else if (column.valueBuilder != null) {
-        dynamic dynValue = column.valueBuilder!(context, document);
-        output.add(
-          ListGridDataCell<T>(
-            listgrid: listgrid,
-            column: column,
-            queryDocumentSnapshot: queryDocumentSnapshot,
-            document: document,
-            dynValue: dynValue,
-          ),
-        );
-      } else {
-        dynamic dynValue = "undefined";
-        output.add(
-          ListGridDataCell<T>(
-            listgrid: listgrid,
-            column: column,
-            queryDocumentSnapshot: queryDocumentSnapshot,
-            document: document,
-            dynValue: dynValue,
-          ),
-        );
-      }
-    } else {
-      if (rowsSelectable) {
-        output.add(
-          ListGridRowSelector<T>(
-            listgrid: listgrid,
+  ListGridController listgrid = ListGridController.of(context);
+  if (listgrid.documentOpen) {
+    ListGridColumn<T> column = columnSettings[0];
+    if (column.cellBuilder != null) {
+      Widget cellWidget = column.cellBuilder!(
+        context,
+        document,
+        () {
+          return DatabaseService<T>().updateDocument(
+            collection: queryDocumentSnapshot.reference.parent.path,
             documentId: queryDocumentSnapshot.id,
-            document: queryDocumentSnapshot.data(),
-            snapshot: queryDocumentSnapshot,
-          ),
-        );
-      }
-      for (ListGridColumn<T> column in columnSettings) {
-        if (column.visible) {
-          if (column.cellBuilder != null) {
-            Widget cellWidget = column.cellBuilder!(
-              context,
-              document,
-              () {
-                DocumentConfig<T> documentConfig =
-                    DocumentScreenConfig.of(context)?.documentConfig
-                        as DocumentConfig<T>;
+            data: document,
+            fromFirestore: listgrid.config.fromFirestore as T Function(
+                DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?),
+            toFirestore: listgrid.config.toFirestore,
+          );
+        },
+      );
+      output.add(
+        ListGridBuilderCell<T>(
+          listgrid: listgrid,
+          column: column,
+          queryDocumentSnapshot: queryDocumentSnapshot,
+          document: document,
+          cellWidget: cellWidget,
+        ),
+      );
+    } else if (column.valueBuilder != null) {
+      dynamic dynValue = column.valueBuilder!(context, document);
+      output.add(
+        ListGridDataCell<T>(
+          listgrid: listgrid,
+          column: column,
+          queryDocumentSnapshot: queryDocumentSnapshot,
+          document: document,
+          dynValue: dynValue,
+        ),
+      );
+    } else {
+      dynamic dynValue = "undefined";
+      output.add(
+        ListGridDataCell<T>(
+          listgrid: listgrid,
+          column: column,
+          queryDocumentSnapshot: queryDocumentSnapshot,
+          document: document,
+          dynValue: dynValue,
+        ),
+      );
+    }
+  } else {
+    if (rowsSelectable) {
+      output.add(
+        ListGridRowSelector<T>(
+          listgrid: listgrid,
+          documentId: queryDocumentSnapshot.id,
+          document: queryDocumentSnapshot.data(),
+          snapshot: queryDocumentSnapshot,
+        ),
+      );
+    }
+    for (ListGridColumn<T> column in columnSettings) {
+      if (column.visible) {
+        if (column.cellBuilder != null) {
+          Widget cellWidget = column.cellBuilder!(
+            context,
+            document,
+            () {
+              DocumentConfig<T> documentConfig =
+                  DocumentScreenConfig.of(context)?.documentConfig
+                      as DocumentConfig<T>;
 
-                return DatabaseService<T>().updateDocument(
-                  collection: queryDocumentSnapshot.reference.parent.path,
-                  documentId: queryDocumentSnapshot.id,
-                  data: document,
-                  fromFirestore: documentConfig.fromFirestore,
-                  toFirestore: documentConfig.toFirestore,
-                );
-              },
-            );
-            output.add(
-              ListGridBuilderCell<T>(
-                listgrid: listgrid,
-                column: column,
-                queryDocumentSnapshot: queryDocumentSnapshot,
-                document: document,
-                cellWidget: cellWidget,
-              ),
-            );
-          } else if (column.valueBuilder != null) {
-            dynamic dynValue = column.valueBuilder!(context, document);
-            output.add(
-              ListGridDataCell<T>(
-                listgrid: listgrid,
-                column: column,
-                queryDocumentSnapshot: queryDocumentSnapshot,
-                document: document,
-                dynValue: dynValue,
-              ),
-            );
-          } else {
-            dynamic dynValue = "undefined";
-            output.add(
-              ListGridDataCell<T>(
-                listgrid: listgrid,
-                column: column,
-                queryDocumentSnapshot: queryDocumentSnapshot,
-                document: document,
-                dynValue: dynValue,
-              ),
-            );
-          }
+              return DatabaseService<T>().updateDocument(
+                collection: queryDocumentSnapshot.reference.parent.path,
+                documentId: queryDocumentSnapshot.id,
+                data: document,
+                fromFirestore: documentConfig.fromFirestore,
+                toFirestore: documentConfig.toFirestore,
+              );
+            },
+          );
+          output.add(
+            ListGridBuilderCell<T>(
+              listgrid: listgrid,
+              column: column,
+              queryDocumentSnapshot: queryDocumentSnapshot,
+              document: document,
+              cellWidget: cellWidget,
+            ),
+          );
+        } else if (column.valueBuilder != null) {
+          dynamic dynValue = column.valueBuilder!(context, document);
+          output.add(
+            ListGridDataCell<T>(
+              listgrid: listgrid,
+              column: column,
+              queryDocumentSnapshot: queryDocumentSnapshot,
+              document: document,
+              dynValue: dynValue,
+            ),
+          );
+        } else {
+          dynamic dynValue = "undefined";
+          output.add(
+            ListGridDataCell<T>(
+              listgrid: listgrid,
+              column: column,
+              queryDocumentSnapshot: queryDocumentSnapshot,
+              document: document,
+              dynValue: dynValue,
+            ),
+          );
         }
       }
-      if (addEndFlex) {
-        output.add(
-          TableCell(
-            verticalAlignment: TableCellVerticalAlignment.bottom,
-            child: Container(
-              decoration: BoxDecoration(
-                // color: Colors.green,
-                color: listgrid.cellBackgroundColor,
-                border: Border(
-                  bottom: listgrid.rowBorder > 0
-                      ? BorderSide(
-                          color: listgrid.widgetBackgroundColor,
-                          width: listgrid.rowBorder,
-                        )
-                      : BorderSide.none,
-                ),
-              ),
-              child: Padding(
-                padding: listgrid.cellPadding,
-                child: const IgnorePointer(),
-                // child: const Text("cell"),
+    }
+    if (addEndFlex) {
+      output.add(
+        TableCell(
+          verticalAlignment: TableCellVerticalAlignment.bottom,
+          child: Container(
+            decoration: BoxDecoration(
+              // color: Colors.green,
+              color: listgrid.cellBackgroundColor,
+              border: Border(
+                bottom: listgrid.rowBorder > 0
+                    ? BorderSide(
+                        color: listgrid.widgetBackgroundColor,
+                        width: listgrid.rowBorder,
+                      )
+                    : BorderSide.none,
               ),
             ),
+            child: Padding(
+              padding: listgrid.cellPadding,
+              child: const IgnorePointer(),
+              // child: const Text("cell"),
+            ),
           ),
-        );
-      }
+        ),
+      );
     }
-    return output;
   }
+  return output;
 }
