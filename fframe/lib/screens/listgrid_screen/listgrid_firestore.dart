@@ -2,10 +2,10 @@ part of fframe;
 
 class FirestoreListGrid<T> extends ConsumerStatefulWidget {
   const FirestoreListGrid({
-    Key? key,
+    super.key,
     required this.config,
     required this.query,
-  }) : super(key: key);
+  });
 
   // the configuration that was provided
   final ListGridConfig<T> config;
@@ -19,7 +19,6 @@ class FirestoreListGrid<T> extends ConsumerStatefulWidget {
 
 class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
   final ScrollController _horizontal = ScrollController();
-  final ScrollController _vertical = ScrollController();
 
   late List<ListGridColumn<T>> columnSettings;
 
@@ -78,7 +77,11 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                 return FirestoreQueryBuilder<T>(
                   pageSize: listgrid.dataMode.limit,
                   query: listgrid.currentQuery as Query<T>,
-                  builder: (context, snapshot, child) {
+                  builder: (
+                    BuildContext context,
+                    FirestoreQueryBuilderSnapshot<T> snapshot,
+                    Widget? child,
+                  ) {
                     // int count = snapshot.docs.length;
                     return Stack(
                       children: [
@@ -186,120 +189,9 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                                             ),
                                                           ),
                                                         )
-                                                      : Scrollbar(
-                                                          controller: _vertical,
-                                                          thumbVisibility: true,
-                                                          child: ListView
-                                                              .separated(
-                                                            itemCount: snapshot
-                                                                .docs.length,
-                                                            separatorBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              return const IgnorePointer();
-                                                            },
-                                                            itemBuilder:
-                                                                (context,
-                                                                    index) {
-                                                              final isLastItem =
-                                                                  index + 1 ==
-                                                                      snapshot
-                                                                          .docs
-                                                                          .length;
-                                                              if (isLastItem &&
-                                                                  snapshot
-                                                                      .hasMore) {
-                                                                snapshot
-                                                                    .fetchMore();
-                                                              }
-
-                                                              final queryDocumentSnapshot =
-                                                                  snapshot.docs[
-                                                                      index];
-                                                              final String
-                                                                  documentId =
-                                                                  queryDocumentSnapshot
-                                                                      .id;
-                                                              final T document =
-                                                                  queryDocumentSnapshot
-                                                                      .data();
-
-                                                              return Table(
-                                                                  columnWidths:
-                                                                      listgrid
-                                                                          .columnWidths,
-                                                                  // defaultColumnWidth: const FlexColumnWidth(),
-                                                                  defaultVerticalAlignment:
-                                                                      listgrid
-                                                                          .cellVerticalAlignment,
-                                                                  textBaseline:
-                                                                      TextBaseline
-                                                                          .alphabetic,
-                                                                  children: [
-                                                                    TableRow(
-                                                                      decoration:
-                                                                          BoxDecoration(
-                                                                        color: listgrid
-                                                                            .cellBackgroundColor,
-                                                                        // border: Border(
-                                                                        //   bottom: BorderSide(
-                                                                        //     color: widgetBackgroundColor,
-                                                                        //     width: rowBorder,
-                                                                        //   ),
-                                                                        // ),
-                                                                      ),
-                                                                      children:
-                                                                          renderRow(
-                                                                        context:
-                                                                            context,
-                                                                        documentId:
-                                                                            documentId,
-                                                                        queryDocumentSnapshot:
-                                                                            queryDocumentSnapshot,
-                                                                        document:
-                                                                            document,
-                                                                        columnSettings:
-                                                                            listgrid.columnSettings
-                                                                                as List<ListGridColumn<T>>,
-                                                                        addEndFlex:
-                                                                            listgrid.addEndFlex,
-                                                                        rowsSelectable: listgrid
-                                                                            .config
-                                                                            .rowsSelectable,
-                                                                      ),
-                                                                    ),
-                                                                  ]);
-                                                            },
-                                                            scrollDirection:
-                                                                Axis.vertical,
-                                                            reverse: false,
-                                                            controller:
-                                                                _vertical,
-                                                            // primary: primary,
-                                                            physics:
-                                                                const BouncingScrollPhysics(),
-                                                            shrinkWrap: false,
-                                                            // itemExtent: itemExtent,
-                                                            // prototypeItem: prototypeItem,
-                                                            addAutomaticKeepAlives:
-                                                                true,
-                                                            addRepaintBoundaries:
-                                                                true,
-                                                            addSemanticIndexes:
-                                                                true,
-                                                            // cacheExtent: cacheExtent,
-                                                            // cacheExtent: 1000,
-                                                            // semanticChildCount: semanticChildCount,
-                                                            dragStartBehavior:
-                                                                DragStartBehavior
-                                                                    .start,
-                                                            keyboardDismissBehavior:
-                                                                ScrollViewKeyboardDismissBehavior
-                                                                    .manual,
-                                                            // restorationId: restorationId,
-                                                            clipBehavior:
-                                                                Clip.hardEdge,
-                                                          ),
+                                                      : ListGridEndless(
+                                                          snapshot: snapshot,
+                                                          listgrid: listgrid,
                                                         ),
                                                 ),
                                               ),
@@ -373,6 +265,97 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
         ? (MediaQuery.of(context).size.width - 100)
         : (MediaQuery.of(context).size.width + 0));
     return viewportWidth;
+  }
+
+  Future<int> countQueryResult({required Query<T> query}) async {
+    // TODO: fix this properly, it's spammy on the network
+    return 0;
+    // AggregateQuerySnapshot snaphot = await query.count().get();
+    // return snaphot.count;
+  }
+}
+
+class ListGridEndless<T> extends StatelessWidget {
+  const ListGridEndless({
+    super.key,
+    required this.snapshot,
+    required this.listgrid,
+  });
+
+  // the configuration that was provided
+  final FirestoreQueryBuilderSnapshot<T> snapshot;
+  final ListGridController listgrid;
+
+  @override
+  Widget build(BuildContext context) {
+    final ScrollController verticalScroll = ScrollController();
+    return Scrollbar(
+      controller: verticalScroll,
+      thumbVisibility: true,
+      child: ListView.separated(
+        itemCount: snapshot.docs.length,
+        separatorBuilder: (context, index) {
+          return const IgnorePointer();
+        },
+        itemBuilder: (context, index) {
+          final isLastItem = index + 1 == snapshot.docs.length;
+          if (isLastItem && snapshot.hasMore) {
+            snapshot.fetchMore();
+          }
+
+          final queryDocumentSnapshot = snapshot.docs[index];
+          final String documentId = queryDocumentSnapshot.id;
+          final T document = queryDocumentSnapshot.data();
+
+          return Table(
+              columnWidths: listgrid.columnWidths,
+              // defaultColumnWidth: const FlexColumnWidth(),
+              defaultVerticalAlignment: listgrid.cellVerticalAlignment,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                TableRow(
+                  decoration: BoxDecoration(
+                    color: listgrid.cellBackgroundColor,
+                    // border: Border(
+                    //   bottom: BorderSide(
+                    //     color: widgetBackgroundColor,
+                    //     width: rowBorder,
+                    //   ),
+                    // ),
+                  ),
+                  children: renderRow(
+                    context: context,
+                    documentId: documentId,
+                    queryDocumentSnapshot: queryDocumentSnapshot,
+                    document: document,
+                    columnSettings:
+                        listgrid.columnSettings as List<ListGridColumn<T>>,
+                    addEndFlex: listgrid.addEndFlex,
+                    rowsSelectable: listgrid.config.rowsSelectable,
+                  ),
+                ),
+              ]);
+        },
+        scrollDirection: Axis.vertical,
+        reverse: false,
+        controller: verticalScroll,
+        // primary: primary,
+        physics: const BouncingScrollPhysics(),
+        shrinkWrap: false,
+        // itemExtent: itemExtent,
+        // prototypeItem: prototypeItem,
+        addAutomaticKeepAlives: true,
+        addRepaintBoundaries: true,
+        addSemanticIndexes: true,
+        // cacheExtent: cacheExtent,
+        // cacheExtent: 1000,
+        // semanticChildCount: semanticChildCount,
+        dragStartBehavior: DragStartBehavior.start,
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
+        // restorationId: restorationId,
+        clipBehavior: Clip.hardEdge,
+      ),
+    );
   }
 
   List<Widget> renderRow({
@@ -528,14 +511,6 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
         );
       }
     }
-
     return output;
-  }
-
-  Future<int> countQueryResult({required Query<T> query}) async {
-    // TODO: fix this properly, it's spammy on the network
-    return 0;
-    // AggregateQuerySnapshot snaphot = await query.count().get();
-    // return snaphot.count;
   }
 }
