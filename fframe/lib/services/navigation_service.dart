@@ -50,36 +50,13 @@ class NavigationNotifier extends ChangeNotifier {
   authChangeListener(User? user) async {
     if (user != null) {
       try {
-        IdTokenResult idTokenResult = await user.getIdTokenResult(true);
-        List<String>? roles = [];
-
-        Map<String, dynamic>? claims = idTokenResult.claims;
-
-        if (claims != null && claims.containsKey("roles") == true) {
-          Console.log(
-            "Has roles in ${claims["roles"].runtimeType}",
-            scope: "fframeLog.NavigationNotifier.authChangeListener",
-            level: LogLevel.fframe,
-          );
-
-          if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
-            roles = List<String>.from(claims["roles"]);
-          } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
-            roles = List<String>.from(claims["roles"]);
-          } else {
-            //Legacy mode... it's a map..
-            Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
-            rolesMap.removeWhere((key, value) => value == false);
-            roles = List<String>.from(rolesMap.keys);
-          }
-        }
-        roles = roles.map((role) => role.toLowerCase()).toList();
+        FFrameUser fFrameUser = FFrameUser.fromFirebaseUser(firebaseUser: user, idTokenResult: (await user.getIdTokenResult()));
         Console.log(
-          "User is signed in as ${user.uid} ${user.displayName} with roles: ${roles.join(", ")}",
+          "User is signed in as ${fFrameUser.uid} ${user.displayName} with roles: ${fFrameUser.roles.join(", ")}",
           scope: "fframeLog.NavigationNotifier.authChangeListener",
           level: LogLevel.dev,
         );
-        signIn(roles: roles);
+        signIn(roles: fFrameUser.roles);
       } catch (e) {
         Console.log(
           "ERROR: Unable to interpret claims ${e.toString()}",
@@ -317,8 +294,8 @@ class NavigationNotifier extends ChangeNotifier {
     return uri;
   }
 
-  String restoreRouteInformation() {
-    return composeUri().toString();
+  Uri restoreRouteInformation() {
+    return composeUri();
   }
 
   Uri? get uri {

@@ -24,5 +24,7 @@ class SelectionState<T> with ChangeNotifier {
     }
   }
 
-  
+  factory SelectionState.reset() {
+    return SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false);
+  }
 }

@@ -3,19 +3,15 @@ import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fframe/services/navigation_service.dart';
 
-class FNavigationRouteInformationParser
-    extends RouteInformationParser<NavigationNotifier> {
+class FNavigationRouteInformationParser extends RouteInformationParser<NavigationNotifier> {
   @override
-  Future<NavigationNotifier> parseRouteInformation(
-      RouteInformation routeInformation) async {
+  Future<NavigationNotifier> parseRouteInformation(RouteInformation routeInformation) async {
     Console.log(
-      "Updated to ${routeInformation.location!}s",
-      scope:
-          "fframeLog.FNavigationRouteInformationParser.parseRouteInformation",
+      "Updated to ${routeInformation.uri}s",
+      scope: "fframeLog.FNavigationRouteInformationParser.parseRouteInformation",
       level: LogLevel.fframe,
     );
-    navigationNotifier.parseRouteInformation(
-        uri: Uri.parse(routeInformation.location!));
+    navigationNotifier.parseRouteInformation(uri: routeInformation.uri);
     return navigationNotifier;
   }
 
@@ -25,17 +21,15 @@ class FNavigationRouteInformationParser
 
     Console.log(
       "Updated to ${configuration.composeUri()}",
-      scope:
-          "fframeLog.FNavigationRouteInformationParser.restoreRouteInformation",
+      scope: "fframeLog.FNavigationRouteInformationParser.restoreRouteInformation",
       level: LogLevel.fframe,
     );
 
-    return RouteInformation(location: configuration.restoreRouteInformation());
+    return RouteInformation(uri: configuration.restoreRouteInformation());
   }
 }
 
-class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier>
-    with ChangeNotifier, PopNavigatorRouterDelegateMixin {
+class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   @override
   final GlobalKey<NavigatorState> navigatorKey;
   bool hasListener = false;
@@ -75,8 +69,7 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier>
 
   @override
   Widget build(BuildContext context) {
-    Console.log("NavigationRouterDelegate.build",
-        scope: "fframeLog.NavigationRouter", level: LogLevel.fframe);
+    Console.log("NavigationRouterDelegate.build", scope: "fframeLog.NavigationRouter", level: LogLevel.fframe);
 
     return Navigator(
       key: navigatorKey,

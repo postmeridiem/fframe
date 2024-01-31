@@ -1,3 +1,5 @@
+// ignore_for_file: unused_import
+
 import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:flutter/material.dart';
@@ -50,8 +52,7 @@ class _Tab03State extends State<Tab03> {
               documentId: Fframe.of(context)!.user!.uid!,
               fromFirestore: AppUser.fromFirestore,
               toFirestore: (user, options) => user.toFirestore(),
-              builder: (BuildContext context,
-                  FirestoreDocument<AppUser> appUserDocument) {
+              builder: (BuildContext context, FirestoreDocument<AppUser> appUserDocument) {
                 return Text(appUserDocument.data!.displayName ?? "?");
               },
             ),

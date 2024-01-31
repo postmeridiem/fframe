@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:example/models/suggestion.dart';
 
-class Tab01 extends StatelessWidget {
+class Tab01 extends StatefulWidget {
   const Tab01({
     Key? key,
     required this.suggestion,
@@ -12,6 +12,11 @@ class Tab01 extends StatelessWidget {
   final Suggestion suggestion;
   final bool readOnly;
 
+  @override
+  State<Tab01> createState() => _Tab01State();
+}
+
+class _Tab01State extends State<Tab01> {
   @override
   Widget build(BuildContext context) {
     // register shared validator class for common patterns
@@ -26,7 +31,7 @@ class Tab01 extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16.0),
             child: TextFormField(
               readOnly: true,
-              initialValue: suggestion.createdBy ?? "unknown",
+              initialValue: widget.suggestion.createdBy ?? "unknown",
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "Author",
@@ -36,17 +41,17 @@ class Tab01 extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 16.0),
             child: TextFormField(
-              readOnly: readOnly,
+              readOnly: widget.readOnly,
               decoration: const InputDecoration(
                 // hoverColor: Color(0xFFFF00C8),
                 // hoverColor: Theme.of(context).indicatorColor,
                 border: OutlineInputBorder(),
                 labelText: "Name",
               ),
-              initialValue: suggestion.name ?? '',
+              initialValue: widget.suggestion.name ?? '',
               validator: (curValue) {
                 if (validator.validString(curValue)) {
-                  suggestion.name = curValue;
+                  widget.suggestion.name = curValue;
                   return null;
                 } else {
                   return 'Enter a valid name';
@@ -58,14 +63,14 @@ class Tab01 extends StatelessWidget {
             padding: const EdgeInsets.only(bottom: 16.0),
             child: TextFormField(
               onSaved: (String? value) {
-                suggestion.fieldTab1 = value;
+                widget.suggestion.fieldTab1 = value;
               },
-              readOnly: readOnly,
+              readOnly: widget.readOnly,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: "tab1 value",
               ),
-              initialValue: suggestion.fieldTab1 ?? '',
+              initialValue: widget.suggestion.fieldTab1 ?? '',
               validator: (value) {
                 if (!validator.validString(value)) {
                   return 'Enter a valid value';
@@ -74,6 +79,14 @@ class Tab01 extends StatelessWidget {
               },
             ),
           ),
+          IconButton(
+            onPressed: () {
+              setState(() {
+                widget.suggestion.name = "${widget.suggestion.name}.";
+              });
+            },
+            icon: const Icon(Icons.refresh),
+          )
         ],
       ),
     );

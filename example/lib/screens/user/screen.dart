@@ -1,8 +1,8 @@
 // ignore: unused_import
-import 'package:example/pages/empty_page.dart';
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:example/screens/user/user.dart';
 
@@ -72,12 +72,9 @@ class _UsersScreenState extends State<UsersScreen> {
   Document<AppUser> _document() {
     return Document<AppUser>(
       autoSave: false,
-      extraActionButtons: (BuildContext context, AppUser appUser,
-          bool isReadOnly, bool isNew, FFrameUser? user) {
+      extraActionButtons: (BuildContext context, AppUser appUser, bool isReadOnly, bool isNew, FFrameUser? user) {
         return [
-          if (user != null &&
-              user.roles != null &&
-              user.roles!.contains("firestoreaccess"))
+          if (user != null && user.hasRole("firestoreaccess"))
             IconButton(
               tooltip: "Open Firestore Document",
               onPressed: () {
@@ -85,10 +82,8 @@ class _UsersScreenState extends State<UsersScreen> {
                 String application = "firestore/databases/-default-/data/panel";
                 String collection = "users";
                 String docId = appUser.uid ?? "";
-                String gcpProject =
-                    Fframe.of(context)!.firebaseOptions.projectId;
-                Uri url = Uri.parse(
-                    "$domain/$application/$collection/$docId?&project=$gcpProject");
+                String gcpProject = Fframe.of(context)!.firebaseOptions.projectId;
+                Uri url = Uri.parse("$domain/$application/$collection/$docId?&project=$gcpProject");
                 launchUrl(url);
               },
               icon: Icon(

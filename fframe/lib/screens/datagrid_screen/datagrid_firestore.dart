@@ -1,11 +1,14 @@
-part of fframe;
+// ignore_for_file: use_super_parameters
+
+part of '../../fframe.dart';
 
 class FirestoreDataGrid<T> extends StatefulWidget {
   const FirestoreDataGrid({
-    Key? key,
+    super.key,
     required this.query,
     // required this.fireStoreQueryState,
     required this.dataGridConfig,
+    required this.documentConfig,
     this.header,
     this.onError,
     this.canDeleteItems = false,
@@ -23,12 +26,10 @@ class FirestoreDataGrid<T> extends StatefulWidget {
     this.dragStartBehavior = DragStartBehavior.start,
     this.arrowHeadColor,
     this.checkboxHorizontalMargin,
-  }) :
-
-        ///assert(columnLabels is LinkedHashMap,'only LinkedHashMap are supported as header' ), // using an assert instead of a type because `<A, B>{}` types as `Map` but is an instance of `LinkedHashMap`
-        super(key: key);
+  });
 
   final DataGridConfig<T> dataGridConfig;
+  final DocumentConfig<T> documentConfig;
 
   /// The firestore query that will be displayed
   final Query<T> query;
@@ -167,6 +168,7 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
   Widget build(BuildContext context) {
     FFrameDataTableSource<T> fFrameDataTableSource = FFrameDataTableSource<T>(
       documentScreenConfig: DocumentScreenConfig.of(context)!,
+      documentConfig: widget.documentConfig,
       getOnError: () => widget.onError,
       selectionEnabled: selectionEnabled,
       rowsPerPage: widget.rowsPerPage,
@@ -182,8 +184,7 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
           builder: (context, child) {
             final actions = [
               ...?widget.actions,
-              if (widget.canDeleteItems &&
-                  fFrameDataTableSource._selectedRowIds.isNotEmpty)
+              if (widget.canDeleteItems && fFrameDataTableSource._selectedRowIds.isNotEmpty)
                 IconButton(
                   icon: const Icon(Icons.delete),
                   onPressed: fFrameDataTableSource.onDeleteSelectedItems,
@@ -196,8 +197,7 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
               int rowsPerPage = widget.rowsPerPage;
               return PaginatedDataTableExtended(
                 source: fFrameDataTableSource,
-                onSelectAll:
-                    selectionEnabled ? fFrameDataTableSource.onSelectAll : null,
+                onSelectAll: selectionEnabled ? fFrameDataTableSource.onSelectAll : null,
                 onPageChanged: widget.onPageChanged,
                 showCheckboxColumn: widget.showCheckboxColumn,
                 arrowHeadColor: widget.arrowHeadColor,
@@ -211,15 +211,10 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
                 showFirstLastButtons: widget.showFirstLastButtons,
                 sortAscending: widget.sortAscending,
                 sortColumnIndex: widget.sortColumnIndex,
-                header: actions.isEmpty
-                    ? null
-                    : (widget.header ?? const SizedBox()),
+                header: actions.isEmpty ? null : (widget.header ?? const SizedBox()),
                 actions: actions.isEmpty ? null : actions,
                 // Head label
-                columns: widget.dataGridConfig.dataGridConfigColumns
-                    .map((DataGridConfigColumn<T> dataGridConfigColumn) =>
-                        dataGridConfigColumn.headerBuilder())
-                    .toList(),
+                columns: widget.dataGridConfig.dataGridConfigColumns.map((DataGridConfigColumn<T> dataGridConfigColumn) => dataGridConfigColumn.headerBuilder()).toList(),
               );
             });
           },
@@ -237,14 +232,13 @@ class FframeDataRow<T> extends DataRow {
     onLongPress,
     this.onTap,
     color,
-    required List<DataCell> cells,
+    required super.cells,
   }) : super(
           key: key,
           selected: selected,
           onSelectChanged: onSelectChanged,
           onLongPress: onLongPress,
           color: color,
-          cells: cells,
         );
 
   final GestureLongPressCallback? onTap;
@@ -254,6 +248,7 @@ class FFrameDataTableSource<T> extends DataTableSource {
   FFrameDataTableSource({
     required this.documentScreenConfig,
     required this.dataGridConfig,
+    required this.documentConfig,
     required this.getOnError,
     required bool selectionEnabled,
     required int rowsPerPage,
@@ -261,6 +256,7 @@ class FFrameDataTableSource<T> extends DataTableSource {
         _rowsPerpage = rowsPerPage;
   final DocumentScreenConfig documentScreenConfig;
   final DataGridConfig<T> dataGridConfig;
+  final DocumentConfig<T> documentConfig;
 
   int _rowsPerpage;
   int get rowsPerPage => _rowsPerpage;
@@ -281,8 +277,7 @@ class FFrameDataTableSource<T> extends DataTableSource {
   }
 
   //final Map<String, Widget> Function() getHeaders;
-  final void Function(Object error, StackTrace stackTrace)? Function()
-      getOnError;
+  final void Function(Object error, StackTrace stackTrace)? Function() getOnError;
 
   final _selectedRowIds = <String>{};
 
@@ -290,8 +285,7 @@ class FFrameDataTableSource<T> extends DataTableSource {
   int get selectedRowCount => _selectedRowIds.length;
 
   @override
-  bool get isRowCountApproximate =>
-      _previousSnapshot!.isFetching || _previousSnapshot!.hasMore;
+  bool get isRowCountApproximate => _previousSnapshot!.isFetching || _previousSnapshot!.hasMore;
 
   @override
   int get rowCount {
@@ -313,8 +307,7 @@ class FFrameDataTableSource<T> extends DataTableSource {
     }
     if (index >= _previousSnapshot!.docs.length) return null;
 
-    final QueryDocumentSnapshot<T> documentSnapshot =
-        _previousSnapshot!.docs[index];
+    final QueryDocumentSnapshot<T> documentSnapshot = _previousSnapshot!.docs[index];
     final T data = documentSnapshot.data();
 
     return DataRow(
@@ -323,24 +316,22 @@ class FFrameDataTableSource<T> extends DataTableSource {
           ? (selected) {
               if (selected == null) return;
 
-              if ((selected && _selectedRowIds.add(documentSnapshot.id)) ||
-                  (!selected && _selectedRowIds.remove(documentSnapshot.id))) {
+              if ((selected && _selectedRowIds.add(documentSnapshot.id)) || (!selected && _selectedRowIds.remove(documentSnapshot.id))) {
                 notifyListeners();
               }
             }
           : null,
       cells: dataGridConfig.dataGridConfigColumns
           .map(
-            (DataGridConfigColumn<T> dataGridConfigColumn) =>
-                dataGridConfigColumn.dataCellBuilder(
+            (DataGridConfigColumn<T> dataGridConfigColumn) => dataGridConfigColumn.dataCellBuilder(
               data,
               () {
                 return DatabaseService<T>().updateDocument(
                   collection: documentSnapshot.reference.parent.path,
                   documentId: documentSnapshot.id,
                   data: data,
-                  fromFirestore: dataGridConfig.fromFirestore,
-                  toFirestore: dataGridConfig.toFirestore,
+                  fromFirestore: documentConfig.fromFirestore,
+                  toFirestore: documentConfig.toFirestore,
                 );
               },
             ),
@@ -356,9 +347,7 @@ class FFrameDataTableSource<T> extends DataTableSource {
 
     // Try to preserve the selection status when the snapshot got updated,
     // such as when more content got loaded.
-    final wereAllItemsSelected =
-        _previousSnapshot?.docs.length == _selectedRowIds.length &&
-            _previousSnapshot!.docs.isNotEmpty;
+    final wereAllItemsSelected = _previousSnapshot?.docs.length == _selectedRowIds.length && _previousSnapshot!.docs.isNotEmpty;
 
     _previousSnapshot = snapshot;
     if (wereAllItemsSelected) onSelectAll(true);
@@ -391,17 +380,10 @@ class FFrameDataTableSource<T> extends DataTableSource {
 class DataGridConfig<T> {
   final List<DataGridConfigColumn<T>> dataGridConfigColumns;
   final bool showLinks;
-  late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
-  late Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final int rowsPerPage;
   final double? rowHeight;
 
-  DataGridConfig(
-      {required this.dataGridConfigColumns,
-      this.showLinks = true,
-      this.rowsPerPage = -1,
-      this.rowHeight});
+  DataGridConfig({required this.dataGridConfigColumns, this.showLinks = true, this.rowsPerPage = -1, this.rowHeight});
 }
 
 class DataGridConfigColumn<T> {

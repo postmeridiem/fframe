@@ -4,8 +4,6 @@
 
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
 
 import 'package:flutter/material.dart';
 // Examples can assume:
@@ -206,7 +204,7 @@ class DataTableExtended extends StatelessWidget {
   /// The height of each row (excluding the row that contains column headings).
   /// {@endtemplate}
   ///
-  /// If null, [DataTableThemeData.dataRowHeight] is used. This value defaults
+  /// If null, [DataTableThemeData.dataRowMinHeight] is used. This value defaults
   /// to [kMinInteractiveDimension] to adhere to the Material Design
   /// specifications.
   final double? dataRowHeight;
@@ -549,8 +547,8 @@ class DataTableExtended extends StatelessWidget {
         themeData.dataTableTheme.dataTextStyle ??
         themeData.textTheme.bodyMedium!;
     final double? effectiveDataRowHeight = dataRowHeight ??
-        dataTableTheme.dataRowHeight ??
-        themeData.dataTableTheme.dataRowHeight;
+        dataTableTheme.dataRowMinHeight ??
+        themeData.dataTableTheme.dataRowMinHeight;
     label = Container(
       padding: padding,
       height: effectiveDataRowHeight,

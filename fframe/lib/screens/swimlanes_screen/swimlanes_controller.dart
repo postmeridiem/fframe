@@ -1,14 +1,15 @@
-part of fframe;
+part of '../../fframe.dart';
 
 // ignore: must_be_immutable
-class SwimlanesController extends InheritedModel {
+class SwimlanesController extends InheritedModel<SwimlanesController> {
+  // ignore: use_super_parameters
   SwimlanesController({
     super.key,
     required child,
     required this.context,
     required this.sourceQuery,
     required this.theme,
-    required this.config,
+    required this.swimlanesConfig,
     required this.viewportSize,
     required this.documentOpen,
   }) : super(child: child) {
@@ -17,19 +18,18 @@ class SwimlanesController extends InheritedModel {
 
     // get a handle to the current user
     FFrameUser currentUser = Fframe.of(context)!.user as FFrameUser;
-    List<String> currentRoles = [];
-    // get the user's roles
-    if (currentUser.roles != null) {
-      currentRoles = currentUser.roles as List<String>;
-    }
+    List<String> currentRoles = currentUser.roles;
 
-    // initialize the tasks database
-    database = SwimlaneTaskDatabase(currentUser: currentUser);
+    // // initialize the tasks database
+    // database = SwimlaneTaskDatabase(
+    //   currentUser: currentUser,
+    //   swimlanesConfig: swimlanesConfig,
+    // );
 
-    for (var i = 0; i < (config.swimlaneSettings.length); i++) {
+    for (var i = 0; i < (swimlanesConfig.swimlaneSettings.length); i++) {
       // get the settings for the current swimlane
       SwimlaneSetting swimlaneSetting = swimlaneSettings[i];
-      database.registerStatus(index: i, status: swimlaneSetting.status);
+      // database.registerStatus(index: i, status: swimlaneSetting.status);
 
       if (swimlaneSetting.roles == null) {
         // there is no role configuration, defaulting to hasAccess
@@ -66,56 +66,52 @@ class SwimlanesController extends InheritedModel {
   late SwimlanesNotifier notifier;
 
   final BuildContext context;
-  final SwimlanesConfig config;
+  final SwimlanesConfig swimlanesConfig;
   final ThemeData theme;
   final Size viewportSize;
   final bool documentOpen;
 
   late Query sourceQuery;
-  late SwimlaneTaskDatabase database;
+  // late SwimlaneTaskDatabase database;
   late double _calculatedWidth;
   late double _viewportWidth;
 
   // late Map<String, bool> listGridSelection = {};
 
   Color get swimlaneBackgroundColor {
-    return config.swimlaneBackgroundColor ??
-        theme.colorScheme.secondaryContainer;
+    return swimlanesConfig.swimlaneBackgroundColor ?? theme.colorScheme.secondaryContainer;
   }
 
   Color get swimlaneHeaderColor {
-    return config.swimlaneHeaderColor ?? theme.colorScheme.primaryContainer;
+    return swimlanesConfig.swimlaneHeaderColor ?? theme.colorScheme.primaryContainer;
   }
 
   Color get swimlaneHeaderTextColor {
-    return config.swimlaneHeaderTextColor ??
-        theme.colorScheme.onPrimaryContainer;
+    return swimlanesConfig.swimlaneHeaderTextColor ?? theme.colorScheme.onPrimaryContainer;
   }
 
   Color get swimlaneHeaderSeparatorColor {
-    return config.swimlaneHeaderSeparatorColor ??
-        theme.colorScheme.primaryContainer;
+    return swimlanesConfig.swimlaneHeaderSeparatorColor ?? theme.colorScheme.primaryContainer;
   }
 
   Color get swimlaneSeparatorColor {
-    return config.swimlaneHeaderSeparatorColor ??
-        theme.colorScheme.onBackground;
+    return swimlanesConfig.swimlaneHeaderSeparatorColor ?? theme.colorScheme.onBackground;
   }
 
   Color get taskCardColor {
-    return config.taskCardColor ?? theme.colorScheme.surfaceVariant;
+    return swimlanesConfig.taskCardColor ?? theme.colorScheme.surfaceVariant;
   }
 
   Color get taskCardTextColor {
-    return config.taskCardTextColor ?? theme.colorScheme.onSurfaceVariant;
+    return swimlanesConfig.taskCardTextColor ?? theme.colorScheme.onSurfaceVariant;
   }
 
   Color get taskCardHeaderColor {
-    return config.taskCardHeaderColor ?? theme.colorScheme.surface;
+    return swimlanesConfig.taskCardHeaderColor ?? theme.colorScheme.surface;
   }
 
   Color get taskCardHeaderTextColor {
-    return config.taskCardHeaderTextColor ?? theme.colorScheme.onSurface;
+    return swimlanesConfig.taskCardHeaderTextColor ?? theme.colorScheme.onSurface;
   }
 
   double get calculatedWidth {
@@ -131,7 +127,7 @@ class SwimlanesController extends InheritedModel {
   }
 
   List<SwimlaneSetting> get swimlaneSettings {
-    return config.swimlaneSettings;
+    return swimlanesConfig.swimlaneSettings;
   }
 
   Query get currentQuery {
@@ -151,22 +147,18 @@ class SwimlanesController extends InheritedModel {
   }
 
   double _calculateWidth(double calculatedMinWidth, double viewportWidth) {
-    double calculatedWidth =
-        calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
+    double calculatedWidth = calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
     return calculatedWidth;
   }
 
   double _getViewportWidth({required Size viewportSize}) {
-    double viewportWidth = ((viewportSize.width > 1000)
-        ? (viewportSize).width - 100
-        : (viewportSize.width + 0));
+    double viewportWidth = ((viewportSize.width > 1000) ? (viewportSize).width - 100 : (viewportSize.width + 0));
     return viewportWidth;
   }
 
+  // ignore: unused_element
   double _getViewportHeight({required Size viewportSize}) {
-    double viewportWidth = ((viewportSize.width > 1000)
-        ? (viewportSize).width - 100
-        : (viewportSize.width + 0));
+    double viewportWidth = ((viewportSize.width > 1000) ? (viewportSize).width - 100 : (viewportSize.width + 0));
     return viewportWidth;
   }
 
@@ -175,7 +167,7 @@ class SwimlanesController extends InheritedModel {
     bool updated = false;
 
     // test if any fields are changed that should trigger an update
-    updated = (config != oldWidget.config) ? true : updated;
+    updated = (swimlanesConfig != oldWidget.swimlanesConfig) ? true : updated;
     updated = (swimlaneSettings != oldWidget.swimlaneSettings) ? true : updated;
     updated = (theme != oldWidget.theme) ? true : updated;
     // updated = (theme != oldWidget.task) ? true : updated;

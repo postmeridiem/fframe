@@ -61,60 +61,59 @@ class _TabloaderScreenState extends State<TabloaderScreen> {
       ),
 
       // Center part, shows a firestore doc. Tabs possible
-      document: _document(context),
-      // document: _document(),
+      document: tabLoaderDocument(context),
     );
   }
+}
 
-  Document<FframePage> _document(BuildContext context) {
-    return Document<FframePage>(
-      showSaveButton: false,
-      showCloseButton: false,
-      prefetchTabs: false,
-      documentTabsBuilder: (context, page, isReadOnly, isNew, fFrameUser) {
-        return [
-          DocumentTab<FframePage>(
-            tabBuilder: (user) {
-              return const Tab(
-                text: "TAB 1",
-              );
-            },
-            childBuilder: (page, readOnly) {
-              return Tab01(
-                page: page,
-                readOnly: readOnly,
-                // user: user,
-              );
-            },
-          ),
-          DocumentTab<FframePage>(
-            tabBuilder: (user) {
-              return const Tab(
-                text: "TAB 2",
-              );
-            },
-            childBuilder: (page, readOnly) {
-              return Tab02(
-                page: page,
-                readOnly: readOnly,
-              );
-            },
-          ),
-          DocumentTab<FframePage>(
-            tabBuilder: (user) {
-              return const Tab(
-                text: "TAB 3",
-              );
-            },
-            childBuilder: (page, readOnly) {
-              return Tab03(
-                page: page,
-                readOnly: readOnly,
-              );
-            },
-          )
-        ];
-      },
-    );
-  }
+Document<FframePage> tabLoaderDocument(BuildContext context) {
+  return Document<FframePage>(
+    showSaveButton: false,
+    showCloseButton: false,
+    prefetchTabs: false,
+    documentTabsBuilder: (context, page, isReadOnly, isNew, fFrameUser) {
+      return [
+        DocumentTab<FframePage>(
+          tabBuilder: (user) {
+            return const Tab(
+              text: "TAB 1",
+            );
+          },
+          childBuilder: (page, readOnly) {
+            return Tab01(
+              page: page,
+              readOnly: readOnly,
+              // user: user,
+            );
+          },
+        ),
+        DocumentTab<FframePage>(
+          tabBuilder: (user) {
+            return const Tab(
+              text: "TAB 2",
+            );
+          },
+          childBuilder: (page, readOnly) {
+            return Tab02(
+              page: page,
+              readOnly: readOnly,
+            );
+          },
+        ),
+        DocumentTab<FframePage>(
+          tabBuilder: (user) {
+            return const Tab(
+              text: "TAB 3",
+            );
+          },
+          childBuilder: (page, readOnly) {
+            return Tab03(
+              page: page,
+              readOnly: readOnly,
+            );
+          },
+        )
+      ];
+    },
+  );
 }

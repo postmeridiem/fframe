@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class NotImplementedError extends StatelessWidget {
-  const NotImplementedError({Key? key}) : super(key: key);
+  const NotImplementedError({super.key});
 
   @override
   Widget build(BuildContext context) {

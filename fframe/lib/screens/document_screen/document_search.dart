@@ -1,3 +1,5 @@
+// ignore_for_file: use_super_parameters
+
 import 'package:intl/intl.dart';
 
 import 'package:fframe/controllers/query_state_controller.dart';

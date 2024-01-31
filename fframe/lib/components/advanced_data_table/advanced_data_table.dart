@@ -5,7 +5,7 @@ import 'package:horizontal_data_table/horizontal_data_table.dart';
 class AdvancedDataTable<T> extends StatefulWidget {
 
   AdvancedDataTable({
-    Key? key,
+    super.key,
     required this.headerWidgets,
     required this.footerWidgets,
     required this.columnWidths,
@@ -14,8 +14,7 @@ class AdvancedDataTable<T> extends StatefulWidget {
     // this.firstColumnSticky = false,
     this.data
   }):
-        assert(headerWidgets.length == columnWidths.length, 'colum widths should match number of columns'),
-        super(key: key);
+        assert(headerWidgets.length == columnWidths.length, 'colum widths should match number of columns');
 
   final List<double> columnWidths;
 

@@ -1,4 +1,4 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class DocumentConfig<T> extends ChangeNotifier {
   DocumentConfig({
@@ -7,16 +7,15 @@ class DocumentConfig<T> extends ChangeNotifier {
     required this.createNew,
     required this.initialViewType,
     this.preSave,
-    this.postOpen,
-    this.postRefresh,
+    this.preOpen,
     this.createDocumentId,
     required this.fromFirestore,
     required this.toFirestore,
     this.query,
     this.searchConfig,
     this.documentList,
-    this.dataGrid,
-    this.listGrid,
+    this.dataGridConfig,
+    this.listGridConfig,
     this.swimlanes,
     this.titleBuilder,
     required this.autoSelectFirst,
@@ -28,23 +27,21 @@ class DocumentConfig<T> extends ChangeNotifier {
 
   final GlobalKey<FormState> formKey;
   final DocumentList<T>? documentList;
-  final DataGridConfig<T>? dataGrid;
-  final ListGridConfig<T>? listGrid;
+  final DataGridConfig<T>? dataGridConfig;
+  final ListGridConfig<T>? listGridConfig;
   final SwimlanesConfig<T>? swimlanes;
   final TitleBuilder<T>? titleBuilder;
   final Document<T> document;
   final String queryStringIdParam;
   final String collection;
   final bool autoSelectFirst;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
   final T Function() createNew;
   final T Function(T)? preSave;
-  final T Function(T)? postOpen;
-  final T Function(T)? postRefresh;
+  final T? Function(T)? preOpen;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
   final bool embeddedDocument;
@@ -60,9 +57,9 @@ class DocumentConfig<T> extends ChangeNotifier {
     switch (initialViewType) {
       case ViewType.auto:
         List<ViewType> returnValue = [];
-        if (listGrid != null) returnValue.add(ViewType.listgrid);
+        if (listGridConfig != null) returnValue.add(ViewType.listgrid);
         if (documentList != null) returnValue.add(ViewType.list);
-        if (dataGrid != null) returnValue.add(ViewType.grid);
+        if (dataGridConfig != null) returnValue.add(ViewType.grid);
         if (returnValue.isEmpty) returnValue.add(ViewType.none);
         return returnValue;
       case ViewType.listgrid:
@@ -208,12 +205,7 @@ class SearchOption<T> {
   late SearchOptionSortOrder sort;
   late SearchOptionComparisonOperator comparisonOperator;
   late bool isSelected = false;
-  SearchOption(
-      {required this.caption,
-      required this.field,
-      required this.type,
-      this.sort = SearchOptionSortOrder.none,
-      this.comparisonOperator = SearchOptionComparisonOperator.equal});
+  SearchOption({required this.caption, required this.field, required this.type, this.sort = SearchOptionSortOrder.none, this.comparisonOperator = SearchOptionComparisonOperator.equal});
 }
 
 enum SearchOptionType {

@@ -1,3 +1,5 @@
+// ignore_for_file: unused_element
+
 import 'package:flutter/material.dart';
 import 'package:fframe/components/advanced_data_table/advanced_data_table.dart';
 import 'user_data.dart';

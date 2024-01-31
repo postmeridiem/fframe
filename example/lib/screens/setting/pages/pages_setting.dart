@@ -2,6 +2,7 @@ import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 
+// ignore: unnecessary_import
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:example/models/fframe_page.dart';

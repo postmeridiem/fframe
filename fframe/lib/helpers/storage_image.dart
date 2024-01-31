@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 // StorageImage is a custom widget that allows to get a image from firebase storage
 class StorageImage extends StatelessWidget {
   const StorageImage({
-    Key? key,
+    super.key,
     required this.bucketName,
     required this.filePath,
-  }) : super(key: key);
+  });
 
   final String bucketName;
   final String filePath;

@@ -1,6 +1,6 @@
-part of fframe;
+part of '../../fframe.dart';
 
-class ListGridHeader extends StatelessWidget {
+class ListGridHeader<T> extends StatelessWidget {
   const ListGridHeader({
     super.key,
     required this.calculatedWidth,
@@ -13,34 +13,29 @@ class ListGridHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ListGridController listgrid = ListGridController.of(context);
+    ListGridController listGridController = ListGridController.of(context);
     return SizedBox(
-      height: listgrid.headerHeight,
-      width: listgrid.documentOpen ? 300 : calculatedWidth,
+      height: listGridController.headerHeight,
+      width: listGridController.documentOpen ? 300 : calculatedWidth,
       child: Column(
         children: [
           Table(
-            columnWidths: listgrid.documentOpen
-                ? {
-                    0: listgrid.columnWidths[rowsSelectable ? 1 : 0]
-                        as TableColumnWidth
-                  }
-                : listgrid.columnWidths,
+            columnWidths: listGridController.documentOpen ? {0: listGridController.columnWidths[rowsSelectable ? 1 : 0] as TableColumnWidth} : listGridController.columnWidths,
             defaultVerticalAlignment: TableCellVerticalAlignment.middle,
             children: [
               TableRow(
                 children: renderHeaderCells(
                   context: context,
-                  documentOpen: listgrid.documentOpen,
-                  columnSettings: listgrid.columnSettings,
-                  cellPadding: listgrid.cellPadding,
-                  cellBorder: listgrid.cellBorder,
-                  widgetBackgroundColor: listgrid.widgetBackgroundColor,
-                  widgetTextColor: listgrid.widgetTextColor,
-                  widgetAccentColor: listgrid.widgetAccentColor,
-                  widgetTextSize: listgrid.widgetTextSize,
-                  widgetColor: listgrid.widgetColor,
-                  sortedColumnIndex: listgrid.sortedColumnIndex,
+                  documentOpen: listGridController.documentOpen,
+                  columnSettings: listGridController.columnSettings,
+                  cellPadding: listGridController.cellPadding,
+                  cellBorder: listGridController.cellBorder,
+                  widgetBackgroundColor: listGridController.widgetBackgroundColor,
+                  widgetTextColor: listGridController.widgetTextColor,
+                  widgetAccentColor: listGridController.widgetAccentColor,
+                  widgetTextSize: listGridController.widgetTextSize,
+                  widgetColor: listGridController.widgetColor,
+                  sortedColumnIndex: listGridController.sortedColumnIndex,
                 ),
               ),
             ],
@@ -158,35 +153,34 @@ class ListGridHeader extends StatelessWidget {
   }
 }
 
-class ListGridSearchWidget extends StatelessWidget {
+class ListGridSearchWidget<T> extends StatelessWidget {
   const ListGridSearchWidget({
     super.key,
-    required this.listgrid,
+    required this.listGridController,
     required this.documentOpen,
   });
-  final ListGridController listgrid;
+  final ListGridController listGridController;
   final bool documentOpen;
 
   @override
   Widget build(BuildContext context) {
-    Color widgetColor = listgrid.widgetColor;
-    double calculatedWidth = documentOpen ? 300 : listgrid.calculatedWidth;
+    Color widgetColor = listGridController.widgetColor;
+    double calculatedWidth = documentOpen ? 300 : listGridController.calculatedWidth;
 
     ///lalalala
     List<InputChip> searchChips = [];
 
-    if (listgrid.searchableColumns.length > 1) {
-      for (int searchableColumnIndex in listgrid.searchableColumns) {
-        ListGridColumn searchableColumn =
-            listgrid.columnSettings[searchableColumnIndex];
+    if (listGridController.searchableColumns.length > 1) {
+      for (int searchableColumnIndex in listGridController.searchableColumns) {
+        ListGridColumn searchableColumn = listGridController.columnSettings[searchableColumnIndex];
         searchChips.add(
           InputChip(
             label: Text(
               searchableColumn.label,
-              style: TextStyle(color: listgrid.widgetColor),
+              style: TextStyle(color: listGridController.widgetColor),
             ),
-            backgroundColor: listgrid.widgetBackgroundColor,
-            disabledColor: listgrid.widgetBackgroundColor,
+            backgroundColor: listGridController.widgetBackgroundColor,
+            disabledColor: listGridController.widgetBackgroundColor,
           ),
         );
       }
@@ -223,7 +217,7 @@ class ListGridSearchWidget extends StatelessWidget {
                 fontSize: 16,
               ),
               decoration: InputDecoration(
-                hintText: listgrid.config.searchHint,
+                hintText: listGridController.listGridConfig.searchHint,
                 hintStyle: TextStyle(
                   color: Theme.of(context).disabledColor,
                 ),
@@ -252,18 +246,18 @@ class ListGridSearchWidget extends StatelessWidget {
 class ListGridActionBarWidget<T> extends StatelessWidget {
   const ListGridActionBarWidget({
     super.key,
-    required this.listgrid,
+    required this.listGridController,
   });
 
-  final ListGridController listgrid;
+  final ListGridController listGridController;
 
   @override
   Widget build(BuildContext context) {
-    ListGridConfig<T> listGridConfig = listgrid.config as ListGridConfig<T>;
-    double calculatedWidth = listgrid.calculatedWidth;
-    Color widgetColor = listgrid.widgetColor;
-    Color widgetBackgroundColor = listgrid.widgetBackgroundColor;
-    double cellBorder = listgrid.cellBorder;
+    ListGridConfig<T> listGridConfig = listGridController.listGridConfig as ListGridConfig<T>;
+    double calculatedWidth = listGridController.calculatedWidth;
+    Color widgetColor = listGridController.widgetColor;
+    Color widgetBackgroundColor = listGridController.widgetBackgroundColor;
+    double cellBorder = listGridController.cellBorder;
     return Theme(
       data: ThemeData(
         textSelectionTheme: TextSelectionThemeData(
@@ -300,15 +294,14 @@ class ListGridActionBarWidget<T> extends StatelessWidget {
     );
   }
 
-  List<ListGridActionMenuWidget<T>> renderActionBar(
-      {required List<ListGridActionMenu<T>> actionBar}) {
+  List<ListGridActionMenuWidget<T>> renderActionBar({required List<ListGridActionMenu<T>> actionBar}) {
     List<ListGridActionMenuWidget<T>> output = [];
 
-    for (ListGridActionMenu actionMenu in actionBar) {
+    for (ListGridActionMenu<T> actionMenu in actionBar) {
       bool isMenuHeader = actionMenu.menuItems.length > 1;
       output.add(
         ListGridActionMenuWidget<T>(
-          listgrid: listgrid,
+          listGridController: listGridController,
           actionMenu: actionMenu,
           isMenuHeader: isMenuHeader,
         ),
@@ -347,22 +340,20 @@ class ListGridActionBarWidget<T> extends StatelessWidget {
 class ListGridActionMenuWidget<T> extends StatefulWidget {
   const ListGridActionMenuWidget({
     super.key,
-    required this.listgrid,
+    required this.listGridController,
     required this.actionMenu,
     required this.isMenuHeader,
   });
 
-  final ListGridController listgrid;
-  final ListGridActionMenu actionMenu;
+  final ListGridController listGridController;
+  final ListGridActionMenu<T> actionMenu;
   final bool isMenuHeader;
 
   @override
-  State<ListGridActionMenuWidget<T>> createState() =>
-      _ListGridActionMenuWidgetState<T>();
+  State<ListGridActionMenuWidget<T>> createState() => _ListGridActionMenuWidgetState<T>();
 }
 
-class _ListGridActionMenuWidgetState<T>
-    extends State<ListGridActionMenuWidget<T>> {
+class _ListGridActionMenuWidgetState<T> extends State<ListGridActionMenuWidget<T>> {
   late OverlayEntry? menuWidget;
   late bool menuOpen = false;
   late bool mouseOver = false;
@@ -372,9 +363,7 @@ class _ListGridActionMenuWidgetState<T>
     menuWidget = null;
   }
 
-  void openMenu(
-      {required ListGridController listgrid,
-      required ListGridActionMenu actionMenu}) {
+  void openMenu({required ListGridController listGridController, required ListGridActionMenu<T> actionMenu}) {
     if (menuOpen) {
       // menu was already open. tap just means close
       closeMenu();
@@ -388,8 +377,8 @@ class _ListGridActionMenuWidgetState<T>
       List<Widget> menuItems = [];
       for (var actionMenuItem in actionMenu.menuItems) {
         menuItems.add(
-          ListGridActionMenuItemWidget(
-            listgrid: listgrid,
+          ListGridActionMenuItemWidget<T>(
+            listGridController: listGridController,
             actionMenuItem: actionMenuItem,
           ),
         );
@@ -402,19 +391,11 @@ class _ListGridActionMenuWidgetState<T>
           top: (offset.dy + size.height + 7),
           child: Material(
             elevation: 1,
-            color: listgrid.widgetBackgroundColor,
+            color: listGridController.widgetBackgroundColor,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: menuItems,
-                // children: [
-                //   Text("menu item"),
-                //   ListGridActionMenuItemWidget(
-                //     listgrid: listgrid,
-                //     actionMenuItem: actionMenu.menuItems.first,
-                //     isEnabled: isEnabled,
-                //   )
-                // ],
               ),
             ),
           ),
@@ -436,11 +417,12 @@ class _ListGridActionMenuWidgetState<T>
 
   @override
   Widget build(BuildContext context) {
-    ListGridController listgrid = widget.listgrid;
-    ListGridActionMenu actionMenu = widget.actionMenu;
-    List<SelectedDocument> selectedDocuments = listgrid.selectedDocuments;
-    // enable ActionMenu if selection requirement is not set
-    // isEnabled = widget.requireSelection ? isEnabled : true;
+    ListGridController listGridController = widget.listGridController;
+    ListGridActionMenu<T> actionMenu = widget.actionMenu;
+    ListGridNotifier<T> listGridNotifier = listGridController.notifier as ListGridNotifier<T>;
+    List<SelectedDocument<T>> selectedDocuments = listGridNotifier.selectedDocuments;
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    FFrameUser fFrameUser = documentScreenConfig.fFrameUser;
     if (widget.isMenuHeader) {
       String label = actionMenu.label ?? actionMenu.menuItems.first.label;
       IconData icon = actionMenu.icon ?? actionMenu.menuItems.first.icon;
@@ -458,7 +440,7 @@ class _ListGridActionMenuWidgetState<T>
         },
         child: TapRegion(
           onTapInside: (event) {
-            openMenu(listgrid: listgrid, actionMenu: actionMenu);
+            openMenu(listGridController: listGridController, actionMenu: actionMenu);
           },
           onTapOutside: (event) {
             closeMenu();
@@ -466,10 +448,10 @@ class _ListGridActionMenuWidgetState<T>
           child: Container(
             decoration: BoxDecoration(
               border: Border(
-                right: listgrid.cellBorder > 0
+                right: listGridController.cellBorder > 0
                     ? BorderSide(
-                        color: listgrid.widgetColor,
-                        width: listgrid.cellBorder,
+                        color: listGridController.widgetColor,
+                        width: listGridController.cellBorder,
                       )
                     : BorderSide.none,
               ),
@@ -480,18 +462,14 @@ class _ListGridActionMenuWidgetState<T>
                 children: [
                   Icon(
                     icon,
-                    color: (mouseOver)
-                        ? listgrid.widgetAccentColor
-                        : listgrid.widgetColor,
+                    color: (mouseOver) ? listGridController.widgetAccentColor : listGridController.widgetColor,
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                     child: Text(
                       label,
                       style: TextStyle(
-                        color: (mouseOver)
-                            ? listgrid.widgetAccentColor
-                            : listgrid.widgetColor,
+                        color: (mouseOver) ? listGridController.widgetAccentColor : listGridController.widgetColor,
                       ),
                     ),
                   ),
@@ -502,9 +480,9 @@ class _ListGridActionMenuWidgetState<T>
         ),
       );
     } else {
-      bool isEnabled = (actionMenu.menuItems.first.requireSelection == false) ||
-          (widget.listgrid.selectionCount > 0);
-      ListGridActionMenuItem headerItem = actionMenu.menuItems.first;
+      ListGridActionMenuItem<T> listGridActionMenuItem = actionMenu.menuItems.first;
+      bool isEnabled = (listGridActionMenuItem.processSelection == false) || (listGridNotifier.selectionCount > 0);
+      ListGridActionMenuItem<T> headerItem = actionMenu.menuItems.first;
       return Opacity(
         opacity: isEnabled ? 1 : 0.4,
         child: MouseRegion(
@@ -526,24 +504,29 @@ class _ListGridActionMenuWidgetState<T>
           child: TapRegion(
             onTapInside: isEnabled
                 ? (event) {
-                    headerItem.clickHandler(
-                      listgrid.context,
-                      Fframe.of(context)!.user,
-                      selectedDocuments,
-                      createDocument,
-                    );
-                    setState(() {
-                      mouseOver = false;
-                    });
+                    if (listGridActionMenuItem.processSelection == false) {
+                      SelectedDocument<T>? updatedDocument = listGridActionMenuItem.onClick(context, fFrameUser, null, documentScreenConfig);
+                      updatedDocument!.update();
+                    } else {
+                      for (SelectedDocument<T> selectedDocument in selectedDocuments) {
+                        SelectedDocument<T>? updatedDocument = listGridActionMenuItem.onClick(context, fFrameUser, selectedDocument, documentScreenConfig);
+                        updatedDocument!.update();
+                      }
+                      // SelectedDocument<T>? selectedDocument = selectedDocuments.isNotEmpty ? selectedDocuments.first : null;
+                      // if (selectedDocument != null) {
+                      //   SelectedDocument<T>? updatedDocument = listGridActionMenuItem.onClick(context, fFrameUser, selectedDocument, documentScreenConfig);
+                      //   if (updatedDocument != null) updatedDocument.update();
+                      // }
+                    }
                   }
                 : (event) {},
             child: Container(
               decoration: BoxDecoration(
                 border: Border(
-                  right: listgrid.cellBorder > 0
+                  right: listGridController.cellBorder > 0
                       ? BorderSide(
-                          color: listgrid.widgetColor,
-                          width: listgrid.cellBorder,
+                          color: listGridController.widgetColor,
+                          width: listGridController.cellBorder,
                         )
                       : BorderSide.none,
                 ),
@@ -554,18 +537,14 @@ class _ListGridActionMenuWidgetState<T>
                   children: [
                     Icon(
                       headerItem.icon,
-                      color: (isEnabled && mouseOver)
-                          ? listgrid.widgetAccentColor
-                          : listgrid.widgetColor,
+                      color: (isEnabled && mouseOver) ? listGridController.widgetAccentColor : listGridController.widgetColor,
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                       child: Text(
                         headerItem.label,
                         style: TextStyle(
-                          color: (isEnabled && mouseOver)
-                              ? listgrid.widgetAccentColor
-                              : listgrid.widgetColor,
+                          color: (isEnabled && mouseOver) ? listGridController.widgetAccentColor : listGridController.widgetColor,
                         ),
                       ),
                     ),
@@ -586,7 +565,7 @@ class _ListGridActionMenuWidgetState<T>
     } else {
       Console.log(
         "Cannot create new with a document already in scope",
-        scope: "fframeLog.listgrid",
+        scope: "fframeLog.listGridController",
         level: LogLevel.prod,
       );
     }
@@ -596,27 +575,28 @@ class _ListGridActionMenuWidgetState<T>
 class ListGridActionMenuItemWidget<T> extends StatefulWidget {
   const ListGridActionMenuItemWidget({
     super.key,
-    required this.listgrid,
+    required this.listGridController,
     required this.actionMenuItem,
   });
-  final ListGridController listgrid;
-  final ListGridActionMenuItem actionMenuItem;
+  final ListGridController listGridController;
+  final ListGridActionMenuItem<T> actionMenuItem;
 
   @override
-  State<ListGridActionMenuItemWidget<T>> createState() =>
-      _ListGridActionMenuItemWidgetState<T>();
+  State<ListGridActionMenuItemWidget<T>> createState() => _ListGridActionMenuItemWidgetState<T>();
 }
 
-class _ListGridActionMenuItemWidgetState<T>
-    extends State<ListGridActionMenuItemWidget<T>> {
+class _ListGridActionMenuItemWidgetState<T> extends State<ListGridActionMenuItemWidget<T>> {
   late bool mouseOver = false;
   @override
   Widget build(BuildContext context) {
-    ListGridController listgrid = widget.listgrid;
-    ListGridActionMenuItem actionMenuItem = widget.actionMenuItem;
-    List<SelectedDocument> selectedDocuments = listgrid.selectedDocuments;
-    bool isEnabled =
-        actionMenuItem.requireSelection ? (listgrid.selectionCount > 0) : true;
+    ListGridController listGridController = widget.listGridController;
+    // DocumentConfig<T> documentConfig = listGridController.documentConfig as DocumentConfig<T>;
+    ListGridActionMenuItem<T> actionMenuItem = widget.actionMenuItem;
+    ListGridNotifier<T> listGridNotifier = listGridController.notifier as ListGridNotifier<T>;
+    List<SelectedDocument<T>> selectedDocuments = listGridNotifier.selectedDocuments;
+    bool isEnabled = actionMenuItem.processSelection ? (listGridNotifier.selectionCount > 0) : true;
+    DocumentScreenConfig? documentScreenConfig = DocumentScreenConfig.of(context);
+    FFrameUser fFrameUser = documentScreenConfig!.fFrameUser;
     return Opacity(
       opacity: isEnabled ? 1 : 0.4,
       child: MouseRegion(
@@ -632,37 +612,26 @@ class _ListGridActionMenuItemWidgetState<T>
           });
         },
         child: TapRegion(
-          onTapInside: isEnabled
-              ? (event) {
-                  actionMenuItem.clickHandler(
-                    listgrid.context,
-                    Fframe.of(context)!.user,
-                    selectedDocuments,
-                    createDocument,
-                  );
-                  setState(() {
-                    mouseOver = false;
-                  });
-                }
-              : (event) {},
+          onTapInside: (event) {
+            for (SelectedDocument<T> selectedDocument in selectedDocuments) {
+              SelectedDocument<T>? updatedDocument = actionMenuItem.onClick(context, fFrameUser, selectedDocument, documentScreenConfig);
+              updatedDocument!.update();
+            }
+          },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
                 Icon(
                   actionMenuItem.icon,
-                  color: (isEnabled && mouseOver)
-                      ? listgrid.widgetAccentColor
-                      : listgrid.widgetColor,
+                  color: (isEnabled && mouseOver) ? listGridController.widgetAccentColor : listGridController.widgetColor,
                 ),
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                   child: Text(
                     actionMenuItem.label,
                     style: TextStyle(
-                      color: (isEnabled && mouseOver)
-                          ? listgrid.widgetAccentColor
-                          : listgrid.widgetColor,
+                      color: (isEnabled && mouseOver) ? listGridController.widgetAccentColor : listGridController.widgetColor,
                     ),
                   ),
                 ),
@@ -673,28 +642,10 @@ class _ListGridActionMenuItemWidgetState<T>
       ),
     );
   }
-
-  void createDocument() {
-    FRouter router = FRouter.of(context);
-    if (router.queryStringParam("id") == null) {
-      router.updateQueryString(queryParameters: {"new": "true"});
-    } else {
-      Console.log(
-        "Cannot create new with a document already in scope",
-        scope: "fframeLog.listgrid",
-        level: LogLevel.prod,
-      );
-    }
-  }
 }
 
-class ListGridHeaderSortingWidget extends StatelessWidget {
-  const ListGridHeaderSortingWidget(
-      {super.key,
-      required this.column,
-      required this.columnIndex,
-      required this.widgetColor,
-      required this.widgetAccentColor});
+class ListGridHeaderSortingWidget<T> extends StatelessWidget {
+  const ListGridHeaderSortingWidget({super.key, required this.column, required this.columnIndex, required this.widgetColor, required this.widgetAccentColor});
 
   final ListGridColumn column;
   final int columnIndex;
@@ -708,10 +659,7 @@ class ListGridHeaderSortingWidget extends StatelessWidget {
       bool isSorted = (columnIndex == controller.sortedColumnIndex);
       return Positioned.fill(
           child: Align(
-              alignment: (column.alignment == Alignment.bottomLeft ||
-                      column.alignment == Alignment.topLeft)
-                  ? Alignment.centerRight
-                  : Alignment.centerLeft,
+              alignment: (column.alignment == Alignment.bottomLeft || column.alignment == Alignment.topLeft) ? Alignment.centerRight : Alignment.centerLeft,
               child: Padding(
                 padding: const EdgeInsets.only(left: 4.0, right: 4.0),
                 child: Column(
@@ -723,14 +671,11 @@ class ListGridHeaderSortingWidget extends StatelessWidget {
                       child: IconButton(
                         padding: const EdgeInsets.all(0),
                         onPressed: () {
-                          controller.sortColumn(
-                              columnIndex: columnIndex, descending: false);
+                          controller.sortColumn(columnIndex: columnIndex, descending: false);
                         },
                         icon: const Icon(Icons.expand_less),
                         iconSize: 12,
-                        color: (isSorted && !column.descending)
-                            ? widgetAccentColor
-                            : widgetColor,
+                        color: (isSorted && !column.descending) ? widgetAccentColor : widgetColor,
                         style: const ButtonStyle(
                           padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
                             EdgeInsets.all(0),
@@ -745,20 +690,16 @@ class ListGridHeaderSortingWidget extends StatelessWidget {
                         isSelected: true,
                         padding: const EdgeInsets.all(0),
                         onPressed: () {
-                          controller.sortColumn(
-                              columnIndex: columnIndex, descending: true);
+                          controller.sortColumn(columnIndex: columnIndex, descending: true);
                         },
                         icon: const Icon(Icons.expand_more),
                         iconSize: 12,
-                        color: (isSorted && column.descending)
-                            ? widgetAccentColor
-                            : widgetColor,
+                        color: (isSorted && column.descending) ? widgetAccentColor : widgetColor,
                         style: ButtonStyle(
                           surfaceTintColor: MaterialStatePropertyAll<Color>(
                             Colors.grey.shade500,
                           ),
-                          padding: const MaterialStatePropertyAll<
-                              EdgeInsetsGeometry>(
+                          padding: const MaterialStatePropertyAll<EdgeInsetsGeometry>(
                             EdgeInsets.all(0),
                           ),
                         ),
@@ -784,11 +725,12 @@ class ListGridFooter<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ListGridController listgrid = ListGridController.of(context);
-    int collectionCount = listgrid.collectionCount;
-    int selectionCount = listgrid.selectionCount;
+    ListGridController listGridController = ListGridController.of(context);
+    ListGridNotifier<T> listGridNotifier = listGridController.notifier as ListGridNotifier<T>;
+    int collectionCount = listGridController.collectionCount;
+    int selectionCount = listGridNotifier.selectionCount;
     return SizedBox(
-      height: listgrid.footerHeight,
+      height: listGridController.footerHeight,
       width: viewportWidth,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -797,30 +739,26 @@ class ListGridFooter<T> extends StatelessWidget {
           //   height: 1,
           // ),
           Container(
-            color: listgrid.widgetBackgroundColor,
+            color: listGridController.widgetBackgroundColor,
             child: Padding(
-                padding: listgrid.cellPadding,
+                padding: listGridController.cellPadding,
                 child: Row(
-                  mainAxisAlignment: listgrid.documentOpen
-                      ? MainAxisAlignment.start
-                      : MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: listGridController.documentOpen ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween,
                   children: [
                     const IgnorePointer(),
-                    (dataMode == ListGridDataMode.autopager ||
-                            dataMode == ListGridDataMode.pager)
+                    (dataMode == ListGridDataMode.autopager || dataMode == ListGridDataMode.pager)
                         ? ListGridPaginator(
                             collectionCount: collectionCount,
-                            widgetTextColor: listgrid.widgetTextColor,
-                            widgetTextSize: listgrid.widgetTextSize,
-                            widgetBackgroundColor:
-                                listgrid.widgetBackgroundColor,
-                            widgetColor: listgrid.widgetColor,
+                            widgetTextColor: listGridController.widgetTextColor,
+                            widgetTextSize: listGridController.widgetTextSize,
+                            widgetBackgroundColor: listGridController.widgetBackgroundColor,
+                            widgetColor: listGridController.widgetColor,
                           )
                         : ListGridDefaultFooter(
                             collectionCount: collectionCount,
                             selectionCount: selectionCount,
-                            widgetTextColor: listgrid.widgetTextColor,
-                            widgetTextSize: listgrid.widgetTextSize,
+                            widgetTextColor: listGridController.widgetTextColor,
+                            widgetTextSize: listGridController.widgetTextSize,
                           ),
                   ],
                 )),
@@ -831,7 +769,7 @@ class ListGridFooter<T> extends StatelessWidget {
   }
 }
 
-class ListGridDefaultFooter extends StatelessWidget {
+class ListGridDefaultFooter<T> extends StatelessWidget {
   const ListGridDefaultFooter({
     super.key,
     required this.collectionCount,
@@ -880,7 +818,7 @@ class ListGridDefaultFooter extends StatelessWidget {
   }
 }
 
-class ListGridPaginator extends StatelessWidget {
+class ListGridPaginator<T> extends StatelessWidget {
   const ListGridPaginator({
     super.key,
     required this.collectionCount,
@@ -957,18 +895,15 @@ class ListGridPaginator extends StatelessWidget {
 }
 
 class ListGridRowSelector<T> extends StatefulWidget {
-  ListGridRowSelector({
+  const ListGridRowSelector({
     super.key,
-    required this.listgrid,
-    this.documentId,
-    this.document,
-    this.snapshot,
-  }) {}
+    required this.selectedDocument,
+  });
 
-  final ListGridController listgrid;
-  final String? documentId;
-  final T? document;
-  final QueryDocumentSnapshot<T>? snapshot;
+  final SelectedDocument<T> selectedDocument;
+  // final String? documentId;
+  // final T? document;
+  // final QueryDocumentSnapshot<T>? queryDocumentSnapshot;
 
   @override
   State<ListGridRowSelector<T>> createState() => _ListGridRowSelectorState<T>();
@@ -977,21 +912,21 @@ class ListGridRowSelector<T> extends StatefulWidget {
 class _ListGridRowSelectorState<T> extends State<ListGridRowSelector<T>> {
   @override
   Widget build(BuildContext context) {
-    ListGridController? listgrid = widget.listgrid;
-    List<SelectedDocument> selectedDocuments = listgrid.selectedDocuments;
-    bool isSelected = selectedDocuments
-        .map((selectedDocument) => selectedDocument.id)
-        .contains(widget.documentId);
+    ListGridController listGridController = ListGridController.of(context);
+    ListGridNotifier<T> listGridNotifier = listGridController.notifier as ListGridNotifier<T>;
+    List<SelectedDocument<T>> selectedDocuments = listGridNotifier.selectedDocuments;
+    bool isSelected = selectedDocuments.map((selectedDocument) => selectedDocument.id).contains(widget.selectedDocument.id);
+
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.bottom,
       child: Container(
         decoration: BoxDecoration(
-          color: listgrid.cellBackgroundColor,
+          color: listGridController.cellBackgroundColor,
           border: Border(
-            bottom: listgrid.rowBorder > 0
+            bottom: listGridController.rowBorder > 0
                 ? BorderSide(
-                    color: listgrid.widgetBackgroundColor,
-                    width: listgrid.rowBorder,
+                    color: listGridController.widgetBackgroundColor,
+                    width: listGridController.rowBorder,
                   )
                 : BorderSide.none,
           ),
@@ -1003,20 +938,15 @@ class _ListGridRowSelectorState<T> extends State<ListGridRowSelector<T>> {
               padding: const EdgeInsets.all(0),
               onPressed: isSelected
                   ? () {
-                      ListGridController.of(context)
-                          .unselectRow(documentId: widget.documentId ?? "");
+                      listGridNotifier.unselectRow(unSelectedDocument: widget.selectedDocument);
                     }
                   : () {
-                      ListGridController.of(context).selectRow(
-                          documentId: widget.documentId ?? "",
-                          document: widget.document as T);
+                      listGridNotifier.selectRow(selectedDocument: widget.selectedDocument);
                     },
               icon: Icon(
-                isSelected
-                    ? Icons.check_box_outlined
-                    : Icons.check_box_outline_blank_outlined,
+                isSelected ? Icons.check_box_outlined : Icons.check_box_outline_blank_outlined,
               ),
-              color: listgrid.widgetColor,
+              color: listGridController.widgetColor,
             ),
           ),
         ),
@@ -1028,17 +958,17 @@ class _ListGridRowSelectorState<T> extends State<ListGridRowSelector<T>> {
 class ListGridBuilderCell<T> extends StatefulWidget {
   const ListGridBuilderCell({
     super.key,
-    required this.listgrid,
+    required this.listGridController,
     required this.column,
-    required this.queryDocumentSnapshot,
-    required this.document,
     required this.cellWidget,
+    required this.document,
   });
 
-  final ListGridController listgrid;
-  final ListGridColumn column;
-  final QueryDocumentSnapshot<T> queryDocumentSnapshot;
-  final T document;
+  final ListGridController listGridController;
+  final ListGridColumn<T> column;
+  final SelectedDocument<T> document;
+  // final QueryDocumentSnapshot<T> queryDocumentSnapshot;
+  // final T document;
   final Widget cellWidget;
 
   @override
@@ -1062,9 +992,8 @@ class _ListGridBuilderCellState<T> extends State<ListGridBuilderCell<T>> {
 
   @override
   Widget build(BuildContext context) {
-    ListGridController listgrid = widget.listgrid;
-    DocumentScreenConfig documentScreenConfig =
-        DocumentScreenConfig.of(context)!;
+    ListGridController listGridController = widget.listGridController;
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.bottom,
       child: MouseRegion(
@@ -1074,31 +1003,31 @@ class _ListGridBuilderCellState<T> extends State<ListGridBuilderCell<T>> {
             if (widget.column.onTableCellClick != null) {
               widget.column.onTableCellClick?.call(
                 context,
-                widget.queryDocumentSnapshot,
+                widget.document,
               );
             } else {
-              if (listgrid.config.openDocumentOnClick) {
+              if (listGridController.listGridConfig.openDocumentOnClick) {
                 documentScreenConfig.selectDocument(
                   context,
-                  widget.queryDocumentSnapshot,
+                  widget.document,
                 );
               }
             }
           },
           child: Container(
             decoration: BoxDecoration(
-              color: widget.listgrid.cellBackgroundColor,
+              color: widget.listGridController.cellBackgroundColor,
               border: Border(
-                bottom: widget.listgrid.rowBorder > 0
+                bottom: widget.listGridController.rowBorder > 0
                     ? BorderSide(
-                        color: widget.listgrid.widgetBackgroundColor,
-                        width: widget.listgrid.rowBorder,
+                        color: widget.listGridController.widgetBackgroundColor,
+                        width: widget.listGridController.rowBorder,
                       )
                     : BorderSide.none,
               ),
             ),
             child: Padding(
-              padding: widget.listgrid.cellPadding,
+              padding: widget.listGridController.cellPadding,
               child: widget.cellWidget,
               // child: const Text("cell"),
             ),
@@ -1112,18 +1041,16 @@ class _ListGridBuilderCellState<T> extends State<ListGridBuilderCell<T>> {
 class ListGridDataCell<T> extends StatefulWidget {
   const ListGridDataCell({
     super.key,
-    required this.listgrid,
+    required this.listGridController,
     required this.column,
     required this.dynValue,
-    required this.queryDocumentSnapshot,
     required this.document,
   });
 
-  final ListGridController listgrid;
-  final ListGridColumn column;
+  final ListGridController listGridController;
+  final ListGridColumn<T> column;
   final dynamic dynValue;
-  final QueryDocumentSnapshot<T> queryDocumentSnapshot;
-  final T document;
+  final SelectedDocument<T> document;
 
   @override
   State<ListGridDataCell> createState() => _ListGridDataCellState<T>();
@@ -1134,8 +1061,9 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
   bool buttonMouseOver = false;
   @override
   Widget build(BuildContext context) {
-    ListGridController listgrid = widget.listgrid;
-    ListGridColumn column = widget.column;
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    ListGridController listGridController = widget.listGridController;
+    ListGridColumn<T> column = widget.column;
 
     // TODO: use typeOf to do stuff like:
     //  - automatic timestamp conversions
@@ -1169,9 +1097,6 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
       });
     }
 
-    DocumentScreenConfig documentScreenConfig =
-        DocumentScreenConfig.of(context)!;
-
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.bottom,
       child: MouseRegion(
@@ -1183,31 +1108,31 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
             if (widget.column.onTableCellClick != null) {
               widget.column.onTableCellClick!.call(
                 context,
-                widget.queryDocumentSnapshot,
+                widget.document,
               );
             } else {
-              if (listgrid.config.openDocumentOnClick) {
+              if (listGridController.listGridConfig.openDocumentOnClick) {
                 documentScreenConfig.selectDocument(
                   context,
-                  widget.queryDocumentSnapshot,
+                  widget.document,
                 );
               }
             }
           },
           child: Container(
               decoration: BoxDecoration(
-                color: listgrid.cellBackgroundColor,
+                color: listGridController.cellBackgroundColor,
                 border: Border(
-                  right: listgrid.cellBorder > 0
+                  right: listGridController.cellBorder > 0
                       ? BorderSide(
-                          color: listgrid.widgetBackgroundColor,
-                          width: listgrid.cellBorder,
+                          color: listGridController.widgetBackgroundColor,
+                          width: listGridController.cellBorder,
                         )
                       : BorderSide.none,
-                  bottom: listgrid.rowBorder > 0
+                  bottom: listGridController.rowBorder > 0
                       ? BorderSide(
-                          color: listgrid.widgetBackgroundColor,
-                          width: listgrid.rowBorder,
+                          color: listGridController.widgetBackgroundColor,
+                          width: listGridController.rowBorder,
                         )
                       : BorderSide.none,
                 ),
@@ -1219,53 +1144,47 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
                       ? Tooltip(
                           message: prepTooltip(stringValue),
                           child: Padding(
-                            padding: listgrid.cellPadding,
+                            padding: listGridController.cellPadding,
                             child: column.textSelectable
                                 ? SelectableText(
                                     stringValue,
-                                    style: listgrid.defaultTextStyle,
+                                    style: listGridController.defaultTextStyle,
                                     // overflow: TextOverflow.ellipsis,
                                   )
                                 : Text(
                                     stringValue,
-                                    style: listgrid.defaultTextStyle,
+                                    style: listGridController.defaultTextStyle,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                             // child: const Text("cell"),
                           ),
                         )
                       : Padding(
-                          padding: listgrid.cellPadding,
+                          padding: listGridController.cellPadding,
                           child: column.textSelectable
                               ? SelectableText(
                                   stringValue,
-                                  style: listgrid.defaultTextStyle,
+                                  style: listGridController.defaultTextStyle,
                                   // overflow: TextOverflow.ellipsis,
                                 )
                               : Text(
                                   stringValue,
-                                  style: listgrid.defaultTextStyle,
+                                  style: listGridController.defaultTextStyle,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                           // child: const Text("cell"),
                         ),
                   (column.cellControlsBuilder != null)
                       ? Row(
-                          mainAxisAlignment:
-                              (column.alignment == Alignment.bottomLeft ||
-                                      column.alignment == Alignment.topLeft)
-                                  ? MainAxisAlignment.end
-                                  : MainAxisAlignment.start,
+                          mainAxisAlignment: (column.alignment == Alignment.bottomLeft || column.alignment == Alignment.topLeft) ? MainAxisAlignment.end : MainAxisAlignment.start,
                           children: [
                             Opacity(
-                              opacity: buttonMouseOver
-                                  ? 1
-                                  : (cellMouseOver ? 0.2 : 0),
+                              opacity: buttonMouseOver ? 1 : (cellMouseOver ? 0.2 : 0),
                               child: MouseRegion(
                                 onEnter: buttonMouseIn,
                                 onExit: buttonMouseOut,
                                 child: Card(
-                                  color: listgrid.widgetBackgroundColor,
+                                  color: listGridController.widgetBackgroundColor,
                                   child: Row(
                                     children: buttonMouseOver
                                         ? column.cellControlsBuilder!(
@@ -1284,7 +1203,6 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
                                             )
                                                 .first
                                           ],
-                                    // children: [],
                                   ),
                                 ),
                               ),

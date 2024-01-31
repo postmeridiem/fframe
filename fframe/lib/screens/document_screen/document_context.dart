@@ -1,7 +1,7 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class ContextCanvas extends StatelessWidget {
-  const ContextCanvas({Key? key, required this.contextWidgets}) : super(key: key);
+  const ContextCanvas({super.key, required this.contextWidgets});
   final List<Widget> contextWidgets;
 
   @override
@@ -26,9 +26,9 @@ class ContextCanvas extends StatelessWidget {
 
 class ContextDrawer<T> extends StatelessWidget {
   const ContextDrawer({
-    Key? key,
+    super.key,
     required this.contextDrawerOpen,
-  }) : super(key: key);
+  });
 
   final bool contextDrawerOpen;
 
@@ -59,7 +59,7 @@ class ContextDrawer<T> extends StatelessWidget {
 }
 
 class DrawerButton extends StatefulWidget {
-  const DrawerButton({Key? key, required this.scaffoldKey}) : super(key: key);
+  const DrawerButton({super.key, required this.scaffoldKey});
   final GlobalKey<ScaffoldState> scaffoldKey;
   @override
   State<DrawerButton> createState() => _DrawerButtonState();

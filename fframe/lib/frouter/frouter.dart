@@ -1,17 +1,16 @@
-part of fframe;
-
 //FFRame Router
+part of '../../fframe.dart';
 
 @immutable
 // ignore: must_be_immutable
 class FRouterInit extends StatefulWidget {
   const FRouterInit({
-    Key? key,
+    super.key,
     required this.navigationConfig,
     this.debugMode = false,
     required this.routerBuilder,
     required this.mainScreen,
-  }) : super(key: key);
+  });
 
   final bool debugMode;
 

@@ -1,6 +1,7 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class ReadFromFireStoreByDocumentId<T> extends StatelessWidget {
+  // ignore: use_super_parameters
   const ReadFromFireStoreByDocumentId({
     required this.builder,
     this.errorBuilder,
@@ -17,8 +18,7 @@ class ReadFromFireStoreByDocumentId<T> extends StatelessWidget {
   final ErrorBuilder? errorBuilder;
   final WaitBuilder? waitBuilder;
   final NotFoundBuilder? notFoundBuilder;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final String documentId;
   final String collection;
@@ -32,8 +32,7 @@ class ReadFromFireStoreByDocumentId<T> extends StatelessWidget {
         fromFirestore: fromFirestore,
         toFirestore: toFirestore,
       )!,
-      builder:
-          (BuildContext context, AsyncSnapshot<DocumentSnapshot<T>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot<T>> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
@@ -88,6 +87,7 @@ class ReadFromFireStoreByDocumentId<T> extends StatelessWidget {
 }
 
 class QueryFromFireStore<T> extends StatelessWidget {
+  // ignore: use_super_parameters
   const QueryFromFireStore({
     required this.builder,
     this.errorBuilder,
@@ -105,8 +105,7 @@ class QueryFromFireStore<T> extends StatelessWidget {
   final ErrorBuilder? errorBuilder;
   final WaitBuilder? waitBuilder;
   final NotFoundBuilder? notFoundBuilder;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final Query<T> Function(Query<T>)? query;
   final String collection;
@@ -123,8 +122,7 @@ class QueryFromFireStore<T> extends StatelessWidget {
 
     return FutureBuilder<QuerySnapshot<T>>(
       future: query.get(),
-      builder:
-          (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
@@ -151,9 +149,7 @@ class QueryFromFireStore<T> extends StatelessWidget {
               }
               return errorBuilder!(context, snapshot.error.toString());
             }
-            if (!snapshot.hasData ||
-                snapshot.data == null ||
-                snapshot.data!.docs.isEmpty) {
+            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.docs.isEmpty) {
               if (notFoundBuilder == null) {
                 return const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -171,8 +167,7 @@ class QueryFromFireStore<T> extends StatelessWidget {
               context,
               snapshot.data!.docs
                   .map(
-                    (QueryDocumentSnapshot<T> queryDocument) =>
-                        FirestoreDocument<T>(
+                    (QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
                       data: queryDocument.data(),
                       documentReference: queryDocument.reference,
                       fromFirestore: fromFirestore,
@@ -188,6 +183,7 @@ class QueryFromFireStore<T> extends StatelessWidget {
 }
 
 class QueryStreamFromFireStore<T> extends StatelessWidget {
+  // ignore: use_super_parameters
   const QueryStreamFromFireStore({
     required this.builder,
     this.errorBuilder,
@@ -205,8 +201,7 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
   final ErrorBuilder? errorBuilder;
   final WaitBuilder? waitBuilder;
   final NotFoundBuilder? notFoundBuilder;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final Query<T> Function(Query<T>)? query;
   final String collection;
@@ -223,8 +218,7 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
 
     return StreamBuilder<QuerySnapshot<T>>(
       stream: query.snapshots(),
-      builder:
-          (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.waiting:
@@ -251,9 +245,7 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
               }
               return errorBuilder!(context, snapshot.error.toString());
             }
-            if (!snapshot.hasData ||
-                snapshot.data == null ||
-                snapshot.data!.docs.isEmpty) {
+            if (!snapshot.hasData || snapshot.data == null || snapshot.data!.docs.isEmpty) {
               if (notFoundBuilder == null) {
                 return const Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -270,8 +262,7 @@ class QueryStreamFromFireStore<T> extends StatelessWidget {
             return builder(
               context,
               snapshot.data!.docs
-                  .map((QueryDocumentSnapshot<T> queryDocument) =>
-                      FirestoreDocument<T>(
+                  .map((QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
                         data: queryDocument.data(),
                         documentReference: queryDocument.reference,
                         fromFirestore: fromFirestore,
@@ -295,19 +286,13 @@ class FirestoreDocument<T> {
 
   final T? data;
   final DocumentReference<T> documentReference;
-  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
+  final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
 
   // T get data => data;
 
   Future<SaveState> update(T newData) async {
-    return DatabaseService<T>().updateDocument(
-        collection: documentReference.parent.path,
-        documentId: documentReference.id,
-        data: newData,
-        fromFirestore: fromFirestore,
-        toFirestore: toFirestore);
+    return DatabaseService<T>().updateDocument(collection: documentReference.parent.path, documentId: documentReference.id, data: newData, fromFirestore: fromFirestore, toFirestore: toFirestore);
   }
 }
 

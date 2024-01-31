@@ -13,7 +13,7 @@ class UserProfileScreen extends ConsumerStatefulWidget {
 class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    FFrameUser? fFrameUser = ref.watch(userStateNotifier).fFrameUser;
+    FFrameUser? fFrameUser = Fframe.of(context)?.user;
     if (fFrameUser != null) {
       return Padding(
         padding: const EdgeInsets.all(8.0),
@@ -90,8 +90,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                         border: OutlineInputBorder(),
                       ),
                       readOnly: true,
-                      controller: TextEditingController.fromValue(
-                          TextEditingValue(text: fFrameUser.displayName ?? "")),
+                      controller: TextEditingController.fromValue(TextEditingValue(text: fFrameUser.displayName ?? "")),
                     ),
                   ),
                 ],
@@ -114,8 +113,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
                         border: OutlineInputBorder(),
                       ),
                       readOnly: true,
-                      controller: TextEditingController.fromValue(
-                          TextEditingValue(text: fFrameUser.email!)),
+                      controller: TextEditingController.fromValue(TextEditingValue(text: fFrameUser.email!)),
                     ),
                   ),
                 ],
@@ -125,7 +123,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
         ),
       );
     } else {
-      return Text("no profile active");
+      return const Text("no profile active");
     }
   }
 }
@@ -136,22 +134,21 @@ class UserProfileRoleChips extends StatelessWidget {
     required this.fFrameUser,
   }) : super(key: key);
 
-  final FFrameUser? fFrameUser;
+  final FFrameUser fFrameUser;
 
   @override
   Widget build(BuildContext context) {
     List<Widget> roleChips = [];
-    if (fFrameUser != null && fFrameUser!.roles != null) {
-      List<String> roles = fFrameUser!.roles as List<String>;
-      for (String role in roles) {
-        roleChips.add(Padding(
-          padding: const EdgeInsets.all(2.0),
-          child: Chip(
-            label: Text(role),
-          ),
-        ));
-      }
+
+    for (String role in fFrameUser.roles) {
+      roleChips.add(Padding(
+        padding: const EdgeInsets.all(2.0),
+        child: Chip(
+          label: Text(role),
+        ),
+      ));
     }
+
     return Row(
       children: roleChips,
     );

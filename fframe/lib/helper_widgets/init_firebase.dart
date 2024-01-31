@@ -4,11 +4,10 @@ import 'package:flutter/material.dart';
 
 class InitializeFirebase extends StatelessWidget {
   const InitializeFirebase(
-      {Key? key,
+      {super.key,
       required this.firebaseOptions,
       required this.child,
-      required this.navigationConfig})
-      : super(key: key);
+      required this.navigationConfig});
   final FirebaseOptions firebaseOptions;
   final NavigationConfig navigationConfig;
   final Widget child;

@@ -1,4 +1,4 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class FRouterConfig {
   late NavigationConfig navigationConfig;
@@ -15,17 +15,16 @@ class FRouterConfig {
     required NavigationConfig navigationConfig,
     required Widget mainScreen,
   }) {
-    //Register parent/child relationships
+    
     navigationConfig.navigationTargets.forEach(
       ((NavigationTarget navigationTarget) {
-        if (navigationTarget.navigationTabs != null &&
-            navigationTarget.navigationTabs!.isNotEmpty) {
-          for (NavigationTab navigationTab
-              in navigationTarget.navigationTabs!) {
+        if (navigationTarget.navigationTabs != null && navigationTarget.navigationTabs!.isNotEmpty) {
+          for (NavigationTab navigationTab in navigationTarget.navigationTabs!) {
             navigationTab.parentTarget = navigationTarget;
-            navigationTab.path =
-                "${navigationTab.parentTarget.path}/${navigationTab.path}";
+            navigationTab.path = "${navigationTab.parentTarget.path}/${navigationTab.path}";
           }
+        } else if (!navigationTarget.path.startsWith("/")) {
+          navigationTarget.path = "/${navigationTarget.path}";
         }
       }),
     );

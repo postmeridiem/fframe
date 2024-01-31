@@ -1,4 +1,4 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class FFrameUser extends StateNotifier {
   FFrameUser({
@@ -8,10 +8,11 @@ class FFrameUser extends StateNotifier {
     this.email,
     this.photoURL,
     this.metaData,
-    this.roles,
+    roles,
     this.firebaseUser,
   }) : super(null) {
     timeStamp = DateTime.now();
+    _roles = roles;
   }
 
   final String? id;
@@ -20,9 +21,11 @@ class FFrameUser extends StateNotifier {
   final String? email;
   final String? photoURL;
   final UserMetadata? metaData;
-  late List<String>? roles;
+  List<String>? _roles;
   final User? firebaseUser;
   late DateTime? timeStamp;
+
+  List<String> get roles => _roles ?? [];
 
   factory FFrameUser.fromFirestore({
     required DocumentSnapshot<Map<String, dynamic>> snapshot,
@@ -40,8 +43,39 @@ class FFrameUser extends StateNotifier {
     return user;
   }
 
-  factory FFrameUser.fromFirebaseUser(
-      {required User firebaseUser, List<String>? roles}) {
+  bool hasRole(String role) {
+    return _roles!.contains(role.toLowerCase());
+  }
+
+  factory FFrameUser.fromFirebaseUser({required User firebaseUser, required IdTokenResult idTokenResult}) {
+    List<String> roles = [];
+
+    Map<String, dynamic>? claims = idTokenResult.claims;
+
+    if (claims != null && claims.containsKey("roles") == true) {
+      Map<String, dynamic>? claims = idTokenResult.claims;
+
+      if (claims != null && claims.containsKey("roles") == true) {
+        Console.log(
+          "Has roles in ${claims["roles"].runtimeType}",
+          scope: "fframeLog.NavigationNotifier.authChangeListener",
+          level: LogLevel.fframe,
+        );
+
+        if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
+          roles = List<String>.from(claims["roles"]);
+        } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
+          roles = List<String>.from(claims["roles"]);
+        } else {
+          //Legacy mode... it's a map..
+          Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
+          rolesMap.removeWhere((key, value) => value == false);
+          roles = List<String>.from(rolesMap.keys);
+        }
+      }
+      roles = roles.map((role) => role.toLowerCase()).toList();
+    }
+
     return FFrameUser(
       uid: firebaseUser.uid,
       displayName: firebaseUser.displayName,

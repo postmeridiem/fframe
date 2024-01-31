@@ -1,7 +1,10 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
 import 'package:example/models/suggestion.dart';
+import '../suggestion/screen.dart';
 import 'list_grid.dart';
 
 enum ListGridQueryStates { active, inactive }
@@ -40,8 +43,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
-            "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -83,70 +85,13 @@ class _ListGridScreenState extends State<ListGridScreen> {
         // showHeader: false,
         // // showFooter: false,
         rowsSelectable: true,
-        actionBar: listgridActionMenu<Suggestion>(),
+        actionBar: listgridActionMenu(),
         columnSettings: listGridColumns,
       ),
 
       // Center part, shows a firestore doc. Tabs possible
-      document: _document(context),
+      document: suggestionDocument(context),
       // document: _document(),
-    );
-  }
-
-  Document<Suggestion> _document(BuildContext context) {
-    return Document<Suggestion>(
-      scrollableHeader: false,
-      showCloseButton: true,
-      showEditToggleButton: true,
-      showDeleteButton: true,
-      showSaveButton: true,
-      extraActionButtons: (context, suggestion, isReadOnly, isNew, user) {
-        return [
-          if (user != null &&
-              user.roles != null &&
-              user.roles!.contains("firestoreaccess"))
-            IconButton(
-              tooltip: "Open Firestore Document",
-              onPressed: () {
-                String domain = "https://console.cloud.google.com";
-                String application = "firestore/databases/-default-/data/panel";
-                String collection = "suggestions";
-                String docId = suggestion.id ?? "";
-                String gcpProject =
-                    Fframe.of(context)!.firebaseOptions.projectId;
-                Uri url = Uri.parse(
-                    "$domain/$application/$collection/$docId?&project=$gcpProject");
-                launchUrl(url);
-              },
-              icon: Icon(
-                Icons.table_chart_outlined,
-                color: Theme.of(context).colorScheme.onBackground,
-              ),
-            ),
-        ];
-      },
-      documentTabsBuilder:
-          (context, suggestion, isReadOnly, isNew, fFrameUser) {
-        return [
-          DocumentTab<Suggestion>(
-            tabBuilder: (user) {
-              return Tab(
-                text: "${suggestion.name}",
-                icon: const Icon(
-                  Icons.pest_control,
-                ),
-              );
-            },
-            childBuilder: (suggestion, readOnly) {
-              return DocTab(
-                suggestion: suggestion,
-                readOnly: readOnly,
-                // user: user,
-              );
-            },
-          ),
-        ];
-      },
     );
   }
 }

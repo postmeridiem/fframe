@@ -6,29 +6,29 @@ homepage: fframe.app
 publish_to: none
 
 environment:
-  sdk: ">=2.17.0 <3.4.0"
+  sdk: ">=2.17.0 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  intl: ^0.18.0
-  cloud_firestore: ^4.4.2
+  intl:
+  cloud_firestore: 
   firebase_storage:
   uuid: #to generate uids
   flutter_signin_button:
-  google_sign_in: ^5.2.1
-  flutterfire_ui: ^0.4.3+20
+  google_sign_in: 
+  flutterfire_ui: 
   file_picker:
   firebase_analytics:
-  flutter_riverpod:
+  flutter_riverpod: 
   clipboard:
-  url_launcher: ^6.1.14
+  url_launcher: 
   cloud_functions:
   preload_page_view:
   shimmer:
   shared_preferences:
-  horizontal_data_table: ^4.1.4
+  horizontal_data_table: 
   dotted_border: 
 
 dev_dependencies:

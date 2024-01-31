@@ -15,9 +15,7 @@ class L10n {
 
   L10n._internal();
 
-  factory L10n(
-      {required L10nConfig l10nConfig,
-      required Map<String, dynamic> localeData}) {
+  factory L10n({required L10nConfig l10nConfig, required Map<String, dynamic> localeData}) {
     instance.config = l10nConfig;
     instance.map = localeData;
 
@@ -76,20 +74,15 @@ class L10n {
   }
 
   static DateTime dateTimeFromTimestamp({required Timestamp timestamp}) {
-    return DateTime.fromMillisecondsSinceEpoch(
-        timestamp.millisecondsSinceEpoch);
+    return DateTime.fromMillisecondsSinceEpoch(timestamp.millisecondsSinceEpoch);
   }
 
-  static String stringFromDateTime(
-      {required DateTime datetime, String? formatMask}) {
-    String mask = formatMask ?? 'yyyy-MM-dd  HH:mm';
-    final DateFormat _formatter = DateFormat(mask);
-    return _formatter.format(datetime);
+  static String stringFromDateTime({required DateTime datetime, String? formatMask}) {
+    return DateFormat(formatMask ?? 'yyyy-MM-dd  HH:mm').format(datetime);
   }
 
   static String stringFromTimestamp({required Timestamp timestamp}) {
-    return stringFromDateTime(
-        datetime: dateTimeFromTimestamp(timestamp: timestamp));
+    return stringFromDateTime(datetime: dateTimeFromTimestamp(timestamp: timestamp));
   }
 }
 
@@ -174,29 +167,21 @@ class L10nReplacer {
 class L10nReader {
   L10nReader();
 
-  static Future<Map<String, dynamic>> read(
-      BuildContext context, L10nConfig config) async {
+  static Future<Map<String, dynamic>> read(BuildContext context, L10nConfig config) async {
     Map<String, dynamic> output = {'fframe': {}, 'global': {}};
     List<String> namespaces = config.namespaces as List<String>;
     String mode = config.source.mode;
 
-    Console.log("Translation loader mode: $mode.",
-        scope: "fframeLog.L10N", level: LogLevel.fframe);
+    Console.log("Translation loader mode: $mode.", scope: "fframeLog.L10N", level: LogLevel.fframe);
     switch (mode) {
       case 'local_assets':
         {
           for (String namespace in namespaces) {
-            String sourcepath =
-                "assets/translations/${namespace}_${config.locale.languageCode}_${config.locale.countryCode}.json";
-            Console.log(
-                "Loading namespace translations from path: <$sourcepath>.",
-                scope: "fframeLog.L10N",
-                level: LogLevel.fframe);
+            String sourcepath = "assets/translations/${namespace}_${config.locale.languageCode}_${config.locale.countryCode}.json";
+            Console.log("Loading namespace translations from path: <$sourcepath>.", scope: "fframeLog.L10N", level: LogLevel.fframe);
             // loading namespace for locale
-            final String response =
-                await DefaultAssetBundle.of(context).loadString(sourcepath);
-            final Map<String, dynamic> data =
-                json.decode(response) as Map<String, dynamic>;
+            final String response = await DefaultAssetBundle.of(context).loadString(sourcepath);
+            final Map<String, dynamic> data = json.decode(response) as Map<String, dynamic>;
             output[namespace] = data;
           }
         }

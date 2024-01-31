@@ -14,7 +14,7 @@ class _CurrentUserProfileState extends State<CurrentUserProfile> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Consumer(builder: (context, ref, child) {
-        FFrameUser? fFrameUser = ref.watch(userStateNotifier).fFrameUser;
+        FFrameUser? fFrameUser = Fframe.of(context)?.user;
 
         return Column(
           children: [
@@ -71,8 +71,7 @@ class _CurrentUserProfileState extends State<CurrentUserProfile> {
                   ),
                 ),
                 onPressed: () {
-                  FRouter.of(context).navigateToRoute(context,
-                      route: "settings", id: "99-firestore-tools");
+                  FRouter.of(context).navigateToRoute(context, route: "settings", id: "99-firestore-tools");
                 },
                 style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(

@@ -1,14 +1,14 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class FirestoreListGrid<T> extends ConsumerStatefulWidget {
   const FirestoreListGrid({
     super.key,
-    required this.config,
+    required this.documentConfig,
     required this.query,
   });
 
   // the configuration that was provided
-  final ListGridConfig<T> config;
+  final DocumentConfig<T> documentConfig;
 
   /// The firestore core query that was provided
   final Query<T> query;
@@ -55,72 +55,73 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
 
     return ListGridController(
       context: context,
-      sourceQuery: widget.query,
-      config: widget.config,
+      documentConfig: widget.documentConfig,
       documentOpen: documentOpen,
       viewportSize: MediaQuery.of(context).size,
       theme: Theme.of(context),
+      notifier: ListGridNotifier<T>(
+        documentConfig: widget.documentConfig,
+        initialQuery: widget.query,
+      ),
       child: Builder(
         builder: (BuildContext context) {
           return AnimatedBuilder(
               animation: ListGridController.of(context).notifier,
               builder: (context, child) {
-                DocumentConfig<T> documentConfig =
-                    DocumentScreenConfig.of(context)?.documentConfig
-                        as DocumentConfig<T>;
-                var listGrid = ListGridController.of(context);
-                ListGridController listgrid = listGrid;
+                ListGridController listGridController = ListGridController.of(context);
+                DocumentConfig<T> documentConfig = listGridController.documentConfig as DocumentConfig<T>;
+                ListGridNotifier<T> listGridNotifier = listGridController.notifier as ListGridNotifier<T>;
 
                 if (documentOpen) {
-                  listgrid.actionBar(false);
+                  listGridController.actionBar(false);
                 }
                 return FirestoreQueryBuilder<T>(
-                  pageSize: listgrid.dataMode.limit,
-                  query: listgrid.currentQuery as Query<T>,
+                  pageSize: listGridController.dataMode.limit,
+                  query: listGridNotifier.sourceQuery,
                   builder: (
                     BuildContext context,
-                    FirestoreQueryBuilderSnapshot<T> snapshot,
+                    FirestoreQueryBuilderSnapshot<T> queryBuilderSnapshot,
                     Widget? child,
                   ) {
-                    // int count = snapshot.docs.length;
+                    // int count = queryBuilderSnapshot.docs.length;
                     return Stack(
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            listgrid.enableActionBar
-                                ? ListGridActionBarWidget(
-                                    listgrid: listgrid,
+                            listGridController.enableActionBar
+                                ? ListGridActionBarWidget<T>(
+                                    listGridController: listGridController,
                                   )
                                 : const IgnorePointer(),
-                            listgrid.enableSearchBar
-                                ? ListGridSearchWidget(
-                                    listgrid: listgrid,
-                                    documentOpen: listgrid.documentOpen,
+                            listGridController.enableSearchBar
+                                ? ListGridSearchWidget<T>(
+                                    listGridController: listGridController,
+                                    documentOpen: listGridController.documentOpen,
                                   )
                                 : const IgnorePointer(),
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: listgrid.widgetBackgroundColor,
+                                  color: listGridController.widgetBackgroundColor,
                                   border: Border(
                                     left: BorderSide(
                                       width: 1,
-                                      color: listgrid.widgetBackgroundColor,
+                                      color: listGridController.widgetBackgroundColor,
                                     ),
                                     top: BorderSide(
                                       width: 1,
-                                      color: listgrid.widgetBackgroundColor,
+                                      color: listGridController.widgetBackgroundColor,
                                     ),
                                     right: BorderSide(
                                       width: 1,
-                                      color: listgrid.widgetBackgroundColor,
+                                      color: listGridController.widgetBackgroundColor,
                                     ),
                                   ),
                                 ),
                                 child: Padding(
                                   padding: EdgeInsets.only(
-                                    bottom: listgrid.showFooter ? 38.0 : 0.0,
+                                    bottom: listGridController.showFooter ? 38.0 : 0.0,
                                   ),
                                   child: Scrollbar(
                                     controller: _horizontal,
@@ -129,69 +130,49 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                       scrollDirection: Axis.horizontal,
                                       controller: _horizontal,
                                       child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          listgrid.showHeader
-                                              ? ListGridHeader(
-                                                  calculatedWidth:
-                                                      listgrid.calculatedWidth,
-                                                  addEndFlex:
-                                                      listgrid.addEndFlex,
-                                                  rowsSelectable: listgrid
-                                                      .config.rowsSelectable,
+                                          listGridController.showHeader
+                                              ? ListGridHeader<T>(
+                                                  calculatedWidth: listGridController.calculatedWidth,
+                                                  addEndFlex: listGridController.addEndFlex,
+                                                  rowsSelectable: listGridController.listGridConfig.rowsSelectable,
                                                 )
                                               : const IgnorePointer(),
                                           Expanded(
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: listgrid
-                                                    .widgetBackgroundColor,
+                                                color: listGridController.widgetBackgroundColor,
                                                 border: Border(
                                                   top: BorderSide(
                                                     width: 1,
-                                                    color: listgrid.widgetColor,
+                                                    color: listGridController.widgetColor,
                                                   ),
                                                 ),
                                               ),
                                               child: Container(
-                                                color: (Fframe.of(context)!
-                                                            .getSystemThemeMode ==
-                                                        ThemeMode.dark)
-                                                    ? Colors.black
-                                                        .withOpacity(0.2)
-                                                    : Colors.white
-                                                        .withOpacity(0.2),
+                                                color: (Fframe.of(context)!.getSystemThemeMode == ThemeMode.dark) ? Colors.black.withOpacity(0.2) : Colors.white.withOpacity(0.2),
                                                 child: SizedBox(
-                                                  width: documentOpen
-                                                      ? 300
-                                                      : listgrid
-                                                          .calculatedWidth,
-                                                  child: snapshot.hasError
+                                                  width: documentOpen ? 300 : listGridController.calculatedWidth,
+                                                  child: queryBuilderSnapshot.hasError
                                                       ? Card(
                                                           child: Center(
                                                             child: SizedBox(
                                                               width: 500,
-                                                              height: double
-                                                                  .infinity,
+                                                              height: double.infinity,
                                                               child: Padding(
-                                                                padding:
-                                                                    const EdgeInsets
-                                                                            .all(
-                                                                        40.0),
-                                                                child:
-                                                                    SelectableText(
-                                                                  "error ${snapshot.error}",
+                                                                padding: const EdgeInsets.all(40.0),
+                                                                child: SelectableText(
+                                                                  "error ${queryBuilderSnapshot.error}",
                                                                 ),
                                                               ),
                                                             ),
                                                           ),
                                                         )
-                                                      : ListGridEndless(
-                                                          snapshot: snapshot,
-                                                          listgrid: listgrid,
+                                                      : ListGridEndless<T>(
+                                                          queryBuilderSnapshot: queryBuilderSnapshot,
+                                                          listGridController: listGridController,
                                                         ),
                                                 ),
                                               ),
@@ -206,23 +187,23 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                             ),
                           ],
                         ),
-                        listgrid.showFooter
+                        listGridController.showFooter
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  ListGridFooter(
-                                    viewportWidth: listgrid.viewportWidth,
-                                    dataMode: listgrid.dataMode.mode,
+                                  ListGridFooter<T>(
+                                    viewportWidth: listGridController.viewportWidth,
+                                    dataMode: listGridController.dataMode.mode,
                                   ),
                                 ],
                               )
                             : const IgnorePointer(),
-                        ListGridDocument(
-                          listgrid: listgrid,
+                        ListGridDocument<T>(
+                          listGridController: listGridController,
                           documentConfig: documentConfig,
                           documentOpen: documentOpen,
                         ),
-                        // if (listgrid.processing)
+                        // if (listGridController.processing)
                         //   const Opacity(
                         //     opacity: 0.8,
                         //     child: ModalBarrier(
@@ -230,7 +211,7 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                         //       color: Colors.black,
                         //     ),
                         //   ),
-                        // if (listgrid.processing)
+                        // if (listGridController.processing)
                         //   Center(
                         //     child: Column(
                         //       mainAxisAlignment: MainAxisAlignment.center,
@@ -239,7 +220,7 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                         //         Padding(
                         //           padding: const EdgeInsets.all(8.0),
                         //           child: Text(
-                        //               "${listgrid.processingProgress} documents left to process..."),
+                        //               "${listGridController.processingProgress} documents left to process..."),
                         //         ),
                         //       ],
                         //     ),
@@ -255,15 +236,12 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
   }
 
   double calculateWidth(double calculatedMinWidth, double viewportWidth) {
-    double calculatedWidth =
-        calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
+    double calculatedWidth = calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
     return calculatedWidth;
   }
 
   double getViewportWidth(BuildContext context) {
-    double viewportWidth = ((MediaQuery.of(context).size.width > 1000)
-        ? (MediaQuery.of(context).size.width - 100)
-        : (MediaQuery.of(context).size.width + 0));
+    double viewportWidth = ((MediaQuery.of(context).size.width > 1000) ? (MediaQuery.of(context).size.width - 100) : (MediaQuery.of(context).size.width + 0));
     return viewportWidth;
   }
 
@@ -278,13 +256,13 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
 class ListGridEndless<T> extends StatelessWidget {
   const ListGridEndless({
     super.key,
-    required this.snapshot,
-    required this.listgrid,
+    required this.queryBuilderSnapshot,
+    required this.listGridController,
   });
 
   // the configuration that was provided
-  final FirestoreQueryBuilderSnapshot<T> snapshot;
-  final ListGridController listgrid;
+  final FirestoreQueryBuilderSnapshot<T> queryBuilderSnapshot;
+  final ListGridController listGridController;
 
   @override
   Widget build(BuildContext context) {
@@ -293,7 +271,7 @@ class ListGridEndless<T> extends StatelessWidget {
       controller: verticalScroll,
       thumbVisibility: true,
       child: ListView.separated(
-        itemCount: snapshot.docs.length,
+        itemCount: queryBuilderSnapshot.docs.length,
         scrollDirection: Axis.vertical,
         reverse: false,
         controller: verticalScroll,
@@ -316,24 +294,30 @@ class ListGridEndless<T> extends StatelessWidget {
           return const IgnorePointer();
         },
         itemBuilder: (context, index) {
-          final isLastItem = index + 1 == snapshot.docs.length;
-          if (isLastItem && snapshot.hasMore) {
-            snapshot.fetchMore();
+          final isLastItem = index + 1 == queryBuilderSnapshot.docs.length;
+          if (isLastItem && queryBuilderSnapshot.hasMore) {
+            queryBuilderSnapshot.fetchMore();
           }
 
-          final queryDocumentSnapshot = snapshot.docs[index];
-          final String documentId = queryDocumentSnapshot.id;
-          final T document = queryDocumentSnapshot.data();
+          final DocumentSnapshot<T> documentSnapshot = queryBuilderSnapshot.docs[index];
+
+          final SelectedDocument<T> selectedDocument = SelectedDocument(
+            id: documentSnapshot.id,
+            documentConfig: listGridController.documentConfig as DocumentConfig<T>,
+            data: documentSnapshot.data(),
+          );
+          // final String documentId = selectedDocument.id;
+          // final T document = queryDocumentSnapshot.data();
 
           return Table(
-              columnWidths: listgrid.columnWidths,
+              columnWidths: listGridController.columnWidths,
               // defaultColumnWidth: const FlexColumnWidth(),
-              defaultVerticalAlignment: listgrid.cellVerticalAlignment,
+              defaultVerticalAlignment: listGridController.cellVerticalAlignment,
               textBaseline: TextBaseline.alphabetic,
               children: [
                 TableRow(
                   decoration: BoxDecoration(
-                    color: listgrid.cellBackgroundColor,
+                    color: listGridController.cellBackgroundColor,
                     // border: Border(
                     //   bottom: BorderSide(
                     //     color: widgetBackgroundColor,
@@ -343,13 +327,10 @@ class ListGridEndless<T> extends StatelessWidget {
                   ),
                   children: renderRow(
                     context: context,
-                    documentId: documentId,
-                    queryDocumentSnapshot: queryDocumentSnapshot,
-                    document: document,
-                    columnSettings:
-                        listgrid.columnSettings as List<ListGridColumn<T>>,
-                    addEndFlex: listgrid.addEndFlex,
-                    rowsSelectable: listgrid.config.rowsSelectable,
+                    document: selectedDocument,
+                    columnSettings: listGridController.columnSettings as List<ListGridColumn<T>>,
+                    addEndFlex: listGridController.addEndFlex,
+                    rowsSelectable: listGridController.listGridConfig.rowsSelectable,
                   ),
                 ),
               ]);
@@ -357,160 +338,118 @@ class ListGridEndless<T> extends StatelessWidget {
       ),
     );
   }
-}
 
-List<Widget> renderRow<T>({
-  required BuildContext context,
-  required List<ListGridColumn<T>> columnSettings,
-  required bool addEndFlex,
-  required bool rowsSelectable,
-  required String documentId,
-  required QueryDocumentSnapshot<T> queryDocumentSnapshot,
-  required T document,
-}) {
-  List<Widget> output = [];
+  List<Widget> renderRow({
+    required BuildContext context,
+    required SelectedDocument<T> document,
+    required List<ListGridColumn<T>> columnSettings,
+    required bool addEndFlex,
+    required bool rowsSelectable,
+  }) {
+    // ListGridController listGridController = ListGridController.of(context);
+    List<Widget> output = [];
 
-  ListGridController listgrid = ListGridController.of(context);
-  if (listgrid.documentOpen) {
-    ListGridColumn<T> column = columnSettings[0];
-    if (column.cellBuilder != null) {
-      Widget cellWidget = column.cellBuilder!(
-        context,
-        document,
-        () {
-          return DatabaseService<T>().updateDocument(
-            collection: queryDocumentSnapshot.reference.parent.path,
-            documentId: queryDocumentSnapshot.id,
-            data: document,
-            fromFirestore: listgrid.config.fromFirestore as T Function(
-                DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?),
-            toFirestore: listgrid.config.toFirestore,
-          );
-        },
-      );
-      output.add(
-        ListGridBuilderCell<T>(
-          listgrid: listgrid,
-          column: column,
-          queryDocumentSnapshot: queryDocumentSnapshot,
-          document: document,
-          cellWidget: cellWidget,
-        ),
-      );
-    } else if (column.valueBuilder != null) {
-      dynamic dynValue = column.valueBuilder!(context, document);
-      output.add(
-        ListGridDataCell<T>(
-          listgrid: listgrid,
-          column: column,
-          queryDocumentSnapshot: queryDocumentSnapshot,
-          document: document,
-          dynValue: dynValue,
-        ),
-      );
+    if (listGridController.documentOpen) {
+      ListGridColumn<T> columnSetting = columnSettings[0];
+      if (columnSetting.cellBuilder != null) {
+        Widget cellWidget = columnSetting.cellBuilder!(context, document.data, () {});
+        output.add(
+          ListGridBuilderCell<T>(
+            listGridController: listGridController,
+            document: document,
+            column: columnSetting,
+            cellWidget: cellWidget,
+          ),
+        );
+      } else if (columnSetting.valueBuilder != null) {
+        dynamic dynValue = columnSetting.valueBuilder!(context, document.data as T);
+        output.add(
+          ListGridDataCell<T>(
+            listGridController: listGridController,
+            document: document,
+            column: columnSetting,
+            dynValue: dynValue,
+          ),
+        );
+      } else {
+        dynamic dynValue = "undefined";
+        output.add(
+          ListGridDataCell<T>(
+            listGridController: listGridController,
+            document: document,
+            column: columnSetting,
+            dynValue: dynValue,
+          ),
+        );
+      }
     } else {
-      dynamic dynValue = "undefined";
-      output.add(
-        ListGridDataCell<T>(
-          listgrid: listgrid,
-          column: column,
-          queryDocumentSnapshot: queryDocumentSnapshot,
-          document: document,
-          dynValue: dynValue,
-        ),
-      );
-    }
-  } else {
-    if (rowsSelectable) {
-      output.add(
-        ListGridRowSelector<T>(
-          listgrid: listgrid,
-          documentId: queryDocumentSnapshot.id,
-          document: queryDocumentSnapshot.data(),
-          snapshot: queryDocumentSnapshot,
-        ),
-      );
-    }
-    for (ListGridColumn<T> column in columnSettings) {
-      if (column.visible) {
-        if (column.cellBuilder != null) {
-          Widget cellWidget = column.cellBuilder!(
-            context,
-            document,
-            () {
-              DocumentConfig<T> documentConfig =
-                  DocumentScreenConfig.of(context)?.documentConfig
-                      as DocumentConfig<T>;
+      if (rowsSelectable) {
+        output.add(
+          ListGridRowSelector<T>(selectedDocument: document),
+        );
+      }
 
-              return DatabaseService<T>().updateDocument(
-                collection: queryDocumentSnapshot.reference.parent.path,
-                documentId: queryDocumentSnapshot.id,
-                data: document,
-                fromFirestore: documentConfig.fromFirestore,
-                toFirestore: documentConfig.toFirestore,
-              );
-            },
-          );
-          output.add(
-            ListGridBuilderCell<T>(
-              listgrid: listgrid,
-              column: column,
-              queryDocumentSnapshot: queryDocumentSnapshot,
-              document: document,
-              cellWidget: cellWidget,
-            ),
-          );
-        } else if (column.valueBuilder != null) {
-          dynamic dynValue = column.valueBuilder!(context, document);
-          output.add(
-            ListGridDataCell<T>(
-              listgrid: listgrid,
-              column: column,
-              queryDocumentSnapshot: queryDocumentSnapshot,
-              document: document,
-              dynValue: dynValue,
-            ),
-          );
-        } else {
-          dynamic dynValue = "undefined";
-          output.add(
-            ListGridDataCell<T>(
-              listgrid: listgrid,
-              column: column,
-              queryDocumentSnapshot: queryDocumentSnapshot,
-              document: document,
-              dynValue: dynValue,
-            ),
-          );
+      for (ListGridColumn<T> columnSetting in columnSettings) {
+        if (columnSetting.visible) {
+          if (columnSetting.cellBuilder != null) {
+            Widget cellWidget = columnSetting.cellBuilder!(context, document.data, () {});
+            output.add(
+              ListGridBuilderCell<T>(
+                listGridController: listGridController,
+                column: columnSetting,
+                document: document,
+                cellWidget: cellWidget,
+              ),
+            );
+          } else if (columnSetting.valueBuilder != null) {
+            dynamic dynValue = columnSetting.valueBuilder!(context, document.data as T);
+            output.add(
+              ListGridDataCell<T>(
+                listGridController: listGridController,
+                document: document,
+                column: columnSetting,
+                dynValue: dynValue,
+              ),
+            );
+          } else {
+            output.add(
+              ListGridDataCell<T>(
+                listGridController: listGridController,
+                document: document,
+                column: columnSetting,
+                dynValue: const Text("undefined"),
+              ),
+            );
+          }
         }
       }
-    }
-    if (addEndFlex) {
-      output.add(
-        TableCell(
-          verticalAlignment: TableCellVerticalAlignment.bottom,
-          child: Container(
-            decoration: BoxDecoration(
-              // color: Colors.green,
-              color: listgrid.cellBackgroundColor,
-              border: Border(
-                bottom: listgrid.rowBorder > 0
-                    ? BorderSide(
-                        color: listgrid.widgetBackgroundColor,
-                        width: listgrid.rowBorder,
-                      )
-                    : BorderSide.none,
+      if (addEndFlex) {
+        output.add(
+          TableCell(
+            verticalAlignment: TableCellVerticalAlignment.bottom,
+            child: Container(
+              decoration: BoxDecoration(
+                // color: Colors.green,
+                color: listGridController.cellBackgroundColor,
+                border: Border(
+                  bottom: listGridController.rowBorder > 0
+                      ? BorderSide(
+                          color: listGridController.widgetBackgroundColor,
+                          width: listGridController.rowBorder,
+                        )
+                      : BorderSide.none,
+                ),
+              ),
+              child: Padding(
+                padding: listGridController.cellPadding,
+                child: const IgnorePointer(),
+                // child: const Text("cell"),
               ),
             ),
-            child: Padding(
-              padding: listgrid.cellPadding,
-              child: const IgnorePointer(),
-              // child: const Text("cell"),
-            ),
           ),
-        ),
-      );
+        );
+      }
     }
+    return output;
   }
-  return output;
 }

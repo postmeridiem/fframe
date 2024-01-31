@@ -1,3 +1,5 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'package:fframe/components/auth/decorations.dart';
 import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
@@ -25,18 +27,14 @@ class _SignInPageState extends State<SignInPage> {
 
   @override
   Widget build(BuildContext context) {
-    Console.log("Opening SignIn page",
-        scope: "exampleApp.SignIn", level: LogLevel.prod);
+    Console.log("Opening signIn page", scope: "exampleApp.SignIn", level: LogLevel.prod);
 
     // List<ProviderConfiguration>? providerConfigs = Fframe.of(context)?.providerConfigs;
-    List<ProviderConfiguration>? providerConfigurations = Fframe.of(context)
-        ?.providerConfigs
-        ?.where((ProviderConfiguration providerConfiguration) {
+    List<ProviderConfiguration>? providerConfigurations = Fframe.of(context)?.providerConfigs?.where((ProviderConfiguration providerConfiguration) {
       return providerConfiguration.providerId == "google.com";
     }).toList();
     if (providerConfigurations != null && providerConfigurations.isNotEmpty) {
-      GoogleProviderConfiguration providerConfiguration =
-          providerConfigurations.first as GoogleProviderConfiguration;
+      GoogleProviderConfiguration providerConfiguration = providerConfigurations.first as GoogleProviderConfiguration;
       webClientId = providerConfiguration.clientId;
     }
 
@@ -47,8 +45,7 @@ class _SignInPageState extends State<SignInPage> {
       //Sign out from Google when signed out from Firebase
       FirebaseAuth.instance.authStateChanges().listen((User? user) {
         if (user == null) {
-          Console.log("User signed out. Sign out from Google as well.",
-              scope: "exampleApp.SignIn", level: LogLevel.prod);
+          Console.log("User signed out. Sign out from Google as well.", scope: "exampleApp.SignIn", level: LogLevel.prod);
           silentSignOut();
         }
       });
@@ -60,7 +57,6 @@ class _SignInPageState extends State<SignInPage> {
             height: 40,
             child: SignInButton(
               Buttons.Google,
-              text: "Sign in with Google",
               onPressed: () {
                 setState(() {
                   isSigningIn = true;
@@ -75,19 +71,14 @@ class _SignInPageState extends State<SignInPage> {
               child: CircularProgressIndicator(),
             ),
           ),
-          crossFadeState: isSigningIn
-              ? CrossFadeState.showSecond
-              : CrossFadeState.showFirst,
+          crossFadeState: isSigningIn ? CrossFadeState.showSecond : CrossFadeState.showFirst,
           duration: const Duration(milliseconds: 200),
         ),
       );
     }
 
-    if (Fframe.of(context)?.providerConfigs == null ||
-        (Fframe.of(context)?.providerConfigs != null &&
-            Fframe.of(context)!.providerConfigs!.isEmpty)) {
-      Fframe.of(context)!.showErrorPage(
-          context: context, errorText: "Missign auth provider configuration");
+    if (Fframe.of(context)?.providerConfigs == null || (Fframe.of(context)?.providerConfigs != null && Fframe.of(context)!.providerConfigs!.isEmpty)) {
+      Fframe.of(context)!.showErrorPage(context: context, errorText: "Missign auth provider configuration");
     }
 
     return SignInScreen(
@@ -143,13 +134,13 @@ class _SignInPageState extends State<SignInPage> {
 
   Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow
+    Console.log("Trigger the authentication flow", scope: "exampleApp.SignIn", level: LogLevel.prod);
     final GoogleSignInAccount? googleUser = await GoogleSignIn(
       clientId: webClientId,
     ).signIn();
 
     // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth =
-        await googleUser?.authentication;
+    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
 
     // Create a new credential
     final credential = GoogleAuthProvider.credential(

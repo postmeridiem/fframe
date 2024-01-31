@@ -1,24 +1,27 @@
-part of fframe;
+// ignore_for_file: use_super_parameters
+
+part of '../../fframe.dart';
 
 // ignore: must_be_immutable
-class ListGridController<T> extends InheritedModel {
+class ListGridController extends InheritedModel<ListGridController> {
   ListGridController({
     super.key,
     required child,
     required this.context,
-    required this.sourceQuery,
     required this.theme,
-    required this.config,
+    required this.documentConfig,
+    required this.notifier,
     required this.viewportSize,
     required this.documentOpen,
   }) : super(child: child) {
+    listGridConfig = documentConfig.listGridConfig!;
     _columnWidths = {};
     _searchableColumns = [];
     double calculatedMinWidth = 0;
 
     // count  action bar items to see if
     // the actionbar should be drawm
-    _enableActionBar = (config.actionBar.isNotEmpty) ? true : false;
+    _enableActionBar = (listGridConfig.actionBar.isNotEmpty) ? true : false;
 
     // track if all columns have fixed width
     // if so, add an extra blank column at the end with flex
@@ -27,17 +30,17 @@ class ListGridController<T> extends InheritedModel {
     _enableSearchBar = false;
     int columnCount = 0;
 
-    if (config.rowsSelectable) {
+    if (listGridConfig.rowsSelectable) {
       // this grid has row selection enabled.
       // draw an extra column for the check box
       double selectionColumnWidth = 40;
       calculatedMinWidth += selectionColumnWidth;
-      _columnWidths
-          .addAll({columnCount: FixedColumnWidth(selectionColumnWidth)});
+      _columnWidths.addAll({columnCount: FixedColumnWidth(selectionColumnWidth)});
       columnCount += 1;
     }
 
-    for (var i = 0; i < (config.columnSettings.length); i++) {
+    //TODO: Move to notifier
+    for (var i = 0; i < (listGridConfig.columnSettings.length); i++) {
       // get the settings for the current column
       ListGridColumn columnSetting = columnSettings[i];
 
@@ -54,8 +57,7 @@ class ListGridController<T> extends InheritedModel {
           _addEndFlex = false;
           _columnWidths.addAll({columnCount: const FlexColumnWidth(1)});
         } else {
-          _columnWidths.addAll(
-              {columnCount: FixedColumnWidth(columnSetting.columnWidth)});
+          _columnWidths.addAll({columnCount: FixedColumnWidth(columnSetting.columnWidth)});
         }
         columnCount += 1;
       }
@@ -65,23 +67,18 @@ class ListGridController<T> extends InheritedModel {
         _searchableColumns.add(i);
       }
     }
+
     if (_addEndFlex) {
       _columnWidths.addAll({columnCount: const FlexColumnWidth(1)});
     }
     _viewportWidth = _getViewportWidth(viewportSize: viewportSize);
     _calculatedWidth = _calculateWidth(calculatedMinWidth, viewportWidth);
-
-    // register the grid controller update notifier
-    notifier = ListGridNotifier(
-      sourceQuery: sourceQuery,
-      columnSettings: columnSettings,
-      searchableColumns: _searchableColumns,
-    );
   }
-  late ListGridNotifier notifier;
 
+  final ListGridNotifier notifier;
   final BuildContext context;
-  final ListGridConfig config;
+  late ListGridConfig listGridConfig;
+  final DocumentConfig documentConfig;
   final ThemeData theme;
   final Size viewportSize;
   final bool documentOpen;
@@ -90,7 +87,6 @@ class ListGridController<T> extends InheritedModel {
   late bool _enableSearchBar;
   late bool _enableActionBar;
   late List<int> _searchableColumns;
-  late Query sourceQuery;
   late double _calculatedWidth;
   late double _viewportWidth;
   late bool _addEndFlex;
@@ -98,51 +94,51 @@ class ListGridController<T> extends InheritedModel {
   // late Map<String, bool> listGridSelection = {};
 
   double get rowBorder {
-    return config.rowBorder;
+    return listGridConfig.rowBorder;
   }
 
   double get cellBorder {
-    return config.rowBorder;
+    return listGridConfig.rowBorder;
   }
 
   EdgeInsetsGeometry get cellPadding {
-    return config.cellPadding;
+    return listGridConfig.cellPadding;
   }
 
   TableCellVerticalAlignment get cellVerticalAlignment {
-    return config.cellVerticalAlignment;
+    return listGridConfig.cellVerticalAlignment;
   }
 
   Color get cellBackgroundColor {
-    return config.cellBackgroundColor ?? theme.colorScheme.background;
+    return listGridConfig.cellBackgroundColor ?? theme.colorScheme.background;
   }
 
   Color get widgetColor {
-    return config.widgetColor ?? theme.colorScheme.onSurface;
+    return listGridConfig.widgetColor ?? theme.colorScheme.onSurface;
   }
 
   Color get widgetAccentColor {
-    return config.widgetAccentColor ?? theme.colorScheme.onBackground;
+    return listGridConfig.widgetAccentColor ?? theme.colorScheme.onBackground;
   }
 
   Color get widgetBackgroundColor {
-    return config.widgetBackgroundColor ?? theme.colorScheme.surface;
+    return listGridConfig.widgetBackgroundColor ?? theme.colorScheme.surface;
   }
 
   double get widgetTextSize {
-    return config.widgetTextSize;
+    return listGridConfig.widgetTextSize;
   }
 
   Color get widgetTextColor {
-    return config.widgetTextColor ?? theme.colorScheme.onSurface;
+    return listGridConfig.widgetTextColor ?? theme.colorScheme.onSurface;
   }
 
   ListGridDataModeConfig get dataMode {
-    return config.dataMode;
+    return listGridConfig.dataMode;
   }
 
   TextStyle get defaultTextStyle {
-    return config.defaultTextStyle ??
+    return listGridConfig.defaultTextStyle ??
         TextStyle(
           fontSize: 14,
           color: theme.colorScheme.onSecondaryContainer,
@@ -158,43 +154,27 @@ class ListGridController<T> extends InheritedModel {
   }
 
   bool get showHeader {
-    return config.showHeader;
+    return listGridConfig.showHeader;
   }
 
   double? get headerHeight {
-    return config.showHeader ? null : 0;
+    return listGridConfig.showHeader ? null : 0;
   }
 
   bool get showFooter {
-    return config.showFooter;
+    return listGridConfig.showFooter;
   }
 
   double? get footerHeight {
-    return config.showFooter ? null : 0;
+    return listGridConfig.showFooter ? null : 0;
   }
 
   List<ListGridColumn> get columnSettings {
-    return config.columnSettings;
+    return listGridConfig.columnSettings;
   }
 
   Map<int, TableColumnWidth> get columnWidths {
     return _columnWidths;
-  }
-
-  List<SelectedDocument> get selectedDocuments {
-    return notifier.selectedDocuments;
-  }
-
-  int get selectionCount {
-    return notifier.selectionCount;
-  }
-
-  void selectRow({required String documentId, required dynamic document}) {
-    notifier.selectRow(documentId: documentId, document: document);
-  }
-
-  void unselectRow({required String documentId}) {
-    notifier.unselectRow(documentId: documentId);
   }
 
   bool get addEndFlex {
@@ -237,20 +217,13 @@ class ListGridController<T> extends InheritedModel {
     return notifier._sortedColumnIndex;
   }
 
-  Query get currentQuery {
-    return notifier._currentQuery;
-  }
-
   double _calculateWidth(double calculatedMinWidth, double viewportWidth) {
-    double calculatedWidth =
-        calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
+    double calculatedWidth = calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
     return calculatedWidth;
   }
 
   double _getViewportWidth({required Size viewportSize}) {
-    double viewportWidth = ((viewportSize.width > 1000)
-        ? (viewportSize).width - 100
-        : (viewportSize.width + 0));
+    double viewportWidth = ((viewportSize.width > 1000) ? (viewportSize).width - 100 : (viewportSize.width + 0));
     return viewportWidth;
   }
 
@@ -259,7 +232,7 @@ class ListGridController<T> extends InheritedModel {
     bool updated = false;
 
     // test if any fields are changed that should trigger an update
-    updated = (config != oldWidget.config) ? true : updated;
+    updated = (listGridConfig != oldWidget.listGridConfig) ? true : updated;
     updated = (columnSettings != oldWidget.columnSettings) ? true : updated;
     updated = (columnWidths != oldWidget.columnWidths) ? true : updated;
     updated = (theme != oldWidget.theme) ? true : updated;
@@ -293,39 +266,43 @@ class ListGridController<T> extends InheritedModel {
 
 class ListGridNotifier<T> extends ChangeNotifier {
   ListGridNotifier({
-    required this.sourceQuery,
-    // required this.searchConfig,
-    required this.columnSettings,
-    required this.searchableColumns,
+    required Query<T> initialQuery,
+    required DocumentConfig<T> documentConfig,
   }) : super() {
-    // not empyy
+    // not empty
     _searchString = '';
     _collectionCount = 0;
-
+    _currentQuery = initialQuery;
     // initialize the sorting object
     _sortedColumnIndex = null;
-
+    _searchableColumns = [];
     // initialize the row selections
 
+    _listGridConfig = documentConfig.listGridConfig;
+    _columnSettings = _listGridConfig!.columnSettings;
     // initialize the current query, based on sorting and settings
-    _currentQuery = sourceQuery;
     _queryBuilder();
 
     //update the collection count
-    _updateCollectionCount(query: _currentQuery);
+    _updateCollectionCount(query: _currentQuery as Query<T>);
   }
-  final Query sourceQuery;
+
+  set sourceQuery(Query sourceQuery) {
+    _currentQuery = sourceQuery as Query<T>;
+  }
+
+  Query<T> get sourceQuery => _currentQuery as Query<T>;
+
   // final ListGridSearchConfig? searchConfig;
-  final List<ListGridColumn> columnSettings;
-  final List<int> searchableColumns;
+  // late List<ListGridColumn> columnSettings;
+  late List<int> _searchableColumns;
   late String? _searchString;
   late int _collectionCount;
-  late Query _currentQuery;
-
+  Query<T>? _currentQuery;
+  late ListGridConfig<T>? _listGridConfig;
+  late List<ListGridColumn<T>> _columnSettings;
   late int? _sortedColumnIndex;
-  final List<SelectedDocument> _selectedDocuments = [];
-
-  // late Map<String, T> _selectedDocuments;
+  final List<SelectedDocument<T>> _selectedDocuments = [];
 
   String? get searchString {
     return _searchString;
@@ -342,34 +319,32 @@ class ListGridNotifier<T> extends ChangeNotifier {
   }
 
   void _queryBuilder() {
-    Query outputQuery = sourceQuery;
+    Query outputQuery = _currentQuery as Query<T>;
 
     // handle sorting
     if (sortedColumnIndex != null) {
-      ListGridColumn sortedColumn = columnSettings[sortedColumnIndex!];
+      ListGridColumn sortedColumn = _columnSettings[sortedColumnIndex!];
 
-      outputQuery = outputQuery.orderBy(sortedColumn.fieldName!,
-          descending: sortedColumn.descending);
+      outputQuery = outputQuery.orderBy(sortedColumn.fieldName!, descending: sortedColumn.descending);
 
-      if (columnSettings[sortedColumnIndex!].fieldName != null) {
-        String fieldName = columnSettings[sortedColumnIndex!].fieldName!;
+      if (_columnSettings[sortedColumnIndex!].fieldName != null) {
+        String fieldName = _columnSettings[sortedColumnIndex!].fieldName!;
         outputQuery = outputQuery.startsWith(fieldName, searchString!);
       }
     } else {
-      if (searchableColumns.isNotEmpty) {
+      if (_searchableColumns.isNotEmpty) {
         if (searchString != null && searchString!.isNotEmpty) {
-          if (searchableColumns.length > 1) {
+          if (_searchableColumns.length > 1) {
             //TODO make multiple columns supported
             // Console.log(
             //     "ListGrid: ERROR: Multiple searchable columns not supported at this time. Defaulting to first one");
             List<Filter> currentFilters = [];
-            for (int searchableColumnIndex in searchableColumns) {
+            for (int searchableColumnIndex in _searchableColumns) {
               String curSearch = searchString!;
-              ListGridColumn curColumn = columnSettings[searchableColumnIndex];
+              ListGridColumn curColumn = _columnSettings[searchableColumnIndex];
               if (curColumn.fieldName != null) {
                 String fieldName = curColumn.fieldName!;
-                outputQuery = outputQuery.orderBy(fieldName,
-                    descending: curColumn.descending);
+                outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
                 if (curColumn.searchMask != null) {
                   if (curColumn.searchMask!.toLowerCase) {
                     curSearch = curSearch.toLowerCase();
@@ -389,13 +364,11 @@ class ListGridNotifier<T> extends ChangeNotifier {
               //     .where(Filter.or(currentFilters[0], currentFilters[1]));
             }
           } else {
-            if (columnSettings[searchableColumns.first].fieldName != null) {
+            if (_columnSettings[_searchableColumns.first].fieldName != null) {
               String curSearch = searchString!;
-              ListGridColumn curColumn =
-                  columnSettings[searchableColumns.first];
+              ListGridColumn curColumn = _columnSettings[_searchableColumns.first];
               String fieldName = curColumn.fieldName!;
-              outputQuery = outputQuery.orderBy(fieldName,
-                  descending: curColumn.descending);
+              outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
               if (curColumn.searchMask == null) {
                 outputQuery = outputQuery.startsWith(fieldName, curSearch);
               } else {
@@ -415,21 +388,20 @@ class ListGridNotifier<T> extends ChangeNotifier {
         } else {
           // no search string provided, and no column user sorted. make sure to sort the primary search column if available.
 
-          if (columnSettings[searchableColumns.first].fieldName != null) {
-            ListGridColumn curColumn = columnSettings[searchableColumns.first];
+          if (_columnSettings[_searchableColumns.first].fieldName != null) {
+            ListGridColumn curColumn = _columnSettings[_searchableColumns.first];
             String fieldName = curColumn.fieldName!;
-            outputQuery = outputQuery.orderBy(fieldName,
-                descending: curColumn.descending);
+            outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
           }
         }
       }
     }
 
     // apply the newly computedQuery as the current query
-    _currentQuery = outputQuery;
+    _currentQuery = outputQuery as Query<T>;
 
     // the query has changed; recalculate the result collection count
-    _updateCollectionCount(query: _currentQuery);
+    _updateCollectionCount(query: _currentQuery as Query<T>);
 
     // notify the listeners that a redraw is needed
     notifyListeners();
@@ -437,12 +409,9 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
   void sortColumn({required int columnIndex, bool descending = false}) {
     // get the config for the selected column
-    ListGridColumn selectedColumn = columnSettings
-        .where((element) => element.columnIndex == columnIndex)
-        .first;
+    ListGridColumn selectedColumn = _columnSettings.where((element) => element.columnIndex == columnIndex).first;
 
-    if (columnIndex == _sortedColumnIndex &&
-        descending == selectedColumn.descending) {
+    if (columnIndex == _sortedColumnIndex && descending == selectedColumn.descending) {
       // this column and sort direction were already selected. user is deselecting sort
       _sortedColumnIndex = null;
     } else {
@@ -451,7 +420,7 @@ class ListGridNotifier<T> extends ChangeNotifier {
       _sortedColumnIndex = columnIndex;
 
       // set the columns search direction to the input
-      columnSettings[columnIndex].descending = descending;
+      _columnSettings[columnIndex].descending = descending;
 
       Console.log(
         "Sorting column: ${selectedColumn.fieldName} (column: ${columnIndex + 1}) ${descending ? "descending" : "ascending"}",
@@ -473,7 +442,7 @@ class ListGridNotifier<T> extends ChangeNotifier {
     return _collectionCount;
   }
 
-  List<SelectedDocument> get selectedDocuments {
+  List<SelectedDocument<T>> get selectedDocuments {
     return _selectedDocuments;
   }
 
@@ -481,18 +450,13 @@ class ListGridNotifier<T> extends ChangeNotifier {
     return _selectedDocuments.isNotEmpty ? _selectedDocuments.length : 0;
   }
 
-  void selectRow({required String documentId, required T document}) {
-    _selectedDocuments.add(SelectedDocument<T>(
-      id: documentId,
-      document: document,
-    ));
-    // _selectedDocuments[documentId] = document;
+  void selectRow({required SelectedDocument<T> selectedDocument}) {
+    _selectedDocuments.add(selectedDocument);
     notifyListeners();
   }
 
-  void unselectRow({required String documentId}) {
-    _selectedDocuments
-        .removeWhere((selectedDocument) => selectedDocument.id == documentId);
+  void unselectRow({required SelectedDocument<T> unSelectedDocument}) {
+    _selectedDocuments.removeWhere((selectedDocument) => selectedDocument.id == unSelectedDocument.id);
     notifyListeners();
   }
 
@@ -501,7 +465,7 @@ class ListGridNotifier<T> extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _updateCollectionCount({required Query query}) async {
+  void _updateCollectionCount({required Query<T> query}) async {
     AggregateQuerySnapshot snapshot = await query.count().get();
     int collectionCount = snapshot.count;
     _collectionCount = collectionCount;

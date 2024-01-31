@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_import, unnecessary_null_comparison
+
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
@@ -41,14 +43,16 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         return suggestion;
       },
 
-      viewType: widget.suggestionQueryState == SuggestionQueryStates.active
-          ? ViewType.auto
-          : ViewType.grid,
+      preOpen: (Suggestion suggestion) {
+        //Here you can do pre open stuff to the context document.
+        return suggestion;
+      },
+
+      viewType: widget.suggestionQueryState == SuggestionQueryStates.active ? ViewType.auto : ViewType.grid,
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
-            "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -179,11 +183,9 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             headerBuilder: (() => const DataColumn(
                   label: Text("Name"),
                 )),
-            dataCellBuilder: ((Suggestion suggestion, Function save) =>
-                DataCell(
+            dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
                   Text(suggestion.name ?? "?"),
-                  onTap: () => Console.log("onTap ${suggestion.name}",
-                      scope: "exampleApp.Suggestions", level: LogLevel.dev),
+                  onTap: () => Console.log("onTap ${suggestion.name}", scope: "exampleApp.Suggestions", level: LogLevel.dev),
                   placeholder: false,
                 )),
           ),
@@ -191,8 +193,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             headerBuilder: (() => const DataColumn(
                   label: Text("Active"),
                 )),
-            dataCellBuilder: ((Suggestion suggestion, Function save) =>
-                DataCell(
+            dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
                   Switch(
                     value: (suggestion.active ?? false),
                     onChanged: (bool value) {
@@ -206,199 +207,126 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         ],
       ),
       // Center part, shows a firestore doc. Tabs possible
-      document: _document(context),
-      // document: _document(),
-    );
-  }
-
-  Document<Suggestion> _document(BuildContext context) {
-    return Document<Suggestion>(
-      scrollableHeader: false,
-      showCloseButton: true,
-      showCopyButton: true,
-      showEditToggleButton: true,
-      showCreateButton: true,
-      showDeleteButton: true,
-      showSaveButton: true,
-      showValidateButton: true,
-      extraActionButtons: (context, suggestion, isReadOnly, isNew, user) {
-        return [
-          if (suggestion.active == false)
-            TextButton.icon(
-              onPressed: () {
-                suggestion.active = true;
-                DocumentScreenConfig.of(context)!
-                    .save<Suggestion>(context: context, closeAfterSave: false);
-              },
-              icon: const Icon(Icons.check, color: Colors.redAccent),
-              label: const Text("Mark as Active"),
-            ),
-          if (suggestion.active == true)
-            TextButton.icon(
-              onPressed: () {
-                suggestion.active = false;
-                DocumentScreenConfig.of(context)!
-                    .save<Suggestion>(context: context, closeAfterSave: false);
-              },
-              icon: const Icon(Icons.close, color: Colors.greenAccent),
-              label: const Text("Mark as Done"),
-            ),
-          if (user != null &&
-              user.roles != null &&
-              user.roles!.contains("firestoreaccess"))
-            IconButton(
-              tooltip: "Open Firestore Document",
-              onPressed: () {
-                String domain = "https://console.cloud.google.com";
-                String application = "firestore/databases/-default-/data/panel";
-                String collection = "suggestions";
-                String docId = suggestion.id ?? "";
-                String gcpProject =
-                    Fframe.of(context)!.firebaseOptions.projectId;
-                Uri url = Uri.parse(
-                    "$domain/$application/$collection/$docId?&project=$gcpProject");
-                launchUrl(url);
-              },
-              icon: Icon(
-                Icons.table_chart_outlined,
-                color: Theme.of(context).colorScheme.onBackground,
-              ),
-            ),
-        ];
-      },
-      documentTabsBuilder:
-          (context, suggestion, isReadOnly, isNew, fFrameUser) {
-        List<DocumentTab<Suggestion>> output = [];
-        if (fFrameUser!.roles!.contains('user')) {
-          output.add(
-            DocumentTab<Suggestion>(
-              tabBuilder: (user) {
-                return Tab(
-                  text: "${suggestion.name}",
-                  icon: const Icon(
-                    Icons.pest_control,
-                  ),
-                );
-              },
-              childBuilder: (suggestion, readOnly) {
-                return Tab01(
-                  suggestion: suggestion,
-                  readOnly: readOnly,
-                  // user: user,
-                );
-              },
-            ),
-          );
-        }
-        output.add(
-          DocumentTab<Suggestion>(
-            tabBuilder: (user) {
-              return const Tab(
-                text: "Placeholder",
-                icon: Icon(
-                  Icons.settings_overscan,
-                ),
-              );
-            },
-            childBuilder: (suggestion, readOnly) {
-              return Tab02(
-                suggestion: suggestion,
-                readOnly: readOnly,
-              );
-            },
-          ),
-        );
-        output.add(
-          DocumentTab<Suggestion>(
-            tabBuilder: (user) {
-              return const Tab(
-                text: "Ok or Not?",
-                icon: Icon(
-                  Icons.settings_overscan,
-                ),
-              );
-            },
-            childBuilder: (suggestion, readOnly) {
-              return Tab03(
-                suggestion: suggestion,
-                readOnly: readOnly,
-              );
-            },
-          ),
-        );
-
-        return output;
-      },
-      contextCards: [
-        (suggestion) => ContextCard(
-              suggestion: suggestion,
-            ),
-      ],
+      document: suggestionDocument(context),
     );
   }
 }
 
-// class FormCeptionWidget extends StatelessWidget {
-//   const FormCeptionWidget({
-//     Key? key,
-//     required this.suggestion,
-//   }) : super(key: key);
+Document<Suggestion> suggestionDocument(BuildContext context) {
+  return Document<Suggestion>(
+    scrollableHeader: false,
+    showCloseButton: true,
+    showCopyButton: true,
+    showEditToggleButton: true,
+    showCreateButton: true,
+    showDeleteButton: true,
+    showSaveButton: true,
+    showValidateButton: true,
+    extraActionButtons: (context, suggestion, isReadOnly, isNew, user) {
+      return [
+        if (suggestion.active == false)
+          TextButton.icon(
+            onPressed: () {
+              suggestion.active = true;
+              DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+            },
+            icon: const Icon(Icons.check, color: Colors.redAccent),
+            label: const Text("Mark as Active"),
+          ),
+        if (suggestion.active == true)
+          TextButton.icon(
+            onPressed: () {
+              suggestion.active = false;
+              DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+            },
+            icon: const Icon(Icons.close, color: Colors.greenAccent),
+            label: const Text("Mark as Done"),
+          ),
+        if (user != null && user.hasRole("firestoreaccess"))
+          IconButton(
+            tooltip: "Open Firestore Document",
+            onPressed: () {
+              String domain = "https://console.cloud.google.com";
+              String application = "firestore/databases/-default-/data/panel";
+              String collection = "suggestions";
+              String docId = suggestion.id ?? "";
+              String gcpProject = Fframe.of(context)!.firebaseOptions.projectId;
+              Uri url = Uri.parse("$domain/$application/$collection/$docId?&project=$gcpProject");
+              launchUrl(url);
+            },
+            icon: Icon(
+              Icons.table_chart_outlined,
+              color: Theme.of(context).colorScheme.onBackground,
+            ),
+          ),
+      ];
+    },
+    documentTabsBuilder: (context, suggestion, isReadOnly, isNew, fFrameUser) {
+      List<DocumentTab<Suggestion>> output = [];
+      if (fFrameUser!.hasRole('user')) {
+        output.add(
+          DocumentTab<Suggestion>(
+            tabBuilder: (user) {
+              return Tab(
+                text: "${suggestion.name}",
+                icon: const Icon(
+                  Icons.pest_control,
+                ),
+              );
+            },
+            childBuilder: (suggestion, readOnly) {
+              return Tab01(
+                suggestion: suggestion,
+                readOnly: readOnly,
+                // user: user,
+              );
+            },
+          ),
+        );
+      }
+      output.add(
+        DocumentTab<Suggestion>(
+          tabBuilder: (user) {
+            return const Tab(
+              text: "Placeholder",
+              icon: Icon(
+                Icons.settings_overscan,
+              ),
+            );
+          },
+          childBuilder: (suggestion, readOnly) {
+            return Tab02(
+              suggestion: suggestion,
+              readOnly: readOnly,
+            );
+          },
+        ),
+      );
+      output.add(
+        DocumentTab<Suggestion>(
+          tabBuilder: (user) {
+            return const Tab(
+              text: "Ok or Not?",
+              icon: Icon(
+                Icons.settings_overscan,
+              ),
+            );
+          },
+          childBuilder: (suggestion, readOnly) {
+            return Tab03(
+              suggestion: suggestion,
+              readOnly: readOnly,
+            );
+          },
+        ),
+      );
 
-//   final Suggestion suggestion;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return DocumentScreen<Suggestion>(
-//       collection: "suggestions/${suggestion.id}/subcollectionname",
-//       fromFirestore: Suggestion.fromFirestore,
-//       toFirestore: (suggestion, options) {
-//         return suggestion.toFirestore();
-//       },
-//       createDocumentId: (suggestion) {
-//         return "${suggestion.name}";
-//       },
-//       createNew: () => Suggestion(),
-
-//       //Optional title widget
-//       titleBuilder: (BuildContext context, Suggestion data) {
-//         return Text(
-//           data.name ?? "New Suggestion",
-//           style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
-//         );
-//       },
-
-//       // Optional, override on the query string param which holds the document id
-//       // queryStringIdParam: "formception",
-
-//       // Optional Left hand (navigation/document selection pane)
-//       documentList: DocumentList(
-//         builder: (context, selected, data, user) {
-//           return SuggestionListItem(
-//             suggestion: data,
-//             selected: selected,
-//             user: user,
-//           );
-//         },
-//       ),
-
-//       // Center part, shows a firestore doc. Tabs possible
-//       document: Document<Suggestion>(
-//         autoSave: false,
-//         documentTabsBuilder: (context, data, isReadOnly, isNew, fFrameUser) {
-//           return [
-//             DocumentTab<Suggestion>(tabBuilder: (user) {
-//               return const Tab(
-//                 text: "Suggestion",
-//                 icon: Icon(
-//                   Icons.pest_control,
-//                 ),
-//               );
-//             }, childBuilder: (suggestion, readOnly) {
-//               return const Text("FormCeption");
-//             })
-//           ];
-//         },
-//       ),
-//     );
-//   }
-// }
+      return output;
+    },
+    contextCards: [
+      (suggestion) => ContextCard(
+            suggestion: suggestion,
+          ),
+    ],
+  );
+}

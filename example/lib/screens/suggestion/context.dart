@@ -13,8 +13,7 @@ class ContextCard<T> extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         child: Padding(
-          padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
           child: Column(children: [
             Text(contextHeader,
                 style: TextStyle(

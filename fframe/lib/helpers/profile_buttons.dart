@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ThemeDropdown extends StatefulWidget {
+  // ignore: use_super_parameters
   const ThemeDropdown({Key? key}) : super(key: key);
 
   @override
@@ -47,6 +48,7 @@ class _ThemeDropdownState extends State<ThemeDropdown> {
 }
 
 class LocaleDropdown extends StatefulWidget {
+  // ignore: use_super_parameters
   const LocaleDropdown({Key? key}) : super(key: key);
 
   @override

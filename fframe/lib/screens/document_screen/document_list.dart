@@ -1,51 +1,41 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class DocumentListItem<T> extends ConsumerWidget {
   const DocumentListItem({
-    Key? key,
-    required this.queryDocumentSnapshot,
+    super.key,
+    required this.contextDocument,
     required this.hoverSelect,
-  }) : super(key: key);
+  });
 
-  final QueryDocumentSnapshot<T> queryDocumentSnapshot;
+  final SelectedDocument<T> contextDocument;
   final bool hoverSelect;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    DocumentScreenConfig documentScreenConfig =
-        DocumentScreenConfig.of(context)!;
-    DocumentConfig<T> documentConfig =
-        documentScreenConfig.documentConfig as DocumentConfig<T>;
-    DocumentListItemBuilder<T> documentListItemBuilder =
-        documentConfig.documentList!.builder;
-
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
+    DocumentListItemBuilder<T> documentListItemBuilder = documentConfig.documentList!.builder;
     try {
       return GestureDetector(
         onTap: () {
-          documentScreenConfig.selectDocument(context, queryDocumentSnapshot);
+          documentScreenConfig.selectDocument<T>(context, contextDocument);
         },
         child: MouseRegion(
           cursor: SystemMouseCursors.click,
           onHover: (_) {
             if (hoverSelect) {
-              documentScreenConfig.selectDocument(
-                  context, queryDocumentSnapshot);
+              documentScreenConfig.selectDocument<T>(context, contextDocument);
             }
           },
           child: Builder(builder: (BuildContext context) {
             String docId = documentScreenConfig.selectionState.docId ?? '';
             try {
-              return documentListItemBuilder(
-                  context,
-                  docId == queryDocumentSnapshot.id,
-                  queryDocumentSnapshot.data(),
-                  Fframe.of(context)!.user);
+              return documentListItemBuilder(context, docId == contextDocument.id, contextDocument.data as T, Fframe.of(context)!.user);
             } catch (e) {
               String error = e.toString();
-              String path = queryDocumentSnapshot.reference.path;
+              String path = "${documentConfig.collection}/${contextDocument.id}";
               return ListTile(
-                leading: Icon(Icons.warning,
-                    color: Theme.of(context).colorScheme.error),
+                leading: Icon(Icons.warning, color: Theme.of(context).colorScheme.error),
                 subtitle: Text(
                   L10n.interpolated(
                     'errors_dataissue',
@@ -79,9 +69,9 @@ class DocumentListItem<T> extends ConsumerWidget {
 
 class DocumentListLoader<T> extends StatefulWidget {
   const DocumentListLoader({
-    Key? key,
+    super.key,
     required this.ref,
-  }) : super(key: key);
+  });
   final WidgetRef ref;
   @override
   State<DocumentListLoader<T>> createState() => _DocumentListLoaderState<T>();
@@ -92,12 +82,9 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
 
   @override
   Widget build(BuildContext context) {
-    Console.log("Build DocumentList with key ${widget.key.toString()}",
-        scope: "fframeLog.DocumentListLoader", level: LogLevel.fframe);
-    DocumentScreenConfig documentScreenConfig =
-        DocumentScreenConfig.of(context)!;
-    DocumentConfig<T> documentConfig =
-        DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+    Console.log("Build DocumentList with key ${widget.key.toString()}", scope: "fframeLog.DocumentListLoader", level: LogLevel.fframe);
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
 
     return DocumentListBody<T>(
       key: ValueKey("documentListBody_${widget.key.toString()}"),
@@ -111,12 +98,12 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
 
 class DocumentListBody<T> extends StatefulWidget {
   const DocumentListBody({
-    Key? key,
+    super.key,
     required this.scrollController,
     required this.documentScreenConfig,
     required this.documentConfig,
     required this.ref,
-  }) : super(key: key);
+  });
   final ScrollController scrollController;
   final DocumentScreenConfig documentScreenConfig;
   final DocumentConfig<T> documentConfig;
@@ -135,16 +122,12 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
             ? ScreenSize.tablet
             : ScreenSize.large;
 
-    Console.log(
-        "Build documentListLoader with key: listScaffold_${widget.key.toString()}",
-        scope: "fframeLog.DocumentListBody",
-        level: LogLevel.fframe);
+    Console.log("Build documentListLoader with key: listScaffold_${widget.key.toString()}", scope: "fframeLog.DocumentListBody", level: LogLevel.fframe);
 
     double listWidth = 250;
     if (ScreenSize.phone == screenSize) {
       listWidth = MediaQuery.of(context).size.width;
-      Map<String, String>? queryParameters =
-          widget.ref.watch(queryStateProvider).queryParameters;
+      Map<String, String>? queryParameters = widget.ref.watch(queryStateProvider).queryParameters;
       if (queryParameters != null) {
         if (queryParameters.isNotEmpty) {
           //Some document is loaded, and we are on a phone. Don't show the selector
@@ -158,69 +141,52 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
       child: Container(
         key: ValueKey("listScaffold_${widget.key.toString()}"),
         child: Scaffold(
-          floatingActionButton:
-              (widget.documentConfig.documentList?.showCreateButton ?? true)
-                  ? FloatingActionButton(
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      elevation: 0.2,
-                      onPressed: () {
-                        widget.documentScreenConfig.create<T>(context: context);
-                      },
-                      child: Icon(Icons.add,
-                          color: Theme.of(context).colorScheme.onPrimary),
-                    )
-                  : null,
+          floatingActionButton: (widget.documentConfig.documentList?.showCreateButton ?? true)
+              ? FloatingActionButton(
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  elevation: 0.2,
+                  onPressed: () {
+                    widget.documentScreenConfig.create<T>(context: context);
+                  },
+                  child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
+                )
+              : null,
           primary: false,
           body: Stack(
             children: [
               Column(
                 children: [
-                  GetDocumentCount<T>(
-                      documentConfig: widget.documentConfig,
-                      headerType: HeaderType.header),
+                  GetDocumentCount<T>(documentConfig: widget.documentConfig, headerType: HeaderType.header),
                   Expanded(
                     child: AnimatedBuilder(
-                        animation:
-                            widget.documentScreenConfig.fireStoreQueryState,
+                        animation: widget.documentScreenConfig.fireStoreQueryState,
                         builder: (context, child) {
-                          Query<T> query = widget
-                              .documentScreenConfig.fireStoreQueryState
-                              .currentQuery() as Query<T>;
+                          Query<T> query = widget.documentScreenConfig.fireStoreQueryState.currentQuery() as Query<T>;
                           return Column(
                             children: [
                               Expanded(
                                 child: FirestoreSeparatedListView<T>(
-                                  documentList:
-                                      widget.documentConfig.documentList!,
-                                  documentScreenConfig:
-                                      widget.documentScreenConfig,
-                                  selectionState: widget.documentScreenConfig
-                                      .selectionState as SelectionState<T>,
+                                  documentList: widget.documentConfig.documentList!,
+                                  documentScreenConfig: widget.documentScreenConfig,
+                                  selectionState: widget.documentScreenConfig.selectionState as SelectionState<T>,
                                   // queryBuilderSnapshotState: widget.documentScreenConfig.queryBuilderSnapshotState as QueryBuilderSnapshotState<T>,
-                                  seperatorHeight: widget.documentConfig
-                                          .documentList?.seperatorHeight ??
-                                      1,
+                                  seperatorHeight: widget.documentConfig.documentList?.seperatorHeight ?? 1,
                                   controller: widget.scrollController,
                                   query: query,
-                                  itemBuilder: (context,
-                                      QueryDocumentSnapshot<T>
-                                          queryDocumentSnapshot) {
+                                  itemBuilder: (context, documentSnapshot) {
+                                    SelectedDocument<T> contextDocument = SelectedDocument<T>(
+                                      id: documentSnapshot.id,
+                                      documentConfig: widget.documentConfig,
+                                      data: documentSnapshot.data(),
+                                    );
+
                                     return DocumentListItem<T>(
-                                      queryDocumentSnapshot:
-                                          queryDocumentSnapshot,
-                                      hoverSelect: widget.documentConfig
-                                              .documentList?.hoverSelect ??
-                                          false,
+                                      contextDocument: contextDocument,
+                                      hoverSelect: widget.documentConfig.documentList?.hoverSelect ?? false,
                                     );
                                   },
-                                  loadingBuilder: (context) =>
-                                      FRouter.of(context).waitPage(
-                                          context: context,
-                                          text: "Loading documents"),
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Fframe.of(context)!.showErrorPage(
-                                          context: context,
-                                          errorText: error.toString()),
+                                  loadingBuilder: (context) => FRouter.of(context).waitPage(context: context, text: "Loading documents"),
+                                  errorBuilder: (context, error, stackTrace) => Fframe.of(context)!.showErrorPage(context: context, errorText: error.toString()),
                                 ),
                               ),
                             ],
@@ -233,7 +199,7 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
                   ),
                 ],
               ),
-              if (widget.documentConfig.dataGrid != null) DataGridToggle<T>(),
+              if (widget.documentConfig.dataGridConfig != null) DataGridToggle<T>(),
             ],
           ),
         ),
@@ -244,10 +210,10 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
 
 class GetDocumentCount<T> extends StatelessWidget {
   const GetDocumentCount({
-    Key? key,
+    super.key,
     required this.headerType,
     required this.documentConfig,
-  }) : super(key: key);
+  });
   final HeaderType headerType;
   final DocumentConfig<T> documentConfig;
 
@@ -274,8 +240,7 @@ class GetDocumentCount<T> extends StatelessWidget {
       ),
       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
         if (snapshot.hasError) {
-          Console.log("ERROR: ${snapshot.error.toString()}",
-              scope: "fframeLog.GetDocumentCount", level: LogLevel.prod);
+          Console.log("ERROR: ${snapshot.error.toString()}", scope: "fframeLog.GetDocumentCount", level: LogLevel.prod);
           return const IgnorePointer();
         }
         if (!snapshot.hasData) {
@@ -283,11 +248,9 @@ class GetDocumentCount<T> extends StatelessWidget {
         }
         switch (headerType) {
           case HeaderType.header:
-            return documentConfig.documentList!.headerBuilder!(
-                context, snapshot.data!);
+            return documentConfig.documentList!.headerBuilder!(context, snapshot.data!);
           case HeaderType.footer:
-            return documentConfig.documentList!.footerBuilder!(
-                context, snapshot.data!);
+            return documentConfig.documentList!.footerBuilder!(context, snapshot.data!);
         }
       },
     );
@@ -301,14 +264,14 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
   final SelectionState<T> selectionState;
 
   FirestoreSeparatedListView({
-    Key? key,
-    required Query<T> query,
+    super.key,
+    required super.query,
     required FirestoreItemBuilder<T> itemBuilder,
     required this.documentScreenConfig,
     required this.documentList,
     required this.selectionState,
     double seperatorHeight = 1,
-    int pageSize = 10,
+    super.pageSize,
     FirestoreLoadingBuilder? loadingBuilder,
     FirestoreErrorBuilder? errorBuilder,
     Axis scrollDirection = Axis.vertical,
@@ -326,18 +289,13 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
     double? cacheExtent,
     int? semanticChildCount,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
-    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior =
-        ScrollViewKeyboardDismissBehavior.manual,
+    ScrollViewKeyboardDismissBehavior keyboardDismissBehavior = ScrollViewKeyboardDismissBehavior.manual,
     String? restorationId,
     Clip clipBehavior = Clip.hardEdge,
   }) : super(
-          key: key,
-          query: query,
-          pageSize: pageSize,
           builder: (context, snapshot, _) {
             if (snapshot.isFetching) {
-              return loadingBuilder?.call(context) ??
-                  const Center(child: CircularProgressIndicator());
+              return loadingBuilder?.call(context) ?? const Center(child: CircularProgressIndicator());
             }
 
             if (snapshot.hasError && errorBuilder != null) {
@@ -348,8 +306,7 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
               );
             }
 
-            bool autoSelectFirst =
-                documentScreenConfig.documentConfig.autoSelectFirst;
+            bool autoSelectFirst = documentScreenConfig.documentConfig.autoSelectFirst;
 
             return Consumer(builder: (context, ref, child) {
               return ListView.separated(
@@ -360,11 +317,8 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
 
                   final queryDocumentSnapshot = snapshot.docs[index];
 
-                  if (autoSelectFirst &&
-                      index == 0 &&
-                      !FRouter.of(context).hasQueryStringParam('id')) {
-                    documentScreenConfig.load<T>(
-                        context: context, docId: queryDocumentSnapshot.id);
+                  if (autoSelectFirst && index == 0 && !FRouter.of(context).hasQueryStringParam('id')) {
+                    documentScreenConfig.load<T>(context: context, docId: queryDocumentSnapshot.id);
                   }
                   return itemBuilder(context, queryDocumentSnapshot);
                 },
@@ -373,12 +327,7 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
                 controller: controller,
                 primary: primary,
                 physics: physics,
-                separatorBuilder: (BuildContext context, int index) =>
-                    documentList.showSeparator
-                        ? Divider(
-                            height: seperatorHeight,
-                            color: Theme.of(context).dividerColor)
-                        : const IgnorePointer(),
+                separatorBuilder: (BuildContext context, int index) => documentList.showSeparator ? Divider(height: seperatorHeight, color: Theme.of(context).dividerColor) : const IgnorePointer(),
                 shrinkWrap: shrinkWrap,
                 padding: padding,
                 // itemExtent: itemExtent,
@@ -399,12 +348,11 @@ class FirestoreSeparatedListView<T> extends FirestoreQueryBuilder<T> {
 }
 
 class DataGridToggle<T> extends StatelessWidget {
-  const DataGridToggle({Key? key}) : super(key: key);
+  const DataGridToggle({super.key});
 
   @override
   Widget build(BuildContext context) {
-    DocumentConfig<T> documentConfig =
-        DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
     List<ViewType> allowedViewTypes = documentConfig.allowedViewTypes;
 
     if (allowedViewTypes.isEmpty) {
@@ -412,8 +360,7 @@ class DataGridToggle<T> extends StatelessWidget {
       return const IgnorePointer();
     }
 
-    if (allowedViewTypes.length == 1 &&
-        allowedViewTypes.first == documentConfig.currentViewType) {
+    if (allowedViewTypes.length == 1 && allowedViewTypes.first == documentConfig.currentViewType) {
       //Cannot toggle if the current option is the only viable option
       return const IgnorePointer();
     }
@@ -424,13 +371,9 @@ class DataGridToggle<T> extends StatelessWidget {
       // child: Icon(Icons.keyboard_double_arrow_right_rounded),
       child: IconButton(
         onPressed: () {
-          documentConfig.currentViewType =
-              (documentConfig.currentViewType == ViewType.list)
-                  ? ViewType.grid
-                  : ViewType.list;
+          documentConfig.currentViewType = (documentConfig.currentViewType == ViewType.list) ? ViewType.grid : ViewType.list;
         },
-        padding:
-            const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0, right: 0),
+        padding: const EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0, right: 0),
         icon: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.secondary,

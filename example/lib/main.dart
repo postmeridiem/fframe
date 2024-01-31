@@ -1,3 +1,4 @@
+import 'package:example/firebase_options.dart';
 import 'package:example/screens/swimlanes/swimlanes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
@@ -6,7 +7,6 @@ import 'package:fframe/fframe.dart';
 import 'package:example/themes/themes.dart';
 import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/helpers/l10n.dart';
-import 'package:example/firebase_options.dart';
 import 'package:example/pages/empty_page.dart';
 import 'package:example/pages/error_page.dart';
 import 'package:example/pages/wait_page.dart';
@@ -102,12 +102,11 @@ class MainApp extends StatelessWidget {
       darkMode: appDarkTheme,
       themeMode: ThemeMode.system,
       l10nConfig: l10nConfig,
-      consoleLogger: Console(logThreshold: LogLevel.dev),
+      consoleLogger: Console(logThreshold: LogLevel.fframe),
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
-          clientId:
-              "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
+          clientId: "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
       debugShowCheckedModeBanner: false,
@@ -118,13 +117,11 @@ class MainApp extends StatelessWidget {
       ],
       postLoad: (context) async {
         // you can omit this optional event handler
-        Console.log("Executing postLoad code from main.dart",
-            scope: "exampleApp.postLoad", level: LogLevel.dev);
+        Console.log("Executing postLoad code from main.dart", scope: "exampleApp.postLoad", level: LogLevel.dev);
       },
       postSignOut: (context) async {
         // you can omit this optional event handler
-        Console.log("Executing postSignOut code from main.dart",
-            scope: "exampleApp.postSignOut", level: LogLevel.dev);
+        Console.log("Executing postSignOut code from main.dart", scope: "exampleApp.postSignOut", level: LogLevel.dev);
       },
       postSignIn: (
         context,
@@ -132,23 +129,17 @@ class MainApp extends StatelessWidget {
         // These console logs serve as a working example of how to include Console logging in
         // your own application. See <TODO add wiki> for more information.
 
-        Console.log(
-            "Log example for quick usage. these will show up on prod level debug settings, so clean them up");
+        Console.log("Log example for quick usage. these will show up on prod level debug settings, so clean them up");
 
-        Console.log(L10n.string("main_demo_l10n",
-            placeholder: "this is a log from the L10n engine (placeholder)"));
+        Console.log(L10n.string("main_demo_l10n", placeholder: "this is a log from the L10n engine (placeholder)"));
 
-        Console.log("Executing postSignIn code from main.dart",
-            scope: "exampleApp.postSignIn");
+        Console.log("Executing postSignIn code from main.dart", scope: "exampleApp.postSignIn");
 
-        Console.log("Log example fframe level",
-            scope: "exampleApp.postSignIn", level: LogLevel.fframe);
+        Console.log("Log example fframe level", scope: "exampleApp.postSignIn", level: LogLevel.fframe);
 
-        Console.log("Log example dev level",
-            scope: "exampleApp.postSignIn", level: LogLevel.dev);
+        Console.log("Log example dev level", scope: "exampleApp.postSignIn", level: LogLevel.dev);
 
-        Console.log("Log example prod level",
-            scope: "exampleApp.postSignIn", level: LogLevel.prod);
+        Console.log("Log example prod level", scope: "exampleApp.postSignIn", level: LogLevel.prod);
       },
     );
   }

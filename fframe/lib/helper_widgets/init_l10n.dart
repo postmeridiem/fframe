@@ -1,28 +1,22 @@
-import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:flutter/material.dart';
 
 class InitializeL10n extends StatelessWidget {
   const InitializeL10n({
-    Key? key,
+    super.key,
     required this.l10Builder,
-    required this.navigationConfig,
     required this.l10nConfig,
-  }) : super(key: key);
-  final NavigationConfig navigationConfig;
+  });
   final L10Builder l10Builder;
-  // final Widget child;
   final L10nConfig l10nConfig;
 
   @override
   Widget build(BuildContext context) {
-    Console.log("Initializing language engine",
-        scope: "fframeLog.L10n", level: LogLevel.prod);
+    Console.log("Initializing language engine", scope: "fframeLog.L10n", level: LogLevel.prod);
     return FutureBuilder(
       future: L10nReader.read(context, l10nConfig),
-      builder:
-          (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
           case ConnectionState.active:
@@ -33,11 +27,9 @@ class InitializeL10n extends StatelessWidget {
             );
           case ConnectionState.done:
             if (snapshot.hasData) {
-              Map<String, dynamic> localeData =
-                  snapshot.data as Map<String, dynamic>;
+              Map<String, dynamic> localeData = snapshot.data as Map<String, dynamic>;
               // create the language engine
-              Console.log("Language engine loaded",
-                  scope: "fframeLog.L10n", level: LogLevel.fframe);
+              Console.log("Language engine loaded", scope: "fframeLog.L10n", level: LogLevel.fframe);
               return l10Builder(
                 context,
                 L10n(
@@ -47,8 +39,7 @@ class InitializeL10n extends StatelessWidget {
               );
             } else {
               // create the language engine
-              Console.log("ERROR: Language engine failed to load.",
-                  scope: "fframeLog.L10n", level: LogLevel.prod);
+              Console.log("ERROR: Language engine failed to load.", scope: "fframeLog.L10n", level: LogLevel.prod);
               return l10Builder(
                 context,
                 L10n(

@@ -8,14 +8,13 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
     alignment: Alignment.bottomLeft,
     columnSizing: ListGridColumnSizingMode.flex,
-    cellBuilder:
-        (BuildContext context, Suggestion suggestion, Function saveDocument) {
+    cellBuilder: (context, suggestion, saveDocument) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           renderButtons(
             context: context,
-            suggestion: suggestion,
+            suggestion: suggestion!,
           ),
         ],
       );
@@ -23,8 +22,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ),
 ];
 
-Row renderButtons(
-    {required BuildContext context, required Suggestion suggestion}) {
+Row renderButtons({required BuildContext context, required Suggestion suggestion}) {
   return Row(
     children: [
       Tooltip(

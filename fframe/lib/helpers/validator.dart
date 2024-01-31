@@ -1,4 +1,4 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class Validator {
   bool validString(String? rawvalue) {
@@ -28,9 +28,7 @@ class Validator {
   bool validEmail(String? rawvalue) {
     // check if input is a valid email pattern
     if (rawvalue!.isNotEmpty) {
-      return RegExp(
-              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-          .hasMatch(rawvalue);
+      return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(rawvalue);
     } else {
       return false;
     }

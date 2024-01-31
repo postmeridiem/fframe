@@ -1,4 +1,4 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class ListGridConfig<T> {
   ListGridConfig({
@@ -47,10 +47,6 @@ class ListGridConfig<T> {
   final bool openDocumentOnClick;
   final String? searchHint;
   final List<ListGridActionMenu<T>> actionBar;
-
-  late T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?)
-      fromFirestore;
-  late Map<String, Object?> Function(T, SetOptions?) toFirestore;
 }
 
 class ListGridActionMenu<T> {
@@ -60,7 +56,7 @@ class ListGridActionMenu<T> {
     this.icon,
   });
 
-  final List<ListGridActionMenuItem> menuItems;
+  final List<ListGridActionMenuItem<T>> menuItems;
   final String? label;
   final IconData? icon;
 }
@@ -69,15 +65,22 @@ class ListGridActionMenuItem<T> {
   const ListGridActionMenuItem({
     required this.label,
     required this.icon,
-    this.requireSelection = true,
-    required this.clickHandler,
+    this.processSelection = true,
+    required this.onClick,
   });
 
   final String label;
   final IconData icon;
-  final bool requireSelection;
-  final ListGridActionHandler clickHandler;
+  final bool processSelection;
+  final ListGridActionHandler<T> onClick;
 }
+
+typedef ListGridActionHandler<T> = SelectedDocument<T>? Function(
+  BuildContext context,
+  FFrameUser? user,
+  SelectedDocument<T>? selectedDocument,
+  DocumentScreenConfig? screenConfig,
+);
 
 class ListGridColumn<T> {
   ListGridColumn({
@@ -127,8 +130,13 @@ class ListGridColumn<T> {
   late int? columnIndex;
   late bool sortedColumn = false;
 
-  OnTableCellClick? onTableCellClick;
+  OnTableCellClick<T>? onTableCellClick;
 }
+
+typedef OnTableCellClick<T> = void Function(
+  BuildContext context,
+  SelectedDocument<T> document,
+);
 
 class ListGridDataModeConfig {
   const ListGridDataModeConfig({
@@ -142,7 +150,7 @@ class ListGridDataModeConfig {
 // final double? autopagerRowHeight;
 }
 
-class ListGridSearchConfig {
+class ListGridSearchConfig<T> {
   const ListGridSearchConfig({
     required this.mode,
     this.field,
@@ -167,15 +175,83 @@ class ListGridSearchMask {
 }
 
 class SelectedDocument<T> {
-  final String id;
-  final T document;
-  final QueryDocumentSnapshot? snapshot;
+  final DocumentConfig<T> documentConfig;
+  final DocumentSnapshot<Map<String, dynamic>>? documentSnapshot;
+  final DocumentReference<T>? documentReference;
+
+  String? _id;
+  T? _data;
 
   SelectedDocument({
-    required this.id,
-    required this.document,
-    this.snapshot,
-  });
+    required id,
+    required this.documentConfig,
+    this.documentSnapshot,
+    this.documentReference,
+    T? data,
+  }) {
+    _id = id;
+    if (data != null) {
+      _data = data;
+    } else if (this.documentSnapshot != null) {
+      _data = documentConfig.fromFirestore(this.documentSnapshot!, null);
+    }
+  }
+
+  // Getter for _data
+  T? get data => _data;
+
+  String? get id => _id;
+
+  // Setter for _data
+  set data(T? newData) {
+    if (newData != null) {
+      documentConfig.toFirestore(newData, null);
+      _data = newData;
+    }
+  }
+
+  close({required BuildContext context}) {
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    documentScreenConfig.close(context: context);
+  }
+
+  open({required BuildContext context}) {
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    documentScreenConfig.selectDocument(context, this);
+  }
+
+  update({T? newData}) {
+    T data = newData ?? _data!;
+    if (_id == null) {
+      //Must be a new document, create an Id for it
+      _id = documentConfig.createDocumentId!(data);
+      DatabaseService<T>().createDocument(
+        collection: documentConfig.collection,
+        documentId: _id!,
+        data: data,
+        fromFirestore: documentConfig.fromFirestore,
+        toFirestore: documentConfig.toFirestore,
+      );
+    } else {
+      DatabaseService<T>().updateDocument(
+        collection: documentConfig.collection,
+        documentId: _id!,
+        data: data,
+        fromFirestore: documentConfig.fromFirestore,
+        toFirestore: documentConfig.toFirestore,
+      );
+    }
+  }
+
+  factory SelectedDocument.createNew({required BuildContext context}) {
+    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
+    DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
+    return SelectedDocument<T>(
+      documentConfig: documentConfig,
+      id: null,
+      data: documentScreenConfig.create<T>(context: context) as T,
+    );
+  }
 }
 
 enum ListGridColumnSizingMode {
@@ -197,30 +273,20 @@ enum ListGridSearchMode {
   underscoreTypeAhead,
 }
 
-typedef ListGridActionHandler = void Function(
-  BuildContext context,
-  FFrameUser? user,
-  List<SelectedDocument> selectedDocuments,
-  Function createDocument,
-);
-
-typedef ListGridValueBuilderFunction<T> = dynamic Function(
+typedef ListGridValueBuilderFunction<T> = Function(
   BuildContext context,
   T data,
 );
 
 typedef ListGridCellBuilderFunction<T> = Widget Function(
   BuildContext context,
-  T data,
-  Function saveDocument,
+  T? data,
+  Function? onChange,
 );
 
 typedef ListGridCellControlsBuilderFunction<T> = List<IconButton> Function(
   BuildContext context,
   FFrameUser? user,
-  dynamic data,
+  SelectedDocument<T>? data,
   String stringValue,
 );
-
-typedef OnTableCellClick = void Function(
-    BuildContext context, QueryDocumentSnapshot snapshot);

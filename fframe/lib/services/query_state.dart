@@ -1,4 +1,4 @@
-part of fframe;
+part of '../fframe.dart';
 
 class QueryState {
   QueryState({this.queryParameters});

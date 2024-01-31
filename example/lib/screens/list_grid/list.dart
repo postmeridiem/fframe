@@ -37,16 +37,16 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 60,
     cellBuilder: (
-      BuildContext context,
-      Suggestion suggestion,
-      Function saveDocument,
+      context,
+      suggestion,
+      saveDocument,
     ) {
       return Switch(
-        value: (suggestion.active ?? false),
+        value: (suggestion?.active ?? false),
         activeColor: SignalColors().constAccentColor,
         onChanged: (bool value) {
-          suggestion.active = value;
-          saveDocument();
+          suggestion?.active = value;
+          // saveDocument();
         },
       );
     },
@@ -54,14 +54,13 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ListGridColumn(
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 200,
-    cellBuilder:
-        (BuildContext context, Suggestion suggestion, Function saveDocument) {
+    cellBuilder: (context, suggestion, saveDocument) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           renderButtons(
             context: context,
-            suggestion: suggestion,
+            suggestion: suggestion!,
           ),
         ],
       );
@@ -86,12 +85,12 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     cellControlsBuilder: (
       context,
       user,
-      suggestion,
+      contextDocument,
       stringValue,
     ) {
       return renderCreatedByCellIcons(
         context: context,
-        suggestion: suggestion,
+        contextDocument: contextDocument!,
         stringValue: stringValue,
       );
     },
@@ -100,8 +99,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     label: "",
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 40,
-    cellBuilder:
-        (BuildContext context, Suggestion suggestion, Function saveDocument) {
+    cellBuilder: (context, suggestion, saveDocument) {
       return FutureBuilder(
         future: Future.delayed(
           const Duration(
@@ -273,8 +271,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ),
 ];
 
-Row renderButtons(
-    {required BuildContext context, required Suggestion suggestion}) {
+Row renderButtons({required BuildContext context, required Suggestion suggestion}) {
   return Row(
     children: [
       Tooltip(
@@ -331,7 +328,7 @@ Row renderButtons(
 
 List<IconButton> renderCreatedByCellIcons({
   required BuildContext context,
-  required Suggestion suggestion,
+  required SelectedDocument<Suggestion> contextDocument,
   required String stringValue,
 }) {
   return [
@@ -351,7 +348,7 @@ List<IconButton> renderCreatedByCellIcons({
                 Icons.date_range,
               ),
               title: Text(
-                dateTimeTextTS(suggestion.creationDate as Timestamp),
+                dateTimeTextTS(contextDocument.data!.creationDate as Timestamp),
               ),
               textColor: Colors.amber[900],
             ),
@@ -363,7 +360,7 @@ List<IconButton> renderCreatedByCellIcons({
     ),
     IconButton(
       onPressed: () {
-        suggestion.active = false;
+        contextDocument.data!.active = false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: ListTile(

@@ -16,6 +16,8 @@ export 'package:dotted_border/dotted_border.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:js_interop';
+import 'dart:math';
 
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/controllers/query_state_controller.dart';
@@ -70,17 +72,15 @@ part 'package:fframe/models/navigation_target.dart';
 part 'package:fframe/models/sign_in_config.dart';
 part 'package:fframe/models/router_config.dart';
 part 'package:fframe/models/navigation_config.dart';
-part 'package:fframe/providers/global_providers.dart';
-part 'models/swimlanes_task.dart';
 
 part 'package:fframe/services/target_state.dart';
 part 'package:fframe/services/query_state.dart';
 
 part 'screens/document_screen/models.dart';
 part 'screens/document_screen/typedefs.dart';
+part 'screens/document_screen/document_context.dart';
 part 'screens/document_screen/document_screen.dart';
 part 'screens/document_screen/document_body.dart';
-part 'screens/document_screen/document_context.dart';
 part 'screens/document_screen/document_list.dart';
 part 'package:fframe/screens/datagrid_screen/datagrid_firestore.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_firestore.dart';

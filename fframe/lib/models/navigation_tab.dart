@@ -1,26 +1,21 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class NavigationTab extends NavigationTarget {
+  // ignore: use_super_parameters
   NavigationTab({
-    required String title,
-    required String path,
-    required Widget contentPane,
-    required Destination destination,
-    List<NavigationTab>? navigationTabs,
-    List<String>? roles,
+    required super.title,
+    required super.path,
+    required Widget super.contentPane,
+    required Destination super.destination,
+    super.navigationTabs,
+    super.roles,
     public = false,
     private = true,
   }) :
         // assert(contentPane == null, "NavigationTab: '/${path}' contentPane must not be null"),
         super(
-          title: title,
-          path: path,
-          contentPane: contentPane,
-          destination: destination,
-          roles: roles,
           public: public,
           private: private,
-          navigationTabs: navigationTabs,
         );
 
   late NavigationTarget parentTarget;

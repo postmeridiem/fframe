@@ -1,4 +1,4 @@
-part of fframe;
+part of '../../fframe.dart';
 
 class Destination {
   /// Creates a destination that is used with [NavigationRail.destinations].

@@ -14,10 +14,10 @@ class MainScreen extends StatefulWidget {
   final String appTitle;
   final L10nConfig l10nConfig;
   const MainScreen({
-    Key? key,
+    super.key,
     required this.appTitle,
     required this.l10nConfig,
-  }) : super(key: key);
+  });
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -173,7 +173,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 }
 
 class ProfileButton extends StatefulWidget {
-  const ProfileButton({Key? key}) : super(key: key);
+  const ProfileButton({super.key});
 
   @override
   State<ProfileButton> createState() => _ProfileButtonState();
