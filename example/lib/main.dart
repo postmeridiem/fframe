@@ -123,24 +123,24 @@ class MainApp extends StatelessWidget {
         // you can omit this optional event handler
         Console.log("Executing postSignOut code from main.dart", scope: "exampleApp.postSignOut", level: LogLevel.dev);
       },
-      postSignIn: (
-        context,
-      ) async {
-        // These console logs serve as a working example of how to include Console logging in
-        // your own application. See <TODO add wiki> for more information.
+      // postSignIn: (
+      //   context,
+      // ) async {
+      //   // These console logs serve as a working example of how to include Console logging in
+      //   // your own application. See <TODO add wiki> for more information.
 
-        Console.log("Log example for quick usage. these will show up on prod level debug settings, so clean them up");
+      //   Console.log("Log example for quick usage. these will show up on prod level debug settings, so clean them up");
 
-        Console.log(L10n.string("main_demo_l10n", placeholder: "this is a log from the L10n engine (placeholder)"));
+      //   Console.log(L10n.string("main_demo_l10n", placeholder: "this is a log from the L10n engine (placeholder)"));
 
-        Console.log("Executing postSignIn code from main.dart", scope: "exampleApp.postSignIn");
+      //   Console.log("Executing postSignIn code from main.dart", scope: "exampleApp.postSignIn");
 
-        Console.log("Log example fframe level", scope: "exampleApp.postSignIn", level: LogLevel.fframe);
+      //   Console.log("Log example fframe level", scope: "exampleApp.postSignIn", level: LogLevel.fframe);
 
-        Console.log("Log example dev level", scope: "exampleApp.postSignIn", level: LogLevel.dev);
+      //   Console.log("Log example dev level", scope: "exampleApp.postSignIn", level: LogLevel.dev);
 
-        Console.log("Log example prod level", scope: "exampleApp.postSignIn", level: LogLevel.prod);
-      },
+      //   Console.log("Log example prod level", scope: "exampleApp.postSignIn", level: LogLevel.prod);
+      // },
     );
   }
 }

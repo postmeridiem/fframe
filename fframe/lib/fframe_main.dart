@@ -169,92 +169,79 @@ class _FRouterLoaderState extends State<FRouterLoader> {
       stream: FirebaseAuth.instance.userChanges(),
       initialData: null,
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-          case ConnectionState.done:
-            return const FFWaitPage(
-              message: 'Awaiting authentication..',
-            );
-          case ConnectionState.active:
-            if (snapshot.error != null) {
-              return const FFErrorPage();
-            }
+        if (!snapshot.hasData) {
+          return const FFWaitPage(
+            message: 'Awaiting authentication..',
+          );
+        } else if (snapshot.error != null) {
+          return const FFErrorPage();
+        } else {
+          //Check if user is signed in
+          User? user = snapshot.data;
+          if (Fframe.of(context)!.signInState == SignInState.unknown && user == null) {
+            //User has just loaded application, but did sign in state is still unknown
+            Fframe.of(context)!.signInState = SignInState.signedOut;
+          } else if (Fframe.of(context)!.signInState == SignInState.unknown && user == null) {
+            //User has just loaded application, but did not sign in
+            Fframe.of(context)!.signInState = SignInState.signedOut;
+          } else if (Fframe.of(context)!.signInState == SignInState.signedIn && user == null) {
+            //User has just signed out
+            Fframe.of(context)!.signInState = SignInState.signedOut;
+            Fframe.of(context)!.user = null;
+          } else if (Fframe.of(context)!.signInState == SignInState.unknown && user != null) {
+            //User has just signed in
+            Fframe.of(context)!.signInState = SignInState.signedIn;
+          }
 
-            //Check if user is signed in
-            User? user = snapshot.data;
-            if (Fframe.of(context)!.signInState == SignInState.unknown && user == null) {
-              //User has just loaded application, but did sign in state is still unknown
-              Fframe.of(context)!.signInState = SignInState.signedOut;
-            } else if (Fframe.of(context)!.signInState == SignInState.unknown && user == null) {
-              //User has just loaded application, but did not sign in
-              Fframe.of(context)!.signInState = SignInState.signedOut;
-            } else if (Fframe.of(context)!.signInState == SignInState.signedIn && user == null) {
-              //User has just signed out
-              Fframe.of(context)!.signInState = SignInState.signedOut;
-              Fframe.of(context)!.user = null;
-            } else if (Fframe.of(context)!.signInState == SignInState.unknown && user != null) {
-              //User has just signed in
-              Fframe.of(context)!.signInState = SignInState.signedIn;
-            }
-
-            //Update UI according to sign-in-state
-            switch (Fframe.of(context)!.signInState) {
-              case (SignInState.unknown):
-                return const SignInWithLink();
-              case (SignInState.signedOut):
-                return FutureBuilder<void>(
-                  future: postSignOut(context),
-                  builder: (BuildContext context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.none:
-                      case ConnectionState.waiting:
-                      case ConnectionState.active:
-                        return const FFWaitPage(message: "Running post sign-out scripts...");
-                      case ConnectionState.done:
-                        if (snapshot.error != null) {
+          //Update UI according to sign-in-state
+          switch (Fframe.of(context)!.signInState) {
+            case (SignInState.unknown):
+              return const SignInWithLink();
+            case (SignInState.signedOut):
+              return FutureBuilder<void>(
+                future: postSignOut(context),
+                builder: (BuildContext context, snapshot) {
+                  if (!snapshot.hasData) {
+                    return const FFWaitPage(
+                      message: "Running post sign-out scripts...",
+                    );
+                  } else if (snapshot.error != null) {
+                    return const FFErrorPage();
+                  } else {
+                    return const InitFrouter();
+                  }
+                },
+              );
+            case (SignInState.signedIn):
+              return FutureBuilder<IdTokenResult>(
+                future: user!.getIdTokenResult(),
+                builder: (BuildContext context, AsyncSnapshot<IdTokenResult> snapshot) {
+                  if (!snapshot.hasData) {
+                    return const FFWaitPage(
+                      message: "Loading user data...",
+                    );
+                  } else if (snapshot.error != null) {
+                    return const FFErrorPage();
+                  } else {
+                    Fframe.of(context)!.user = FFrameUser.fromFirebaseUser(firebaseUser: user, idTokenResult: snapshot.data!);
+                    return FutureBuilder<void>(
+                      future: postSignIn(context),
+                      builder: (BuildContext context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return const FFWaitPage(
+                            message: "Running post sign-in scripts...",
+                          );
+                        } else if (snapshot.error != null) {
                           return const FFErrorPage();
+                        } else {
+                          return const InitFrouter();
                         }
-
-                        return const InitFrouter();
-                    }
-                  },
-                );
-              case (SignInState.signedIn):
-                return FutureBuilder<IdTokenResult>(
-                  future: user!.getIdTokenResult(),
-                  builder: (BuildContext context, AsyncSnapshot<IdTokenResult> snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.none:
-                      case ConnectionState.waiting:
-                      case ConnectionState.active:
-                        return const FFWaitPage(message: "Loading user data...");
-                      case ConnectionState.done:
-                        if (snapshot.error != null) {
-                          return const FFErrorPage();
-                        }
-
-                        Fframe.of(context)!.user = FFrameUser.fromFirebaseUser(firebaseUser: user, idTokenResult: snapshot.data!);
-                        return FutureBuilder<void>(
-                          future: postSignIn(context),
-                          builder: (BuildContext context, snapshot) {
-                            switch (snapshot.connectionState) {
-                              case ConnectionState.none:
-                              case ConnectionState.waiting:
-                              case ConnectionState.active:
-                                return const FFWaitPage(message: "Running post sign-in scripts...");
-                              case ConnectionState.done:
-                                if (snapshot.error != null) {
-                                  return const FFErrorPage();
-                                }
-                                return const InitFrouter();
-                            }
-                          },
-                        );
-                    }
-                  },
-                );
-            }
+                      },
+                    );
+                  }
+                },
+              );
+          }
         }
       },
     );
@@ -264,14 +251,14 @@ class _FRouterLoaderState extends State<FRouterLoader> {
     if (Fframe.of(context)?.postSignIn != null) {
       await Fframe.of(context)!.postSignIn!(context);
     }
-    return Future.value();
+    return Future.value(true);
   }
 
   Future postSignOut(BuildContext context) async {
-    if (Fframe.of(context)?.postSignOut != null) {
+    if (Fframe.of(context)!.postSignOut != null) {
       await Fframe.of(context)!.postSignOut!(context);
     }
-    return Future.value();
+    return Future.value(true);
   }
 }
 
@@ -320,20 +307,16 @@ class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObser
         return FutureBuilder<UserCredential>(
             future: FirebaseAuth.instance.signInWithEmailLink(email: emailAddress, emailLink: Uri.base.toString()),
             builder: (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.waiting:
-                case ConnectionState.active:
-                  return const FFWaitPage(message: "Processing sign in link");
-                case ConnectionState.done:
-                  if (snapshot.hasError) {
-                    Console.log("Link sign in failed: ${snapshot.error}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
-                    return const FFErrorPage();
-                  }
-
-                  UserCredential? userCredential = snapshot.data;
-                  Console.log("Resulting user: ${userCredential?.user?.email}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
-                  return const FFWaitPage(message: "Signing in with link");
+              if (!snapshot.hasData) {
+                return const FFWaitPage(
+                  message: "Running post sign in link",
+                );
+              } else if (snapshot.error != null) {
+                return const FFErrorPage();
+              } else {
+                UserCredential? userCredential = snapshot.data;
+                Console.log("Resulting user: ${userCredential?.user?.email}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
+                return const FFWaitPage(message: "Signing in with link");
               }
             });
       } else {
@@ -341,7 +324,7 @@ class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObser
       }
     }
     return const FFWaitPage(
-      message: 'Awaiting authentication...',
+      message: 'Awaiting link authentication...',
     );
   }
 }
@@ -371,16 +354,14 @@ class _FframePostLoadState extends State<FframePostLoad> {
       return FutureBuilder<void>(
         future: Fframe.of(context)!.postLoad!(context),
         builder: (BuildContext context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-            case ConnectionState.waiting:
-            case ConnectionState.active:
-              return const FFWaitPage();
-            case ConnectionState.done:
-              if (snapshot.error != null) {
-                return const FFErrorPage();
-              }
-              return const FframeBuilder();
+          if (!snapshot.hasData) {
+            return const FFWaitPage(
+              message: "Intializing application",
+            );
+          } else if (snapshot.error != null) {
+            return const FFErrorPage();
+          } else {
+            return const FframeBuilder();
           }
         },
       );
