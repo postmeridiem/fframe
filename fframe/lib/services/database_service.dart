@@ -24,7 +24,7 @@ class DatabaseService<T> {
     int? limit,
   }) {
     Query<T> query = FirebaseFirestore.instance.collection(collection).withConverter<T>(
-          fromFirestore : fromFirestore,
+          fromFirestore: fromFirestore,
           toFirestore: (_, __) => {},
         );
 
@@ -54,7 +54,7 @@ class DatabaseService<T> {
 
     //Count the documents;
     AggregateQuerySnapshot aggregateQuerySnapshot = await query.count().get();
-    return aggregateQuerySnapshot.count;
+    return aggregateQuerySnapshot.count!;
   }
 
   Stream<DocumentSnapshot<T>>? documentStream({

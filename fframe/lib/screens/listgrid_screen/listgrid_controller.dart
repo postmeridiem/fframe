@@ -467,7 +467,7 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
   void _updateCollectionCount({required Query<T> query}) async {
     AggregateQuerySnapshot snapshot = await query.count().get();
-    int collectionCount = snapshot.count;
+    int collectionCount = snapshot.count!;
     _collectionCount = collectionCount;
   }
 

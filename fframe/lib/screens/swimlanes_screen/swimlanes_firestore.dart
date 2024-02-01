@@ -83,7 +83,7 @@ class FirestoreSwimlanesState<T> extends ConsumerState<FirestoreSwimlanes<T>> {
 
   Future<int> countQueryResult({required Query<T> query}) async {
     AggregateQuerySnapshot snaphot = await query.count().get();
-    return snaphot.count;
+    return snaphot.count!;
   }
 }
 
