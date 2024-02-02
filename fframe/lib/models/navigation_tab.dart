@@ -18,5 +18,5 @@ class NavigationTab extends NavigationTarget {
           private: private,
         );
 
-  late NavigationTarget parentTarget;
+  NavigationTarget? parentTarget;
 }

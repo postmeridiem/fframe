@@ -324,11 +324,16 @@ class FRouter extends InheritedWidget {
             if (navigationNotifier.selectedNavRailIndex == null) {
               navigationNotifier.selectedNavRailIndex = 0;
               NavigationTarget? currentTarget = navigationNotifier.currentTarget?.navigationTarget;
+
               if (currentTarget != null) {
                 for (NavigationTarget navigationTarget in navigationNotifier.filteredNavigationConfig.navigationTargets.where(
                   ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
                 )) {
-                  if (navigationTarget.path == currentTarget.path.split('/').first) {
+                  if (currentTarget.path == navigationTarget.path) {
+                    //This is a single-item path
+                    break; //Jump from the loop
+                  } else if (currentTarget.path.startsWith("${navigationTarget.path}/")) {
+                    //This is a subpath
                     break; //Jump from the loop
                   } else {
                     navigationNotifier.selectedNavRailIndex = navigationNotifier.selectedNavRailIndex! + 1;

@@ -118,7 +118,7 @@ class NavigationNotifier extends ChangeNotifier {
   List<NavigationTab> get navigationTabs {
     if (_targetState!.navigationTarget is NavigationTab) {
       NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
-      NavigationTarget parentTarget = currentTab.parentTarget;
+      NavigationTarget parentTarget = currentTab.parentTarget!;
       return parentTarget.navigationTabs!;
     }
     return [];
@@ -285,11 +285,12 @@ class NavigationNotifier extends ChangeNotifier {
     String pathComponent = (_targetState == null) ? _uri?.path ?? "/" : _targetState!.navigationTarget.path;
     String queryComponent = (_queryState == null) ? _uri?.query ?? "" : _queryState!.queryString;
     Uri uri = Uri.parse("/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}".replaceAll("//", "/"));
+
     //Trigger the setter and te external method with it;
     Console.log(
-      "Created URI for: ${uri.toString()}",
+      "Created URI for: ${uri.toString()} from path: $pathComponent and query: $queryComponent",
       scope: "fframeLog.NavigationNotifier.composeUri",
-      level: LogLevel.fframe,
+      level: LogLevel.dev,
     );
     return uri;
   }
