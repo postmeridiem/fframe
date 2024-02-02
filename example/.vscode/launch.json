@@ -2,6 +2,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Flutter Web",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": [
+                "-d",
+                "chrome",
+                "--web-port",
+                "8000"
+            ],
+            "program": "lib/main.dart",
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "example Web Chrome @ 8000",
             "request": "launch",
             "type": "dart",
