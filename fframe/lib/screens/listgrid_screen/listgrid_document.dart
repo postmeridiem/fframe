@@ -33,7 +33,6 @@ class _ListGridDocumentState<T> extends ConsumerState<ListGridDocument<T>> {
             child: Container(
               decoration: BoxDecoration(
                 color: widget.listGridController.listGridConfig.widgetBackgroundColor,
-                // color: Colors.cyan,
                 border: Border(
                   left: BorderSide(
                     width: 1,

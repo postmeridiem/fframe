@@ -26,8 +26,6 @@ class Fframe extends InheritedWidget {
     this.postSignOut,
   }) : super(child: FFramePreload()) {
     Console.log("+-=-=-=-=-=-=-=-=-=-=-= ${DateTime.now().toIso8601String()} -=-=-=-=-=-=-=-=-=-=-=-=-=-+", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.green);
-    // Uri uri = Uri.parse("http://localhost:8888/suggestions/active");
-    // Console.log("Initial path: $uri::${uri.path}::${uri.query}", scope: "Fframe", level: LogLevel.fframe);
   }
 
   final String title;
@@ -182,9 +180,7 @@ class _FRouterLoaderState extends State<FRouterLoader> {
       initialData: null,
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (!snapshot.hasData) {
-          return FFWaitPage(
-            message: 'Awaiting authentication..',
-          );
+          return const SignInWithLink();
         } else if (snapshot.error != null) {
           return FFErrorPage();
         } else {
@@ -297,7 +293,6 @@ class InitFrouter extends StatelessWidget {
 
 class SignInWithLink extends StatefulWidget {
   const SignInWithLink({super.key});
-
   @override
   SignInWithLinkState createState() => SignInWithLinkState();
 }
@@ -339,9 +334,19 @@ class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObser
         Console.log("emailAddress not found in hash", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
       }
     }
-    return FFWaitPage(
-      message: 'Awaiting link authentication...',
+    return MaterialApp(
+      theme: Fframe.of(context)!.lightMode,
+      darkTheme: Fframe.of(context)!.darkMode,
+      themeMode: Fframe.of(context)!.themeMode,
+      title: Fframe.of(context)!.title,
+      color: Theme.of(context).colorScheme.surface,
+      debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+      home: Fframe.of(context)!.navigationConfig.signInConfig.signInTarget.contentPane ??
+          FFErrorPage(
+            message: "Sign in configuration not set",
+          ),
     );
+    ;
   }
 }
 
@@ -420,68 +425,61 @@ class FFWaitPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Console.log("Show wait page with message $message", scope: "FFWaitPage", level: LogLevel.fframe);
-    return
-        // MaterialApp(
-        // onUnknownRoute: (settings) {
-        //   debugger();
-        //   return MaterialPageRoute(
-        //     builder: (context) => FFErrorPage(),
-        //   );
-        // },
-        // theme: Fframe.of(context)!.lightMode,
-        // darkTheme: Fframe.of(context)!.darkMode,
-        // themeMode: Fframe.of(context)!.themeMode,
-        // debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-        // home:
-        Directionality(
-      textDirection: TextDirection.ltr,
-      child: Scaffold(
+    return MaterialApp(
+      theme: Fframe.of(context)!.lightMode,
+      darkTheme: Fframe.of(context)!.darkMode,
+      themeMode: Fframe.of(context)!.themeMode,
+      debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+      title: Fframe.of(context)!.title,
+      color: Theme.of(context).colorScheme.surface,
+      home: Scaffold(
         body: (message != null)
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(
-                    height: 200.0,
-                    child: Stack(
-                      children: <Widget>[
-                        const Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(),
-                          ),
+            ? Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                SizedBox(
+                  height: 200.0,
+                  child: Stack(
+                    children: <Widget>[
+                      const Center(
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(),
                         ),
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 100),
-                            child: Text(message!),
-                          ),
+                      ),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 100),
+                          child: Text(message!),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              )
+                ),
+              ])
             : const Center(
                 child: CircularProgressIndicator(),
               ),
-        // ),
       ),
     );
   }
 }
 
 class FFErrorPage extends StatelessWidget {
-  FFErrorPage({super.key}) {
+  FFErrorPage({super.key, this.message}) {
     Console.log("FFErrorPage", scope: "Fframe", level: LogLevel.fframe);
   }
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
+    Fframe.of(context)?.errorText = message;
+    Console.log("Show error page with message $message", scope: "FFErrorPage", level: LogLevel.fframe);
     return MaterialApp(
       theme: Fframe.of(context)!.lightMode,
       darkTheme: Fframe.of(context)!.darkMode,
       themeMode: Fframe.of(context)!.themeMode,
+      title: Fframe.of(context)!.title,
+      color: Theme.of(context).colorScheme.surface,
       debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
       home: Scaffold(
         body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,

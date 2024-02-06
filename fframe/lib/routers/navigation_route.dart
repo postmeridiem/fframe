@@ -12,8 +12,7 @@ class FNavigationRouteInformationParser extends RouteInformationParser<Navigatio
     Console.log(
       "parseRouteInformation to ${routeInformation.uri}",
       scope: "fframeLog.FNavigationRouteInformationParser.parseRouteInformation",
-      level: LogLevel.dev,
-      color: ConsoleColor.cyan,
+      level: LogLevel.dev
     );
     navigationNotifier.parseRouteInformation(uri: routeInformation.uri);
     return navigationNotifier;
