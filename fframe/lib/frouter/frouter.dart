@@ -10,7 +10,9 @@ class FRouterInit extends StatefulWidget {
     this.debugMode = false,
     required this.routerBuilder,
     required this.mainScreen,
-  });
+  }) {
+    Console.log("FRouterInit", scope: "Fframe", level: LogLevel.dev);
+  }
 
   final bool debugMode;
 

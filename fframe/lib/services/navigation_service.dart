@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +41,11 @@ class NavigationNotifier extends ChangeNotifier {
   late NavigationConfig filteredNavigationConfig = FRouterConfig.instance.navigationConfig;
 
   NavigationNotifier({required this.ref}) {
+    Console.log(
+      "init NavigationNotifier",
+      scope: "fframeLog.NavigationNotifier",
+      level: LogLevel.dev,
+    );
     _filterNavigationRoutes();
     FirebaseAuth.instance.authStateChanges().listen((User? user) => authChangeListener(user));
   }
@@ -48,6 +55,11 @@ class NavigationNotifier extends ChangeNotifier {
   bool get isSignedIn => _isSignedIn ?? false;
 
   authChangeListener(User? user) async {
+    Console.log(
+      "authChangeListener",
+      scope: "fframeLog.NavigationNotifier.authChangeListener",
+      level: LogLevel.dev,
+    );
     if (user != null) {
       try {
         FFrameUser fFrameUser = FFrameUser.fromFirebaseUser(firebaseUser: user, idTokenResult: (await user.getIdTokenResult()));
@@ -71,6 +83,12 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   signIn({List<String>? roles}) {
+    Console.log(
+      "signIn",
+      scope: "fframeLog.NavigationNotifier.signIn",
+      level: LogLevel.dev,
+    );
+
     _roles = roles;
     _isSignedIn = true;
     _filterNavigationRoutes();
@@ -84,6 +102,11 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   signOut() {
+    Console.log(
+      "signOut",
+      scope: "fframeLog.NavigationNotifier.signOut",
+      level: LogLevel.dev,
+    );
     _roles = null;
     _isSignedIn = false;
 
@@ -95,14 +118,29 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   TargetState? get currentTarget {
+    Console.log(
+      "get currentTarget",
+      scope: "fframeLog.NavigationNotifier.currentTarget",
+      level: LogLevel.dev,
+    );
     return _targetState;
   }
 
   bool get hasTabs {
+    Console.log(
+      "get hasTabs",
+      scope: "fframeLog.NavigationNotifier.hasTabs",
+      level: LogLevel.dev,
+    );
     return _targetState!.navigationTarget is NavigationTab;
   }
 
   bool get hasSubTabs {
+    Console.log(
+      "get hasSubTabs",
+      scope: "fframeLog.NavigationNotifier.hasSubTabs",
+      level: LogLevel.dev,
+    );
     // if (_targetState == null) {
     //   return false;
     // }
@@ -116,15 +154,26 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   List<NavigationTab> get navigationTabs {
+    Console.log(
+      "Getting navigation tabs",
+      scope: "fframeLog.NavigationNotifier.navigationTabs",
+      level: LogLevel.fframe,
+    );
     if (_targetState!.navigationTarget is NavigationTab) {
       NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
       NavigationTarget parentTarget = currentTab.parentTarget!;
       return parentTarget.navigationTabs!;
     }
+    debugger();
     return [];
   }
 
   _filterNavigationRoutes() {
+    Console.log(
+      "Filter navigation tabs",
+      scope: "fframeLog.NavigationNotifier._filterNavigationRoutes",
+      level: LogLevel.fframe,
+    );
     filteredNavigationConfig = NavigationConfig.clone(navigationConfig);
     FRouterConfig.instance.filteredNavigationConfig = filteredNavigationConfig;
     if (_isSignedIn ?? false) {
@@ -210,6 +259,11 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   List<NavigationTab> _filterTabRoutes(List<NavigationTab> navigationTabs) {
+    Console.log(
+      "Filter tab routes",
+      scope: "fframeLog.NavigationNotifier._filterTabRoutes",
+      level: LogLevel.fframe,
+    );
     if (_isSignedIn ?? false) {
       navigationTabs.removeWhere((NavigationTab navigationTab) {
         //Signed in. Keep private routes
@@ -245,6 +299,11 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   parseRouteInformation({required Uri uri}) {
+    Console.log(
+      "parseRouteInformation",
+      scope: "fframeLog.NavigationNotifier.parseRouteInformation uri: ${uri.toString()}",
+      level: LogLevel.fframe,
+    );
     if (_buildPending) {
       Console.log(
         "Build already pending",
@@ -275,6 +334,11 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   processRouteInformation({TargetState? targetState, QueryState? queryState}) {
+    Console.log(
+      "processRouteInformation",
+      scope: "fframeLog.NavigationNotifier.processRouteInformation",
+      level: LogLevel.fframe,
+    );
     _targetState = targetState ?? ref.read(targetStateProvider);
     _queryState = queryState ?? ref.read(queryStateProvider);
 
@@ -282,7 +346,16 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   Uri composeUri() {
-    String pathComponent = (_targetState == null) ? _uri?.path ?? "/" : _targetState!.navigationTarget.path;
+    Console.log(
+      "Compose the uri",
+      scope: "fframeLog.NavigationNotifier.composeUri",
+      level: LogLevel.fframe,
+    );
+    String pathComponent = (_targetState == null)
+        ? _uri?.path ?? "/"
+        : _targetState!.navigationTarget.path.isNotEmpty
+            ? _targetState!.navigationTarget.path
+            : "/";
     String queryComponent = (_queryState == null) ? _uri?.query ?? "" : _queryState!.queryString;
     Uri uri = Uri.parse("/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}".replaceAll("//", "/"));
 
@@ -292,14 +365,26 @@ class NavigationNotifier extends ChangeNotifier {
       scope: "fframeLog.NavigationNotifier.composeUri",
       level: LogLevel.dev,
     );
+    debugger(when: pathComponent.isEmpty, message: "Path is empty");
+
     return uri;
   }
 
   Uri restoreRouteInformation() {
+    Console.log(
+      "restoreRouteInformation",
+      scope: "fframeLog.NavigationNotifier.restoreRouteInformation",
+      level: LogLevel.fframe,
+    );
     return composeUri();
   }
 
   Uri? get uri {
+    Console.log(
+      "NavigationService.getUri: ${_uri.toString()}",
+      scope: "fframeLog.NavigationNotifier.uri",
+      level: LogLevel.fframe,
+    );
     return _uri;
   }
 
@@ -310,9 +395,10 @@ class NavigationNotifier extends ChangeNotifier {
       level: LogLevel.fframe,
     );
 
-    if (_uri == uri) {
+    if (_uri == uri && _buildPending == false) {
       return;
     }
+    debugger(when: uri == _uri);
 
     if (_uri == null) {
       _buildPending = true;
@@ -339,6 +425,12 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   updateProviders() {
+    Console.log(
+      "NavigationService.updateProviders",
+      scope: "fframeLog.NavigationNotifier.updateProviders",
+      level: LogLevel.fframe,
+    );
+
     StateController<TargetState> targetStateNotifier = ref.read(targetStateProvider.notifier);
     StateController<QueryState> queryStateNotifier = ref.read(queryStateProvider.notifier);
 

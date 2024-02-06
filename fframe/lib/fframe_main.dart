@@ -24,8 +24,10 @@ class Fframe extends InheritedWidget {
     this.postLoad,
     this.postSignIn,
     this.postSignOut,
-  }) : super(child: const FFramePreload()) {
-    Console.log("+-=-=-=-=-=-=-=-=-=-=-= ${DateTime.now().toIso8601String()} -=-=-=-=-=-=-=-=-=-=-=-=-=-+", scope: "Fframe", level: LogLevel.dev);
+  }) : super(child: FFramePreload()) {
+    Console.log("+-=-=-=-=-=-=-=-=-=-=-= ${DateTime.now().toIso8601String()} -=-=-=-=-=-=-=-=-=-=-=-=-=-+", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.green);
+    // Uri uri = Uri.parse("http://localhost:8888/suggestions/active");
+    // Console.log("Initial path: $uri::${uri.path}::${uri.query}", scope: "Fframe", level: LogLevel.fframe);
   }
 
   final String title;
@@ -80,7 +82,9 @@ class Fframe extends InheritedWidget {
 }
 
 class FFramePreload extends StatelessWidget {
-  const FFramePreload({super.key});
+  FFramePreload({super.key}) {
+    Console.log("FframeFirebaseLoader", scope: "Fframe", level: LogLevel.fframe);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +111,8 @@ class FframeFirebaseLoader extends StatefulWidget {
 class _FframeLoaderState extends State<FframeFirebaseLoader> {
   @override
   initState() {
+    Console.log("FframeFirebaseLoader", scope: "Fframe", level: LogLevel.fframe);
+
     super.initState();
   }
 
@@ -119,10 +125,10 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
           case ConnectionState.none:
           case ConnectionState.waiting:
           case ConnectionState.active:
-            return const FFWaitPage(message: "Connecting with backend services...");
+            return FFWaitPage(message: "Connecting with backend services...");
           case ConnectionState.done:
             if (snapshot.error != null) {
-              return const FFErrorPage();
+              return FFErrorPage();
             }
             return const FframeL10nLoader();
         }
@@ -146,7 +152,7 @@ class _FframeL10nLoaderState extends State<FframeL10nLoader> {
       l10Builder: (context, l10n) {
         if (l10n == null) {
           //Apparently stil loading.... give it a bit of time...
-          return const FFWaitPage(message: "Loading language library...");
+          return FFWaitPage(message: "Loading language library...");
         }
 
         return const FRouterLoader();
@@ -164,17 +170,23 @@ class FRouterLoader extends StatefulWidget {
 
 class _FRouterLoaderState extends State<FRouterLoader> {
   @override
+  initState() {
+    Console.log("FRouterLoader", scope: "Fframe", level: LogLevel.fframe);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
       stream: FirebaseAuth.instance.userChanges(),
       initialData: null,
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (!snapshot.hasData) {
-          return const FFWaitPage(
+          return FFWaitPage(
             message: 'Awaiting authentication..',
           );
         } else if (snapshot.error != null) {
-          return const FFErrorPage();
+          return FFErrorPage();
         } else {
           //Check if user is signed in
           User? user = snapshot.data;
@@ -202,13 +214,13 @@ class _FRouterLoaderState extends State<FRouterLoader> {
                 future: postSignOut(context),
                 builder: (BuildContext context, snapshot) {
                   if (!snapshot.hasData) {
-                    return const FFWaitPage(
+                    return FFWaitPage(
                       message: "Running post sign-out scripts...",
                     );
                   } else if (snapshot.error != null) {
-                    return const FFErrorPage();
+                    return FFErrorPage();
                   } else {
-                    return const InitFrouter();
+                    return InitFrouter();
                   }
                 },
               );
@@ -217,24 +229,24 @@ class _FRouterLoaderState extends State<FRouterLoader> {
                 future: user!.getIdTokenResult(),
                 builder: (BuildContext context, AsyncSnapshot<IdTokenResult> snapshot) {
                   if (!snapshot.hasData) {
-                    return const FFWaitPage(
+                    return FFWaitPage(
                       message: "Loading user data...",
                     );
                   } else if (snapshot.error != null) {
-                    return const FFErrorPage();
+                    return FFErrorPage();
                   } else {
                     Fframe.of(context)!.user = FFrameUser.fromFirebaseUser(firebaseUser: user, idTokenResult: snapshot.data!);
                     return FutureBuilder<void>(
                       future: postSignIn(context),
                       builder: (BuildContext context, snapshot) {
                         if (!snapshot.hasData) {
-                          return const FFWaitPage(
+                          return FFWaitPage(
                             message: "Running post sign-in scripts...",
                           );
                         } else if (snapshot.error != null) {
-                          return const FFErrorPage();
+                          return FFErrorPage();
                         } else {
-                          return const InitFrouter();
+                          return InitFrouter();
                         }
                       },
                     );
@@ -263,11 +275,13 @@ class _FRouterLoaderState extends State<FRouterLoader> {
 }
 
 class InitFrouter extends StatelessWidget {
-  const InitFrouter({super.key});
+  InitFrouter({super.key}) {
+    Console.log("InitFrouter", scope: "Fframe", level: LogLevel.fframe);
+  }
 
   @override
   Widget build(BuildContext context) {
-    Console.log("InitFrouter", scope: "InitFrouter", level: LogLevel.dev);
+    Console.log("InitFrouter", scope: "InitFrouter", level: LogLevel.fframe);
 
     return FRouterInit(
         mainScreen: MainScreen(
@@ -276,7 +290,7 @@ class InitFrouter extends StatelessWidget {
         ),
         navigationConfig: Fframe.of(context)!.navigationConfig,
         routerBuilder: (context) {
-          return const FframeBuilder();
+          return FframeBuilder();
         });
   }
 }
@@ -291,6 +305,8 @@ class SignInWithLink extends StatefulWidget {
 class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObserver {
   @override
   void initState() {
+    Console.log("SignInWithLinkState", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
+
     super.initState();
   }
 
@@ -308,22 +324,22 @@ class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObser
             future: FirebaseAuth.instance.signInWithEmailLink(email: emailAddress, emailLink: Uri.base.toString()),
             builder: (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
               if (!snapshot.hasData) {
-                return const FFWaitPage(
+                return FFWaitPage(
                   message: "Running post sign in link",
                 );
               } else if (snapshot.error != null) {
-                return const FFErrorPage();
+                return FFErrorPage();
               } else {
                 UserCredential? userCredential = snapshot.data;
                 Console.log("Resulting user: ${userCredential?.user?.email}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
-                return const FFWaitPage(message: "Signing in with link");
+                return FFWaitPage(message: "Signing in with link");
               }
             });
       } else {
         Console.log("emailAddress not found in hash", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
       }
     }
-    return const FFWaitPage(
+    return FFWaitPage(
       message: 'Awaiting link authentication...',
     );
   }
@@ -341,6 +357,7 @@ class FframePostLoad extends StatefulWidget {
 class _FframePostLoadState extends State<FframePostLoad> {
   @override
   initState() {
+    Console.log("postLoad", scope: "fframeLog.postLoad", level: LogLevel.fframe);
     super.initState();
   }
 
@@ -348,20 +365,20 @@ class _FframePostLoadState extends State<FframePostLoad> {
   Widget build(BuildContext context) {
     if (Fframe.of(context)?.postLoad == null) {
       Console.log("No code provided", scope: "fframeLog.postLoad", level: LogLevel.fframe);
-      return const FframeBuilder();
+      return FframeBuilder();
     } else {
       Console.log("Code executing", scope: "fframeLog.postLoad", level: LogLevel.fframe);
       return FutureBuilder<void>(
         future: Fframe.of(context)!.postLoad!(context),
         builder: (BuildContext context, snapshot) {
           if (!snapshot.hasData) {
-            return const FFWaitPage(
+            return FFWaitPage(
               message: "Intializing application",
             );
           } else if (snapshot.error != null) {
-            return const FFErrorPage();
+            return FFErrorPage();
           } else {
-            return const FframeBuilder();
+            return FframeBuilder();
           }
         },
       );
@@ -370,7 +387,9 @@ class _FframePostLoadState extends State<FframePostLoad> {
 }
 
 class FframeBuilder extends StatelessWidget {
-  const FframeBuilder({super.key});
+  FframeBuilder({super.key}) {
+    Console.log("FframeBuilder", scope: "Fframe", level: LogLevel.fframe);
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
@@ -393,18 +412,30 @@ typedef PostFunction = Function(
 );
 
 class FFWaitPage extends StatelessWidget {
-  const FFWaitPage({super.key, this.message});
+  FFWaitPage({super.key, this.message}) {
+    Console.log("FFWaitPage", scope: "Fframe", level: LogLevel.fframe);
+  }
   final String? message;
 
   @override
   Widget build(BuildContext context) {
-    Console.log("Show wait page with message $message", scope: "FFWaitPage", level: LogLevel.dev);
-    return MaterialApp(
-      theme: Fframe.of(context)!.lightMode,
-      darkTheme: Fframe.of(context)!.darkMode,
-      themeMode: Fframe.of(context)!.themeMode,
-      debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-      home: Scaffold(
+    Console.log("Show wait page with message $message", scope: "FFWaitPage", level: LogLevel.fframe);
+    return
+        // MaterialApp(
+        // onUnknownRoute: (settings) {
+        //   debugger();
+        //   return MaterialPageRoute(
+        //     builder: (context) => FFErrorPage(),
+        //   );
+        // },
+        // theme: Fframe.of(context)!.lightMode,
+        // darkTheme: Fframe.of(context)!.darkMode,
+        // themeMode: Fframe.of(context)!.themeMode,
+        // debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+        // home:
+        Directionality(
+      textDirection: TextDirection.ltr,
+      child: Scaffold(
         body: (message != null)
             ? Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -434,13 +465,16 @@ class FFWaitPage extends StatelessWidget {
             : const Center(
                 child: CircularProgressIndicator(),
               ),
+        // ),
       ),
     );
   }
 }
 
 class FFErrorPage extends StatelessWidget {
-  const FFErrorPage({super.key});
+  FFErrorPage({super.key}) {
+    Console.log("FFErrorPage", scope: "Fframe", level: LogLevel.fframe);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -451,6 +485,25 @@ class FFErrorPage extends StatelessWidget {
       debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
       home: Scaffold(
         body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+      ),
+    );
+  }
+}
+
+class FFRedirectPage extends StatelessWidget {
+  FFRedirectPage({super.key}) {
+    Console.log("FFErrorPage", scope: "Fframe", level: LogLevel.fframe);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: Fframe.of(context)!.lightMode,
+      darkTheme: Fframe.of(context)!.darkMode,
+      themeMode: Fframe.of(context)!.themeMode,
+      debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+      home: const Scaffold(
+        body: Icon(Icons.forward),
       ),
     );
   }

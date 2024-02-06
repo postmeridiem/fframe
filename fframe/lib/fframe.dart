@@ -59,6 +59,7 @@ import 'package:uuid/uuid.dart';
 import 'package:shimmer/shimmer.dart';
 
 import 'package:fframe/extensions/query.dart';
+import "package:fframe/extensions/string.dart";
 
 import 'material/paginated_data_table_extended.dart';
 import 'package:dotted_border/dotted_border.dart';

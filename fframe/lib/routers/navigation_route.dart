@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fframe/services/navigation_service.dart';
 
@@ -7,9 +10,10 @@ class FNavigationRouteInformationParser extends RouteInformationParser<Navigatio
   @override
   Future<NavigationNotifier> parseRouteInformation(RouteInformation routeInformation) async {
     Console.log(
-      "Updated to ${routeInformation.uri}s",
+      "parseRouteInformation to ${routeInformation.uri}",
       scope: "fframeLog.FNavigationRouteInformationParser.parseRouteInformation",
-      level: LogLevel.fframe,
+      level: LogLevel.dev,
+      color: ConsoleColor.cyan,
     );
     navigationNotifier.parseRouteInformation(uri: routeInformation.uri);
     return navigationNotifier;
@@ -20,9 +24,9 @@ class FNavigationRouteInformationParser extends RouteInformationParser<Navigatio
     //Updates the browser history
 
     Console.log(
-      "Updated to ${configuration.composeUri()}",
+      "restoreRouteInformation",
       scope: "fframeLog.FNavigationRouteInformationParser.restoreRouteInformation",
-      level: LogLevel.fframe,
+      level: LogLevel.dev,
     );
 
     return RouteInformation(uri: configuration.restoreRouteInformation());
@@ -38,7 +42,7 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
     Console.log(
       "init FNavigationRouterDelegate",
       scope: "fframeLog.FNavigationRouterDelegate",
-      level: LogLevel.fframe,
+      level: LogLevel.dev,
     );
 
     navigationNotifier.addListener(_navigationNotifierListener);
@@ -46,9 +50,9 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
 
   _navigationNotifierListener() {
     Console.log(
-      "Updated to ${navigationNotifier.uri}, notifyListeners",
-      scope: "fframeLog.FNavigationRouterDelegate.navigationNotifier",
-      level: LogLevel.fframe,
+      "_navigationNotifierListener",
+      scope: "fframeLog.FNavigationRouterDelegate._navigationNotifier",
+      level: LogLevel.dev,
     );
     notifyListeners();
     // navigationNotifier.removeListener(_navigationNotifierListener);
@@ -57,9 +61,9 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
   @override
   NavigationNotifier? get currentConfiguration {
     Console.log(
-      "Updated to ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}",
+      "get currentConfiguration",
       scope: "fframeLog.FNavigationRouterDelegate.currentConfiguration",
-      level: LogLevel.fframe,
+      level: LogLevel.dev,
     );
 
     // currentConfiguration?.uri?.path;
@@ -69,13 +73,22 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
 
   @override
   Widget build(BuildContext context) {
-    Console.log("NavigationRouterDelegate.build", scope: "fframeLog.NavigationRouter", level: LogLevel.fframe);
+    Console.log("NavigationRouterDelegate.build", scope: "fframeLog.NavigationRouter", level: LogLevel.dev);
 
     return Navigator(
       key: navigatorKey,
       pages: const [
         RouterPage(),
       ],
+      // onGenerateInitialRoutes: (navigatorState, uri) {
+      //   return navigatorState;
+      // },
+      onUnknownRoute: (settings) {
+        debugger();
+        return MaterialPageRoute(
+          builder: (context) => FFErrorPage(),
+        );
+      },
       onPopPage: (route, result) {
         if (!route.didPop(result)) {
           return false;
@@ -89,9 +102,9 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
   // ignore: avoid_renaming_method_parameters
   Future<void> setNewRoutePath(NavigationNotifier navigationNotifier) async {
     Console.log(
-      "Updated to ${navigationNotifier.uri?.path} :: ${navigationNotifier.uri?.query.toString()}",
+      "setNewRoutePath",
       scope: "fframeLog.FNavigationRouterDelegate.setNewRoutePath",
-      level: LogLevel.fframe,
+      level: LogLevel.dev,
     );
     return;
   }

@@ -784,7 +784,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
             case ConnectionState.none:
             case ConnectionState.waiting:
             case ConnectionState.active:
-              return const FFWaitPage();
+              return FFWaitPage();
             case ConnectionState.done:
               selectionState.data = snapshot.data;
               return AnimatedBuilder(

@@ -165,14 +165,32 @@ class FRouter extends InheritedWidget {
   }
 
   NavigationTarget? get currentTarget {
+    Console.log(
+      "get currentTarget}",
+      scope: "FRouter.currentTarget",
+      level: LogLevel.dev,
+      color: ConsoleColor.standard,
+    );
     return navigationNotifier.currentTarget?.navigationTarget;
   }
 
   List<NavigationTab> get navigationTabs {
+    Console.log(
+      "get navigationTabs}",
+      scope: "FRouter.navigationTabs",
+      level: LogLevel.dev,
+      color: ConsoleColor.standard,
+    );
     return navigationNotifier.navigationTabs;
   }
 
   NavigationConfig get navigationConfig {
+    Console.log(
+      "get navigationConfig}",
+      scope: "FRouter.navigationConfig",
+      level: LogLevel.dev,
+      color: ConsoleColor.standard,
+    );
     return navigationNotifier.filteredNavigationConfig;
   }
 
@@ -261,21 +279,46 @@ class FRouter extends InheritedWidget {
   }
 
   bool get hasTabs {
+    Console.log(
+      "Check if there are tabs",
+      scope: "fframeLog.FRouter.hasTabs",
+      level: LogLevel.prod,
+      color: ConsoleColor.yellow,
+    );
     return navigationNotifier.hasTabs;
   }
 
   int get tabLength {
+    Console.log(
+      "Count the amount of tabs",
+      scope: "fframeLog.FRouter.tabLength",
+      level: LogLevel.prod,
+      color: ConsoleColor.yellow,
+    );
     return navigationNotifier.navigationTabs.length;
   }
 
   int get currentTab {
+    Console.log(
+      "Define the current tab",
+      scope: "fframeLog.FRouter.currentTab",
+      level: LogLevel.prod,
+      color: ConsoleColor.yellow,
+    );
     int index = navigationNotifier.navigationTabs.indexWhere(
       (NavigationTab navigationTab) => navigationTab.path == navigationNotifier.currentTarget!.navigationTarget.path,
     );
+    debugger(when: index == -1);
     return index == -1 ? 0 : index;
   }
 
   tabSwitch({required TabController tabController, required}) {
+    Console.log(
+      "Change from one tab to another tab",
+      scope: "fframeLog.FRouter.tabSwitch",
+      level: LogLevel.prod,
+      color: ConsoleColor.yellow,
+    );
     if (!tabController.indexIsChanging) {
       NavigationTarget currentTarget = navigationNotifier.currentTarget!.navigationTarget;
       NavigationTarget pendingTarget = navigationNotifier.navigationTabs[tabController.index];
@@ -320,6 +363,29 @@ class FRouter extends InheritedWidget {
     return AnimatedBuilder(
         animation: navigationNotifier,
         builder: (context, child) {
+          List<NavigationRailDestination> destinations = [
+            ...navigationNotifier.filteredNavigationConfig.navigationTargets
+                .where(
+                  ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
+                )
+                .map(
+                  (NavigationTarget navigationTarget) => NavigationRailDestination(
+                    icon: navigationTarget.destination!.icon,
+                    selectedIcon: navigationTarget.destination!.selectedIcon,
+                    label: navigationTarget.destination!.navigationLabel(),
+                    padding: navigationTarget.destination!.padding,
+                  ),
+                ),
+            if (!navigationNotifier.isSignedIn && navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination != null)
+              NavigationRailDestination(
+                icon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.icon,
+                selectedIcon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
+                label: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
+                padding: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.padding,
+              ),
+          ];
+
+          //Todo : Merge destinations with remapper
           if (navigationNotifier.filteredNavigationConfig.navigationTargets.length >= 2) {
             if (navigationNotifier.selectedNavRailIndex == null) {
               navigationNotifier.selectedNavRailIndex = 0;
@@ -344,8 +410,15 @@ class FRouter extends InheritedWidget {
             if (navigationNotifier.selectedNavRailIndex == null || navigationNotifier.selectedNavRailIndex! < 0 || navigationNotifier.selectedNavRailIndex! > navigationNotifier.filteredNavigationConfig.navigationTargets.length) {
               navigationNotifier.selectedNavRailIndex = 0;
             }
+
+            //Prevent null values
+            // print(navigationNotifier.selectedNavRailIndex);
+            // navigationNotifier.selectedNavRailIndex == 0 ? navigationNotifier.selectedNavRailIndex = 1 : navigationNotifier.selectedNavRailIndex;
+            // debugger(when: navigationNotifier.selectedNavRailIndex == null);
+            // debugger(when: navigationNotifier.selectedNavRailIndex! < destinations.length);
+
             return NavigationRail(
-              selectedIndex: navigationNotifier.selectedNavRailIndex,
+              selectedIndex: 0,
               onDestinationSelected: (int index) {
                 if (index < navigationNotifier.filteredNavigationConfig.navigationTargets.length) {
                   navigationNotifier.selectedNavRailIndex = index;
@@ -367,27 +440,7 @@ class FRouter extends InheritedWidget {
                 }
               },
               labelType: NavigationRailLabelType.all,
-              destinations: [
-                ...navigationNotifier.filteredNavigationConfig.navigationTargets
-                    .where(
-                      ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
-                    )
-                    .map(
-                      (NavigationTarget navigationTarget) => NavigationRailDestination(
-                        icon: navigationTarget.destination!.icon,
-                        selectedIcon: navigationTarget.destination!.selectedIcon,
-                        label: navigationTarget.destination!.navigationLabel(),
-                        padding: navigationTarget.destination!.padding,
-                      ),
-                    ),
-                if (!navigationNotifier.isSignedIn && navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination != null)
-                  NavigationRailDestination(
-                    icon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.icon,
-                    selectedIcon: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
-                    label: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
-                    padding: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget.destination!.padding,
-                  ),
-              ],
+              destinations: destinations,
             );
           }
           return const IgnorePointer();
@@ -415,11 +468,21 @@ class RouterScreen extends StatefulWidget {
 
 class _RouterScreenState extends State<RouterScreen> {
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => markBuildDone(),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     Console.log("Build RouterScreen", scope: "fframeLog.RouterScreen", level: LogLevel.fframe);
-    Future.delayed(Duration.zero, () {
-      navigationNotifier.isBuilding = false;
-    });
     return FRouterConfig.instance.mainScreen;
+  }
+
+  markBuildDone() {
+    Console.log("Build completed", scope: "fframeLog.RouterScreen", level: LogLevel.fframe);
+    navigationNotifier.isBuilding = false;
   }
 }
