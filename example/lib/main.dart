@@ -24,6 +24,7 @@ import 'package:flutterfire_ui/i10n.dart';
 import 'helpers/header_buttons.dart';
 
 void main() {
+  // usePathUrlStrategy();
   runApp(const MainApp());
 }
 

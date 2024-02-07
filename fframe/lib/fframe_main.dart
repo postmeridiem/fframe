@@ -6,6 +6,39 @@ enum SignInState {
   signedOut,
 }
 
+class InitialUri {
+  factory InitialUri({Uri? initialUri}) {
+    if (instance == null) {
+      Console.log("InitialUri", scope: "Fframe", level: LogLevel.fframe, color: ConsoleColor.white);
+      initialUri = initialUri ?? _getCleanedBaseUri();
+      Console.log("Initial Uri: ${initialUri.path} ${initialUri.queryParameters}", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.white);
+      instance = InitialUri._internal(initialUri);
+    }
+    return instance!;
+  }
+
+  static InitialUri? instance;
+  InitialUri._internal(this.initalUri);
+
+  Uri? initalUri;
+
+  static Uri _getCleanedBaseUri() {
+    return Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
+  }
+
+  static InitialUri getInstance() {
+    return instance ?? InitialUri(); // Ensure instance is not null
+  }
+
+  Uri getInitialUri() {
+    return initalUri ?? _getCleanedBaseUri();
+  }
+
+  void clearInitialUri() {
+    initalUri = null;
+  }
+}
+
 // ignore: must_be_immutable
 class Fframe extends InheritedWidget {
   Fframe({
@@ -26,7 +59,13 @@ class Fframe extends InheritedWidget {
     this.postSignOut,
   }) : super(child: FFramePreload()) {
     Console.log("+-=-=-=-=-=-=-=-=-=-=-= ${DateTime.now().toIso8601String()} -=-=-=-=-=-=-=-=-=-=-=-=-=-+", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.green);
+    InitialUri();
+    // Console.log("deepLinkUri: ${deepLinkUri!.path} ${deepLinkUri?.queryParameters}", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.white);
   }
+
+  // static final Fframe instance = Fframe._internal();
+
+  // Fframe._internal();
 
   final String title;
 
@@ -43,6 +82,8 @@ class Fframe extends InheritedWidget {
   final PostFunction? postLoad;
   final PostFunction? postSignIn;
   final PostFunction? postSignOut;
+
+  Uri? deepLinkUri;
 
   FFrameUser? user;
 
@@ -307,16 +348,16 @@ class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObser
 
   @override
   Widget build(BuildContext context) {
-    Console.log("dynamic link research: ${Uri.base} => ${FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
-    Uri uri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
+    Uri uri = InitialUri.instance!.getInitialUri();
+    Console.log("dynamic link research: ${uri.toString()} => ${FirebaseAuth.instance.isSignInWithEmailLink(uri.toString())}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
 
-    if (FirebaseAuth.instance.isSignInWithEmailLink(Uri.base.toString())) {
+    if (FirebaseAuth.instance.isSignInWithEmailLink(uri.toString())) {
       if (uri.queryParameters.containsKey("hash")) {
         String hash = uri.queryParameters["hash"]!;
         String emailAddress = utf8.decode(base64.decode(hash));
 
         return FutureBuilder<UserCredential>(
-            future: FirebaseAuth.instance.signInWithEmailLink(email: emailAddress, emailLink: Uri.base.toString()),
+            future: FirebaseAuth.instance.signInWithEmailLink(email: emailAddress, emailLink: uri.toString()),
             builder: (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
               if (!snapshot.hasData) {
                 return FFWaitPage(
@@ -346,7 +387,6 @@ class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObser
             message: "Sign in configuration not set",
           ),
     );
-    ;
   }
 }
 
@@ -424,7 +464,11 @@ class FFWaitPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Console.log("Show wait page with message $message", scope: "FFWaitPage", level: LogLevel.fframe);
+    if (message != null) {
+      Console.log("Show wait page with message $message", scope: "FFWaitPage", level: LogLevel.fframe);
+    } else {
+      Console.log("Show wait page", scope: "FFWaitPage", level: LogLevel.fframe);
+    }
     return MaterialApp(
       theme: Fframe.of(context)!.lightMode,
       darkTheme: Fframe.of(context)!.darkMode,

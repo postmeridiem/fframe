@@ -2,14 +2,20 @@ import 'dart:developer';
 
 import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
+import 'package:fframe/routers/navigation_route.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/providers/state_providers.dart';
 
+late FNavigationRouteInformationParser routeInformationParser;
 late NavigationNotifier navigationNotifier;
+late FNavigationRouterDelegate routerDelegate;
 
 final navigationProvider = ChangeNotifierProvider<NavigationNotifier>(
   (ref) {
-    return NavigationNotifier(ref: ref);
+    return NavigationNotifier(
+      ref: ref,
+      fFrameUser: null,
+    );
   },
 );
 
@@ -27,6 +33,7 @@ class NavigationNotifier extends ChangeNotifier {
   final Ref ref;
   Uri? _uri;
   List<NextState> nextState = [];
+  FFrameUser? fFrameUser;
 
   TargetState? _targetState;
   QueryState? _queryState;
@@ -40,7 +47,10 @@ class NavigationNotifier extends ChangeNotifier {
   final NavigationConfig navigationConfig = FRouterConfig.instance.navigationConfig;
   late NavigationConfig filteredNavigationConfig = FRouterConfig.instance.navigationConfig;
 
-  NavigationNotifier({required this.ref}) {
+  NavigationNotifier({
+    required this.ref,
+    required this.fFrameUser,
+  }) {
     Console.log(
       "init NavigationNotifier",
       scope: "fframeLog.NavigationNotifier",
@@ -48,6 +58,15 @@ class NavigationNotifier extends ChangeNotifier {
     );
     _filterNavigationRoutes();
     FirebaseAuth.instance.authStateChanges().listen((User? user) => authChangeListener(user));
+    // Uri? deepLink = InitialUri.instance?.getInitialUri();
+    // if (deepLink != null && deepLink.pathSegments.isNotEmpty && deepLink.pathSegments.first != "/") {
+    //   Console.log(
+    //     "Forward to deep link",
+    //     scope: "fframeLog.NavigationNotifier.constructor",
+    //     level: LogLevel.dev,
+    //     color: ConsoleColor.white,
+    //   );
+    // }
   }
 
   int? selectedNavRailIndex;
@@ -62,20 +81,14 @@ class NavigationNotifier extends ChangeNotifier {
     );
     if (user != null) {
       try {
-        FFrameUser fFrameUser = FFrameUser.fromFirebaseUser(firebaseUser: user, idTokenResult: (await user.getIdTokenResult()));
-        Console.log(
-          "User is signed in as ${fFrameUser.uid} ${user.displayName} with roles: ${fFrameUser.roles.join(", ")}",
-          scope: "fframeLog.NavigationNotifier.authChangeListener",
-          level: LogLevel.dev,
-        );
-        signIn(roles: fFrameUser.roles);
+        signIn(roles: fFrameUser!.roles);
       } catch (e) {
         Console.log(
           "ERROR: Unable to interpret claims ${e.toString()}",
           scope: "fframeLog.NavigationNotifier.authChangeListener",
           level: LogLevel.prod,
         );
-        signIn();
+        signIn(roles: fFrameUser!.roles);
       }
     } else {
       signOut();
@@ -92,12 +105,15 @@ class NavigationNotifier extends ChangeNotifier {
     _roles = roles;
     _isSignedIn = true;
     _filterNavigationRoutes();
+
     TargetState? targetState = TargetState.defaultRoute();
     QueryState? queryState = QueryState.defaultroute();
     if (navigationNotifier.nextState.isNotEmpty) {
       navigationNotifier.nextState.removeAt(0);
     }
+
     processRouteInformation(targetState: targetState, queryState: queryState);
+    // routerDelegate.setNewRoutePath(this);
     notifyListeners();
   }
 
@@ -356,6 +372,7 @@ class NavigationNotifier extends ChangeNotifier {
         : _targetState!.navigationTarget.path.isNotEmpty
             ? _targetState!.navigationTarget.path
             : "/";
+
     String queryComponent = (_queryState == null) ? _uri?.query ?? "" : _queryState!.queryString;
     Uri uri = Uri.parse("/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}".replaceAll("//", "/"));
 
@@ -368,6 +385,27 @@ class NavigationNotifier extends ChangeNotifier {
     debugger(when: pathComponent.isEmpty, message: "Path is empty");
 
     return uri;
+  }
+
+  markBuildDone() {
+    _isbuilding = false;
+    _buildPending == true;
+    Console.log(
+      "Mark build done",
+      scope: "fframeLog.NavigationNotifier.markBuildDone buildPending: $_buildPending",
+      level: LogLevel.fframe,
+    );
+    if (_buildPending) {
+      _buildPending = false;
+
+      if (navigationNotifier.nextState.isNotEmpty) {
+        NextState nextState = navigationNotifier.nextState.first;
+        processRouteInformation(targetState: nextState.targetState, queryState: nextState.queryState);
+      }
+
+      updateProviders();
+      notifyListeners();
+    }
   }
 
   Uri restoreRouteInformation() {
@@ -385,7 +423,7 @@ class NavigationNotifier extends ChangeNotifier {
       scope: "fframeLog.NavigationNotifier.uri",
       level: LogLevel.fframe,
     );
-    return _uri;
+    return composeUri();
   }
 
   set uri(Uri? uri) {
@@ -398,7 +436,6 @@ class NavigationNotifier extends ChangeNotifier {
     if (_uri == uri && _buildPending == false) {
       return;
     }
-    debugger(when: uri == _uri);
 
     if (_uri == null) {
       _buildPending = true;

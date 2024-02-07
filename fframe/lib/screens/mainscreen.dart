@@ -307,6 +307,7 @@ class _ProfileButtonState extends State<ProfileButton> {
                           await FirebaseAuth.instance.signOut();
                           overlayEntry.remove();
                         },
+                        // ignore: dead_code
                         icon: isSigningOut ? const CircularProgressIndicator() : Icon(Icons.logout, size: 24.0, color: Theme.of(context).colorScheme.onSecondary),
                         label: Text(
                           L10n.string("header_signout", placeholder: "Sign out...", namespace: "fframe"),

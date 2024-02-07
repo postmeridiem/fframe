@@ -43,8 +43,8 @@ class DocumentScreen<T> extends StatelessWidget {
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final T Function() createNew;
-  final T Function(T)? preSave;
-  final T? Function(T)? preOpen;
+  final T? Function(T)? preSave;
+  final T Function(T)? preOpen;
   final bool autoSelectFirst;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
@@ -413,7 +413,9 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
       //optional presave script
       if (documentConfig.preSave != null) {
-        selectionState.data = documentConfig.preSave!(selectionState.data!);
+        T? newData = documentConfig.preSave!(selectionState.data!);
+        if (newData == null) return; //Cancel save
+        selectionState.data = newData;
       }
       Console.log("Save item $docId in collection ${documentConfig.collection}", scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
 

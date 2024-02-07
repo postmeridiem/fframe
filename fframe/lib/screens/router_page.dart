@@ -470,19 +470,12 @@ class _RouterScreenState extends State<RouterScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => markBuildDone(),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) => navigationNotifier.markBuildDone());
   }
 
   @override
   Widget build(BuildContext context) {
     Console.log("Build RouterScreen", scope: "fframeLog.RouterScreen", level: LogLevel.fframe);
     return FRouterConfig.instance.mainScreen;
-  }
-
-  markBuildDone() {
-    Console.log("Build completed", scope: "fframeLog.RouterScreen", level: LogLevel.fframe);
-    navigationNotifier.isBuilding = false;
   }
 }

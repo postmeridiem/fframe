@@ -40,8 +40,8 @@ class DocumentConfig<T> extends ChangeNotifier {
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
   final T Function() createNew;
-  final T Function(T)? preSave;
-  final T? Function(T)? preOpen;
+  final T? Function(T)? preSave;
+  final T Function(T)? preOpen;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder>? contextCardBuilders;
   final bool embeddedDocument;

@@ -25,10 +25,7 @@ class FRouterInit extends StatefulWidget {
 }
 
 class _FRouterInitState extends State<FRouterInit> {
-  /// The route information parser used by the go router.
-  final FNavigationRouteInformationParser routeInformationParser = FNavigationRouteInformationParser();
 
-  late FNavigationRouterDelegate routerDelegate;
 
   @override
   void initState() {
@@ -47,7 +44,9 @@ class _FRouterInitState extends State<FRouterInit> {
       child: Consumer(
         builder: (context, ref, _) {
           navigationNotifier = ref.read(navigationProvider);
+          navigationNotifier.fFrameUser = Fframe.of(context)?.user;
           routerDelegate = FNavigationRouterDelegate();
+          routeInformationParser = FNavigationRouteInformationParser();
           return widget.routerBuilder(context);
         },
       ),

@@ -1,19 +1,12 @@
-import 'dart:developer';
-
 import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fframe/services/navigation_service.dart';
 
 class FNavigationRouteInformationParser extends RouteInformationParser<NavigationNotifier> {
   @override
   Future<NavigationNotifier> parseRouteInformation(RouteInformation routeInformation) async {
-    Console.log(
-      "parseRouteInformation to ${routeInformation.uri}",
-      scope: "fframeLog.FNavigationRouteInformationParser.parseRouteInformation",
-      level: LogLevel.dev
-    );
+    Console.log("parseRouteInformation to ${routeInformation.uri}", scope: "fframeLog.FNavigationRouteInformationParser.parseRouteInformation", level: LogLevel.dev);
     navigationNotifier.parseRouteInformation(uri: routeInformation.uri);
     return navigationNotifier;
   }
@@ -83,7 +76,6 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
       //   return navigatorState;
       // },
       onUnknownRoute: (settings) {
-        debugger();
         return MaterialPageRoute(
           builder: (context) => FFErrorPage(),
         );
@@ -102,9 +94,10 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
   Future<void> setNewRoutePath(NavigationNotifier navigationNotifier) async {
     Console.log(
       "setNewRoutePath",
-      scope: "fframeLog.FNavigationRouterDelegate.setNewRoutePath",
+      scope: "fframeLog.FNavigationRouterDelegate.setNewRoutePath ${navigationNotifier.uri}",
       level: LogLevel.dev,
     );
+    navigationNotifier.notifyListeners();
     return;
   }
 

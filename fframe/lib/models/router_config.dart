@@ -34,7 +34,7 @@ class FRouterConfig {
             if (navigationTab.parentTarget == null) {
               navigationTab.parentTarget = navigationTarget;
 
-              //Remove leading slash
+              //Remove leading slash, as it is hard added during the string compose
               if (navigationTab.path.startsWith("/")) {
                 navigationTab.path = navigationTab.path.substring(1);
               }

@@ -16,12 +16,17 @@ class TargetState {
   }
 
   factory TargetState.fromUri(NavigationNotifier navigationNotifier, Uri uri) {
+    return _fromUri(navigationNotifier, uri);
+  }
+
+  static TargetState _fromUri(NavigationNotifier navigationNotifier, Uri uri) {
     if (uri.pathSegments.isEmpty && navigationNotifier.currentTarget == null) {
-      //This either routes to a / route or to the default route.
+      //This either routes t or to the default route.
       return TargetState(
         navigationTarget: navigationNotifier.navigationConfig.navigationTargets.firstWhere(
           (NavigationTarget navigationTarget) => navigationTarget.path == "/",
           orElse: () {
+            Console.log("Route to default route", scope: "fframeLog.TargetState.fromUri", level: LogLevel.fframe, color: ConsoleColor.white);
             return TargetState.defaultRoute().navigationTarget;
           },
         ),
@@ -85,6 +90,13 @@ class TargetState {
   }
 
   factory TargetState.defaultRoute() {
+    Uri? uri = InitialUri.instance?.getInitialUri();
+    if (uri != null && uri.pathSegments.isNotEmpty) {
+      return _fromUri(navigationNotifier, uri);
+    }
+    return _defaultRoute();
+  }
+  static TargetState _defaultRoute() {
     if (navigationNotifier.filteredNavigationConfig.navigationTargets.isEmpty && navigationNotifier.navigationConfig.navigationTargets.isNotEmpty) {
       //There are no unauthenticated routes
 
