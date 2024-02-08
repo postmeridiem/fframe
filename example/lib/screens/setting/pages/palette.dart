@@ -398,6 +398,29 @@ class _PaletteFormFormState extends State<PaletteForm> {
                     ),
                   ],
                 ),
+                TableRow(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 12, left: 8),
+                      child: Text(
+                        "colorScheme.errorContainer\ncolorScheme.onErrorContainer",
+                        style: TextStyle(
+                          fontFamily: "OpenSans",
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0, bottom: 16.0),
+                      child: TextFormField(
+                        initialValue: "textytext",
+                        decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          labelText: "Author",
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ],

@@ -39,7 +39,7 @@ final ThemeData appLightTheme = ThemeData(
     onBackground: lightModeConfig.constPrimaryAccentColor,
     error: lightModeConfig.signalColors.constErrorColor,
     onError: const Color(0xff000000),
-    outline: const Color(0xFFFF00C8),
+    outline: lightModeConfig.constOnSecondaryColor,
   ),
   inputDecorationTheme: InputDecorationTheme(
     fillColor: lightModeConfig.constTertiaryColor,
@@ -62,9 +62,15 @@ final ThemeData appLightTheme = ThemeData(
   cardTheme: CardTheme(
     color: lightModeConfig.constSecondaryColor,
   ),
+  navigationRailTheme: NavigationRailThemeData(
+    backgroundColor: lightModeConfig.constSurfaceColor,
+  ),
+  navigationBarTheme: NavigationBarThemeData(
+    backgroundColor: lightModeConfig.constSurfaceColor,
+  ),
   tabBarTheme: TabBarTheme(
     indicatorSize: TabBarIndicatorSize.tab,
-    labelColor: lightModeConfig.constPrimaryAccentColor,
+    // labelColor: lightModeConfig.constPrimaryAccentColor,
     unselectedLabelColor: lightModeConfig.constUnselectedColor,
   ),
   checkboxTheme: CheckboxThemeData(

@@ -42,7 +42,7 @@ final ThemeData appDarkTheme = ThemeData(
     onError: const Color(0xff000000),
     errorContainer: const Color.fromARGB(255, 30, 255, 236),
     onErrorContainer: const Color(0xff000000),
-    outline: const Color(0xFFFF00C8),
+    outline: darkModeConfig.constOnPrimaryColor,
   ),
   inputDecorationTheme: InputDecorationTheme(
     fillColor: darkModeConfig.constTertiaryColor,
