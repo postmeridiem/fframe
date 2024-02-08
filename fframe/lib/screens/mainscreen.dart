@@ -115,9 +115,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 bottom: FRouter.of(context).hasTabs
                     ? TabBar(
                         labelColor:
-                            Theme.of(context).colorScheme.onPrimaryContainer,
+                            Theme.of(context).colorScheme.onSurfaceVariant,
                         unselectedLabelColor:
-                            Theme.of(context).colorScheme.onPrimaryContainer,
+                            Theme.of(context).colorScheme.onSurfaceVariant,
                         controller: _tabController,
                         tabs: FRouter.of(context).tabBar(context),
                       )
