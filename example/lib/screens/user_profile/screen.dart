@@ -1,4 +1,5 @@
 import 'package:fframe/fframe.dart';
+import 'package:fframe/helpers/slug.dart';
 import 'package:flutter/material.dart';
 
 class CurrentUserProfile extends StatefulWidget {
@@ -29,6 +30,20 @@ class _CurrentUserProfileState extends State<CurrentUserProfile> {
                 Expanded(
                   flex: 3,
                   child: Text("${fFrameUser?.timeStamp?.toLocal()}"),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(
+                  flex: 1,
+                  child: Text("timeStamp"),
+                ),
+                Expanded(
+                  flex: 3,
+                  child: Text(getSlug("${fFrameUser?.timeStamp?.toLocal()}")),
                 ),
               ],
             ),
@@ -71,7 +86,8 @@ class _CurrentUserProfileState extends State<CurrentUserProfile> {
                   ),
                 ),
                 onPressed: () {
-                  FRouter.of(context).navigateToRoute(context, route: "settings", id: "99-firestore-tools");
+                  FRouter.of(context).navigateToRoute(context,
+                      route: "settings", id: "99-firestore-tools");
                 },
                 style: OutlinedButton.styleFrom(
                   shape: RoundedRectangleBorder(
