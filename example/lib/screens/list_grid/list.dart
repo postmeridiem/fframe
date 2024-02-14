@@ -53,7 +53,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ),
   ListGridColumn(
     columnSizing: ListGridColumnSizingMode.fixed,
-    columnWidth: 200,
+    columnWidth: 240,
     cellBuilder: (context, suggestion, saveDocument) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -271,7 +271,8 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ),
 ];
 
-Row renderButtons({required BuildContext context, required Suggestion suggestion}) {
+Row renderButtons(
+    {required BuildContext context, required Suggestion suggestion}) {
   return Row(
     children: [
       Tooltip(
