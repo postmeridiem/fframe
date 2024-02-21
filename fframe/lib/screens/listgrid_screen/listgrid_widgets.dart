@@ -208,16 +208,9 @@ class ListGridSearchWidget<T> extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
-            // border: Border(
-            //   bottom: BorderSide(
-            //     color: widgetColor,
-            //     width: cellBorder,
-            //   ),
-            // ),
           ),
           // color: Colors.white,
           child: Padding(
-            // padding: EdgeInsets.only(left: 8.0, right: 8.0),
             padding: const EdgeInsets.all(0),
             child: TextField(
               style: TextStyle(
@@ -231,13 +224,10 @@ class ListGridSearchWidget<T> extends StatelessWidget {
                 ),
                 contentPadding: const EdgeInsets.all(10.0),
                 focusColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                // prefix: Card(
-                //   // color: Colors.amber,
-                //   child: Wrap(
-                //     children: searchChips,
-                //   ),
-                // ),
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               onChanged: (String value) {
                 ListGridController.of(context).searchString = value;
