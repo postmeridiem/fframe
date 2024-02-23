@@ -68,16 +68,19 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
           return AnimatedBuilder(
               animation: ListGridController.of(context).notifier,
               builder: (context, child) {
-                ListGridController listGridController = ListGridController.of(context);
-                DocumentConfig<T> documentConfig = listGridController.documentConfig as DocumentConfig<T>;
-                ListGridNotifier<T> listGridNotifier = listGridController.notifier as ListGridNotifier<T>;
+                ListGridController listGridController =
+                    ListGridController.of(context);
+                DocumentConfig<T> documentConfig =
+                    listGridController.documentConfig as DocumentConfig<T>;
+                ListGridNotifier<T> listGridNotifier =
+                    listGridController.notifier as ListGridNotifier<T>;
 
                 if (documentOpen) {
                   listGridController.actionBar(false);
                 }
                 return FirestoreQueryBuilder<T>(
                   pageSize: listGridController.dataMode.limit,
-                  query: listGridNotifier.sourceQuery,
+                  query: listGridNotifier.currentQuery,
                   builder: (
                     BuildContext context,
                     FirestoreQueryBuilderSnapshot<T> queryBuilderSnapshot,
@@ -97,31 +100,38 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                             listGridController.enableSearchBar
                                 ? ListGridSearchWidget<T>(
                                     listGridController: listGridController,
-                                    documentOpen: listGridController.documentOpen,
+                                    documentOpen:
+                                        listGridController.documentOpen,
                                   )
                                 : const IgnorePointer(),
                             Expanded(
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: listGridController.widgetBackgroundColor,
+                                  color:
+                                      listGridController.widgetBackgroundColor,
                                   border: Border(
                                     left: BorderSide(
                                       width: 1,
-                                      color: listGridController.widgetBackgroundColor,
+                                      color: listGridController
+                                          .widgetBackgroundColor,
                                     ),
                                     top: BorderSide(
                                       width: 1,
-                                      color: listGridController.widgetBackgroundColor,
+                                      color: listGridController
+                                          .widgetBackgroundColor,
                                     ),
                                     right: BorderSide(
                                       width: 1,
-                                      color: listGridController.widgetBackgroundColor,
+                                      color: listGridController
+                                          .widgetBackgroundColor,
                                     ),
                                   ),
                                 ),
                                 child: Padding(
                                   padding: EdgeInsets.only(
-                                    bottom: listGridController.showFooter ? 38.0 : 0.0,
+                                    bottom: listGridController.showFooter
+                                        ? 38.0
+                                        : 0.0,
                                   ),
                                   child: Scrollbar(
                                     controller: _horizontal,
@@ -130,40 +140,65 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                       scrollDirection: Axis.horizontal,
                                       controller: _horizontal,
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.start,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           listGridController.showHeader
                                               ? ListGridHeader<T>(
-                                                  calculatedWidth: listGridController.calculatedWidth,
-                                                  addEndFlex: listGridController.addEndFlex,
-                                                  rowsSelectable: listGridController.listGridConfig.rowsSelectable,
+                                                  calculatedWidth:
+                                                      listGridController
+                                                          .calculatedWidth,
+                                                  addEndFlex: listGridController
+                                                      .addEndFlex,
+                                                  rowsSelectable:
+                                                      listGridController
+                                                          .listGridConfig
+                                                          .rowsSelectable,
                                                 )
                                               : const IgnorePointer(),
                                           Expanded(
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: listGridController.widgetBackgroundColor,
+                                                color: listGridController
+                                                    .widgetBackgroundColor,
                                                 border: Border(
                                                   top: BorderSide(
                                                     width: 1,
-                                                    color: listGridController.widgetColor,
+                                                    color: listGridController
+                                                        .widgetColor,
                                                   ),
                                                 ),
                                               ),
                                               child: Container(
-                                                color: (Fframe.of(context)!.getSystemThemeMode == ThemeMode.dark) ? Colors.black.withOpacity(0.2) : Colors.white.withOpacity(0.2),
+                                                color: (Fframe.of(context)!
+                                                            .getSystemThemeMode ==
+                                                        ThemeMode.dark)
+                                                    ? Colors.black
+                                                        .withOpacity(0.2)
+                                                    : Colors.white
+                                                        .withOpacity(0.2),
                                                 child: SizedBox(
-                                                  width: documentOpen ? 300 : listGridController.calculatedWidth,
-                                                  child: queryBuilderSnapshot.hasError
+                                                  width: documentOpen
+                                                      ? 300
+                                                      : listGridController
+                                                          .calculatedWidth,
+                                                  child: queryBuilderSnapshot
+                                                          .hasError
                                                       ? Card(
                                                           child: Center(
                                                             child: SizedBox(
                                                               width: 500,
-                                                              height: double.infinity,
+                                                              height: double
+                                                                  .infinity,
                                                               child: Padding(
-                                                                padding: const EdgeInsets.all(40.0),
-                                                                child: SelectableText(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                        .all(
+                                                                        40.0),
+                                                                child:
+                                                                    SelectableText(
                                                                   "error ${queryBuilderSnapshot.error}",
                                                                 ),
                                                               ),
@@ -171,8 +206,10 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                                           ),
                                                         )
                                                       : ListGridEndless<T>(
-                                                          queryBuilderSnapshot: queryBuilderSnapshot,
-                                                          listGridController: listGridController,
+                                                          queryBuilderSnapshot:
+                                                              queryBuilderSnapshot,
+                                                          listGridController:
+                                                              listGridController,
                                                         ),
                                                 ),
                                               ),
@@ -192,7 +229,8 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   ListGridFooter<T>(
-                                    viewportWidth: listGridController.viewportWidth,
+                                    viewportWidth:
+                                        listGridController.viewportWidth,
                                     dataMode: listGridController.dataMode.mode,
                                   ),
                                 ],
@@ -236,12 +274,15 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
   }
 
   double calculateWidth(double calculatedMinWidth, double viewportWidth) {
-    double calculatedWidth = calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
+    double calculatedWidth =
+        calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
     return calculatedWidth;
   }
 
   double getViewportWidth(BuildContext context) {
-    double viewportWidth = ((MediaQuery.of(context).size.width > 1000) ? (MediaQuery.of(context).size.width - 100) : (MediaQuery.of(context).size.width + 0));
+    double viewportWidth = ((MediaQuery.of(context).size.width > 1000)
+        ? (MediaQuery.of(context).size.width - 100)
+        : (MediaQuery.of(context).size.width + 0));
     return viewportWidth;
   }
 
@@ -299,11 +340,13 @@ class ListGridEndless<T> extends StatelessWidget {
             queryBuilderSnapshot.fetchMore();
           }
 
-          final DocumentSnapshot<T> documentSnapshot = queryBuilderSnapshot.docs[index];
+          final DocumentSnapshot<T> documentSnapshot =
+              queryBuilderSnapshot.docs[index];
 
           final SelectedDocument<T> selectedDocument = SelectedDocument(
             id: documentSnapshot.id,
-            documentConfig: listGridController.documentConfig as DocumentConfig<T>,
+            documentConfig:
+                listGridController.documentConfig as DocumentConfig<T>,
             data: documentSnapshot.data(),
           );
           // final String documentId = selectedDocument.id;
@@ -312,7 +355,8 @@ class ListGridEndless<T> extends StatelessWidget {
           return Table(
               columnWidths: listGridController.columnWidths,
               // defaultColumnWidth: const FlexColumnWidth(),
-              defaultVerticalAlignment: listGridController.cellVerticalAlignment,
+              defaultVerticalAlignment:
+                  listGridController.cellVerticalAlignment,
               textBaseline: TextBaseline.alphabetic,
               children: [
                 TableRow(
@@ -328,9 +372,11 @@ class ListGridEndless<T> extends StatelessWidget {
                   children: renderRow(
                     context: context,
                     document: selectedDocument,
-                    columnSettings: listGridController.columnSettings as List<ListGridColumn<T>>,
+                    columnSettings: listGridController.columnSettings
+                        as List<ListGridColumn<T>>,
                     addEndFlex: listGridController.addEndFlex,
-                    rowsSelectable: listGridController.listGridConfig.rowsSelectable,
+                    rowsSelectable:
+                        listGridController.listGridConfig.rowsSelectable,
                   ),
                 ),
               ]);
@@ -352,7 +398,8 @@ class ListGridEndless<T> extends StatelessWidget {
     if (listGridController.documentOpen) {
       ListGridColumn<T> columnSetting = columnSettings[0];
       if (columnSetting.cellBuilder != null) {
-        Widget cellWidget = columnSetting.cellBuilder!(context, document.data, () {});
+        Widget cellWidget =
+            columnSetting.cellBuilder!(context, document.data, () {});
         output.add(
           ListGridBuilderCell<T>(
             listGridController: listGridController,
@@ -362,7 +409,8 @@ class ListGridEndless<T> extends StatelessWidget {
           ),
         );
       } else if (columnSetting.valueBuilder != null) {
-        dynamic dynValue = columnSetting.valueBuilder!(context, document.data as T);
+        dynamic dynValue =
+            columnSetting.valueBuilder!(context, document.data as T);
         output.add(
           ListGridDataCell<T>(
             listGridController: listGridController,
@@ -392,7 +440,8 @@ class ListGridEndless<T> extends StatelessWidget {
       for (ListGridColumn<T> columnSetting in columnSettings) {
         if (columnSetting.visible) {
           if (columnSetting.cellBuilder != null) {
-            Widget cellWidget = columnSetting.cellBuilder!(context, document.data, () {});
+            Widget cellWidget =
+                columnSetting.cellBuilder!(context, document.data, () {});
             output.add(
               ListGridBuilderCell<T>(
                 listGridController: listGridController,
@@ -402,7 +451,8 @@ class ListGridEndless<T> extends StatelessWidget {
               ),
             );
           } else if (columnSetting.valueBuilder != null) {
-            dynamic dynValue = columnSetting.valueBuilder!(context, document.data as T);
+            dynamic dynValue =
+                columnSetting.valueBuilder!(context, document.data as T);
             output.add(
               ListGridDataCell<T>(
                 listGridController: listGridController,
