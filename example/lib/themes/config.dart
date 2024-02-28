@@ -21,7 +21,7 @@ class DarkModeThemeConfig {
   // DARK MODE =======
   final brightness = Brightness.dark;
   // color that sets the appbar, navrail, contextwidgets and FAB
-  Color constPrimaryColor = const Color.fromARGB(255, 78, 4, 31);
+  Color constPrimaryColor = const Color.fromARGB(255, 41, 3, 16);
   Color constOnPrimaryColor = const Color.fromARGB(255, 255, 255, 255);
 
   // color that sets 'secondary' level control widgets
@@ -31,7 +31,7 @@ class DarkModeThemeConfig {
 
   // color that sets 'tertiary' level control widgets
   // (the background of fields and the text that goes in there)
-  Color constTertiaryColor = const Color.fromARGB(255, 36, 3, 15);
+  Color constTertiaryColor = const Color.fromARGB(255, 46, 3, 16);
   Color constOnTertiaryColor = const Color.fromARGB(255, 238, 238, 238);
 
   // color that sets the default surface of the app
@@ -81,7 +81,7 @@ class LightModeThemeConfig {
   // color that sets 'tertiary' level control widgets
   // (the background of fields and the text that goes in there)
   Color constTertiaryColor = const Color.fromARGB(255, 255, 255, 255);
-  Color constOnTertiaryColor = const Color.fromARGB(255, 107, 6, 42);
+  Color constOnTertiaryColor = const Color.fromARGB(255, 114, 7, 45);
 
   // color that sets the default surface of the app
   // (window chrome)

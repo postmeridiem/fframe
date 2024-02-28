@@ -75,6 +75,7 @@ class _Tab01State extends State<Tab01> {
                 if (!validator.validString(value)) {
                   return 'Enter a valid value';
                 }
+                widget.suggestion.fieldTab1 = value;
                 return null;
               },
             ),

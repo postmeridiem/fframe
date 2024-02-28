@@ -16,7 +16,6 @@ class ListGridController extends InheritedModel<ListGridController> {
   }) : super(child: child) {
     listGridConfig = documentConfig.listGridConfig!;
     _columnWidths = {};
-    _searchableColumns = [];
     double calculatedMinWidth = 0;
 
     // count  action bar items to see if
@@ -27,7 +26,6 @@ class ListGridController extends InheritedModel<ListGridController> {
     // if so, add an extra blank column at the end with flex
     // to fill the screen
     _addEndFlex = true;
-    _enableSearchBar = false;
     int columnCount = 0;
 
     if (listGridConfig.rowsSelectable) {
@@ -35,11 +33,11 @@ class ListGridController extends InheritedModel<ListGridController> {
       // draw an extra column for the check box
       double selectionColumnWidth = 40;
       calculatedMinWidth += selectionColumnWidth;
-      _columnWidths.addAll({columnCount: FixedColumnWidth(selectionColumnWidth)});
+      _columnWidths
+          .addAll({columnCount: FixedColumnWidth(selectionColumnWidth)});
       columnCount += 1;
     }
 
-    //TODO: Move to notifier
     for (var i = 0; i < (listGridConfig.columnSettings.length); i++) {
       // get the settings for the current column
       ListGridColumn columnSetting = columnSettings[i];
@@ -57,14 +55,10 @@ class ListGridController extends InheritedModel<ListGridController> {
           _addEndFlex = false;
           _columnWidths.addAll({columnCount: const FlexColumnWidth(1)});
         } else {
-          _columnWidths.addAll({columnCount: FixedColumnWidth(columnSetting.columnWidth)});
+          _columnWidths.addAll(
+              {columnCount: FixedColumnWidth(columnSetting.columnWidth)});
         }
         columnCount += 1;
-      }
-      // calculate the list of searchable fields for the search box
-      if (columnSetting.searchable && columnSetting.fieldName != null) {
-        _enableSearchBar = true;
-        _searchableColumns.add(i);
       }
     }
 
@@ -84,9 +78,7 @@ class ListGridController extends InheritedModel<ListGridController> {
   final bool documentOpen;
 
   late Map<int, TableColumnWidth> _columnWidths;
-  late bool _enableSearchBar;
   late bool _enableActionBar;
-  late List<int> _searchableColumns;
   late double _calculatedWidth;
   late double _viewportWidth;
   late bool _addEndFlex;
@@ -186,7 +178,7 @@ class ListGridController extends InheritedModel<ListGridController> {
   }
 
   bool get enableSearchBar {
-    return _enableSearchBar;
+    return notifier._enableSearchBar;
   }
 
   String? get searchString {
@@ -198,7 +190,7 @@ class ListGridController extends InheritedModel<ListGridController> {
   }
 
   List<int> get searchableColumns {
-    return _searchableColumns;
+    return notifier._searchableColumns;
   }
 
   bool get enableActionBar {
@@ -218,12 +210,15 @@ class ListGridController extends InheritedModel<ListGridController> {
   }
 
   double _calculateWidth(double calculatedMinWidth, double viewportWidth) {
-    double calculatedWidth = calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
+    double calculatedWidth =
+        calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
     return calculatedWidth;
   }
 
   double _getViewportWidth({required Size viewportSize}) {
-    double viewportWidth = ((viewportSize.width > 1000) ? (viewportSize).width - 100 : (viewportSize.width + 0));
+    double viewportWidth = ((viewportSize.width > 1000)
+        ? (viewportSize).width - 100
+        : (viewportSize.width + 0));
     return viewportWidth;
   }
 
@@ -272,6 +267,7 @@ class ListGridNotifier<T> extends ChangeNotifier {
     // not empty
     _searchString = '';
     _collectionCount = 0;
+    _initialQuery = initialQuery;
     _currentQuery = initialQuery;
     // initialize the sorting object
     _sortedColumnIndex = null;
@@ -280,24 +276,39 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
     _listGridConfig = documentConfig.listGridConfig;
     _columnSettings = _listGridConfig!.columnSettings;
+    _enableSearchBar = false;
+
+    for (var i = 0; i < (_columnSettings.length); i++) {
+      // get the settings for the current column
+      ListGridColumn columnSetting = _columnSettings[i];
+
+      // calculate the list of searchable fields for the search box
+      if (columnSetting.searchable && columnSetting.fieldName != null) {
+        _enableSearchBar = true;
+        _searchableColumns.add(i);
+      }
+    }
+
     // initialize the current query, based on sorting and settings
     _queryBuilder();
 
     //update the collection count
-    _updateCollectionCount(query: _currentQuery as Query<T>);
+    // _updateCollectionCount(query: _currentQuery as Query<T>);
   }
 
-  set sourceQuery(Query sourceQuery) {
-    _currentQuery = sourceQuery as Query<T>;
+  set currentQuery(Query newQuery) {
+    _currentQuery = newQuery as Query<T>;
   }
 
-  Query<T> get sourceQuery => _currentQuery as Query<T>;
+  Query<T> get currentQuery => _currentQuery as Query<T>;
 
   // final ListGridSearchConfig? searchConfig;
   // late List<ListGridColumn> columnSettings;
   late List<int> _searchableColumns;
+  late bool _enableSearchBar;
   late String? _searchString;
   late int _collectionCount;
+  Query<T>? _initialQuery;
   Query<T>? _currentQuery;
   late ListGridConfig<T>? _listGridConfig;
   late List<ListGridColumn<T>> _columnSettings;
@@ -319,13 +330,18 @@ class ListGridNotifier<T> extends ChangeNotifier {
   }
 
   void _queryBuilder() {
-    Query outputQuery = _currentQuery as Query<T>;
+    Query outputQuery = _initialQuery as Query<T>;
 
     // handle sorting
     if (sortedColumnIndex != null) {
       ListGridColumn sortedColumn = _columnSettings[sortedColumnIndex!];
+      Console.log(
+        "fframeLog.ListGridNotifier: column sorted, search on the ${sortedColumn.fieldName!} column",
+        level: LogLevel.fframe,
+      );
 
-      outputQuery = outputQuery.orderBy(sortedColumn.fieldName!, descending: sortedColumn.descending);
+      outputQuery = outputQuery.orderBy(sortedColumn.fieldName!,
+          descending: sortedColumn.descending);
 
       if (_columnSettings[sortedColumnIndex!].fieldName != null) {
         String fieldName = _columnSettings[sortedColumnIndex!].fieldName!;
@@ -334,41 +350,46 @@ class ListGridNotifier<T> extends ChangeNotifier {
     } else {
       if (_searchableColumns.isNotEmpty) {
         if (searchString != null && searchString!.isNotEmpty) {
+          Console.log(
+              "fframeLog.ListGridNotifier: searching for: $searchString");
           if (_searchableColumns.length > 1) {
             //TODO make multiple columns supported
-            // Console.log(
-            //     "ListGrid: ERROR: Multiple searchable columns not supported at this time. Defaulting to first one");
-            List<Filter> currentFilters = [];
-            for (int searchableColumnIndex in _searchableColumns) {
-              String curSearch = searchString!;
-              ListGridColumn curColumn = _columnSettings[searchableColumnIndex];
-              if (curColumn.fieldName != null) {
-                String fieldName = curColumn.fieldName!;
-                outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
-                if (curColumn.searchMask != null) {
-                  if (curColumn.searchMask!.toLowerCase) {
-                    curSearch = curSearch.toLowerCase();
-                  }
-                  curSearch = curSearch.replaceAll(
-                    curColumn.searchMask!.from,
-                    curColumn.searchMask!.to,
-                  );
-                }
-                currentFilters.add(Filter(fieldName, isEqualTo: curSearch));
-                // outputQuery = outputQuery.startsWith(
-                //   fieldName,
-                //   curSearch,
-                // );
-              }
-              // outputQuery = outputQuery
-              //     .where(Filter.or(currentFilters[0], currentFilters[1]));
-            }
+            Console.log(
+                "fframeLog.ListGridNotifier: ERROR: Multiple searchable columns not supported at this time. Please adjust configuration");
+            // List<Filter> currentFilters = [];
+            // for (int searchableColumnIndex in _searchableColumns) {
+            //   String curSearch = searchString!;
+            //   ListGridColumn curColumn = _columnSettings[searchableColumnIndex];
+            //   if (curColumn.fieldName != null) {
+            //     String fieldName = curColumn.fieldName!;
+            //     outputQuery = outputQuery.orderBy(fieldName,
+            //         descending: curColumn.descending);
+            //     if (curColumn.searchMask != null) {
+            //       if (curColumn.searchMask!.toLowerCase) {
+            //         curSearch = curSearch.toLowerCase();
+            //       }
+            //       curSearch = curSearch.replaceAll(
+            //         curColumn.searchMask!.from,
+            //         curColumn.searchMask!.to,
+            //       );
+            //     }
+            //     currentFilters.add(Filter(fieldName, isEqualTo: curSearch));
+            //     outputQuery = outputQuery.startsWith(
+            //       fieldName,
+            //       curSearch,
+            //     );
+            //   }
+            //   outputQuery = outputQuery
+            //       .where(Filter.or(currentFilters[0], currentFilters[1]));
+            // }
           } else {
             if (_columnSettings[_searchableColumns.first].fieldName != null) {
               String curSearch = searchString!;
-              ListGridColumn curColumn = _columnSettings[_searchableColumns.first];
+              ListGridColumn curColumn =
+                  _columnSettings[_searchableColumns.first];
               String fieldName = curColumn.fieldName!;
-              outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
+              outputQuery = outputQuery.orderBy(fieldName,
+                  descending: curColumn.descending);
               if (curColumn.searchMask == null) {
                 outputQuery = outputQuery.startsWith(fieldName, curSearch);
               } else {
@@ -389,16 +410,27 @@ class ListGridNotifier<T> extends ChangeNotifier {
           // no search string provided, and no column user sorted. make sure to sort the primary search column if available.
 
           if (_columnSettings[_searchableColumns.first].fieldName != null) {
-            ListGridColumn curColumn = _columnSettings[_searchableColumns.first];
+            ListGridColumn curColumn =
+                _columnSettings[_searchableColumns.first];
             String fieldName = curColumn.fieldName!;
-            outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
+            outputQuery = outputQuery.orderBy(fieldName,
+                descending: curColumn.descending);
           }
         }
+      } else {
+        Console.log(
+          "fframeLog.ListGridNotifier: no searchable column specified",
+          level: LogLevel.fframe,
+        );
       }
     }
 
     // apply the newly computedQuery as the current query
     _currentQuery = outputQuery as Query<T>;
+    Console.log(
+      "fframeLog.ListGridNotifier: ${outputQuery.parameters.toString()}",
+      level: LogLevel.fframe,
+    );
 
     // the query has changed; recalculate the result collection count
     _updateCollectionCount(query: _currentQuery as Query<T>);
@@ -409,9 +441,12 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
   void sortColumn({required int columnIndex, bool descending = false}) {
     // get the config for the selected column
-    ListGridColumn selectedColumn = _columnSettings.where((element) => element.columnIndex == columnIndex).first;
+    ListGridColumn selectedColumn = _columnSettings
+        .where((element) => element.columnIndex == columnIndex)
+        .first;
 
-    if (columnIndex == _sortedColumnIndex && descending == selectedColumn.descending) {
+    if (columnIndex == _sortedColumnIndex &&
+        descending == selectedColumn.descending) {
       // this column and sort direction were already selected. user is deselecting sort
       _sortedColumnIndex = null;
     } else {
@@ -456,7 +491,8 @@ class ListGridNotifier<T> extends ChangeNotifier {
   }
 
   void unselectRow({required SelectedDocument<T> unSelectedDocument}) {
-    _selectedDocuments.removeWhere((selectedDocument) => selectedDocument.id == unSelectedDocument.id);
+    _selectedDocuments.removeWhere(
+        (selectedDocument) => selectedDocument.id == unSelectedDocument.id);
     notifyListeners();
   }
 

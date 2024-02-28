@@ -58,6 +58,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
         centerTitle: true,
         elevation: 2,
         automaticallyImplyLeading: false,
+        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+        surfaceTintColor: Theme.of(context).colorScheme.primaryContainer,
         title: Text(Fframe.of(context)?.title ?? ""),
         leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
             ? IconButton(
@@ -104,11 +107,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             child: Scaffold(
               primary: false,
               appBar: AppBar(
+                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 toolbarHeight: 0,
                 bottom: FRouter.of(context).hasTabs
                     ? TabBar(
-                        labelColor: Theme.of(context).colorScheme.onPrimaryContainer,
-                        unselectedLabelColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                        labelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                        unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
                         controller: _tabController,
                         tabs: FRouter.of(context).tabBar(context),
                       )
@@ -224,7 +228,6 @@ class _ProfileButtonState extends State<ProfileButton> {
 
   showUserOverlay() {
     overlayEntry = OverlayEntry(builder: (context) {
-      bool isSigningOut = false;
       return Stack(
         children: <Widget>[
           Positioned.fill(
@@ -301,14 +304,13 @@ class _ProfileButtonState extends State<ProfileButton> {
                       padding: const EdgeInsets.only(left: 8, right: 8, top: 8, bottom: 16),
                       child: TextButton.icon(
                         onPressed: () async {
-                          setState(() {
-                            isSigningOut = true;
-                          });
+                          // setState(() {
+                          //   isSigningOut = true;
+                          // });
                           await FirebaseAuth.instance.signOut();
                           overlayEntry.remove();
                         },
-                        // ignore: dead_code
-                        icon: isSigningOut ? const CircularProgressIndicator() : Icon(Icons.logout, size: 24.0, color: Theme.of(context).colorScheme.onSecondary),
+                        icon: Icon(Icons.logout, size: 24.0, color: Theme.of(context).colorScheme.onSecondary),
                         label: Text(
                           L10n.string("header_signout", placeholder: "Sign out...", namespace: "fframe"),
                           style: TextStyle(color: Theme.of(context).colorScheme.onSecondary),
