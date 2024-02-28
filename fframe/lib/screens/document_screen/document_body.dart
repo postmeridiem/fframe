@@ -26,6 +26,7 @@ class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
     Console.log("build documentBodyLoader ${widget.key.toString()}", scope: "fframeLog.DocumentBodyLoader", level: LogLevel.fframe);
     documentScreenConfig = DocumentScreenConfig.of(context)!;
     documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+    //TODO: (AZ) remap from SelectionState<T> to SelectedDocument<T>
     selectionState = documentScreenConfig.selectionState as SelectionState<T>;
 
     return DocumentBody<T>(
@@ -171,7 +172,6 @@ class DocumentBody<T> extends StatelessWidget {
                                               if (!documentConfig.document.prefetchTabs) {
                                                 preloadCurrentTab = tabController.index == position;
                                               }
-                                              final ScrollController tabScrollController = ScrollController();
                                               return Padding(
                                                 padding: const EdgeInsets.all(8.0),
                                                 child: Container(
@@ -187,21 +187,30 @@ class DocumentBody<T> extends StatelessWidget {
                                                               ? SizedBox(
                                                                   height: double.infinity,
                                                                   width: double.infinity,
-                                                                  child: currentTab.childBuilder(
-                                                                    documentScreenConfig.selectionState.data,
-                                                                    documentScreenConfig.selectionState.readOnly,
+                                                                  child: SizedBox.expand(
+                                                                    child: ClipRect(
+                                                                      child: OverflowBox(
+                                                                        alignment: Alignment.topLeft,
+                                                                        child: currentTab.childBuilder(
+                                                                          documentScreenConfig.selectionState.data,
+                                                                          documentScreenConfig.selectionState.readOnly,
+                                                                        ),
+                                                                      ),
+                                                                    ),
                                                                   ),
                                                                 )
-                                                              : ListView(
-                                                                  // physics:
-                                                                  //     const NeverScrollableScrollPhysics(),
-                                                                  controller: tabScrollController,
-                                                                  children: [
-                                                                    currentTab.childBuilder(
-                                                                      documentScreenConfig.selectionState.data,
-                                                                      documentScreenConfig.selectionState.readOnly,
+                                                              : SizedBox.expand(
+                                                                  child: ClipRect(
+                                                                    child: OverflowBox(
+                                                                      alignment: Alignment.topLeft,
+                                                                      child: SingleChildScrollView(
+                                                                        child: currentTab.childBuilder(
+                                                                          documentScreenConfig.selectionState.data,
+                                                                          documentScreenConfig.selectionState.readOnly,
+                                                                        ),
+                                                                      ),
                                                                     ),
-                                                                  ],
+                                                                  ),
                                                                 )
                                                           : Placeholder(
                                                               child: Center(child: Text("auto: $position")),

@@ -638,10 +638,10 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with Sing
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
 
     //Switches between view types
-    return AnimatedBuilder(
-      animation: documentConfig,
+    return ListenableBuilder(
+      listenable: documentConfig,
       builder: (BuildContext context, Widget? child) {
-        if (documentConfig.currentViewType == ViewType.auto) {}
+        // if (documentConfig.currentViewType == ViewType.auto) {}
 
         switch (documentConfig.currentViewType) {
           case ViewType.none:
@@ -664,29 +664,50 @@ class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with Sing
             );
           case ViewType.grid:
             Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
-            return Stack(
-              children: [
-                FirestoreDataGrid<T>(
-                  dataGridConfig: documentConfig.dataGridConfig!,
-                  query: query,
-                  rowsPerPage: documentConfig.dataGridConfig!.rowsPerPage,
-                  dataRowHeight: documentConfig.dataGridConfig!.rowHeight,
-                  documentConfig: documentConfig,
+            return SizedBox.expand(
+              child: ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.topLeft,
+                  child: Stack(
+                    children: [
+                      FirestoreDataGrid<T>(
+                        dataGridConfig: documentConfig.dataGridConfig!,
+                        query: query,
+                        rowsPerPage: documentConfig.dataGridConfig!.rowsPerPage,
+                        dataRowHeight: documentConfig.dataGridConfig!.rowHeight,
+                        documentConfig: documentConfig,
+                      ),
+                      if (documentConfig.documentList != null) DataGridToggle<T>(),
+                    ],
+                  ),
                 ),
-                if (documentConfig.documentList != null) DataGridToggle<T>(),
-              ],
+              ),
             );
           case ViewType.listgrid:
             Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
-            return FirestoreListGrid<T>(
-              documentConfig: documentConfig,
-              query: query,
+            return SizedBox.expand(
+              child: ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.topLeft,
+                  child: FirestoreListGrid<T>(
+                    documentConfig: documentConfig,
+                    query: query,
+                  ),
+                ),
+              ),
             );
           case ViewType.swimlanes:
             Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
-            return FirestoreSwimlanes<T>(
-              config: documentConfig.swimlanes!,
-              query: query,
+            return SizedBox.expand(
+              child: ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.topLeft,
+                  child: FirestoreSwimlanes<T>(
+                    config: documentConfig.swimlanes!,
+                    query: query,
+                  ),
+                ),
+              ),
             );
           default:
             return Fframe.of(context)?.navigationConfig.errorPage.contentPane ??
@@ -789,17 +810,24 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
               return FFWaitPage();
             case ConnectionState.done:
               selectionState.data = snapshot.data;
-              return AnimatedBuilder(
-                animation: selectionState,
+              return ListenableBuilder(
+                listenable: selectionState,
                 builder: ((context, child) => returnWidget),
               );
           }
         },
       );
     } else {
-      return AnimatedBuilder(
-        animation: selectionState,
-        builder: ((context, child) => returnWidget),
+      return ListenableBuilder(
+        listenable: selectionState,
+        builder: ((context, child) => SizedBox.expand(
+              child: ClipRect(
+                child: OverflowBox(
+                  alignment: Alignment.topLeft,
+                  child: returnWidget,
+                ),
+              ),
+            )),
       );
     }
   }

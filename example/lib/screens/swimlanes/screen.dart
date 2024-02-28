@@ -71,20 +71,17 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
         trackerId: "trackerId",
         swimlaneSettings: swimlanesSettings,
         getStatus: (suggestion) => suggestion.status ?? "",
-        getName: (suggestion) => suggestion.name ?? "?",
-        // getId: (suggestion) => suggestion.id ?? "?",
-        // getLinkedId: (suggestion) => suggestion.linkedDocumentId ?? "",
-        // getLinkedPath: (suggestion) => suggestion.linkedPath ?? "",
-        // getAssignee: (suggestion) => suggestion.assignee ?? "",
+        getTitle: (suggestion) => suggestion.name ?? "?",
         getDescription: (suggestion) => suggestion.description ?? "",
         getPriority: (suggestion) => suggestion.priority,
-        // getFollowers: (suggestion) => suggestion.followers ?? [],
-        // getPriority: (suggestion) => suggestion.priority,
+        myId: (user) => user.uid!,
+        // getAssignee: (suggestion,
         taskWidget: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionCard(
           selectedDocument: selectedDocument,
           swimlanesConfig: swimlanesConfig,
           fFrameUser: fFrameUser,
         ),
+        // getAssignee: (Suggestion ) {  },
       ),
 
       // Center part, shows a firestore doc. Tabs possible
@@ -107,18 +104,15 @@ class SuggestionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Suggestion suggestion = selectedDocument.data as Suggestion;
-    return Card(
-      child: SizedBox(
-        width: double.infinity,
-        height: 150,
-        child: Placeholder(
-          child: Center(
-            child: Column(
-              children: [
-                SelectableText("${selectedDocument.id}"),
-                Text("${suggestion.priority}"),
-              ],
-            ),
+    return SizedBox(
+      height: 150,
+      child: Placeholder(
+        child: Center(
+          child: Column(
+            children: [
+              SelectableText("${selectedDocument.id}"),
+              Text("${suggestion.priority}"),
+            ],
           ),
         ),
       ),

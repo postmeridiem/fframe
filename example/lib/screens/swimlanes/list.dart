@@ -21,7 +21,7 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
       return true;
     },
     canChangeSwimLane: (SelectedDocument<Suggestion> selectedDocument, roles, sourceSwimmingLane, sourcePriority, targetPriority) {
-      return true;
+      return false;
     },
   ),
   SwimlaneSetting(

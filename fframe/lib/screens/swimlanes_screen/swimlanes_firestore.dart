@@ -56,16 +56,16 @@ class FirestoreSwimlanesState<T> extends ConsumerState<FirestoreSwimlanes<T>> {
       theme: Theme.of(context),
       child: Builder(
         builder: (BuildContext context) {
-          return AnimatedBuilder(
-              animation: SwimlanesController.of(context).notifier,
-              builder: (context, child) {
-                SwimlanesController swimlanesController = SwimlanesController.of(context);
-                return SwimlaneBuilder<T>(
-                  swimlanesController: swimlanesController,
-                  documentConfig: DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>,
-                  swimlanesConfig: swimlanesController.swimlanesConfig as SwimlanesConfig<T>,
-                );
-              });
+          // return AnimatedBuilder(
+          //     animation: SwimlanesController.of(context).notifier,
+          //     builder: (context, child) {
+          SwimlanesController swimlanesController = SwimlanesController.of(context);
+          return SwimlaneBuilder<T>(
+            swimlanesController: swimlanesController,
+            documentConfig: DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>,
+            swimlanesConfig: swimlanesController.swimlanesConfig as SwimlanesConfig<T>,
+          );
+          // });
         },
       ),
     );

@@ -23,7 +23,7 @@ class _SwimlaneHeadersState<T> extends State<SwimlaneHeaders<T>> {
   @override
   Widget build(BuildContext context) {
     SwimlanesController swimlanesController = widget.swimlanesController;
-    SwimlanesConfig<T> swimlanesConfig = widget.swimlanesController.swimlanesConfig as SwimlanesConfig<T>;
+    // SwimlanesConfig<T> swimlanesConfig = widget.swimlanesController.swimlanesConfig as SwimlanesConfig<T>;
     List<SwimlaneSetting<T>> swimlaneSettings = widget.swimlanesController.swimlaneSettings as List<SwimlaneSetting<T>>;
 
     double filterOpacity = 0.2;
@@ -52,47 +52,54 @@ class _SwimlaneHeadersState<T> extends State<SwimlaneHeaders<T>> {
                 children: swimlaneSettings
                     .map((SwimlaneSetting<T> swimlaneSetting) => SwimlaneHeader<T>(
                           swimlanesController: swimlanesController,
-                          swimlanesConfig: swimlanesConfig,
+                          swimlanesConfig: widget.swimlanesConfig,
                           swimlaneSetting: swimlaneSetting,
                         ))
                     .toList(),
               ),
             ),
           ),
-          Positioned(
-            child: Opacity(
-              opacity: filterOpacity,
-              // opacity: 1,
-              child: MouseRegion(
-                cursor: MaterialStateMouseCursor.clickable,
-                onEnter: (PointerEvent details) {
-                  setState(() {
-                    filterMenuOpen = true;
-                    filterMenuHover = true;
-                  });
-                },
-                onExit: (PointerEvent details) {
-                  setState(() {
-                    if (filterMenuOpen) {
-                      filterMenuOpen = false;
-                    }
-                    filterMenuHover = false;
-                  });
-                },
-                child: Card(
-                  color: swimlanesController.swimlanesConfig.taskCardColor,
-                  child: Row(
-                    children: [
-                      SwimlaneHeaderFilterButton(
-                        swimlanesController: swimlanesController,
+          widget.swimlanesConfig.myId == null
+              ? const IgnorePointer()
+              : Positioned(
+                  child: Opacity(
+                    opacity: filterOpacity,
+                    // opacity: 1,
+                    child: MouseRegion(
+                      cursor: MaterialStateMouseCursor.clickable,
+                      onEnter: (PointerEvent details) {
+                        setState(() {
+                          filterMenuOpen = true;
+                          filterMenuHover = true;
+                        });
+                      },
+                      onExit: (PointerEvent details) {
+                        setState(() {
+                          if (filterMenuOpen) {
+                            filterMenuOpen = false;
+                          }
+                          filterMenuHover = false;
+                        });
+                      },
+                      child: Card(
+                        color: widget.swimlanesConfig.taskCardColor,
+                        child: Row(
+                          children: [
+                            SwimlaneHeaderFilterButton(
+                              swimlanesController: swimlanesController,
+                            ),
+                            filterMenuOpen
+                                ? SwimlanesFilterBar(
+                                    swimlanesController: swimlanesController,
+                                    swimlanesConfig: widget.swimlanesConfig,
+                                  )
+                                : const IgnorePointer(),
+                          ],
+                        ),
                       ),
-                      filterMenuOpen ? SwimlanesFilterBar(swimlanesController: swimlanesController) : const IgnorePointer(),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -126,232 +133,249 @@ class SwimlanesFilterBar<T> extends StatelessWidget {
   const SwimlanesFilterBar({
     super.key,
     required this.swimlanesController,
+    required this.swimlanesConfig,
   });
 
   final SwimlanesController swimlanesController;
+  final SwimlanesConfig<T> swimlanesConfig;
 
   @override
   Widget build(BuildContext context) {
-    SwimlanesFilterType curFilter = swimlanesController.notifier.filter;
-    Color inactive = swimlanesController.taskCardTextColor;
-    Color active = Theme.of(context).colorScheme.onBackground;
+    final Color inactive = swimlanesController.taskCardTextColor;
+    final Color active = Theme.of(context).colorScheme.onBackground;
 
-    return Padding(
-      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-      child: SizedBox(
-        height: 200,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      toggleFilter(SwimlanesFilterType.assignedToMe);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      side: BorderSide(
-                        width: 2,
-                        color: (curFilter == SwimlanesFilterType.assignedToMe) ? active : Theme.of(context).disabledColor,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 4, bottom: 4),
-                      child: Icon(
-                        Icons.person_outline,
-                        size: 16,
-                        color: (curFilter == SwimlanesFilterType.assignedToMe) ? active : inactive,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      "assigned to me",
-                      style: TextStyle(
-                        fontSize: 11,
-                        color: swimlanesController.taskCardTextColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+    return ListenableBuilder(
+      listenable: swimlanesController.notifier,
+      builder: (BuildContext context, Widget? child) {
+        SwimlanesFilterType currentFilter = swimlanesController.notifier.filter;
+        return Padding(
+          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+          child: SizedBox(
+            height: 200,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                swimlanesConfig.getAssignee != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () {
+                                toggleFilter(SwimlanesFilterType.assignedToMe);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(28),
+                                ),
+                                side: BorderSide(
+                                  width: 2,
+                                  color: (currentFilter == SwimlanesFilterType.assignedToMe) ? active : Theme.of(context).disabledColor,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 4, bottom: 4),
+                                child: Icon(
+                                  Icons.person_outline,
+                                  size: 16,
+                                  color: (currentFilter == SwimlanesFilterType.assignedToMe) ? active : inactive,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                "assigned to me",
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: swimlanesController.taskCardTextColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const IgnorePointer(),
+                swimlanesConfig.watching != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () {
+                                toggleFilter(SwimlanesFilterType.followedTasks);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(28),
+                                ),
+                                side: BorderSide(
+                                  width: 2,
+                                  color: (currentFilter == SwimlanesFilterType.followedTasks) ? active : Theme.of(context).disabledColor,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 4, bottom: 4),
+                                child: Icon(
+                                  Icons.visibility_outlined,
+                                  size: 16,
+                                  color: (currentFilter == SwimlanesFilterType.followedTasks) ? active : inactive,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                "following",
+                                style: TextStyle(
+                                  color: swimlanesController.taskCardTextColor,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const IgnorePointer(),
+                swimlanesConfig.getPriority != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () {
+                                toggleFilter(SwimlanesFilterType.prioHigh);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(28),
+                                ),
+                                side: BorderSide(
+                                  width: 2,
+                                  color: (currentFilter == SwimlanesFilterType.prioHigh) ? active : Theme.of(context).disabledColor,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 4, bottom: 4),
+                                child: Icon(
+                                  Icons.priority_high_outlined,
+                                  size: 16,
+                                  color: (currentFilter == SwimlanesFilterType.prioHigh) ? active : inactive,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                "high (1-3)",
+                                style: TextStyle(
+                                  color: swimlanesController.taskCardTextColor,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const IgnorePointer(),
+                swimlanesConfig.getPriority != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () {
+                                toggleFilter(SwimlanesFilterType.prioNormal);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(28),
+                                ),
+                                side: BorderSide(
+                                  width: 2,
+                                  color: (currentFilter == SwimlanesFilterType.prioNormal) ? active : Theme.of(context).disabledColor,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 4, bottom: 4),
+                                child: Icon(
+                                  Icons.task_outlined,
+                                  size: 16,
+                                  color: (currentFilter == SwimlanesFilterType.prioNormal) ? active : inactive,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                "normal (4-6)",
+                                style: TextStyle(
+                                  color: swimlanesController.taskCardTextColor,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const IgnorePointer(),
+                swimlanesConfig.getPriority != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () {
+                                toggleFilter(SwimlanesFilterType.prioLow);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(28),
+                                ),
+                                side: BorderSide(
+                                  width: 2,
+                                  color: (currentFilter == SwimlanesFilterType.prioLow) ? active : Theme.of(context).disabledColor,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 4, bottom: 4),
+                                child: Icon(
+                                  Icons.low_priority_outlined,
+                                  size: 16,
+                                  color: (currentFilter == SwimlanesFilterType.prioLow) ? active : inactive,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                "low (7-9)",
+                                style: TextStyle(
+                                  color: swimlanesController.taskCardTextColor,
+                                  fontSize: 11,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : const IgnorePointer(),
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      toggleFilter(SwimlanesFilterType.followedTasks);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      side: BorderSide(
-                        width: 2,
-                        color: (curFilter == SwimlanesFilterType.followedTasks) ? active : Theme.of(context).disabledColor,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 4, bottom: 4),
-                      child: Icon(
-                        Icons.visibility_outlined,
-                        size: 16,
-                        color: (curFilter == SwimlanesFilterType.followedTasks) ? active : inactive,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      "following",
-                      style: TextStyle(
-                        color: swimlanesController.taskCardTextColor,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      toggleFilter(SwimlanesFilterType.prioHigh);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      side: BorderSide(
-                        width: 2,
-                        color: (curFilter == SwimlanesFilterType.prioHigh) ? active : Theme.of(context).disabledColor,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 4, bottom: 4),
-                      child: Icon(
-                        Icons.priority_high_outlined,
-                        size: 16,
-                        color: (curFilter == SwimlanesFilterType.prioHigh) ? active : inactive,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      "high (1-3)",
-                      style: TextStyle(
-                        color: swimlanesController.taskCardTextColor,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      toggleFilter(SwimlanesFilterType.prioNormal);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      side: BorderSide(
-                        width: 2,
-                        color: (curFilter == SwimlanesFilterType.prioNormal) ? active : Theme.of(context).disabledColor,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 4, bottom: 4),
-                      child: Icon(
-                        Icons.task_outlined,
-                        size: 16,
-                        color: (curFilter == SwimlanesFilterType.prioNormal) ? active : inactive,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      "normal (4-6)",
-                      style: TextStyle(
-                        color: swimlanesController.taskCardTextColor,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(right: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  OutlinedButton(
-                    onPressed: () {
-                      toggleFilter(SwimlanesFilterType.prioLow);
-                    },
-                    style: OutlinedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
-                      side: BorderSide(
-                        width: 2,
-                        color: (curFilter == SwimlanesFilterType.prioLow) ? active : Theme.of(context).disabledColor,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 4, bottom: 4),
-                      child: Icon(
-                        Icons.low_priority_outlined,
-                        size: 16,
-                        color: (curFilter == SwimlanesFilterType.prioLow) ? active : inactive,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4.0),
-                    child: Text(
-                      "low (7-9)",
-                      style: TextStyle(
-                        color: swimlanesController.taskCardTextColor,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -508,22 +532,23 @@ class Swimlanes<T> extends StatelessWidget {
     final List<SwimlaneSetting<T>> swimlaneSettings = swimlanesController.swimlaneSettings as List<SwimlaneSetting<T>>;
     final FFrameUser fFrameUser = Fframe.of(context)!.user!;
     return Container(
-        color: swimlanesController.swimlaneBackgroundColor,
-        child: Row(
-          children: swimlaneSettings
-              .map((swimlaneSetting) => Swimlane<T>(
-                    swimlanesController: swimlanesController,
-                    swimlanesConfig: swimlanesConfig,
-                    swimlaneSetting: swimlaneSetting,
-                    documentConfig: documentConfig,
-                    fFrameUser: fFrameUser,
-                  ))
-              .toList(),
-        ));
+      color: swimlanesController.swimlaneBackgroundColor,
+      child: Row(
+        children: swimlaneSettings
+            .map((swimlaneSetting) => Swimlane<T>(
+                  swimlanesController: swimlanesController,
+                  swimlanesConfig: swimlanesConfig,
+                  swimlaneSetting: swimlaneSetting,
+                  documentConfig: documentConfig,
+                  fFrameUser: fFrameUser,
+                ))
+            .toList(),
+      ),
+    );
   }
 }
 
-class Swimlane<T> extends StatelessWidget {
+class Swimlane<T> extends StatefulWidget {
   const Swimlane({
     super.key,
     required this.swimlanesController,
@@ -539,32 +564,42 @@ class Swimlane<T> extends StatelessWidget {
   final SwimlaneSetting<T> swimlaneSetting;
   final FFrameUser fFrameUser;
 
-  void getTaskCardHeight(GlobalKey taskKey) {
-    final RenderBox renderBox = taskKey.currentContext?.findRenderObject() as RenderBox;
-    final size = renderBox.size;
-    print(" ${size.height}");
+  @override
+  State<Swimlane<T>> createState() => _SwimlaneState<T>();
+}
+
+class _SwimlaneState<T> extends State<Swimlane<T>> {
+  double dropTargetHeight = 200.0;
+
+  double _getTaskCardHeight(GlobalKey dragKey) {
+    if (dragKey.currentContext != null) {
+      final RenderBox renderBox = dragKey.currentContext!.findRenderObject() as RenderBox;
+      dropTargetHeight = renderBox.size.height;
+    }
+
+    return 10.0;
   }
 
   @override
   Widget build(BuildContext context) {
-    final SwimlanesConfig<T> swimlanesConfig = swimlanesController.swimlanesConfig as SwimlanesConfig<T>;
+    final SwimlanesConfig<T> swimlanesConfig = widget.swimlanesController.swimlanesConfig as SwimlanesConfig<T>;
 
     //Fetch the initial query
     Query<T> query = DatabaseService<T>().query(
-      collection: documentConfig.collection,
-      fromFirestore: documentConfig.fromFirestore,
-      queryBuilder: documentConfig.query,
+      collection: widget.documentConfig.collection,
+      fromFirestore: widget.documentConfig.fromFirestore,
+      queryBuilder: widget.documentConfig.query,
     );
 
     //Append the lane query
-    if (swimlaneSetting.query != null) {
-      query = swimlaneSetting.query!(query)!;
+    if (widget.swimlaneSetting.query != null) {
+      query = widget.swimlaneSetting.query!(query)!;
     }
 
     query = query.orderBy("priority");
 
     return SizedBox(
-      height: (swimlanesController.viewportSize.height - (105 + swimlanesController.headerHeight)),
+      height: (widget.swimlanesController.viewportSize.height - (105 + widget.swimlanesController.headerHeight)),
       width: swimlanesConfig.swimlaneWidth,
       child: StreamBuilder<QuerySnapshot<T>>(
         stream: query.snapshots(),
@@ -582,103 +617,141 @@ class Swimlane<T> extends StatelessWidget {
                   (QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
                     data: queryDocument.data(),
                     documentReference: queryDocument.reference,
-                    fromFirestore: documentConfig.fromFirestore,
-                    toFirestore: documentConfig.toFirestore,
+                    fromFirestore: widget.documentConfig.fromFirestore,
+                    toFirestore: widget.documentConfig.toFirestore,
                   ),
                 )
                 .map((FirestoreDocument<T> firestoreDocument) => SelectedDocument(
-                      documentConfig: documentConfig,
+                      documentConfig: widget.documentConfig,
                       id: firestoreDocument.documentReference.id,
                       data: firestoreDocument.data,
                       documentReference: firestoreDocument.documentReference,
                     ))
                 .toList();
 
-            return Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  right: BorderSide(
-                    width: 2,
-                    color: swimlanesController.swimlaneSeparatorColor,
-                  ),
-                ),
-              ),
-              child: (selectedDocuments.isEmpty)
-                  ? SwimlaneDropZone(
-                      swimlanesController: swimlanesController,
-                      swimlanesConfig: swimlanesConfig,
-                      fFrameUser: fFrameUser,
-                      width: swimlanesConfig.swimlaneWidth,
-                      swimlaneSetting: swimlaneSetting,
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: selectedDocuments.length * 2, // Double the count for drop zones and add 1 for the final drop zone
-                      itemBuilder: (context, index) {
-                        // Calculate index in the original documents list
-                        int docIndex = index ~/ 2;
-                        final selectedDocument = selectedDocuments[docIndex];
+            // widget.swimlanesController.notifier.filter
 
-                        if (index.isEven) {
-                          final DragContext<T> dragContext = DragContext<T>(
-                            sourceColumn: swimlaneSetting,
-                            selectedDocument: selectedDocument,
-                            dragKey: GlobalKey(),
-                            buildContext: context,
-                          );
+            return ListenableBuilder(
+              listenable: widget.swimlanesController.notifier,
+              builder: (BuildContext context, Widget? child) {
+                SwimlanesFilterType filterType = widget.swimlanesController.notifier.filter;
 
-                          return GestureDetector(
-                            onTapDown: (_) => getTaskCardHeight(dragContext.dragKey),
-                            child: Draggable<DragContext<T>>(
-                              data: dragContext,
-                              feedback: SwimlanesTaskCard<T>(
-                                selectedDocument: selectedDocument,
-                                swimlanesController: swimlanesController,
-                                swimlanesConfig: swimlanesConfig,
-                                fFrameUser: fFrameUser,
-                                width: swimlanesConfig.swimlaneWidth,
-                                feedback: true,
-                              ),
-                              childWhenDragging: SwimlanesTaskCard<T>(
-                                selectedDocument: selectedDocument,
-                                swimlanesController: swimlanesController,
-                                swimlanesConfig: swimlanesConfig,
-                                fFrameUser: fFrameUser,
-                                width: swimlanesConfig.swimlaneWidth,
-                                childWhenDragging: true,
-                              ),
-                              child: SwimlanesTaskCard<T>(
-                                key: dragContext.dragKey,
-                                selectedDocument: selectedDocument,
-                                swimlanesController: swimlanesController,
-                                swimlanesConfig: swimlanesConfig,
-                                fFrameUser: fFrameUser,
-                                width: swimlanesConfig.swimlaneWidth,
-                              ),
-                            ),
-                          );
-                        } else {
-                          // Calculate priority for drop zone
-                          double dropZonePriority;
-                          if (docIndex < selectedDocuments.length - 1) {
-                            dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
-                          } else {
-                            double lastPriority = swimlanesConfig.getPriority(selectedDocuments[docIndex].data as T);
-                            dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
-                          }
+                Console.log("Swimlane rebuild ${filterType.toString()} ");
 
-                          // Add a drop zone between items
-                          return SwimlaneDropZone(
-                            swimlanesController: swimlanesController,
-                            swimlanesConfig: swimlanesConfig,
-                            fFrameUser: fFrameUser,
-                            width: swimlanesConfig.swimlaneWidth,
-                            swimlaneSetting: swimlaneSetting,
-                            priority: dropZonePriority,
-                          );
-                        }
-                      },
+                switch (filterType) {
+                  case SwimlanesFilterType.unfiltered:
+                    break;
+                  case SwimlanesFilterType.assignedToMe:
+                    break;
+                  case SwimlanesFilterType.prioHigh:
+                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data as T) < 4);
+                    break;
+                  case SwimlanesFilterType.prioLow:
+                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data as T) >= 4 && swimlanesConfig.getPriority!(selectedDocument.data as T) < 7);
+                    break;
+                  case SwimlanesFilterType.prioNormal:
+                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data as T) >= 7);
+                    break;
+                  default:
+                    break;
+                }
+
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        width: 2,
+                        color: widget.swimlanesController.swimlaneSeparatorColor,
+                      ),
                     ),
+                  ),
+                  child: (selectedDocuments.isEmpty)
+                      ? SwimlaneDropZone(
+                          swimlanesController: widget.swimlanesController,
+                          swimlanesConfig: swimlanesConfig,
+                          fFrameUser: widget.fFrameUser,
+                          width: swimlanesConfig.swimlaneWidth,
+                          swimlaneSetting: widget.swimlaneSetting,
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: selectedDocuments.length * 2, // Double the count for drop zones and add 1 for the final drop zone
+                          itemBuilder: (context, index) {
+                            // Calculate index in the original documents list
+                            int docIndex = index ~/ 2;
+                            final selectedDocument = selectedDocuments[docIndex];
+
+                            GlobalKey dragKey = GlobalKey();
+                            if (index.isEven) {
+                              final DragContext<T> dragContext = DragContext<T>(
+                                sourceColumn: widget.swimlaneSetting,
+                                selectedDocument: selectedDocument,
+                                dragKey: dragKey,
+                                buildContext: context,
+                              );
+
+                              return GestureDetector(
+                                onTapDown: (_) => _getTaskCardHeight(dragContext.dragKey),
+                                child: Draggable<DragContext<T>>(
+                                  data: dragContext,
+                                  feedback: SwimlanesTaskCard<T>(
+                                    selectedDocument: selectedDocument,
+                                    swimlanesController: widget.swimlanesController,
+                                    swimlanesConfig: swimlanesConfig,
+                                    fFrameUser: widget.fFrameUser,
+                                    color: widget.swimlanesController.taskCardColor,
+                                    width: swimlanesConfig.swimlaneWidth,
+                                    feedback: true,
+                                  ),
+                                  childWhenDragging: SwimlanesTaskCard<T>(
+                                    selectedDocument: selectedDocument,
+                                    swimlanesController: widget.swimlanesController,
+                                    swimlanesConfig: swimlanesConfig,
+                                    fFrameUser: widget.fFrameUser,
+                                    color: widget.swimlanesController.taskCardColor,
+                                    width: swimlanesConfig.swimlaneWidth,
+                                    childWhenDragging: true,
+                                  ),
+                                  child: Builder(builder: (context) {
+                                    return SwimlanesTaskCard<T>(
+                                      key: dragContext.dragKey,
+                                      selectedDocument: selectedDocument,
+                                      swimlanesController: widget.swimlanesController,
+                                      swimlanesConfig: swimlanesConfig,
+                                      color: widget.swimlanesController.taskCardColor,
+                                      fFrameUser: widget.fFrameUser,
+                                      width: swimlanesConfig.swimlaneWidth,
+                                    );
+                                  }),
+                                ),
+                              );
+                            } else {
+                              // Calculate priority for drop zone
+                              double? dropZonePriority;
+                              if (swimlanesConfig.getPriority != null) {
+                                if (docIndex < selectedDocuments.length - 1) {
+                                  dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
+                                } else {
+                                  double lastPriority = swimlanesConfig.getPriority!(selectedDocuments[docIndex].data as T);
+                                  dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
+                                }
+                              }
+
+                              // Add a drop zone between items
+                              return SwimlaneDropZone(
+                                swimlanesController: widget.swimlanesController,
+                                swimlanesConfig: swimlanesConfig,
+                                fFrameUser: widget.fFrameUser,
+                                height: dropTargetHeight,
+                                width: swimlanesConfig.swimlaneWidth,
+                                swimlaneSetting: widget.swimlaneSetting,
+                                priority: dropZonePriority,
+                              );
+                            }
+                          },
+                        ),
+                );
+              },
             );
           }
         },
@@ -686,14 +759,16 @@ class Swimlane<T> extends StatelessWidget {
     );
   }
 
-  double calculateDropTargetPriority(List<SelectedDocument<T>> items, int index) {
+  double? calculateDropTargetPriority(List<SelectedDocument<T>> items, int index) {
+    if (widget.swimlanesConfig.getPriority == null) return null;
+
     // Handle case when it's the last item in the list
     if (index == items.length - 1) {
-      return swimlanesConfig.getPriority(items[index].data as T) + (1 - (swimlanesConfig.getPriority(items[index].data as T) % 1)) / 2;
+      return widget.swimlanesConfig.getPriority!(items[index].data as T) + (1 - (widget.swimlanesConfig.getPriority!(items[index].data as T) % 1)) / 2;
     }
 
-    double currentPriority = swimlanesConfig.getPriority(items[index].data as T);
-    double nextPriority = swimlanesConfig.getPriority(items[index + 1].data as T);
+    double currentPriority = widget.swimlanesConfig.getPriority!(items[index].data as T);
+    double nextPriority = widget.swimlanesConfig.getPriority!(items[index + 1].data as T);
     int decimals = max(currentPriority.toString().split('.').first.length, nextPriority.toString().split('.').first.length) + 1;
 
     // Check if it's the last item of the integer part
@@ -713,6 +788,7 @@ class SwimlaneDropZone<T> extends StatefulWidget {
     required this.swimlanesConfig,
     required this.fFrameUser,
     required this.width,
+    this.height = 48.0,
     required this.swimlaneSetting,
     this.priority,
   });
@@ -722,6 +798,7 @@ class SwimlaneDropZone<T> extends StatefulWidget {
   final double? priority;
   final FFrameUser fFrameUser;
   final double width;
+  final double height;
   @override
   State<SwimlaneDropZone<T>> createState() => _SwimlaneDropZoneState<T>();
 }
@@ -739,78 +816,74 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
         if (accepted.isNotEmpty) {
           _dragContext = accepted.first;
         }
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-          child: Container(
-            height: (accepted.isNotEmpty)
-                ? 48
-                : (rejected.isNotEmpty)
-                    ? 32.0
-                    : 8.0,
-            width: widget.width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5.0),
-              border: Border.all(
-                width: 2.0,
-                color: (accepted.isNotEmpty)
-                    ? Colors.green
-                    : (rejected.isNotEmpty)
-                        ? Colors.red
-                        : Colors.transparent,
-              ),
-            ),
-            child: (accepted.isNotEmpty || rejected.isNotEmpty)
-                ? Center(
-                    child: SwimlanesTaskCard<T>(
+
+        return Container(
+          height: (accepted.isNotEmpty)
+              ? widget.height
+              : (rejected.isNotEmpty)
+                  ? widget.height
+                  : 8.0,
+          width: widget.width,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5.0),
+          ),
+          child: (accepted.isNotEmpty || rejected.isNotEmpty)
+              ? Center(
+                  child: SwimlanesTaskCard<T>(
                     selectedDocument: _dragContext!.selectedDocument,
                     swimlanesController: widget.swimlanesController,
                     swimlanesConfig: widget.swimlanesConfig,
+                    color: (accepted.isNotEmpty)
+                        ? Colors.green.shade800
+                        : (rejected.isNotEmpty)
+                            ? Colors.red.shade800
+                            : widget.swimlanesController.taskCardColor,
                     fFrameUser: widget.fFrameUser,
                     width: widget.width,
                     // feedback: true,
-                  ))
-                : null,
-          ),
+                  ),
+                )
+              : null,
         );
       },
-      onAccept: ((dragContext) {
+      onAcceptWithDetails: ((dragContext) {
         setState(() {
           _dragContext = null;
         });
-        T newData = dragContext.selectedDocument.data as T;
-        if (widget.swimlaneSetting.id == dragContext.sourceColumn.id) {
+        T newData = dragContext.data.selectedDocument.data as T;
+        if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id) {
           newData = widget.swimlaneSetting.onPriorityChange(newData, widget.priority);
         } else {
           newData = widget.swimlaneSetting.onLaneDrop(newData, widget.priority);
         }
-        dragContext.selectedDocument.update(newData: newData);
+        dragContext.data.selectedDocument.update(newData: newData);
       }),
       onLeave: ((DragContext<T>? dragContext) {
         setState(() {
           _dragContext = null;
         });
       }),
-      onWillAccept: ((DragContext<T>? dragContext) {
+      onWillAcceptWithDetails: ((DragTargetDetails<DragContext<T>>? dragContext) {
         //Track the state
         setState(() {
-          _dragContext = dragContext;
+          _dragContext = dragContext!.data;
         });
 
-        if (widget.swimlaneSetting.id == dragContext!.sourceColumn.id) {
+        if (widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id && widget.swimlanesConfig.getPriority != null) {
           return widget.swimlaneSetting.canChangePriority(
-            dragContext.selectedDocument,
+            dragContext.data.selectedDocument,
             widget.fFrameUser.roles,
-            dragContext.sourceColumn.id,
-            widget.swimlanesConfig.getPriority(dragContext.selectedDocument.data as T).floor(),
+            dragContext.data.sourceColumn.id,
+            widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data as T).floor(),
             widget.priority!.floor(),
           );
         } else {
           return widget.swimlaneSetting.canChangeSwimLane(
-            dragContext.selectedDocument,
+            dragContext.data.selectedDocument,
             widget.fFrameUser.roles,
-            dragContext.sourceColumn.id,
-            widget.swimlanesConfig.getPriority(dragContext.selectedDocument.data as T).floor(),
-            widget.priority!.floor(),
+            dragContext.data.sourceColumn.id,
+            (widget.swimlanesConfig.getPriority != null) ? widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data as T).floor() : null,
+            (widget.swimlanesConfig.getPriority != null) ? widget.priority!.floor() : null,
           );
         }
       }),
@@ -826,6 +899,7 @@ class SwimlanesTaskCard<T> extends StatefulWidget {
     required this.selectedDocument,
     required this.fFrameUser,
     required this.width,
+    required this.color,
     this.feedback = false,
     this.childWhenDragging = false,
   });
@@ -837,6 +911,7 @@ class SwimlanesTaskCard<T> extends StatefulWidget {
   final bool feedback;
   final bool childWhenDragging;
   final double width;
+  final Color color;
 
   @override
   State<SwimlanesTaskCard<T>> createState() => _SwimlanesTaskCardState<T>();
@@ -851,7 +926,11 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
     return Transform.scale(
       scale: widget.feedback ? 0.3 : 1.0,
       child: Opacity(
-        opacity: widget.feedback ? .6 : 1,
+        opacity: widget.childWhenDragging
+            ? 0.2
+            : widget.feedback
+                ? .6
+                : 1,
         child: SizedBox(
           width: widget.width,
           child: Padding(
@@ -859,13 +938,13 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
             child: GestureDetector(
               onTap: () => {selectedDocument.open(context: context)},
               child: Card(
-                color: swimlanesConfig.taskCardColor,
+                color: widget.color,
                 elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 0, 4, 0),
+                  padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
                   child: swimlanesConfig.taskWidget(
                     selectedDocument,
                     swimlanesConfig,
