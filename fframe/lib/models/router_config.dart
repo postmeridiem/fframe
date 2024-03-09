@@ -5,6 +5,7 @@ class FRouterConfig {
   late NavigationConfig filteredNavigationConfig;
   late Widget mainScreen;
   late RouterBuilder routerBuilder;
+  late FFrameUser? user;
 
   static final FRouterConfig instance = FRouterConfig._internal();
 
@@ -14,7 +15,15 @@ class FRouterConfig {
     required RouterBuilder routerBuilder,
     required NavigationConfig navigationConfig,
     required Widget mainScreen,
+    required FFrameUser? user,
   }) {
+    Console.log(
+      "Init FRouterConfig for user: ${user?.email}",
+      scope: "FRouterInit",
+      level: LogLevel.fframe,
+    );
+    instance.user = user;
+
     navigationConfig.navigationTargets.forEach(
       ((NavigationTarget navigationTarget) {
         //Enforce leading slash
@@ -59,18 +68,94 @@ class FRouterConfig {
       }),
     );
 
-    // navigationConfig.navigationTargets.forEach(
-    //   ((NavigationTarget navigationTarget) {
-    //     if (navigationTarget.navigationTabs != null && navigationTarget.navigationTabs!.isNotEmpty) {
-    //       for (NavigationTab navigationTab in navigationTarget.navigationTabs!) {
-    //         navigationTab.parentTarget = navigationTarget;
-    //         navigationTab.path = "${navigationTab.parentTarget!.path}/${navigationTab.path}";
-    //       }
-    //     } else if (!navigationTarget.path.startsWith("/")) {
-    //       navigationTarget.path = "/${navigationTarget.path}";
-    //     }
-    //   }),
-    // );
+    //Filter navigation config for a specific user
+    if (user != null) {
+      //Check routes for roles
+      List<String> roles = user.roles;
+
+      navigationConfig.navigationTargets.removeWhere(
+        (NavigationTarget navigationTarget) {
+          //Remove all routes which are not private
+          if (navigationTarget.private == false) {
+            return true;
+          }
+
+          //If the user does not have roles. return true
+          if (roles.isEmpty) {
+            return true;
+          }
+
+          //Role comparison
+          Set<String> userRolesSet = roles.map((role) => role.toLowerCase()).toSet();
+          List<String> targetRoles = navigationTarget.roles ?? [];
+
+          //Check tabs first(if any)
+          if (navigationTarget.navigationTabs != null) {
+            //Get all roles allowed to see this tab.
+            navigationTarget.navigationTabs!.where((NavigationTab navigationTab) => navigationTab.roles != null).forEach((NavigationTab navigationTab) {
+              targetRoles.addAll(navigationTab.roles!);
+            });
+
+            navigationTarget.navigationTabs!.removeWhere((NavigationTab navigationTab) {
+              //If the tab is not private, remove it
+              if (navigationTab.private == false) {
+                return true;
+              }
+              //If the tab has no role limitations, allow it
+              if (navigationTab.roles == null) {
+                return false;
+              }
+
+              //Check if the intersection contains a value. If so return false
+              Set<String> targetRolesSet = navigationTab.roles!.map((role) => role.toLowerCase()).toSet();
+              Set<String> interSection = userRolesSet.intersection(targetRolesSet);
+              Console.log(
+                "${navigationTarget.title}/${navigationTab.title} => ${interSection.isEmpty ? "no access" : "allow access"} (user: ${userRolesSet.toString()} path: ${targetRolesSet.toString()})",
+                scope: "fframeLog.NavigationNotifier.navigationRoutes.get",
+                level: LogLevel.fframe,
+              );
+              return interSection.isEmpty;
+            });
+          }
+
+          if (targetRoles.isEmpty) {
+            //No role based limitations apply
+            Console.log(
+              "${navigationTarget.title} => allow",
+              scope: "fframeLog.NavigationNotifier.navigationRoutes.get",
+              level: LogLevel.fframe,
+            );
+            return false;
+          }
+
+          //Check if the intersection contains a value. If so return false
+          Set<String> targetRolesSet = targetRoles.map((role) => role.toLowerCase()).toSet();
+
+          Set<String> interSection = userRolesSet.intersection(targetRolesSet);
+          Console.log(
+            "${navigationTarget.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} path: ${targetRolesSet.toString()})",
+            scope: "fframeLog.NavigationNotifier.navigationRoutes.get",
+            level: LogLevel.fframe,
+          );
+          return interSection.isEmpty;
+        },
+      );
+    } else {
+      //Not signed in. Keep public routes
+      navigationConfig.navigationTargets.removeWhere((NavigationTarget navigationTarget) {
+        //Remove all routes which are not public
+        if (navigationTarget.public == false) {
+          return true;
+        }
+
+        //Remove all tabs which are not public
+        navigationTarget.navigationTabs?.removeWhere((NavigationTab navigationTab) {
+          //If the target does not require roles. Return true
+          return navigationTab.roles == null || navigationTab.roles!.isEmpty;
+        });
+        return navigationTarget.navigationTabs?.isEmpty ?? false;
+      });
+    }
 
     instance.mainScreen = mainScreen;
     instance.navigationConfig = navigationConfig;

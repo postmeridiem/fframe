@@ -10,6 +10,7 @@ class FRouterInit extends StatefulWidget {
     this.debugMode = false,
     required this.routerBuilder,
     required this.mainScreen,
+    required this.user,
   }) {
     Console.log("FRouterInit", scope: "Fframe", level: LogLevel.dev);
   }
@@ -19,14 +20,12 @@ class FRouterInit extends StatefulWidget {
   final Widget mainScreen;
   final NavigationConfig navigationConfig;
   final RouterBuilder routerBuilder;
-
+  final FFrameUser? user;
   @override
   State<FRouterInit> createState() => _FRouterInitState();
 }
 
 class _FRouterInitState extends State<FRouterInit> {
-
-
   @override
   void initState() {
     super.initState();
@@ -35,6 +34,7 @@ class _FRouterInitState extends State<FRouterInit> {
       navigationConfig: widget.navigationConfig,
       routerBuilder: widget.routerBuilder,
       mainScreen: widget.mainScreen,
+      user: widget.user,
     );
   }
 

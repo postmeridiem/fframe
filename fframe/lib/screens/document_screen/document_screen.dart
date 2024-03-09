@@ -796,7 +796,7 @@ class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
       returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading document");
     }
 
-    Console.log("Load the AnimatedSwitcher", scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
+    Console.log("Load the ListenableBuilder", scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
     SelectionState<T> selectionState = documentScreenConfig.selectionState as SelectionState<T>;
     if (documentConfig.preOpen != null) {
       return FutureBuilder<T?>(

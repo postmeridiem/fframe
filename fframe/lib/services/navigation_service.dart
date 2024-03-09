@@ -15,6 +15,7 @@ final navigationProvider = ChangeNotifierProvider<NavigationNotifier>(
     return NavigationNotifier(
       ref: ref,
       fFrameUser: null,
+      navigationConfig: FRouterConfig.instance.navigationConfig,
     );
   },
 );
@@ -41,97 +42,24 @@ class NavigationNotifier extends ChangeNotifier {
   bool _isbuilding = false;
   bool _buildPending = false;
 
-  bool? _isSignedIn;
-  List<String>? _roles;
+  // bool? _isSignedIn;
 
-  final NavigationConfig navigationConfig = FRouterConfig.instance.navigationConfig;
-  late NavigationConfig filteredNavigationConfig = FRouterConfig.instance.navigationConfig;
+  // NavigationConfig navigationConfig = FRouterConfig.instance.navigationConfig;
+  NavigationConfig _initialNavigationConfig = FRouterConfig.instance.navigationConfig;
 
-  NavigationNotifier({
-    required this.ref,
-    required this.fFrameUser,
-  }) {
+  NavigationNotifier({required this.ref, required this.fFrameUser, required NavigationConfig navigationConfig}) {
     Console.log(
       "init NavigationNotifier",
       scope: "fframeLog.NavigationNotifier",
       level: LogLevel.dev,
     );
-    _filterNavigationRoutes();
-    FirebaseAuth.instance.authStateChanges().listen((User? user) => authChangeListener(user));
-    // Uri? deepLink = InitialUri.instance?.getInitialUri();
-    // if (deepLink != null && deepLink.pathSegments.isNotEmpty && deepLink.pathSegments.first != "/") {
-    //   Console.log(
-    //     "Forward to deep link",
-    //     scope: "fframeLog.NavigationNotifier.constructor",
-    //     level: LogLevel.dev,
-    //     color: ConsoleColor.white,
-    //   );
-    // }
+    _initialNavigationConfig = navigationConfig;
+    // _filterNavigationRoutes(navigationConfig);
+    // FirebaseAuth.instance.authStateChanges().listen((User? user) => authChangeListener(user));
   }
 
   int? selectedNavRailIndex;
-  bool get pendingAuth => _isSignedIn == null;
-  bool get isSignedIn => _isSignedIn ?? false;
-
-  authChangeListener(User? user) async {
-    Console.log(
-      "authChangeListener",
-      scope: "fframeLog.NavigationNotifier.authChangeListener",
-      level: LogLevel.dev,
-    );
-    if (user != null) {
-      try {
-        signIn(roles: fFrameUser!.roles);
-      } catch (e) {
-        Console.log(
-          "ERROR: Unable to interpret claims ${e.toString()}",
-          scope: "fframeLog.NavigationNotifier.authChangeListener",
-          level: LogLevel.prod,
-        );
-        signIn(roles: fFrameUser!.roles);
-      }
-    } else {
-      signOut();
-    }
-  }
-
-  signIn({List<String>? roles}) {
-    Console.log(
-      "signIn",
-      scope: "fframeLog.NavigationNotifier.signIn",
-      level: LogLevel.dev,
-    );
-
-    _roles = roles;
-    _isSignedIn = true;
-    _filterNavigationRoutes();
-
-    TargetState? targetState = TargetState.defaultRoute();
-    QueryState? queryState = QueryState.defaultroute();
-    if (navigationNotifier.nextState.isNotEmpty) {
-      navigationNotifier.nextState.removeAt(0);
-    }
-
-    processRouteInformation(targetState: targetState, queryState: queryState);
-    // routerDelegate.setNewRoutePath(this);
-    notifyListeners();
-  }
-
-  signOut() {
-    Console.log(
-      "signOut",
-      scope: "fframeLog.NavigationNotifier.signOut",
-      level: LogLevel.dev,
-    );
-    _roles = null;
-    _isSignedIn = false;
-
-    _filterNavigationRoutes();
-    TargetState? targetState = TargetState.defaultRoute();
-    QueryState? queryState = QueryState(queryParameters: null);
-    processRouteInformation(targetState: targetState, queryState: queryState);
-    notifyListeners();
-  }
+  bool get isSignedIn => FRouterConfig.instance.user == null ? false : true;
 
   TargetState? get currentTarget {
     Console.log(
@@ -180,144 +108,18 @@ class NavigationNotifier extends ChangeNotifier {
       NavigationTarget parentTarget = currentTab.parentTarget!;
       return parentTarget.navigationTabs!;
     }
-    debugger();
     return [];
   }
 
-  _filterNavigationRoutes() {
-    Console.log(
-      "Filter navigation tabs",
-      scope: "fframeLog.NavigationNotifier._filterNavigationRoutes",
-      level: LogLevel.fframe,
-    );
-    filteredNavigationConfig = NavigationConfig.clone(navigationConfig);
-    FRouterConfig.instance.filteredNavigationConfig = filteredNavigationConfig;
-    if (_isSignedIn ?? false) {
-      //Check routes for roles
-      filteredNavigationConfig.navigationTargets.removeWhere(
-        (NavigationTarget navigationTarget) {
-          //Remove all routes which are not private
-          if (navigationTarget.private == false) {
-            return true;
-          }
-
-          //If the user does not have roles. return true
-          if (_roles == null) {
-            return true;
-          }
-
-          //Role comparison
-          Set<String> userRolesSet = _roles!.map((role) => role.toLowerCase()).toSet();
-          List<String> targetRoles = navigationTarget.roles ?? [];
-
-          //Check tabs first(if any)
-          if (navigationTarget.navigationTabs != null) {
-            //Get all roles allowed to see this tab.
-            navigationTarget.navigationTabs!.where((NavigationTab navigationTab) => navigationTab.roles != null).forEach((NavigationTab navigationTab) {
-              targetRoles.addAll(navigationTab.roles!);
-            });
-
-            navigationTarget.navigationTabs!.removeWhere((NavigationTab navigationTab) {
-              //If the tab is not private, remove it
-              if (navigationTab.private == false) {
-                return true;
-              }
-              //If the tab has no role limitations, allow it
-              if (navigationTab.roles == null) {
-                return false;
-              }
-
-              //Check if the intersection contains a value. If so return false
-              Set<String> targetRolesSet = navigationTab.roles!.map((role) => role.toLowerCase()).toSet();
-              Set<String> interSection = userRolesSet.intersection(targetRolesSet);
-              Console.log(
-                "${navigationTarget.title}/${navigationTab.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} router: ${targetRolesSet.toString()})",
-                scope: "fframeLog.NavigationNotifier._filterNavigationRoutes",
-                level: LogLevel.fframe,
-              );
-              return interSection.isEmpty;
-            });
-          }
-
-          if (targetRoles.isEmpty) {
-            //No role based limitations apply
-            Console.log(
-              "${navigationTarget.title} => allow",
-              scope: "fframeLog.NavigationNotifier._filterNavigationRoutes",
-              level: LogLevel.fframe,
-            );
-            return false;
-          }
-
-          //Check if the intersection contains a value. If so return false
-          Set<String> targetRolesSet = targetRoles.map((role) => role.toLowerCase()).toSet();
-
-          Set<String> interSection = userRolesSet.intersection(targetRolesSet);
-          Console.log(
-            "${navigationTarget.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} router: ${targetRolesSet.toString()})",
-            scope: "fframeLog.NavigationNotifier._filterNavigationRoutes",
-            level: LogLevel.fframe,
-          );
-          return interSection.isEmpty;
-        },
-      );
-    } else {
-      //Not signed in. Keep public routes
-      filteredNavigationConfig.navigationTargets.removeWhere((NavigationTarget navigationTarget) {
-        if (navigationTarget.navigationTabs != null) {
-          List<NavigationTab> navigationTabs = _filterTabRoutes(navigationTarget.navigationTabs!);
-          return navigationTabs.isEmpty;
-        }
-
-        return navigationTarget.public == false;
-      });
-    }
-  }
-
-  List<NavigationTab> _filterTabRoutes(List<NavigationTab> navigationTabs) {
-    Console.log(
-      "Filter tab routes",
-      scope: "fframeLog.NavigationNotifier._filterTabRoutes",
-      level: LogLevel.fframe,
-    );
-    if (_isSignedIn ?? false) {
-      navigationTabs.removeWhere((NavigationTab navigationTab) {
-        //Signed in. Keep private routes
-        if (navigationTab.private == false) {
-          return true;
-        }
-
-        //If the target does not require roles. Return true
-        if (navigationTab.roles == null) {
-          return false;
-        }
-
-        //If the user does not have roles. return true
-        if (_roles == null) {
-          return true;
-        }
-
-        //Check if the intersection contains a value. If so return false
-        Set<String> userRoles = _roles!.toSet();
-        Set<String> targetRoles = navigationTab.roles!.toSet();
-
-        Set<String> interSection = userRoles.intersection(targetRoles);
-        return interSection.isEmpty;
-      });
-    } else {
-      //Not signed in. Keep public routes
-      navigationTabs.removeWhere(
-        (NavigationTab navigationTab) => navigationTab.public == false,
-      );
-    }
-
-    return navigationTabs;
+  NavigationConfig get navigationConfig {
+    NavigationConfig navigationConfig = NavigationConfig.clone(_initialNavigationConfig);
+    return navigationConfig;
   }
 
   parseRouteInformation({required Uri uri}) {
     Console.log(
       "parseRouteInformation",
-      scope: "fframeLog.NavigationNotifier.parseRouteInformation uri: ${uri.toString()}",
+      scope: "fframeLog.NavigationNotifier.parseRouteInformation uri: ${uri.toString()}}",
       level: LogLevel.fframe,
     );
     if (_buildPending) {

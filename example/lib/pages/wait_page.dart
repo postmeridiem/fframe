@@ -14,37 +14,39 @@ class WaitPage extends StatelessWidget {
       darkTheme: Fframe.of(context)!.darkMode,
       themeMode: Fframe.of(context)!.themeMode,
       debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-      home: Scaffold(
-        body: (waitText != null)
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(
-                    height: 200.0,
-                    child: Stack(
-                      children: <Widget>[
-                        const Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(),
+      builder: (context, child) {
+        return Scaffold(
+          body: (waitText != null)
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(
+                      height: 200.0,
+                      child: Stack(
+                        children: <Widget>[
+                          const Center(
+                            child: SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(),
+                            ),
                           ),
-                        ),
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 100),
-                            child: Text(waitText),
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 100),
+                              child: Text(waitText),
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              )
-            : const Center(
-                child: CircularProgressIndicator(),
-              ),
-      ),
+                  ],
+                )
+              : const Center(
+                  child: CircularProgressIndicator(),
+                ),
+        );
+      },
     );
 
     // return Column(

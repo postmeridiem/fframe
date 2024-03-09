@@ -90,35 +90,44 @@ class TargetState {
   }
 
   factory TargetState.defaultRoute() {
-    Uri? uri = InitialUri.instance?.getInitialUri();
-    if (uri != null && uri.pathSegments.isNotEmpty) {
-      return _fromUri(navigationNotifier, uri);
-    }
+    // Uri? uri = InitialUri.instance?.getInitialUri();
+    // if (uri != null && uri.pathSegments.isNotEmpty) {
+    //   return _fromUri(navigationNotifier, uri);
+    // }
     return _defaultRoute();
   }
   static TargetState _defaultRoute() {
-    if (navigationNotifier.filteredNavigationConfig.navigationTargets.isEmpty && navigationNotifier.navigationConfig.navigationTargets.isNotEmpty) {
+    if (navigationNotifier.navigationConfig.navigationTargets.isEmpty && navigationNotifier.navigationConfig.navigationTargets.isNotEmpty) {
       //There are no unauthenticated routes
 
-      if (navigationNotifier.pendingAuth == false && navigationNotifier.isSignedIn != true) {
-        // if (navigationNotifier.isSignedIn != true) {
+      // if (navigationNotifier.pendingAuth == false && navigationNotifier.isSignedIn != true) {
+      if (navigationNotifier.isSignedIn != true) {
         //Assume there are no applicable routes within the access control. Route to the signin page or wait page
         return TargetState(
-          navigationTarget: navigationNotifier.filteredNavigationConfig.signInConfig.signInTarget,
+          navigationTarget: navigationNotifier.navigationConfig.signInConfig.signInTarget,
         );
       }
 
       //We are still awaiting the auth state.... wait for it to be known
       //Store the current path
       return TargetState(
-        navigationTarget: navigationNotifier.filteredNavigationConfig.waitPage,
+        navigationTarget: navigationNotifier.navigationConfig.waitPage,
       );
     }
-    List<NavigationTarget> navigationTargets = navigationNotifier.filteredNavigationConfig.navigationTargets;
+    List<NavigationTarget> navigationTargets = navigationNotifier.navigationConfig.navigationTargets;
     TargetState targetState = TargetState(
       navigationTarget: navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.landingPage, orElse: () {
-        Console.log("***** No default route has been configured. Please update the navigation config. *****", scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.fframe);
-        return navigationNotifier.filteredNavigationConfig.errorPage;
+        Console.log(
+          "No public default route has been configured. Signed in: ${navigationNotifier.isSignedIn} ",
+          scope: "fframeLog.TargetState.defaultRoute",
+          level: LogLevel.fframe,
+          color: ConsoleColor.yellow,
+        );
+        if (navigationNotifier.isSignedIn != true) {
+          return navigationNotifier.navigationConfig.signInConfig.signInTarget;
+        }
+        Console.log("***** No public default route has been configured. Please update the navigation config. *****", scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.dev, color: ConsoleColor.red);
+        return navigationNotifier.navigationConfig.errorPage;
       }),
     );
 

@@ -49,19 +49,19 @@ class MainApp extends StatelessWidget {
       signInConfig: SignInConfig(signInTarget: signInPageNavigationTarget),
       errorPage: NavigationTarget(
         path: "",
-        title: "",
+        title: "error",
         contentPane: const ErrorPage(),
         public: true,
       ),
       emptyPage: NavigationTarget(
         path: "",
-        title: "",
+        title: "empty",
         contentPane: const EmptyPage(),
         public: true,
       ),
       waitPage: NavigationTarget(
         path: "",
-        title: "",
+        title: "wait",
         contentPane: const WaitPage(),
         public: true,
       ),

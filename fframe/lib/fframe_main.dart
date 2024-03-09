@@ -6,38 +6,38 @@ enum SignInState {
   signedOut,
 }
 
-class InitialUri {
-  factory InitialUri({Uri? initialUri}) {
-    if (instance == null) {
-      Console.log("InitialUri", scope: "Fframe", level: LogLevel.fframe, color: ConsoleColor.white);
-      initialUri = initialUri ?? _getCleanedBaseUri();
-      Console.log("Initial Uri: ${initialUri.path} ${initialUri.queryParameters}", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.white);
-      instance = InitialUri._internal(initialUri);
-    }
-    return instance!;
-  }
+// class InitialUri {
+//   factory InitialUri({Uri? initialUri}) {
+//     if (instance == null) {
+//       Console.log("InitialUri", scope: "Fframe", level: LogLevel.fframe, color: ConsoleColor.white);
+//       initialUri = initialUri ?? _getCleanedBaseUri();
+//       Console.log("Initial Uri: ${initialUri.path} ${initialUri.queryParameters}", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.white);
+//       instance = InitialUri._internal(initialUri);
+//     }
+//     return instance!;
+//   }
 
-  static InitialUri? instance;
-  InitialUri._internal(this.initalUri);
+//   static InitialUri? instance;
+//   InitialUri._internal(this.initalUri);
 
-  Uri? initalUri;
+//   Uri? initalUri;
 
-  static Uri _getCleanedBaseUri() {
-    return Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
-  }
+//   static Uri _getCleanedBaseUri() {
+//     return Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
+//   }
 
-  static InitialUri getInstance() {
-    return instance ?? InitialUri(); // Ensure instance is not null
-  }
+//   static InitialUri getInstance() {
+//     return instance ?? InitialUri(); // Ensure instance is not null
+//   }
 
-  Uri getInitialUri() {
-    return initalUri ?? _getCleanedBaseUri();
-  }
+//   Uri getInitialUri() {
+//     return initalUri ?? _getCleanedBaseUri();
+//   }
 
-  void clearInitialUri() {
-    initalUri = null;
-  }
-}
+//   void clearInitialUri() {
+//     initalUri = null;
+//   }
+// }
 
 // ignore: must_be_immutable
 class Fframe extends InheritedWidget {
@@ -59,8 +59,8 @@ class Fframe extends InheritedWidget {
     this.postSignOut,
   }) : super(child: FFramePreload()) {
     Console.log("+-=-=-=-=-=-=-=-=-=-=-= ${DateTime.now().toIso8601String()} -=-=-=-=-=-=-=-=-=-=-=-=-=-+", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.green);
-    InitialUri();
-    // Console.log("deepLinkUri: ${deepLinkUri!.path} ${deepLinkUri?.queryParameters}", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.white);
+    deepLinkUri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
+    Console.log("deepLinkUri: ${deepLinkUri!.path} ${deepLinkUri?.queryParameters}", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.white);
   }
 
   // static final Fframe instance = Fframe._internal();
@@ -326,6 +326,7 @@ class InitFrouter extends StatelessWidget {
           l10nConfig: Fframe.of(context)!.l10nConfig,
         ),
         navigationConfig: Fframe.of(context)!.navigationConfig,
+        user: Fframe.of(context)!.user,
         routerBuilder: (context) {
           return FframeBuilder();
         });
@@ -348,7 +349,7 @@ class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObser
 
   @override
   Widget build(BuildContext context) {
-    Uri uri = InitialUri.instance!.getInitialUri();
+    Uri uri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
     Console.log("dynamic link research: ${uri.toString()} => ${FirebaseAuth.instance.isSignInWithEmailLink(uri.toString())}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
 
     if (FirebaseAuth.instance.isSignInWithEmailLink(uri.toString())) {
@@ -382,10 +383,12 @@ class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObser
       title: Fframe.of(context)!.title,
       color: Theme.of(context).colorScheme.surface,
       debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-      home: Fframe.of(context)!.navigationConfig.signInConfig.signInTarget.contentPane ??
-          FFErrorPage(
-            message: "Sign in configuration not set",
-          ),
+      builder: (context, child) {
+        return Fframe.of(context)!.navigationConfig.signInConfig.signInTarget.contentPane ??
+            FFErrorPage(
+              message: "Sign in configuration not set",
+            );
+      },
     );
   }
 }
@@ -469,6 +472,7 @@ class FFWaitPage extends StatelessWidget {
     } else {
       Console.log("Show wait page", scope: "FFWaitPage", level: LogLevel.fframe);
     }
+
     return MaterialApp(
       theme: Fframe.of(context)!.lightMode,
       darkTheme: Fframe.of(context)!.darkMode,
@@ -476,34 +480,36 @@ class FFWaitPage extends StatelessWidget {
       debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
       title: Fframe.of(context)!.title,
       color: Theme.of(context).colorScheme.surface,
-      home: Scaffold(
-        body: (message != null)
-            ? Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-                SizedBox(
-                  height: 200.0,
-                  child: Stack(
-                    children: <Widget>[
-                      const Center(
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(),
+      builder: (context, child) {
+        return Scaffold(
+          body: (message != null)
+              ? Column(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+                  SizedBox(
+                    height: 200.0,
+                    child: Stack(
+                      children: <Widget>[
+                        const Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(),
+                          ),
                         ),
-                      ),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 100),
-                          child: Text(message!),
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 100),
+                            child: Text(message!),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                ])
+              : const Center(
+                  child: CircularProgressIndicator(),
                 ),
-              ])
-            : const Center(
-                child: CircularProgressIndicator(),
-              ),
-      ),
+        );
+      },
     );
   }
 }
@@ -525,9 +531,11 @@ class FFErrorPage extends StatelessWidget {
       title: Fframe.of(context)!.title,
       color: Theme.of(context).colorScheme.surface,
       debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-      home: Scaffold(
-        body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
-      ),
+      builder: (context, child) {
+        return Scaffold(
+          body: Fframe.of(context)!.navigationConfig.errorPage.contentPane!,
+        );
+      },
     );
   }
 }
@@ -544,9 +552,11 @@ class FFRedirectPage extends StatelessWidget {
       darkTheme: Fframe.of(context)!.darkMode,
       themeMode: Fframe.of(context)!.themeMode,
       debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
-      home: const Scaffold(
-        body: Icon(Icons.forward),
-      ),
+      builder: (context, child) {
+        return const Scaffold(
+          body: Icon(Icons.forward),
+        );
+      },
     );
   }
 }

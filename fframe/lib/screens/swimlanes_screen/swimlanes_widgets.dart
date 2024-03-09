@@ -156,7 +156,7 @@ class SwimlanesFilterBar<T> extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                swimlanesConfig.getAssignee != null
+                swimlanesConfig.assignee != null
                     ? Padding(
                         padding: const EdgeInsets.only(right: 16.0),
                         child: Column(
@@ -199,7 +199,7 @@ class SwimlanesFilterBar<T> extends StatelessWidget {
                         ),
                       )
                     : const IgnorePointer(),
-                swimlanesConfig.watching != null
+                swimlanesConfig.following != null
                     ? Padding(
                         padding: const EdgeInsets.only(right: 16.0),
                         child: Column(
@@ -612,7 +612,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
             //Something has gone wrong
             return Fframe.of(context)!.showErrorPage(context: context, errorText: snapshot.error.toString());
           } else {
-            List<SelectedDocument<T>> selectedDocuments = snapshot.data!.docs
+            List<SelectedDocument<T>> unfilteredDocuments = snapshot.data!.docs
                 .map(
                   (QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
                     data: queryDocument.data(),
@@ -629,19 +629,19 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                     ))
                 .toList();
 
-            // widget.swimlanesController.notifier.filter
-
             return ListenableBuilder(
               listenable: widget.swimlanesController.notifier,
               builder: (BuildContext context, Widget? child) {
                 SwimlanesFilterType filterType = widget.swimlanesController.notifier.filter;
 
-                Console.log("Swimlane rebuild ${filterType.toString()} ");
+                List<SelectedDocument<T>> selectedDocuments = [...unfilteredDocuments];
+                Console.log("Swimlane rebuild ${filterType.toString()} for ${selectedDocuments.length} ");
 
                 switch (filterType) {
                   case SwimlanesFilterType.unfiltered:
                     break;
                   case SwimlanesFilterType.assignedToMe:
+                    // selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.);
                     break;
                   case SwimlanesFilterType.prioHigh:
                     selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data as T) < 4);

@@ -9,12 +9,9 @@ class SwimlanesConfig<T> {
     required this.getDescription,
     required this.taskWidget,
     this.getPriority,
-    this.getAssignee,
-    this.setAssignee,
+    this.assignee,
     this.myId,
-    this.watching,
-    this.watch,
-    this.unWatch,
+    this.following,
     this.swimlaneBackgroundColor,
     this.swimlaneHeaderColor,
     this.swimlaneHeaderTextColor,
@@ -24,20 +21,10 @@ class SwimlanesConfig<T> {
     this.taskCardHeaderColor,
     this.taskCardHeaderTextColor,
     this.swimlaneWidth = 400,
-  })  : assert(
+  }) : assert(
             // Ensure myId is not null when any of the methods is set
-            myId != null || getAssignee == null && setAssignee == null && watching == null && watch == null && unWatch == null,
-            'If any of the methods (getAssignee, setAssignee, watching, watch, unWatch) is set, myId must not be null.'),
-        assert(
-          // Ensure if getAssignee is set, setAssignee must also be set
-          (getAssignee == null && setAssignee == null) || (getAssignee != null && setAssignee != null),
-          'If getAssignee is set, setAssignee must also be set.',
-        ),
-        assert(
-          // Ensure if watching is set, both watch and unWatch must also be set
-          (watching == null && watch == null && unWatch == null) || (watching != null && watch != null && unWatch != null),
-          'If watching is set, both watch and unWatch must also be set.',
-        );
+            myId != null || assignee == null && assignee == null && following == null,
+            'If any of the methods (getAssignee, setAssignee, isFollowing, startFollowing, unstartFollowing) is set, myId must not be null.');
 
   final List<SwimlaneSetting<T>> swimlaneSettings;
   final String trackerId;
@@ -53,14 +40,35 @@ class SwimlanesConfig<T> {
   final String Function(T) getStatus;
   final String Function(T) getTitle;
   final String Function(FFrameUser)? myId;
-  final String Function(T)? getAssignee;
-  final T Function(T, String)? setAssignee;
-  final bool Function(T)? watching;
-  final T Function(T)? watch;
-  final T Function(T)? unWatch;
+  final SwimlanesFollowing<T>? following;
+  final SwimlanesAssignee<T>? assignee;
   final String Function(T) getDescription;
   final double Function(T)? getPriority;
   final Widget Function(SelectedDocument<T>, SwimlanesConfig<T>, FFrameUser) taskWidget;
+}
+
+class SwimlanesFollowing<T> {
+  SwimlanesFollowing({
+    this.isFollowing,
+    this.startFollowing,
+    this.stopFollowing,
+  }) : assert(
+          // Ensure if isFollowing is set, both startFollowing and unstartFollowing must also be set
+          (isFollowing == null && startFollowing == null && stopFollowing == null) || (isFollowing != null && startFollowing != null && stopFollowing != null),
+          'If isFollowing is set, both startFollowing and unstartFollowing must also be set.',
+        );
+  final bool Function(T, FFrameUser)? isFollowing;
+  final T Function(T, FFrameUser)? startFollowing;
+  final T Function(T, FFrameUser)? stopFollowing;
+}
+
+class SwimlanesAssignee<T> {
+  SwimlanesAssignee({
+    this.getAssignee,
+    this.setAssignee,
+  });
+  final String? Function(T)? getAssignee;
+  final T? Function(T, List<String>, FFrameUser)? setAssignee;
 }
 
 class SwimlanesActionMenu<T> {

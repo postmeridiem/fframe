@@ -30,10 +30,10 @@ class QueryState {
   }
 
   factory QueryState.defaultroute() {
-    Uri? uri = InitialUri.instance?.getInitialUri();
-    if (uri != null && uri.pathSegments.isNotEmpty) {
-      return _fromUri(uri);
-    }
+    // // Uri? uri = InitialUri.instance?.getInitialUri();
+    // if (uri != null && uri.pathSegments.isNotEmpty) {
+    //   return _fromUri(uri);
+    // }
     return _defaultRoute();
   }
 

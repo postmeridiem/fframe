@@ -58,7 +58,7 @@ class FFrameUser extends StateNotifier {
       if (claims != null && claims.containsKey("roles") == true) {
         Console.log(
           "Has roles in ${claims["roles"].runtimeType}",
-          scope: "fframeLog.NavigationNotifier.authChangeListener",
+          scope: "FFrameUser.fromFirebaseUserr",
           level: LogLevel.fframe,
         );
 

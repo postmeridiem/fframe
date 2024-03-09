@@ -109,7 +109,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               appBar: AppBar(
                 backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                 toolbarHeight: 0,
-                bottom: FRouter.of(context).hasTabs
+                bottom: (FRouter.of(context).hasTabs && FRouter.of(context).tabLength > 1)
                     ? TabBar(
                         labelColor: Theme.of(context).colorScheme.onSurfaceVariant,
                         unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -133,8 +133,9 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 ),
                 body: Consumer(
                   builder: (context, ref, child) {
-                    Console.log("MainScreen Consumer builder", scope: "fframeLog.MainScreen", level: LogLevel.fframe);
                     TargetState targetState = ref.watch(targetStateProvider);
+                    Console.log("MainScreen Consumer builder '${targetState.navigationTarget.title}'", scope: "fframeLog.MainScreen", level: LogLevel.fframe, color: ConsoleColor.green);
+
                     return AnimatedSwitcher(
                       duration: const Duration(milliseconds: 250),
                       child: Container(
@@ -273,7 +274,7 @@ class _ProfileButtonState extends State<ProfileButton> {
                               return navigationTarget.profilePage == true;
                             },
                             orElse: () {
-                              return navigationNotifier.filteredNavigationConfig.errorPage;
+                              return navigationNotifier.navigationConfig.errorPage;
                             },
                           );
 

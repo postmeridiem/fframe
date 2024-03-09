@@ -75,7 +75,26 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
         getDescription: (suggestion) => suggestion.description ?? "",
         getPriority: (suggestion) => suggestion.priority,
         myId: (user) => user.uid!,
-        // getAssignee: (suggestion,
+        following: SwimlanesFollowing<Suggestion>(
+          isFollowing: (suggestion, user) => suggestion.followers != null && suggestion.followers!.contains(user.uid),
+          startFollowing: (suggestion, user) {
+            suggestion.followers ??= [];
+            suggestion.followers!.add(user.uid!);
+            return suggestion;
+          },
+          stopFollowing: (suggestion, user) {
+            suggestion.followers ??= [];
+            suggestion.followers!.remove(user.uid!);
+            return suggestion;
+          },
+        ),
+        assignee: SwimlanesAssignee<Suggestion>(
+          setAssignee: (suggestion, roles, user) {
+//TODO: User picker dialog
+            return null;
+          },
+        ),
+        // getDueDate: (suggestion) => suggestion.dueDate,
         taskWidget: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionCard(
           selectedDocument: selectedDocument,
           swimlanesConfig: swimlanesConfig,
