@@ -38,13 +38,13 @@ class MainApp extends StatelessWidget {
       navigationTargets: [
         suggestionNavigationTarget,
         tabloaderNavigationTarget,
-        settingNavigationTarget,
-        usersNavigationTarget,
         // userListNavigationTarget,
         listGridNavigationTarget,
         listGridSingleColumnNavigationTarget,
         swimlanesNavigationTarget,
         userProfileNavigationTarget,
+        usersNavigationTarget,
+        settingNavigationTarget,
       ],
       signInConfig: SignInConfig(signInTarget: signInPageNavigationTarget),
       errorPage: NavigationTarget(
@@ -107,7 +107,8 @@ class MainApp extends StatelessWidget {
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
-          clientId: "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
+          clientId:
+              "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
       debugShowCheckedModeBanner: false,
@@ -118,11 +119,13 @@ class MainApp extends StatelessWidget {
       ],
       postLoad: (context) async {
         // you can omit this optional event handler
-        Console.log("Executing postLoad code from main.dart", scope: "exampleApp.postLoad", level: LogLevel.dev);
+        Console.log("Executing postLoad code from main.dart",
+            scope: "exampleApp.postLoad", level: LogLevel.dev);
       },
       postSignOut: (context) async {
         // you can omit this optional event handler
-        Console.log("Executing postSignOut code from main.dart", scope: "exampleApp.postSignOut", level: LogLevel.dev);
+        Console.log("Executing postSignOut code from main.dart",
+            scope: "exampleApp.postSignOut", level: LogLevel.dev);
       },
       // postSignIn: (
       //   context,
