@@ -42,9 +42,9 @@ class MainApp extends StatelessWidget {
         listGridNavigationTarget,
         listGridSingleColumnNavigationTarget,
         swimlanesNavigationTarget,
-        userProfileNavigationTarget,
         usersNavigationTarget,
         settingNavigationTarget,
+        userProfileNavigationTarget,
       ],
       signInConfig: SignInConfig(signInTarget: signInPageNavigationTarget),
       errorPage: NavigationTarget(
