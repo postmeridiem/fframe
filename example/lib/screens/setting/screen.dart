@@ -20,6 +20,9 @@ class _SettingScreenState extends State<SettingScreen> {
       collection: "/fframe/settings/collection",
       fromFirestore: Setting.fromFirestore,
       toFirestore: (setting, options) => setting.toFirestore(),
+      query: (query) {
+        return query.where("active", isEqualTo: true);
+      },
       createNew: () => Setting(),
       //Optional title widget
       titleBuilder: (context, data) {
