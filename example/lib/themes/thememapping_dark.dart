@@ -39,9 +39,7 @@ final ThemeData appDarkTheme = ThemeData(
     secondaryContainer: darkModeConfig.constSecondaryColor,
     onSecondaryContainer: darkModeConfig.constOnSecondaryColor,
     error: darkModeConfig.signalColors.constErrorColor,
-    onError: const Color(0xff000000),
-    errorContainer: const Color.fromARGB(255, 30, 255, 236),
-    onErrorContainer: const Color(0xff000000),
+    onError: darkModeConfig.constOnPrimaryColor,
     outline: darkModeConfig.constOnPrimaryColor,
   ),
   inputDecorationTheme: InputDecorationTheme(

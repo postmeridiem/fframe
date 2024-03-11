@@ -38,7 +38,7 @@ final ThemeData appLightTheme = ThemeData(
     background: lightModeConfig.constBackgroundColor,
     onBackground: lightModeConfig.constPrimaryAccentColor,
     error: lightModeConfig.signalColors.constErrorColor,
-    onError: const Color(0xff000000),
+    onError: lightModeConfig.constOnPrimaryColor,
     outline: lightModeConfig.constOnSecondaryColor,
   ),
   inputDecorationTheme: InputDecorationTheme(

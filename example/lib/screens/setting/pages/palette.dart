@@ -1,3 +1,4 @@
+import 'package:example/themes/config.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/helpers/console_logger.dart';
 
@@ -403,21 +404,117 @@ class _PaletteFormFormState extends State<PaletteForm> {
                     const Padding(
                       padding: EdgeInsets.only(top: 12, left: 8),
                       child: Text(
-                        "colorScheme.errorContainer\ncolorScheme.onErrorContainer",
+                        "SignalColor() configuration",
                         style: TextStyle(
                           fontFamily: "OpenSans",
                         ),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12.0, bottom: 16.0),
-                      child: TextFormField(
-                        initialValue: "textytext",
-                        decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: "Author",
+                    Row(
+                      children: [
+                        SizedBox(
+                          height: 60,
+                          child: Card(
+                            color: SignalColors().constAccentColor,
+                            child: Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ".constAccentColor",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer),
+                              ),
+                            )),
+                          ),
                         ),
-                      ),
+                        SizedBox(
+                          height: 60,
+                          child: Card(
+                            color: SignalColors().constWaitingColor,
+                            child: Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ".constWaitingColor",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer),
+                              ),
+                            )),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 60,
+                          child: Card(
+                            color: SignalColors().constRunningColor,
+                            child: Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ".constRunningColor",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer),
+                              ),
+                            )),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 60,
+                          child: Card(
+                            color: SignalColors().constSuccessColor,
+                            child: Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ".constSuccessColor",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer),
+                              ),
+                            )),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 60,
+                          child: Card(
+                            color: SignalColors().constWarningColor,
+                            child: Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ".constWarningColor",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer),
+                              ),
+                            )),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 60,
+                          child: Card(
+                            color: SignalColors().constErrorColor,
+                            child: Center(
+                                child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(
+                                ".constErrorColor",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onPrimaryContainer),
+                              ),
+                            )),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
