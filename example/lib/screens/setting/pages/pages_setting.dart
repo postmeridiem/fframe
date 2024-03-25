@@ -10,7 +10,7 @@ import 'package:example/helpers/icons.dart';
 import 'package:example/helpers/strings.dart';
 
 class SettingsPagesForm extends StatefulWidget {
-  const SettingsPagesForm({Key? key}) : super(key: key);
+  const SettingsPagesForm({super.key});
 
   @override
   State<SettingsPagesForm> createState() => _SettingsPagesFormState();
@@ -134,9 +134,9 @@ class _SettingsPagesFormState extends State<SettingsPagesForm> {
 
 class CurrentPageEditor extends StatefulWidget {
   const CurrentPageEditor({
-    Key? key,
+    super.key,
     required this.currentPage,
-  }) : super(key: key);
+  });
 
   final FframePage currentPage;
 

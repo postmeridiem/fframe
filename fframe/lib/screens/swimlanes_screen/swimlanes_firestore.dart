@@ -3,12 +3,14 @@ part of '../../fframe.dart';
 class FirestoreSwimlanes<T> extends ConsumerStatefulWidget {
   const FirestoreSwimlanes({
     super.key,
-    required this.config,
+    required this.documentConfig,
     required this.query,
   });
 
   // the configuration that was provided
-  final SwimlanesConfig<T> config;
+  // the configuration that was provided
+  final DocumentConfig<T> documentConfig;
+  // final SwimlanesConfig<T> config;
 
   /// The firestore core query that was provided
   final Query<T> query;
@@ -42,23 +44,14 @@ class FirestoreSwimlanesState<T> extends ConsumerState<FirestoreSwimlanes<T>> {
 
   @override
   Widget build(BuildContext context) {
-    QueryState queryState = ref.watch(queryStateProvider);
-
-    Map<String, String> params = queryState.queryParameters ?? {};
-    bool documentOpen = params.containsKey("id");
-
     return SwimlanesController(
       context: context,
       sourceQuery: widget.query,
-      swimlanesConfig: widget.config,
-      documentOpen: documentOpen,
+      swimlanesConfig: widget.documentConfig.swimlanes as SwimlanesConfig<T>,
       viewportSize: MediaQuery.of(context).size,
       theme: Theme.of(context),
       child: Builder(
         builder: (BuildContext context) {
-          // return AnimatedBuilder(
-          //     animation: SwimlanesController.of(context).notifier,
-          //     builder: (context, child) {
           SwimlanesController swimlanesController = SwimlanesController.of(context);
           return SwimlaneBuilder<T>(
             swimlanesController: swimlanesController,
@@ -106,54 +99,61 @@ class _SwimlaneBuilderState<T> extends State<SwimlaneBuilder<T>> {
   final ScrollController _horizontal = ScrollController();
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    return ListenableBuilder(
+      listenable: SelectionState.instance,
+      builder: (BuildContext context, Widget? child) {
+        // SelectionState selectionState = SelectionState.instance;
+
+        return Stack(
           children: [
-            Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  color: widget.swimlanesController.swimlaneBackgroundColor,
-                ),
-                child: Scrollbar(
-                  controller: _horizontal,
-                  thumbVisibility: true,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    controller: _horizontal,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SwimlaneHeaders<T>(
-                          swimlanesController: widget.swimlanesController,
-                          documentConfig: widget.documentConfig,
-                          swimlanesConfig: widget.swimlanesConfig,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: widget.swimlanesController.swimlaneBackgroundColor,
+                    ),
+                    child: Scrollbar(
+                      controller: _horizontal,
+                      thumbVisibility: true,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        controller: _horizontal,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SwimlaneHeaders<T>(
+                              swimlanesController: widget.swimlanesController,
+                              documentConfig: widget.documentConfig,
+                              swimlanesConfig: widget.swimlanesConfig,
+                            ),
+                            Swimlanes<T>(
+                              swimlanesController: widget.swimlanesController,
+                              documentConfig: widget.documentConfig,
+                              swimlanesConfig: widget.swimlanesConfig,
+                            ),
+                            // widget.swimlanesConfig.showFooter
+                            //     ? Column(
+                            //         mainAxisAlignment: MainAxisAlignment.end,
+                            //         children: [
+                            //           SwimlanesFooter(
+                            //             viewportWidth: swimlanes.viewportWidth,
+                            //           ),
+                            //         ],
+                            //       )
+                            //     : const IgnorePointer(),
+                          ],
                         ),
-                        Swimlanes<T>(
-                          swimlanesController: widget.swimlanesController,
-                          documentConfig: widget.documentConfig,
-                          swimlanesConfig: widget.swimlanesConfig,
-                        ),
-                        // widget.swimlanesConfig.showFooter
-                        //     ? Column(
-                        //         mainAxisAlignment: MainAxisAlignment.end,
-                        //         children: [
-                        //           SwimlanesFooter(
-                        //             viewportWidth: swimlanes.viewportWidth,
-                        //           ),
-                        //         ],
-                        //       )
-                        //     : const IgnorePointer(),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
           ],
-        ),
-      ],
+        );
+      },
     );
   }
 }

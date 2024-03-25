@@ -1,6 +1,6 @@
 part of '../../fframe.dart';
 
-class SwimlanesConfig<T> {
+class SwimlanesConfig<T> extends ListConfig{
   SwimlanesConfig({
     required this.swimlaneSettings,
     required this.trackerId,

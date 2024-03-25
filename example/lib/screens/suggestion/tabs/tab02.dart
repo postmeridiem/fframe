@@ -5,10 +5,10 @@ import '../../../models/models.dart';
 
 class Tab02 extends StatelessWidget {
   const Tab02({
-    Key? key,
+    super.key,
     required this.suggestion,
     required this.readOnly,
-  }) : super(key: key);
+  });
   final Suggestion suggestion;
   final bool readOnly;
 

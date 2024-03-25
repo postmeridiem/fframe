@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:fframe/fframe.dart';
 import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/routers/navigation_route.dart';
@@ -55,11 +53,28 @@ class NavigationNotifier extends ChangeNotifier {
     );
     _initialNavigationConfig = navigationConfig;
     // _filterNavigationRoutes(navigationConfig);
+    QueryState.instance.addListener(queryStateListener);
     // FirebaseAuth.instance.authStateChanges().listen((User? user) => authChangeListener(user));
+  }
+
+  @override
+  void dispose() {
+    QueryState.instance.removeListener(queryStateListener);
+    super.dispose();
   }
 
   int? selectedNavRailIndex;
   bool get isSignedIn => FRouterConfig.instance.user == null ? false : true;
+
+  queryStateListener() {
+    Console.log(
+      "queryStateListener",
+      scope: "fframeLog.NavigationNotifier.currentTarget",
+      level: LogLevel.dev,
+    );
+
+    processRouteInformation(queryState: QueryState.instance);
+  }
 
   TargetState? get currentTarget {
     Console.log(
@@ -184,7 +199,8 @@ class NavigationNotifier extends ChangeNotifier {
       scope: "fframeLog.NavigationNotifier.composeUri",
       level: LogLevel.dev,
     );
-    debugger(when: pathComponent.isEmpty, message: "Path is empty");
+
+    // debugger(when: queryComponent.isNotEmpty, message: "QS is not empty ${QueryState.instance.queryString}");
 
     return uri;
   }
@@ -287,6 +303,7 @@ class NavigationNotifier extends ChangeNotifier {
         scope: "fframeLog.NavigationNotifier.updateProviders",
         level: LogLevel.fframe,
       );
+      QueryState.instance.notifyListeners();
       queryStateNotifier.update((state) => _queryState!);
     }
   }

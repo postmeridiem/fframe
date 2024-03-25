@@ -9,8 +9,8 @@ enum TabloaderQueryStates { active, done }
 
 class TabloaderScreen<Tabloader> extends StatefulWidget {
   const TabloaderScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<TabloaderScreen> createState() => _TabloaderScreenState();

@@ -41,6 +41,17 @@
             ],
         },
         {
+            "name": "Flutter macOS",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug", 
+            "args": [
+                "-d",
+                "macos" 
+            ]
+        }
+,        
+        {
             "name": "Flutter",
             "request": "launch",
             "type": "dart",

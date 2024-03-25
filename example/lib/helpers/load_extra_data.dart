@@ -12,8 +12,8 @@ class ReadFromFireStoreByDocumentId<T> extends StatelessWidget {
     required this.toFirestore,
     required this.documentId,
     required this.collection,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Builder builder;
   final ErrorBuilder? errorBuilder;
@@ -91,8 +91,8 @@ class QueryFromFireStore<T> extends StatelessWidget {
     required this.query,
     required this.collection,
     this.limit,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final Builder builder;
   final ErrorBuilder? errorBuilder;

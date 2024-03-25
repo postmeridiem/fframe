@@ -5,10 +5,10 @@ import 'package:example/models/fframe_page.dart';
 
 class Tab02 extends StatelessWidget {
   const Tab02({
-    Key? key,
+    super.key,
     required this.page,
     required this.readOnly,
-  }) : super(key: key);
+  });
   final FframePage page;
   final bool readOnly;
 

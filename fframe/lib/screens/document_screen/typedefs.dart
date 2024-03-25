@@ -14,7 +14,7 @@ typedef DocumentTabsBuilder<T> = List<DocumentTab<T>> Function(
 
 typedef ExtraActionButtonsBuilder<T> = List<Widget> Function(
   BuildContext context,
-  T data,
+  SelectedDocument<T> selectedDocument,
   bool isReadOnly,
   bool isNew,
   FFrameUser? user,
@@ -48,7 +48,7 @@ typedef DocumentTabChildBuilder<T> = Widget Function(
   bool isReadOnly,
 );
 
-typedef TitleBuilder<T> = Widget? Function(
+typedef TitleBuilder<T> = Text Function(
   BuildContext context,
   T data,
 );

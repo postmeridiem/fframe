@@ -9,8 +9,8 @@ class PageListItem extends StatelessWidget {
     required this.page,
     required this.selected,
     required this.user,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final FframePage page;
   final FFrameUser? user;
   final bool selected;

@@ -3,7 +3,7 @@ import 'package:fframe/helpers/slug.dart';
 import 'package:flutter/material.dart';
 
 class CurrentUserProfile extends StatefulWidget {
-  const CurrentUserProfile({Key? key}) : super(key: key);
+  const CurrentUserProfile({super.key});
 
   @override
   State<CurrentUserProfile> createState() => _CurrentUserProfileState();

@@ -4,8 +4,8 @@ import 'package:example/models/appuser.dart';
 class ProfileTab extends StatelessWidget {
   const ProfileTab({
     required this.user,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   // Fields in a Widget subclass are always marked "final".
   final AppUser user;
@@ -47,8 +47,8 @@ class ProfileTab extends StatelessWidget {
 class ProfileWidget extends StatelessWidget {
   const ProfileWidget({
     required this.user,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   // Fields in a Widget subclass are always marked "final".
   final AppUser user;

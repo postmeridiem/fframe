@@ -468,14 +468,14 @@ class SwimlanesBuilderCell<T> extends StatefulWidget {
     required this.swimlanesController,
     required this.swimlaneSetting,
     required this.selectedDocument,
-    required this.document,
+    required this.documentConfig,
     required this.cellWidget,
   });
 
   final SwimlanesController swimlanesController;
   final SwimlaneSetting swimlaneSetting;
-  final SelectedDocument selectedDocument;
-  final T document;
+  final SelectedDocument<T> selectedDocument;
+  final DocumentConfig<T> documentConfig;
   final Widget cellWidget;
 
   @override
@@ -505,7 +505,7 @@ class _SwimlanesBuilderCellState<T> extends State<SwimlanesBuilderCell<T>> {
         cursor: MaterialStateMouseCursor.clickable,
         child: GestureDetector(
           onTap: () {
-            widget.selectedDocument.open(context: context);
+            widget.selectedDocument.open();
           },
           child: widget.cellWidget,
         ),
@@ -625,7 +625,6 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                       documentConfig: widget.documentConfig,
                       id: firestoreDocument.documentReference.id,
                       data: firestoreDocument.data,
-                      documentReference: firestoreDocument.documentReference,
                     ))
                 .toList();
 
@@ -644,13 +643,13 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                     // selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.);
                     break;
                   case SwimlanesFilterType.prioHigh:
-                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data as T) < 4);
+                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) < 4);
                     break;
                   case SwimlanesFilterType.prioLow:
-                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data as T) >= 4 && swimlanesConfig.getPriority!(selectedDocument.data as T) < 7);
+                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) >= 4 && swimlanesConfig.getPriority!(selectedDocument.data) < 7);
                     break;
                   case SwimlanesFilterType.prioNormal:
-                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data as T) >= 7);
+                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) >= 7);
                     break;
                   default:
                     break;
@@ -732,7 +731,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                 if (docIndex < selectedDocuments.length - 1) {
                                   dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
                                 } else {
-                                  double lastPriority = swimlanesConfig.getPriority!(selectedDocuments[docIndex].data as T);
+                                  double lastPriority = swimlanesConfig.getPriority!(selectedDocuments[docIndex].data);
                                   dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
                                 }
                               }
@@ -764,11 +763,11 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
 
     // Handle case when it's the last item in the list
     if (index == items.length - 1) {
-      return widget.swimlanesConfig.getPriority!(items[index].data as T) + (1 - (widget.swimlanesConfig.getPriority!(items[index].data as T) % 1)) / 2;
+      return widget.swimlanesConfig.getPriority!(items[index].data) + (1 - (widget.swimlanesConfig.getPriority!(items[index].data) % 1)) / 2;
     }
 
-    double currentPriority = widget.swimlanesConfig.getPriority!(items[index].data as T);
-    double nextPriority = widget.swimlanesConfig.getPriority!(items[index + 1].data as T);
+    double currentPriority = widget.swimlanesConfig.getPriority!(items[index].data);
+    double nextPriority = widget.swimlanesConfig.getPriority!(items[index + 1].data);
     int decimals = max(currentPriority.toString().split('.').first.length, nextPriority.toString().split('.').first.length) + 1;
 
     // Check if it's the last item of the integer part
@@ -850,13 +849,13 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
         setState(() {
           _dragContext = null;
         });
-        T newData = dragContext.data.selectedDocument.data as T;
+        T data = dragContext.data.selectedDocument.data;
         if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id) {
-          newData = widget.swimlaneSetting.onPriorityChange(newData, widget.priority);
+          data = widget.swimlaneSetting.onPriorityChange(data, widget.priority);
         } else {
-          newData = widget.swimlaneSetting.onLaneDrop(newData, widget.priority);
+          data = widget.swimlaneSetting.onLaneDrop(data, widget.priority);
         }
-        dragContext.data.selectedDocument.update(newData: newData);
+        dragContext.data.selectedDocument.update(data: data);
       }),
       onLeave: ((DragContext<T>? dragContext) {
         setState(() {
@@ -874,7 +873,7 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
             dragContext.data.selectedDocument,
             widget.fFrameUser.roles,
             dragContext.data.sourceColumn.id,
-            widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data as T).floor(),
+            widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data).floor(),
             widget.priority!.floor(),
           );
         } else {
@@ -882,7 +881,7 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
             dragContext.data.selectedDocument,
             widget.fFrameUser.roles,
             dragContext.data.sourceColumn.id,
-            (widget.swimlanesConfig.getPriority != null) ? widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data as T).floor() : null,
+            (widget.swimlanesConfig.getPriority != null) ? widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data).floor() : null,
             (widget.swimlanesConfig.getPriority != null) ? widget.priority!.floor() : null,
           );
         }
@@ -936,7 +935,7 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             child: GestureDetector(
-              onTap: () => {selectedDocument.open(context: context)},
+              onTap: () => selectedDocument.open(),
               child: Card(
                 color: widget.color,
                 elevation: 4,

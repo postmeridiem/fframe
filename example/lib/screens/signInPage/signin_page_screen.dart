@@ -9,6 +9,7 @@ import 'package:flutterfire_ui/auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class SignInPage extends StatefulWidget {
+  // ignore: use_super_parameters
   const SignInPage({
     Key? key,
     required this.title,

@@ -8,7 +8,7 @@ import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/helpers/fframe_prefs.dart';
 
 class SettingsGeneralForm extends StatefulWidget {
-  const SettingsGeneralForm({Key? key}) : super(key: key);
+  const SettingsGeneralForm({super.key});
 
   @override
   State<SettingsGeneralForm> createState() => _SettingsGeneralFormState();

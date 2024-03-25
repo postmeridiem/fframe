@@ -354,7 +354,6 @@ class PaginatedDataTableExtendedState extends State<PaginatedDataTableExtended> 
 
   @override
   Widget build(BuildContext context) {
-    // TODO(ianh): This whole build function doesn't handle RTL yet.
     assert(debugCheckHasMaterialLocalizations(context));
     final ThemeData themeData = Theme.of(context);
     final MaterialLocalizations localizations = MaterialLocalizations.of(context);
@@ -523,8 +522,6 @@ class PaginatedDataTableExtendedState extends State<PaginatedDataTableExtended> 
                     opacity: 0.54,
                   ),
                   child: SizedBox(
-                    // TODO(bkonyi): this won't handle text zoom correctly,
-                    //  https://github.com/flutter/flutter/issues/48522
                     height: 56.0,
                     child: SingleChildScrollView(
                       dragStartBehavior: widget.dragStartBehavior,

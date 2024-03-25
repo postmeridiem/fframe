@@ -9,9 +9,9 @@ enum SwimlanesQueryStates { active, inactive }
 
 class SwimlanesScreen extends StatefulWidget {
   const SwimlanesScreen({
-    Key? key,
+    super.key,
     required this.swimlanesQueryState,
-  }) : super(key: key);
+  });
   final SwimlanesQueryStates swimlanesQueryState;
 
   @override
@@ -111,25 +111,25 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
 
 class SuggestionCard extends StatelessWidget {
   const SuggestionCard({
-    Key? key,
+    super.key,
     required this.selectedDocument,
     required this.swimlanesConfig,
     required this.fFrameUser,
-  }) : super(key: key);
+  });
   final SelectedDocument<Suggestion> selectedDocument;
   final SwimlanesConfig<Suggestion> swimlanesConfig;
   final FFrameUser fFrameUser;
 
   @override
   Widget build(BuildContext context) {
-    Suggestion suggestion = selectedDocument.data as Suggestion;
+    Suggestion suggestion = selectedDocument.data;
     return SizedBox(
       height: 150,
       child: Placeholder(
         child: Center(
           child: Column(
             children: [
-              SelectableText("${selectedDocument.id}"),
+              SelectableText("$selectedDocument.id"),
               Text("${suggestion.priority}"),
             ],
           ),

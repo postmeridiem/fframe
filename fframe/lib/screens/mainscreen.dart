@@ -6,6 +6,7 @@ import 'package:fframe/providers/state_providers.dart';
 import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/fframe.dart';
+
 // import 'package:url_launcher/url_launcher.dart';
 
 // import '../helpers/profile_buttons.dart';
@@ -131,19 +132,25 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   //       )
                   //     : null,
                 ),
-                body: Consumer(
-                  builder: (context, ref, child) {
-                    TargetState targetState = ref.watch(targetStateProvider);
-                    Console.log("MainScreen Consumer builder '${targetState.navigationTarget.title}'", scope: "fframeLog.MainScreen", level: LogLevel.fframe, color: ConsoleColor.green);
+                body: Stack(
+                  children: [
+                    Consumer(
+                      builder: (context, ref, child) {
+                        TargetState targetState = ref.watch(targetStateProvider);
+                        Console.log("MainScreen Consumer builder '${targetState.navigationTarget.title}'", scope: "fframeLog.MainScreen", level: LogLevel.fframe, color: ConsoleColor.green);
 
-                    return AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      child: Container(
-                        key: ValueKey("navTarget_${targetState.navigationTarget.title}"),
-                        child: targetState.navigationTarget.contentPane,
-                      ),
-                    );
-                  },
+                    
+                        return AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: Container(
+                            key: ValueKey("navTarget_${targetState.navigationTarget.title}"),
+                            child: targetState.navigationTarget.contentPane,
+                          ),
+                        );
+                      },
+                    ),
+                    const MinimizedDocumentsWatcher(),
+                  ],
                 ),
               ),
             ),
@@ -159,6 +166,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 }
+
 
 class ProfileButton extends StatefulWidget {
   const ProfileButton({super.key});
@@ -277,9 +285,10 @@ class _ProfileButtonState extends State<ProfileButton> {
                               return navigationNotifier.navigationConfig.errorPage;
                             },
                           );
-
                           navigationNotifier.processRouteInformation(
-                            targetState: TargetState(navigationTarget: profilePageTarget),
+                            targetState: TargetState(
+                              navigationTarget: profilePageTarget,
+                            ),
                           );
                           overlayEntry.remove();
                           // FRouter.of(context).navigateTo(navigationTarget: profilePageTarget);

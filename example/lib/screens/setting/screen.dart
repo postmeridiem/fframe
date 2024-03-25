@@ -5,6 +5,7 @@ import 'package:example/models/setting.dart';
 import 'setting.dart';
 
 class SettingScreen<Setting> extends StatefulWidget {
+  // ignore: use_super_parameters
   const SettingScreen({Key? key}) : super(key: key);
 
   @override
@@ -37,6 +38,7 @@ class _SettingScreenState extends State<SettingScreen> {
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
+
         showCreateButton: false,
         builder: (_, selected, data, __) {
           return SettingListItem(

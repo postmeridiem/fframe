@@ -1,6 +1,6 @@
 part of '../fframe.dart';
 
-class TargetState {
+class TargetState extends ChangeNotifier {
   TargetState({
     required this.navigationTarget,
   });

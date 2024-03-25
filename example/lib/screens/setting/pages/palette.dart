@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fframe/helpers/console_logger.dart';
 
 class PaletteForm extends StatefulWidget {
+  // ignore: use_super_parameters
   const PaletteForm({Key? key}) : super(key: key);
 
   @override

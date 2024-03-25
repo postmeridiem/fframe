@@ -86,6 +86,11 @@ class DatabaseService<T> {
     return documentReference;
   }
 
+  String generateDocId({required String collection}) {
+    CollectionReference collectionReference = FirebaseFirestore.instance.collection(collection);
+    return collectionReference.doc().id;
+  }
+
   Future<DocumentSnapshot<T>?> documentSnapshot({
     required String collection,
     required String documentId,
@@ -94,7 +99,26 @@ class DatabaseService<T> {
   }) async {
     if (_auth.currentUser == null) return null;
     DocumentReference<T>? documentReference = await this.documentReference(collection: collection, documentId: documentId, fromFirestore: fromFirestore, toFirestore: toFirestore);
-    return documentReference!.get();
+    return documentReference?.get();
+  }
+
+  Future<SelectedDocument<T>?> selectedDocument({
+    required DocumentConfig<T> documentConfig,
+    required String documentId,
+    // required T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore,
+    // required Map<String, Object?> Function(T, SetOptions?) toFirestore,
+  }) async {
+    if (_auth.currentUser == null) return null;
+    DocumentReference<T>? documentReference = await this.documentReference(collection: documentConfig.collection, documentId: documentId, fromFirestore: documentConfig.fromFirestore, toFirestore: documentConfig.toFirestore);
+    DocumentSnapshot<T> documentSnapshot = await documentReference!.get();
+    if (documentSnapshot.exists) {
+      return SelectedDocument<T>(
+        id: documentId,
+        documentConfig: documentConfig,
+        data: documentSnapshot.data(),
+      );
+    }
+    return null;
   }
 
   Future<SaveState> updateDocument({

@@ -2,7 +2,7 @@ import 'package:example/models/setting.dart';
 import 'package:flutter/material.dart';
 
 class ContextCard extends StatelessWidget {
-  const ContextCard({Key? key, required this.setting}) : super(key: key);
+  const ContextCard({super.key, required this.setting});
   final Setting setting;
 
   @override

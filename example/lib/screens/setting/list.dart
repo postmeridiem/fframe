@@ -7,8 +7,8 @@ class SettingListItem extends StatelessWidget {
   const SettingListItem({
     required this.setting,
     required this.selected,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final Setting setting;
   final bool selected;
 

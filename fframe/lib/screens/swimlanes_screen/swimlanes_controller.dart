@@ -11,7 +11,6 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
     required this.theme,
     required this.swimlanesConfig,
     required this.viewportSize,
-    required this.documentOpen,
   }) : super(child: child) {
     // initialize the total width tracker
     double calculatedMinWidth = 0;
@@ -69,7 +68,6 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
   final SwimlanesConfig swimlanesConfig;
   final ThemeData theme;
   final Size viewportSize;
-  final bool documentOpen;
 
   late Query sourceQuery;
   // late SwimlaneTaskDatabase database;
@@ -181,8 +179,7 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
     covariant InheritedModel oldWidget,
     Set dependencies,
   ) {
-    // TODO: implement updateShouldNotifyDependent
-    return true;
+    return false;
   }
 
   static SwimlanesController? maybeOf(BuildContext context) {
@@ -237,7 +234,7 @@ class SwimlanesNotifier<T> extends ChangeNotifier {
   }
 
   set searchString(String? searchString) {
-    //TODO: add some kind of rate limiting
+    //TODO JPM: add some kind of rate limiting
     if (searchString != null && searchString.isNotEmpty) {
       _searchString = searchString;
     } else {

@@ -12,12 +12,13 @@ export 'package:url_launcher/url_launcher.dart';
 export 'package:clipboard/clipboard.dart';
 export 'package:shimmer/shimmer.dart';
 export 'package:dotted_border/dotted_border.dart';
+export 'dart:collection';
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
-// import 'dart:js_interop';
 import 'dart:math';
+import 'dart:collection';
 
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/controllers/query_state_controller.dart';
@@ -32,7 +33,6 @@ import 'package:fframe/routers/navigation_route.dart';
 import 'package:fframe/helpers/prompts.dart';
 import 'package:fframe/helper_widgets/confirmation_dialog.dart';
 
-import 'package:fframe/controllers/selection_state_controller.dart';
 import 'package:fframe/helper_widgets/init_l10n.dart';
 
 import 'package:fframe/helpers/l10n.dart';
@@ -58,8 +58,7 @@ import 'package:preload_page_view/preload_page_view.dart';
 import 'package:uuid/uuid.dart';
 import 'package:shimmer/shimmer.dart';
 
-import 'package:fframe/extensions/query.dart';
-import "package:fframe/extensions/string.dart";
+import 'package:fframe/extensions/extensions.dart';
 
 import 'material/paginated_data_table_extended.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -76,9 +75,11 @@ part 'package:fframe/models/navigation_config.dart';
 
 part 'package:fframe/services/target_state.dart';
 part 'package:fframe/services/query_state.dart';
+part 'package:fframe/controllers/selection_state_controller.dart';
 
 part 'screens/document_screen/models.dart';
 part 'screens/document_screen/typedefs.dart';
+part 'screens/document_screen/document_minimized.dart';
 part 'screens/document_screen/document_context.dart';
 part 'screens/document_screen/document_screen.dart';
 part 'screens/document_screen/document_body.dart';

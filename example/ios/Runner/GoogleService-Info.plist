@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>252859371693-oepn9hu631cd9pssqlhuau186jdqjs51.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.252859371693-oepn9hu631cd9pssqlhuau186jdqjs51</string>
+	<key>API_KEY</key>
+	<string>AIzaSyADQDQu3GLCd9bzKBxc920b89LmveSNwu8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>252859371693</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>fframe.app.example</string>
+	<key>PROJECT_ID</key>
+	<string>fframe-dev</string>
+	<key>STORAGE_BUCKET</key>
+	<string>fframe-dev.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:252859371693:ios:cb0da463621a3c43733624</string>
+	<key>DATABASE_URL</key>
+	<string>https://fframe-dev-default-rtdb.europe-west1.firebasedatabase.app</string>
+</dict>
+</plist>

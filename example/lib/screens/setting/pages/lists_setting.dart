@@ -8,7 +8,7 @@ import 'package:example/helpers/icons.dart';
 import 'package:example/helpers/strings.dart';
 
 class SettingsListsForm extends StatefulWidget {
-  const SettingsListsForm({Key? key}) : super(key: key);
+  const SettingsListsForm({super.key});
 
   @override
   State<SettingsListsForm> createState() => _SettingsListsFormState();
@@ -132,9 +132,9 @@ class _SettingsListsFormState extends State<SettingsListsForm> {
 
 class CurrentListEditor extends StatefulWidget {
   const CurrentListEditor({
-    Key? key,
+    super.key,
     required this.currentList,
-  }) : super(key: key);
+  });
 
   final FframeList currentList;
 

@@ -2,7 +2,7 @@ import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
 class WaitPage extends StatelessWidget {
-  const WaitPage({Key? key, this.color}) : super(key: key);
+  const WaitPage({super.key, this.color});
   final Color? color;
 
   @override

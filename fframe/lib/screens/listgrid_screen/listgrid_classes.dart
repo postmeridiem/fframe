@@ -1,6 +1,6 @@
 part of '../../fframe.dart';
 
-class ListGridConfig<T> {
+class ListGridConfig<T> extends ListConfig {
   ListGridConfig({
     required this.columnSettings,
     this.dataMode = const ListGridDataModeConfig(mode: ListGridDataMode.all),
@@ -79,7 +79,7 @@ typedef ListGridActionHandler<T> = SelectedDocument<T>? Function(
   BuildContext context,
   FFrameUser? user,
   SelectedDocument<T>? selectedDocument,
-  DocumentScreenConfig? screenConfig,
+  DocumentConfig<T> documentConfig,
 );
 
 class ListGridColumn<T> {
@@ -172,86 +172,6 @@ class ListGridSearchMask {
   final String from;
   final String to;
   final bool toLowerCase;
-}
-
-class SelectedDocument<T> {
-  final DocumentConfig<T> documentConfig;
-  final DocumentSnapshot<Map<String, dynamic>>? documentSnapshot;
-  final DocumentReference<T>? documentReference;
-
-  String? _id;
-  T? _data;
-
-  SelectedDocument({
-    required id,
-    required this.documentConfig,
-    this.documentSnapshot,
-    this.documentReference,
-    T? data,
-  }) {
-    _id = id;
-    if (data != null) {
-      _data = data;
-    } else if (this.documentSnapshot != null) {
-      _data = documentConfig.fromFirestore(this.documentSnapshot!, null);
-    }
-  }
-
-  // Getter for _data
-  T? get data => _data;
-
-  String? get id => _id;
-
-  // Setter for _data
-  set data(T? newData) {
-    if (newData != null) {
-      documentConfig.toFirestore(newData, null);
-      _data = newData;
-    }
-  }
-
-  close({required BuildContext context}) {
-    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
-    documentScreenConfig.close(context: context);
-  }
-
-  open({required BuildContext context}) {
-    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
-    documentScreenConfig.selectDocument(context, this);
-  }
-
-  update({T? newData}) {
-    T data = newData ?? _data!;
-    if (_id == null) {
-      //Must be a new document, create an Id for it
-      _id = documentConfig.createDocumentId!(data);
-      DatabaseService<T>().createDocument(
-        collection: documentConfig.collection,
-        documentId: _id!,
-        data: data,
-        fromFirestore: documentConfig.fromFirestore,
-        toFirestore: documentConfig.toFirestore,
-      );
-    } else {
-      DatabaseService<T>().updateDocument(
-        collection: documentConfig.collection,
-        documentId: _id!,
-        data: data,
-        fromFirestore: documentConfig.fromFirestore,
-        toFirestore: documentConfig.toFirestore,
-      );
-    }
-  }
-
-  factory SelectedDocument.createNew({required BuildContext context}) {
-    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
-    DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
-    return SelectedDocument<T>(
-      documentConfig: documentConfig,
-      id: null,
-      data: documentScreenConfig.create<T>(context: context) as T,
-    );
-  }
 }
 
 enum ListGridColumnSizingMode {

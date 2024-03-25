@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_import, unnecessary_null_comparison
+// ignore_for_file: unnecessary_import, unnecessary_null_comparison, use_super_parameters
 
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
@@ -129,6 +129,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
+        columnWidth: 250.0,
         footerBuilder: (context, documentCount) {
           return Column(
             children: [
@@ -222,22 +223,22 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
     showDeleteButton: true,
     showSaveButton: true,
     showValidateButton: true,
-    extraActionButtons: (context, suggestion, isReadOnly, isNew, user) {
+    extraActionButtons: (context, selectedDocument, isReadOnly, isNew, user) {
       return [
-        if (suggestion.active == false)
+        if (selectedDocument.data.active == false)
           TextButton.icon(
             onPressed: () {
-              suggestion.active = true;
-              DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+              selectedDocument.data.active = true;
+              selectedDocument.save(context: context);
             },
             icon: const Icon(Icons.check, color: Colors.redAccent),
             label: const Text("Mark as Active"),
           ),
-        if (suggestion.active == true)
+        if (selectedDocument.data.active == true)
           TextButton.icon(
             onPressed: () {
-              suggestion.active = false;
-              DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+              selectedDocument.data.active = false;
+              selectedDocument.save(context: context);
             },
             icon: const Icon(Icons.close, color: Colors.greenAccent),
             label: const Text("Mark as Done"),
@@ -249,7 +250,7 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
               String domain = "https://console.cloud.google.com";
               String application = "firestore/databases/-default-/data/panel";
               String collection = "suggestions";
-              String docId = suggestion.id ?? "";
+              String docId = selectedDocument.data.id ?? "";
               String gcpProject = Fframe.of(context)!.firebaseOptions.projectId;
               Uri url = Uri.parse("$domain/$application/$collection/$docId?&project=$gcpProject");
               launchUrl(url);

@@ -8,10 +8,10 @@ import '../../../models/models.dart';
 
 class Tab03 extends StatefulWidget {
   const Tab03({
-    Key? key,
+    super.key,
     required this.suggestion,
     required this.readOnly,
-  }) : super(key: key);
+  });
   final Suggestion suggestion;
   final bool readOnly;
 

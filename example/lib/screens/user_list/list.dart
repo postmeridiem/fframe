@@ -7,8 +7,8 @@ class UserListItem extends StatelessWidget {
     required this.user,
     required this.selected,
     required this.fFrameUser,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final AppUser user;
   final bool selected;
   final FFrameUser? fFrameUser;

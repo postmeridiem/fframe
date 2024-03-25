@@ -1,11 +1,20 @@
 part of '../../fframe.dart';
 
+class ListConfig<T> {
+  final double columnWidth;
+
+  ListConfig({
+    this.columnWidth = 0,
+  });
+}
+
 class DocumentConfig<T> extends ChangeNotifier {
   DocumentConfig({
     required this.formKey,
     required this.collection,
     required this.createNew,
     required this.initialViewType,
+    required this.titleBuilder,
     this.preSave,
     this.preOpen,
     this.createDocumentId,
@@ -17,7 +26,7 @@ class DocumentConfig<T> extends ChangeNotifier {
     this.dataGridConfig,
     this.listGridConfig,
     this.swimlanes,
-    this.titleBuilder,
+    this.columnWidth = 0.0,
     required this.autoSelectFirst,
     required this.document,
     this.contextCardBuilders,
@@ -30,7 +39,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   final DataGridConfig<T>? dataGridConfig;
   final ListGridConfig<T>? listGridConfig;
   final SwimlanesConfig<T>? swimlanes;
-  final TitleBuilder<T>? titleBuilder;
+  final TitleBuilder<T> titleBuilder;
   final Document<T> document;
   final String queryStringIdParam;
   final String collection;
@@ -43,17 +52,16 @@ class DocumentConfig<T> extends ChangeNotifier {
   final T? Function(T)? preSave;
   final T Function(T)? preOpen;
   final String? Function(T)? createDocumentId;
-  final List<ContextCardBuilder>? contextCardBuilders;
+  final List<ContextCardBuilder<T>>? contextCardBuilders;
   final bool embeddedDocument;
   final ViewType initialViewType;
-
+  final double columnWidth;
   late PreloadPageController preloadPageController;
   late PageController pageController;
   late TabController tabController;
   ViewType? _viewType;
 
   List<ViewType> get allowedViewTypes {
-    //TODO: this needs to be cleaned up after listgrid is mature
     switch (initialViewType) {
       case ViewType.auto:
         List<ViewType> returnValue = [];
@@ -112,7 +120,7 @@ class Document<T> {
     this.prefetchTabs = true,
   });
   final Key? key;
-  final DocumentTabsBuilder<T>? documentTabsBuilder;
+  final DocumentTabsBuilder<T> documentTabsBuilder;
   final DocumentHeaderBuilder<T>? documentHeaderBuilder;
   final List<ContextCardBuilder>? contextCards;
   final ExtraActionButtonsBuilder<T>? extraActionButtons;
@@ -143,10 +151,12 @@ class DocumentTab<T> {
     required this.childBuilder,
     this.lockViewportScroll = false,
   });
+
+  save() {}
 }
 
-class DocumentList<T> {
-  const DocumentList({
+class DocumentList<T> extends ListConfig {
+  DocumentList({
     required this.builder,
     this.headerBuilder,
     this.footerBuilder,
@@ -154,6 +164,7 @@ class DocumentList<T> {
     this.showSeparator = true,
     this.showCreateButton = true,
     this.seperatorHeight = 1,
+    super.columnWidth = 250,
   });
   final DocumentListItemBuilder<T> builder;
   final DocumentListHeaderBuilder<T>? headerBuilder;

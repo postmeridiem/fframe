@@ -48,14 +48,7 @@ class _ListGridDocumentState<T> extends ConsumerState<ListGridDocument<T>> {
                   ),
                 ),
               ),
-              // color: Theme.of(context).colorScheme.surface,
-              // child: Text(
-              //   queryState.queryString.toString(),
-              // )
-              // child: Column(children: [Text("${document}")]),
-              child: ScreenBody<T>(
-                key: ValueKey("ScreenBody_${widget.documentConfig.collection}"),
-              ),
+              color: Theme.of(context).colorScheme.surface,
             ),
           ),
         ],

@@ -72,9 +72,6 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
       pages: const [
         RouterPage(),
       ],
-      // onGenerateInitialRoutes: (navigatorState, uri) {
-      //   return navigatorState;
-      // },
       onUnknownRoute: (settings) {
         return MaterialPageRoute(
           builder: (context) => FFErrorPage(),

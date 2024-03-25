@@ -9,9 +9,9 @@ enum ListGridQueryStates { active, inactive }
 
 class ListGridScreen<Suggestion> extends StatefulWidget {
   const ListGridScreen({
-    Key? key,
+    super.key,
     required this.listgridQueryState,
-  }) : super(key: key);
+  });
   final ListGridQueryStates listgridQueryState;
 
   @override

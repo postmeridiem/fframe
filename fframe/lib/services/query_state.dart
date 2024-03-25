@@ -1,9 +1,28 @@
 part of '../fframe.dart';
 
-class QueryState {
-  QueryState({this.queryParameters});
+class QueryState extends ChangeNotifier {
+  // Private static instance for the singleton
+  static final QueryState instance = QueryState._internal();
 
-  final Map<String, String>? queryParameters;
+  // Factory constructor to return the singleton instance
+  factory QueryState({Map<String, dynamic>? queryParameters}) {
+    // Initialize with queryParameters inside the factory constructor if needed
+    if (queryParameters != null) {
+      instance.queryParameters = queryParameters;
+      instance.notifyListeners();
+    }
+    return instance;
+  }
+
+  // Private constructor to prevent external instantiation
+  QueryState._internal();
+
+  // Your state properties
+  Map<String, dynamic>? queryParameters;
+// class QueryState extends ChangeNotifier {
+//   QueryState({this.queryParameters});
+
+//   final Map<String, String>? queryParameters;
 
   factory QueryState.fromUri(Uri uri) {
     return _fromUri(uri);
@@ -18,22 +37,18 @@ class QueryState {
   }
 
   factory QueryState.mergeComponents(QueryState queryState, Map<String, String>? queryParameters) {
-    Map<String, String> newQueryParameters = {};
-    newQueryParameters.addAll(queryState.queryParameters ?? {});
-    newQueryParameters.addAll(queryParameters ?? {});
+    Map<String, String> newQueryParameters = {...queryState.queryParameters ?? {}, ...queryParameters ?? {}}; // Use spread operator for concise merging
+
     Console.log(
       "Merged parameters: ${newQueryParameters.toString()}",
       scope: "fframeLog.QueryState.mergeComponents",
       level: LogLevel.fframe,
     );
-    return QueryState(queryParameters: newQueryParameters); //, context: context);
+
+    return QueryState(queryParameters: newQueryParameters);
   }
 
   factory QueryState.defaultroute() {
-    // // Uri? uri = InitialUri.instance?.getInitialUri();
-    // if (uri != null && uri.pathSegments.isNotEmpty) {
-    //   return _fromUri(uri);
-    // }
     return _defaultRoute();
   }
 

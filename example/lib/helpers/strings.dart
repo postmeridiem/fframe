@@ -6,10 +6,10 @@ import 'package:flutter/material.dart';
 
 class DateTimeText extends StatelessWidget {
   const DateTimeText({
-    Key? key,
+    super.key,
     required this.datetime,
     this.style = const TextStyle(),
-  }) : super(key: key);
+  });
 
   final DateTime datetime;
   final TextStyle style;
@@ -25,10 +25,10 @@ class DateTimeText extends StatelessWidget {
 
 class DateText extends StatelessWidget {
   const DateText({
-    Key? key,
+    super.key,
     required this.datetime,
     this.style = const TextStyle(),
-  }) : super(key: key);
+  });
 
   final DateTime datetime;
   final TextStyle style;
@@ -44,10 +44,10 @@ class DateText extends StatelessWidget {
 
 class TimeText extends StatelessWidget {
   const TimeText({
-    Key? key,
+    super.key,
     required this.datetime,
     this.style = const TextStyle(),
-  }) : super(key: key);
+  });
 
   final DateTime datetime;
   final TextStyle style;
@@ -63,10 +63,10 @@ class TimeText extends StatelessWidget {
 
 class TimestampDateTimeText extends StatelessWidget {
   const TimestampDateTimeText({
-    Key? key,
+    super.key,
     required this.timestamp,
     this.style = const TextStyle(),
-  }) : super(key: key);
+  });
 
   final Timestamp timestamp;
   final TextStyle style;
@@ -82,10 +82,10 @@ class TimestampDateTimeText extends StatelessWidget {
 
 class TimestampDateText extends StatelessWidget {
   const TimestampDateText({
-    Key? key,
+    super.key,
     required this.timestamp,
     this.style = const TextStyle(),
-  }) : super(key: key);
+  });
 
   final Timestamp timestamp;
   final TextStyle style;
@@ -101,10 +101,10 @@ class TimestampDateText extends StatelessWidget {
 
 class TimestampTimeText extends StatelessWidget {
   const TimestampTimeText({
-    Key? key,
+    super.key,
     required this.timestamp,
     this.style = const TextStyle(),
-  }) : super(key: key);
+  });
 
   final Timestamp timestamp;
   final TextStyle style;

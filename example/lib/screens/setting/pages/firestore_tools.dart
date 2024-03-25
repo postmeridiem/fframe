@@ -5,7 +5,7 @@ import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/helpers/console_logger.dart';
 
 class SettingsFirestoreToolsForm extends StatefulWidget {
-  const SettingsFirestoreToolsForm({Key? key}) : super(key: key);
+  const SettingsFirestoreToolsForm({super.key});
 
   @override
   State<SettingsFirestoreToolsForm> createState() =>
@@ -100,8 +100,8 @@ class StampUpdate {
 
 class StampUpdater extends StatelessWidget {
   const StampUpdater({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -386,7 +386,7 @@ const List<String> types = <String>[
 ];
 
 class DataTypeSelector extends StatefulWidget {
-  const DataTypeSelector({Key? key}) : super(key: key);
+  const DataTypeSelector({super.key});
 
   @override
   State<DataTypeSelector> createState() => _DataTypeSelectorState();
@@ -421,7 +421,7 @@ class _DataTypeSelectorState extends State<DataTypeSelector> {
 }
 
 class OperationSelector extends StatefulWidget {
-  const OperationSelector({Key? key}) : super(key: key);
+  const OperationSelector({super.key});
 
   @override
   State<OperationSelector> createState() => _OperationSelectorState();

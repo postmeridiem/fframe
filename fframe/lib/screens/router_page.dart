@@ -42,11 +42,6 @@ class FRouter extends InheritedWidget {
     QueryState queryState = ref.read(queryStateProvider);
 
     QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
-    // Console.log(
-    //   "${navigationTarget.path} ${queryParameters == null ? "without" : "with"} queryString ${queryParameters?.toString() ?? ""}. Reset queryString: $resetQueryString",
-    //   scope: "fframeLog.FRouter.navigateTo",
-    //   level: LogLevel.fframe,
-    // );
     Console.log(
       "Update route to /${navigationTarget.path} with query: `${newQueryState.toString()}`. Reset queryString: $resetQueryString",
       scope: "fframeLog.FRouter.navigateTo",
@@ -55,6 +50,10 @@ class FRouter extends InheritedWidget {
 
     TargetState targetState = TargetState.processRouteRequest(navigationTarget: navigationTarget);
     navigationNotifier.processRouteInformation(targetState: targetState, queryState: newQueryState);
+  }
+
+  TargetState get currentTargetState {
+    return ref.read(targetStateProvider);
   }
 
   ///Text based route Only
@@ -97,8 +96,6 @@ class FRouter extends InheritedWidget {
         target = target!.navigationTabs!.firstWhere((NavigationTab tab) => (tab.path == selector1 || tab.path == selector2));
       }
     }
-
-    //NavigationTarget navigationTarget = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == routeSegments.last);
 
     QueryState newQueryState = QueryState(queryParameters: queryParameters);
 
@@ -277,7 +274,6 @@ class FRouter extends InheritedWidget {
     int index = navigationNotifier.navigationTabs.indexWhere(
       (NavigationTab navigationTab) => navigationTab.path == navigationNotifier.currentTarget!.navigationTarget.path,
     );
-    debugger(when: index == -1);
     return index == -1 ? 0 : index;
   }
 
@@ -432,12 +428,6 @@ class RouterScreen extends StatefulWidget {
 }
 
 class _RouterScreenState extends State<RouterScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => navigationNotifier.markBuildDone());
-  }
-
   @override
   Widget build(BuildContext context) {
     Console.log("Build RouterScreen", scope: "fframeLog.RouterScreen", level: LogLevel.fframe);

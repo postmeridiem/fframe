@@ -5,6 +5,7 @@ class DocumentScreen<T> extends StatelessWidget {
     super.key,
     required this.collection,
     required this.createNew,
+    required this.titleBuilder,
     this.preSave,
     this.preOpen,
     this.createDocumentId,
@@ -18,7 +19,6 @@ class DocumentScreen<T> extends StatelessWidget {
     this.autoSelectFirst = false,
     this.query,
     this.searchConfig,
-    this.titleBuilder,
     required this.document,
     this.contextCardBuilders,
     this.queryStringIdParam = "id",
@@ -36,7 +36,7 @@ class DocumentScreen<T> extends StatelessWidget {
   final ViewType viewType;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
-  final TitleBuilder<T>? titleBuilder;
+  final TitleBuilder<T> titleBuilder;
   final Document<T> document;
   final String queryStringIdParam;
   final String collection;
@@ -66,70 +66,91 @@ class DocumentScreen<T> extends StatelessWidget {
       embeddedDocument = true;
     }
 
-    return Column(
+    return Stack(
       children: [
-        if (documentScreenHeaderBuilder != null) documentScreenHeaderBuilder!(),
-        Expanded(
-          child: Form(
-            key: formKey,
-            child: DocumentScreenConfig(
-              fireStoreQueryState: FireStoreQueryState<T>(
-                collection: collection,
-                fromFirestore: fromFirestore,
-                initialQuery: query,
-                listQuery: queryBuilder,
-              ),
-              fFrameUser: fFrameUser,
-              selectionState: SelectionState<T>(),
-              documentConfig: DocumentConfig<T>(
-                formKey: formKey,
-                collection: collection,
-                documentList: documentList,
-                dataGridConfig: dataGrid,
-                listGridConfig: listGrid,
-                swimlanes: swimlanes,
-                initialViewType: viewType,
-                autoSelectFirst: autoSelectFirst,
-                queryStringIdParam: queryStringIdParam ?? this.queryStringIdParam,
-                createNew: createNew,
-                createDocumentId: createDocumentId,
-                preSave: preSave,
-                preOpen: preOpen,
-                document: document,
-                toFirestore: toFirestore,
-                fromFirestore: fromFirestore,
-                query: query,
-                searchConfig: searchConfig,
-                titleBuilder: titleBuilder,
-                contextCardBuilders: contextCardBuilders,
-                embeddedDocument: embeddedDocument ?? false,
-              ),
-              child: DocumentLoader<T>(
-                key: ValueKey("DocumentLoader_$collection"),
+        Column(
+          children: [
+            if (documentScreenHeaderBuilder != null) documentScreenHeaderBuilder!(),
+            Expanded(
+              child: Form(
+                key: formKey,
+                child: DocumentScreenConfig(
+                  fireStoreQueryState: FireStoreQueryState<T>(
+                    collection: collection,
+                    fromFirestore: fromFirestore,
+                    initialQuery: query,
+                    listQuery: queryBuilder,
+                  ),
+                  fFrameUser: fFrameUser,
+                  documentConfig: DocumentConfig<T>(
+                    formKey: formKey,
+                    collection: collection,
+                    documentList: documentList,
+                    dataGridConfig: dataGrid,
+                    listGridConfig: listGrid,
+                    swimlanes: swimlanes,
+                    initialViewType: viewType,
+                    autoSelectFirst: autoSelectFirst,
+                    queryStringIdParam: queryStringIdParam ?? this.queryStringIdParam,
+                    createNew: createNew,
+                    createDocumentId: createDocumentId,
+                    preSave: preSave,
+                    preOpen: preOpen,
+                    document: document,
+                    toFirestore: toFirestore,
+                    fromFirestore: fromFirestore,
+                    query: query,
+                    searchConfig: searchConfig,
+                    titleBuilder: titleBuilder,
+                    contextCardBuilders: contextCardBuilders,
+                    embeddedDocument: embeddedDocument ?? false,
+                  ),
+                  child: DocumentScreenLoader<T>(
+                    key: ValueKey("DocumentScreenLoader_$collection"),
+                  ),
+                ),
               ),
             ),
-          ),
+            if (documentScreenFooterBuilder != null) documentScreenFooterBuilder!(),
+          ],
         ),
-        if (documentScreenFooterBuilder != null) documentScreenFooterBuilder!(),
+        const DocumentBodyWatcher(),
+        // Consumer(
+        //   builder: (context, ref, child) {
+        //     QueryState queryState = ref.read(queryStateProvider);
+        //     return Text(queryState.queryString); // Hello world
+        //   },
+        // ),
+        // ListenableBuilder(
+        //     listenable: SelectionState.instance,
+        //     builder: (context, child) {
+        //       double columnWidth = SelectionState.instance.columnWidth;
+        //       return SizedBox.expand(
+        //         child: AnimatedPadding(
+        //           padding: EdgeInsets.only(
+        //             left: columnWidth,
+        //           ),
+        //           duration: const Duration(seconds: 5),
+        //           child: const DocumentBodyWatcher(),
+        //         ),
+        //       );
+        //     }),
       ],
     );
   }
 }
 
-//  =
 class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   // ignore: use_super_parameters
   const DocumentScreenConfig({
     super.key,
     required this.documentConfig,
     required this.fireStoreQueryState,
-    required this.selectionState,
     required this.fFrameUser,
     required child,
   }) : super(child: child);
 
   final DocumentConfig documentConfig;
-  final SelectionState selectionState;
   final FireStoreQueryState fireStoreQueryState;
   final FFrameUser fFrameUser;
 
@@ -168,721 +189,174 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     );
   }
 
-  bool get isNew => selectionState.isNew;
-
-  void selectDocument<T>(BuildContext context, SelectedDocument<T> document) {
-    bool embeddedDocument = documentConfig.embeddedDocument;
-    String tabIndexKey = embeddedDocument ? "childTabIndex" : "tabIndex";
-    selectionState.setState(SelectionState<T>(docId: document.id, data: document.data));
-    if (documentConfig.document.activeTabs == null || documentConfig.document.activeTabs!.length == 1) {
-      FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: document.id!}, resetQueryString: !embeddedDocument);
-    } else {
-      FRouter.of(context).updateQueryString<T>(queryParameters: {documentConfig.queryStringIdParam: document.id!, tabIndexKey: "0"}, resetQueryString: !embeddedDocument);
-    }
-  }
-
-  toggleReadOnly<T>({required BuildContext context}) {
-    selectionState.setState(SelectionState<T>(data: selectionState.data!, docId: selectionState.docId, isNew: false, readOnly: !selectionState.readOnly), notify: true);
-  }
-
-  delete<T>({required BuildContext context}) async {
-    bool dialogResult = await (confirmationDialog(
-        context: context,
-        cancelText: L10n.string(
-          "iconbutton_document_delete_cancel",
-          placeholder: "Cancel",
-          namespace: 'fframe',
-        ),
-        continueText: L10n.string(
-          "iconbutton_document_delete_continue",
-          placeholder: "Continue",
-          namespace: 'fframe',
-        ),
-        titleText: L10n.string(
-          "iconbutton_document_delete_title",
-          placeholder: "Delete this document",
-          namespace: 'fframe',
-        ),
-        child: SizedBox(
-          height: 100.0,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.warning,
-                  color: Theme.of(context).colorScheme.error,
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    L10n.string(
-                      "iconbutton_document_delete1",
-                      placeholder: "Delete this document?",
-                      namespace: 'fframe',
-                    ),
-                  ),
-                  Text(
-                    L10n.string(
-                      "iconbutton_document_delete2",
-                      placeholder: "This operation cannot be undone.",
-                      namespace: 'fframe',
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        )));
-
-    if (dialogResult == true) {
-      DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
-      SaveState saveResult = await DatabaseService<T>().deleteDocument(
-        collection: documentConfig.collection,
-        documentId: selectionState.docId!,
-        fromFirestore: documentConfig.fromFirestore,
-        toFirestore: documentConfig.toFirestore,
-      );
-      if (saveResult.result == true && context.mounted) {
-        FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
-      } else {
-        //show the error
-        if (!context.mounted) return;
-        snackbar(
-          context: context,
-          text: saveResult.errorMessage!,
-          icon: Icon(
-            Icons.error,
-            color: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    }
-  }
-
-  close<T>({required BuildContext context, bool skipWarning = false}) async {
-    if (selectionState.readOnly == true || skipWarning == true) {
-      selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
-      FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
-      return;
-    }
-    if (await (confirmationDialog(
-            context: context,
-            cancelText: L10n.string(
-              "iconbutton_document_close_cancel",
-              placeholder: "Cancel",
-            ),
-            continueText: L10n.string(
-              "iconbutton_document_close_continue",
-              placeholder: "Continue",
-            ),
-            titleText: L10n.string(
-              "iconbutton_document_close_title",
-              placeholder: "Close this document",
-            ),
-            child: SizedBox(
-              height: 100.0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(
-                      Icons.question_mark,
-                      color: Colors.yellowAccent.shade200,
-                    ),
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        L10n.string(
-                          "iconbutton_document_close1",
-                          placeholder: "Close this document?",
-                        ),
-                      ),
-                      Text(
-                        L10n.string(
-                          "iconbutton_document_close2",
-                          placeholder: "Any changes made to the document will be lost.",
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ))) ==
-        true) {
-      selectionState.setState(SelectionState<T>.reset());
-      if (context.mounted) FRouter.of(context).updateQueryString(queryParameters: {}, resetQueryString: true);
-    }
-  }
-
-  // ignore: unused_element
-  copy<T>({required BuildContext context}) {
-    selectionState.setState(SelectionState<T>(data: selectionState.data!, docId: "copy", isNew: true, readOnly: false));
-    FRouter.of(context).updateQueryString(queryParameters: {documentConfig.queryStringIdParam: selectionState.docId!}, resetQueryString: selectionState.isNew);
+  void selectDocument<T>(BuildContext context, SelectedDocument<T> selectedDocument) {
+    Console.log("*** DocumentScreen.selectDocument<T> is deprecated please replace is with selectedDocument.open() ***", scope: "DocumentScreen", level: LogLevel.dev, color: ConsoleColor.red);
+    debugger(); //This is to annoy developers to make the change mentioned in the previous line, and change to code to be in the lines below.
+    selectedDocument.open();
   }
 
   create<T>({required BuildContext context}) {
-    //Clear the cache
-
-    selectionState.setState(SelectionState<T>(data: null, docId: null, isNew: false, readOnly: false));
-    if (documentConfig.document.activeTabs != null && documentConfig.document.activeTabs!.length == 1) {
-      FRouter.of(context).updateQueryString<T>(
-        queryParameters: {"new": "true"},
-        resetQueryString: true,
-      );
-    } else {
-      FRouter.of(context).updateQueryString<T>(
-        queryParameters: {"new": "true", "tabIndex": "0"},
-        resetQueryString: true,
-      );
-    }
-  }
-
-  load<T>({required BuildContext context, required String docId}) async {
-    try {
-      DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
-
-      DocumentSnapshot<T>? documentSnapshot = await DatabaseService<T>().documentSnapshot(
-        collection: documentConfig.collection,
-        documentId: docId,
-        fromFirestore: documentConfig.fromFirestore,
-        toFirestore: documentConfig.toFirestore,
-      );
-
-      if (documentSnapshot?.exists ?? false) {
-        Console.log("Loaded document $docId to selectionState and notify", scope: "fframeLog.DocumentScreen.load", level: LogLevel.fframe);
-        selectionState.setState(
-          SelectionState<T>(
-            data: documentSnapshot!.data(),
-            docId: docId,
-          ),
-          notify: true,
-        );
-      } else {
-        Console.log("ERROR: Document does not exist", scope: "fframeLog.DocumentScreen.load", level: LogLevel.prod);
-        if (context.mounted) {
-          FRouter.of(context).updateQueryString(
-            queryParameters: {},
-            resetQueryString: true,
-          );
-          snackbar(
-            context: context,
-            text: "Referenced document could not be loaded: $docId",
-            icon: Icon(
-              Icons.error,
-              color: Theme.of(context).colorScheme.error,
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        snackbar(
-          context: context,
-          text: "Referenced document system broken: $docId \n ${e.toString()}",
-          icon: Icon(
-            Icons.error,
-            color: Theme.of(context).colorScheme.error,
-          ),
-        );
-      }
-    }
-  }
-
-  save<T>({required BuildContext context, bool closeAfterSave = true, T? data}) async {
-    if (validate<T>(context: context, moveToTab: true) == -1) {
-      DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
-      String? docId = selectionState.docId;
-      if (docId == null || selectionState.isNew == true) {
-        if (documentConfig.createDocumentId != null) {
-          docId = documentConfig.createDocumentId!(selectionState.data!);
-        } else {
-          docId = const Uuid().v4();
-        }
-      }
-
-      //optional presave script
-      if (documentConfig.preSave != null) {
-        T? newData = documentConfig.preSave!(selectionState.data!);
-        if (newData == null) return; //Cancel save
-        selectionState.data = newData;
-      }
-      Console.log("Save item $docId in collection ${documentConfig.collection}", scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
-
-      SaveState saveResult = selectionState.isNew
-          ? await DatabaseService<T>().createDocument(
-              collection: documentConfig.collection,
-              documentId: docId!,
-              data: selectionState.data!,
-              fromFirestore: documentConfig.fromFirestore,
-              toFirestore: documentConfig.toFirestore,
-            )
-          : await DatabaseService<T>().updateDocument(
-              collection: documentConfig.collection,
-              documentId: docId!,
-              data: selectionState.data!,
-              fromFirestore: documentConfig.fromFirestore,
-              toFirestore: documentConfig.toFirestore,
-            );
-
-      if (saveResult.result) {
-        //Success
-        Console.log("Save was successfull", scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
-
-        if (closeAfterSave) {
-          if (context.mounted) {
-            close<T>(context: context, skipWarning: true);
-          }
-        }
-      } else {
-        Console.log("ERROR: Save failed", scope: "fframeLog.DocumentScreen.save", level: LogLevel.prod);
-        if (context.mounted) {
-          snackbar(
-            context: context,
-            text: saveResult.errorMessage!,
-            icon: Icon(
-              Icons.error,
-              color: Theme.of(context).colorScheme.error,
-            ),
-          );
-        }
-      }
-    }
-  }
-
-  int validate<T>({required BuildContext context, bool showPopup = false, bool moveToTab = false}) {
     DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
-
-    int invalidTab = documentConfig.document.activeTabs!
-        .map((DocumentTab tab) {
-          bool result = tab.formKey.currentState!.validate();
-          Console.log("Tab ${documentConfig.tabController.index} validated: $result", scope: "fframeLog.DocumentScreen.validate", level: LogLevel.dev);
-          return tab.formKey.currentState!.validate();
-        })
-        .toList()
-        .indexWhere((bool validationResult) => validationResult == false);
-    // .toDouble();
-    if (invalidTab == -1) {
-      if (showPopup) {
-        snackbar(
-          context: context,
-          text: L10n.string(
-            'validator_success',
-            placeholder: "Form is valid",
-          ),
-          icon: Icon(
-            Icons.check,
-            color: Colors.green.shade900,
-          ),
-        );
-      }
-    } else {
-      if (documentConfig.tabController.index != invalidTab || moveToTab) {
-        documentConfig.tabController.animateTo(invalidTab);
-        // _documentConfig.preloadPageController.animateTo(invalidTab, duration: const Duration(microseconds: 250), curve: Curves.easeOutCirc);
-      }
-    }
-    return invalidTab.toInt();
-  }
-
-  List<IconButton>? iconButtons<T>(BuildContext context) {
-    DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
-    Document<T> document = documentConfig.document;
-    SelectionState<T> selectionState = DocumentScreenConfig.of(context)!.selectionState as SelectionState<T>;
-    List<IconButton>? iconButtons = [];
-
-    if (document.showCloseButton) {
-      iconButtons.add(
-        IconButton(
-          tooltip: L10n.string(
-            "iconbutton_document_close",
-            placeholder: "Close this document",
-            namespace: 'fframe',
-          ),
-          icon: Icon(
-            Icons.close,
-            color: Theme.of(context).colorScheme.onBackground,
-          ),
-          onPressed: () {
-            close<T>(context: context);
-          },
-        ),
-      );
-    }
-
-    if (!selectionState.isNew) {
-      if (document.showDeleteButton) {
-        iconButtons.add(
-          IconButton(
-            tooltip: L10n.string(
-              "iconbutton_document_delete",
-              placeholder: "Delete this document",
-              namespace: 'fframe',
-            ),
-            icon: Icon(
-              Icons.delete_forever,
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
-            onPressed: () {
-              copy<T>(context: context);
-            },
-          ),
-        );
-      }
-      if (document.showCopyButton) {
-        iconButtons.add(
-          IconButton(
-            tooltip: L10n.string(
-              "iconbutton_document_copy",
-              placeholder: "Copy this document",
-              namespace: 'fframe',
-            ),
-            icon: Icon(
-              Icons.copy_outlined,
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
-            onPressed: () {
-              copy<T>(context: context);
-            },
-          ),
-        );
-      }
-      if (selectionState.readOnly == true && document.showEditToggleButton) {
-        iconButtons.add(
-          IconButton(
-            tooltip: L10n.string(
-              "iconbutton_document_edit",
-              placeholder: "Edit this document",
-              namespace: 'fframe',
-            ),
-            icon: Icon(
-              Icons.edit,
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
-            onPressed: () {
-              toggleReadOnly(context: context);
-            },
-          ),
-        );
-      }
-    }
-
-    if (selectionState.readOnly == false) {
-      if (document.showValidateButton) {
-        iconButtons.add(
-          IconButton(
-            tooltip: L10n.string(
-              "iconbutton_document_validate",
-              placeholder: "Validate this document",
-              namespace: 'fframe',
-            ),
-            icon: Icon(
-              Icons.check,
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
-            onPressed: () {
-              validate<T>(context: context, showPopup: true);
-              // validate();
-            },
-          ),
-        );
-      }
-      if (document.showSaveButton) {
-        iconButtons.add(
-          IconButton(
-            tooltip: L10n.string(
-              "iconbutton_document_save",
-              placeholder: "Save this document",
-              namespace: 'fframe',
-            ),
-            icon: Icon(
-              Icons.save,
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
-            onPressed: () {
-              save<T>(context: context);
-              // validate();
-            },
-          ),
-        );
-      }
-    }
-    return iconButtons;
+    SelectedDocument<T>.createNew(documentConfig: documentConfig);
   }
 }
 
-class DocumentLoader<T> extends ConsumerStatefulWidget {
+class DocumentScreenLoader<T> extends StatefulWidget {
   final int rowsPerPage;
 
-  const DocumentLoader({super.key, this.rowsPerPage = -1});
+  const DocumentScreenLoader({super.key, this.rowsPerPage = -1});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _DocumentLoaderState<T>();
+  State<StatefulWidget> createState() => _DocumentScreenLoaderState<T>();
 }
 
-class _DocumentLoaderState<T> extends ConsumerState<DocumentLoader<T>> with SingleTickerProviderStateMixin {
-  @override
-  Widget build(BuildContext context) {
-    Console.log("Build DocumentLoader: ${widget.key.toString()}", scope: "fframeLog.DocumentLoader", level: LogLevel.fframe);
-
-    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
-
-    //Switches between view types
-    return ListenableBuilder(
-      listenable: documentConfig,
-      builder: (BuildContext context, Widget? child) {
-        // if (documentConfig.currentViewType == ViewType.auto) {}
-
-        switch (documentConfig.currentViewType) {
-          case ViewType.none:
-            return ScreenBody<T>(
-              key: ValueKey("ScreenBody_${documentConfig.collection}"),
-            );
-          case ViewType.list:
-            return Row(
-              children: [
-                DocumentListLoader<T>(
-                  key: ValueKey("DocumentListBuilder_${documentConfig.collection}"),
-                  ref: ref,
-                ),
-                Expanded(
-                  child: ScreenBody<T>(
-                    key: ValueKey("ScreenBody_${documentConfig.collection}"),
-                  ),
-                ),
-              ],
-            );
-          case ViewType.grid:
-            Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
-            return SizedBox.expand(
-              child: ClipRect(
-                child: OverflowBox(
-                  alignment: Alignment.topLeft,
-                  child: Stack(
-                    children: [
-                      FirestoreDataGrid<T>(
-                        dataGridConfig: documentConfig.dataGridConfig!,
-                        query: query,
-                        rowsPerPage: documentConfig.dataGridConfig!.rowsPerPage,
-                        dataRowHeight: documentConfig.dataGridConfig!.rowHeight,
-                        documentConfig: documentConfig,
-                      ),
-                      if (documentConfig.documentList != null) DataGridToggle<T>(),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          case ViewType.listgrid:
-            Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
-            return SizedBox.expand(
-              child: ClipRect(
-                child: OverflowBox(
-                  alignment: Alignment.topLeft,
-                  child: FirestoreListGrid<T>(
-                    documentConfig: documentConfig,
-                    query: query,
-                  ),
-                ),
-              ),
-            );
-          case ViewType.swimlanes:
-            Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
-            return SizedBox.expand(
-              child: ClipRect(
-                child: OverflowBox(
-                  alignment: Alignment.topLeft,
-                  child: FirestoreSwimlanes<T>(
-                    config: documentConfig.swimlanes!,
-                    query: query,
-                  ),
-                ),
-              ),
-            );
-          default:
-            return Fframe.of(context)?.navigationConfig.errorPage.contentPane ??
-                const Icon(
-                  Icons.error,
-                  color: Colors.red,
-                );
-        }
-      },
-    );
-  }
-}
-
-class ScreenBody<T> extends ConsumerStatefulWidget {
-  const ScreenBody({super.key});
-
-  @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _ScreenBodyState<T>();
-}
-
-class _ScreenBodyState<T> extends ConsumerState<ScreenBody> {
-  QueryDocumentSnapshot<dynamic>? firstDoc;
-  bool building = true;
-  late QueryState queryState;
-
+class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => navigationNotifier.markBuildDone());
   }
 
   @override
   Widget build(BuildContext context) {
-    Console.log("Build _ScreenBodyState", scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
-    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
-    DocumentConfig<T> documentConfig = documentScreenConfig.documentConfig as DocumentConfig<T>;
-    if (firstDoc != null) {
-      Console.log("First doc", scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
-    }
+    Console.log("Build DocumentScreenLoader: ${widget.key.toString()}", scope: "fframeLog.DocumentScreenLoader", level: LogLevel.fframe);
+    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
 
-    ScreenSize screenSize = (MediaQuery.of(context).size.width <= 599)
-        ? ScreenSize.phone
-        : (MediaQuery.of(context).size.width < 1000)
-            ? ScreenSize.tablet
-            : ScreenSize.large;
+    // double columnWidth = 0;
+    // if (documentConfig.currentViewType case ViewType.list) {
+    //   if (documentConfig.documentList != null) {
+    //     // Add this check
+    //     columnWidth = documentConfig.documentList!.columnWidth;
+    //   }
+    // } else if (documentConfig.currentViewType case ViewType.listgrid) {
+    //   columnWidth = documentConfig.listGridConfig!.columnSettings.first.columnWidth;
+    // } else {
+    //   columnWidth = 0;
+    // }
 
-    queryState = ref.watch(queryStateProvider);
+    //Switches between view types
+    return Consumer(builder: (context, ref, child) {
+      ref.watch(targetStateProvider);
 
-    Widget returnWidget = queryState.queryString.isEmpty
-        ? (screenSize == ScreenSize.phone)
-            ? const IgnorePointer()
-            : FRouter.of(context).emptyPage()
-        : DocumentBodyLoader<T>(
-            key: ValueKey(queryState.queryString),
-          );
-
-    //Handle document loads...
-
-    if (queryState.queryParameters == null && documentScreenConfig.documentConfig.autoSelectFirst) {
-      documentScreenConfig.selectionState.addListener(() {
-        documentScreenConfig.selectionState.removeListener(() {});
-        setState(() {});
-        FRouter.of(context).updateQueryString(queryParameters: {
-          documentScreenConfig.documentConfig.queryStringIdParam: documentScreenConfig.selectionState.docId!,
-        });
-        returnWidget = DocumentBodyLoader<T>(
-          key: ValueKey(queryState.queryString),
+      //(pre-load the query-string. If any.
+      QueryState queryState = ref.read(queryStateProvider);
+      if (queryState.queryString.isNotEmpty && queryState.queryParameters!.containsKey(documentConfig.queryStringIdParam)) {
+        SelectedDocument.load<T>(
+          documentConfig: documentConfig,
+          documentId: queryState.queryParameters![documentConfig.queryStringIdParam],
         );
-      });
-      returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading document");
-    } else if (queryState.queryParameters == null) {
-      returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
-    } else if (documentScreenConfig.selectionState.data == null && documentScreenConfig.selectionState.isNew == false && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
-      Console.log("Spawn a new document", scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
-      documentScreenConfig.selectionState.setState(SelectionState<T>(data: documentScreenConfig.documentConfig.createNew(), docId: "new", isNew: true, readOnly: false), notify: true);
-    } else if (documentScreenConfig.selectionState.data is T && queryState.queryParameters!.containsKey("new") && queryState.queryParameters!["new"] == "true") {
-      Console.log("Spawn document from cache", scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
-      // return returnWidget;
-    } else if (!queryState.queryParameters!.containsKey(documentScreenConfig.documentConfig.queryStringIdParam)) {
-      returnWidget = (screenSize == ScreenSize.phone) ? const IgnorePointer() : FRouter.of(context).emptyPage();
-    } else if (((documentScreenConfig.selectionState.docId != queryState.queryParameters?[documentScreenConfig.documentConfig.queryStringIdParam]) || (documentScreenConfig.selectionState.data == null && queryState.queryParameters != null))) {
-      documentScreenConfig.selectionState.addListener(() {
-        documentScreenConfig.selectionState.removeListener(() {});
-        setState(() {});
-      });
-      documentScreenConfig.load<T>(context: context, docId: queryState.queryParameters![documentScreenConfig.documentConfig.queryStringIdParam]!);
-      returnWidget = FRouter.of(context).waitPage(context: context, text: "Loading document");
-    }
+      }
 
-    Console.log("Load the ListenableBuilder", scope: "fframeLog.ScreenBody", level: LogLevel.fframe);
-    SelectionState<T> selectionState = documentScreenConfig.selectionState as SelectionState<T>;
-    if (documentConfig.preOpen != null) {
-      return FutureBuilder<T?>(
-        future: preOpen(documentScreenConfig: documentScreenConfig, documentConfig: documentConfig),
-        // initialData: InitialData,
-        builder: (BuildContext context, AsyncSnapshot snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-            case ConnectionState.waiting:
-            case ConnectionState.active:
-              return FFWaitPage();
-            case ConnectionState.done:
-              selectionState.data = snapshot.data;
-              return ListenableBuilder(
-                listenable: selectionState,
-                builder: ((context, child) => returnWidget),
-              );
-          }
-        },
-      );
-    } else {
-      return ListenableBuilder(
-        listenable: selectionState,
-        builder: ((context, child) => SizedBox.expand(
-              child: ClipRect(
-                child: OverflowBox(
-                  alignment: Alignment.topLeft,
-                  child: returnWidget,
+      switch (documentConfig.currentViewType) {
+        // case ViewType.none:
+        //   return DocumentBodyWatcher<T>(
+        //     key: ValueKey("DocumentBodyWatcher_${documentConfig.collection}"),
+        //   );
+        case ViewType.list:
+          SelectionState.instance.columnWidth = documentConfig.documentList?.columnWidth ?? 0;
+          return Row(
+            children: [
+              DocumentListLoader<T>(
+                key: ValueKey("DocumentListBuilder_${documentConfig.collection}"),
+              ),
+              Expanded(child: FRouter.of(context).emptyPage()),
+            ],
+          );
+        case ViewType.grid:
+          SelectionState.instance.columnWidth = documentConfig.dataGridConfig!.columnWidth;
+          return SizedBox.expand(
+            child: ClipRect(
+              child: OverflowBox(
+                alignment: Alignment.topLeft,
+                child: Stack(
+                  children: [
+                    FirestoreDataGrid<T>(
+                      dataGridConfig: documentConfig.dataGridConfig!,
+                      query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
+                      rowsPerPage: documentConfig.dataGridConfig!.rowsPerPage,
+                      dataRowHeight: documentConfig.dataGridConfig!.rowHeight,
+                      documentConfig: documentConfig,
+                    ),
+                    if (documentConfig.documentList != null) DataGridToggle<T>(),
+                  ],
                 ),
               ),
-            )),
-      );
-    }
-  }
-
-  Future<T?> preOpen({required DocumentScreenConfig documentScreenConfig, required DocumentConfig<T> documentConfig}) async {
-    if (documentScreenConfig.selectionState.data == null) {
-      return Future.value(null);
-    }
-
-    return documentConfig.preOpen!.call(documentScreenConfig.selectionState.data as T);
-  }
-}
-
-class AutoFirstDocumentLoader<T> extends StatefulWidget {
-  const AutoFirstDocumentLoader({
-    super.key,
-    required this.documentConfig,
-  });
-
-  final DocumentConfig<T> documentConfig; // = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
-
-  @override
-  State<AutoFirstDocumentLoader> createState() => _AutoFirstDocumentLoaderState<T>();
-}
-
-class _AutoFirstDocumentLoaderState<T> extends State<AutoFirstDocumentLoader<T>> {
-  @override
-  Widget build(BuildContext context) {
-    Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
-    return StreamBuilder<QuerySnapshot<T>>(
-      stream: query.snapshots(),
-      initialData: null,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> querySnapshot) {
-        switch (querySnapshot.connectionState) {
-          case ConnectionState.none:
-          case ConnectionState.waiting:
-          case ConnectionState.done:
-            return FRouter.of(context).waitPage(context: context, text: "Loading first document");
-          case ConnectionState.active:
-            if (querySnapshot.hasData && querySnapshot.data != null && querySnapshot.data!.docs.isNotEmpty) {
-              QueryDocumentSnapshot<T> queryDocumentSnapshot = querySnapshot.data!.docs.first;
-              SelectionState<T> selectionState = DocumentScreenConfig.of(context)!.selectionState as SelectionState<T>;
-              selectionState.setState(SelectionState<T>(
-                data: queryDocumentSnapshot.data(),
-                docId: queryDocumentSnapshot.id,
-                isNew: false,
-              ));
-              return DocumentBodyLoader<T>(
-                key: ValueKey(queryDocumentSnapshot.id),
+            ),
+          );
+        case ViewType.listgrid:
+          SelectionState.instance.columnWidth = documentConfig.listGridConfig!.columnWidth;
+          return SizedBox.expand(
+            child: ClipRect(
+              child: OverflowBox(
+                alignment: Alignment.topLeft,
+                child: FirestoreListGrid<T>(
+                  documentConfig: documentConfig,
+                  query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
+                ),
+              ),
+            ),
+          );
+        case ViewType.swimlanes:
+          SelectionState.instance.columnWidth = documentConfig.swimlanes!.columnWidth;
+          return FirestoreSwimlanes<T>(
+            documentConfig: documentConfig,
+            query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
+          );
+        default:
+          return Fframe.of(context)?.navigationConfig.errorPage.contentPane ??
+              const Icon(
+                Icons.error,
+                color: Colors.red,
               );
-            }
-
-            return FRouter.of(context).emptyPage();
-        }
-      },
-    );
+      }
+      // },
+      // );
+    });
   }
 }
+
+// class AutoFirstDocumentScreenLoader<T> extends StatefulWidget {
+//   const AutoFirstDocumentScreenLoader({
+//     super.key,
+//     required this.documentConfig,
+//   });
+
+//   final DocumentConfig<T> documentConfig; // = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
+
+//   @override
+//   State<AutoFirstDocumentScreenLoader> createState() => _AutoFirstDocumentScreenLoaderState<T>();
+// }
+
+// class _AutoFirstDocumentScreenLoaderState<T> extends State<AutoFirstDocumentScreenLoader<T>> {
+//   @override
+//   Widget build(BuildContext context) {
+//     Query<T> query = DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>;
+//     return StreamBuilder<QuerySnapshot<T>>(
+//       stream: query.snapshots(),
+//       initialData: null,
+//       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> querySnapshot) {
+//         switch (querySnapshot.connectionState) {
+//           case ConnectionState.none:
+//           case ConnectionState.waiting:
+//           case ConnectionState.done:
+//             return FRouter.of(context).waitPage(context: context, text: "Loading first document");
+//           case ConnectionState.active:
+//             if (querySnapshot.hasData && querySnapshot.data != null && querySnapshot.data!.docs.isNotEmpty) {
+//               QueryDocumentSnapshot<T> queryDocumentSnapshot = querySnapshot.data!.docs.first;
+//               SelectionState<T> selectionState = DocumentScreenConfig.of(context)!.selectionState as SelectionState<T>;
+//               selectionState.setState(SelectionState<T>(
+//                 data: queryDocumentSnapshot.data(),
+//                 docId: queryDocumentSnapshot.id,
+//                 isNew: false,
+//               ));
+//               return DocumentBodyLoader<T>(
+//                 key: ValueKey(queryDocumentSnapshot.id),
+//               );
+//             }
+
+//             return FRouter.of(context).emptyPage();
+//         }
+//       },
+//     );
+//   }
+// }

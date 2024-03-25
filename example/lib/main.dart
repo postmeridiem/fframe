@@ -29,7 +29,7 @@ void main() {
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({Key? key}) : super(key: key);
+  const MainApp({super.key});
 
   // This widget is the root of your FlutFrame application.
   @override

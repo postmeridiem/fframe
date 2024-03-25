@@ -179,8 +179,8 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
       builder: (context, snapshot, child) {
         fFrameDataTableSource.fromSnapShot(snapshot);
 
-        return AnimatedBuilder(
-          animation: fFrameDataTableSource,
+        return ListenableBuilder(
+          listenable: fFrameDataTableSource,
           builder: (context, child) {
             final actions = [
               ...?widget.actions,
@@ -377,7 +377,7 @@ class FFrameDataTableSource<T> extends DataTableSource {
   }
 }
 
-class DataGridConfig<T> {
+class DataGridConfig<T> extends ListConfig {
   final List<DataGridConfigColumn<T>> dataGridConfigColumns;
   final bool showLinks;
   final int rowsPerPage;

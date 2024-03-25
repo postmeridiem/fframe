@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:example/models/appuser.dart';
 
 class RolesTab extends StatelessWidget {
+  // ignore: use_super_parameters
   const RolesTab({
     required this.user,
     Key? key,

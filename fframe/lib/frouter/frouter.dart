@@ -43,6 +43,7 @@ class _FRouterInitState extends State<FRouterInit> {
     return ProviderScope(
       child: Consumer(
         builder: (context, ref, _) {
+          Console.log("Build FRouterInit}", scope: "fframeLog.FRouterInit", level: LogLevel.fframe);
           navigationNotifier = ref.read(navigationProvider);
           navigationNotifier.fFrameUser = Fframe.of(context)?.user;
           routerDelegate = FNavigationRouterDelegate();

@@ -3,8 +3,8 @@ import 'package:fframe/fframe.dart';
 
 class UserProfileScreen extends ConsumerStatefulWidget {
   const UserProfileScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   ConsumerState<UserProfileScreen> createState() => _UserProfileScreenState();
@@ -130,9 +130,9 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
 
 class UserProfileRoleChips extends StatelessWidget {
   const UserProfileRoleChips({
-    Key? key,
+    super.key,
     required this.fFrameUser,
-  }) : super(key: key);
+  });
 
   final FFrameUser fFrameUser;
 

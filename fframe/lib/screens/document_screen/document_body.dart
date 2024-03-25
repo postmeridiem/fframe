@@ -1,68 +1,110 @@
 part of '../../fframe.dart';
 
-class DocumentBodyLoader<T> extends StatefulWidget {
-  const DocumentBodyLoader({
+class DocumentBodyWatcher extends StatefulWidget {
+  const DocumentBodyWatcher({
     super.key,
   });
 
   @override
-  State<DocumentBodyLoader> createState() => _DocumentBodyLoader<T>();
+  State<StatefulWidget> createState() => _DocumentBodyWatcherState();
 }
 
-class _DocumentBodyLoader<T> extends State<DocumentBodyLoader> {
-  late DocumentScreenConfig documentScreenConfig;
-  late DocumentConfig<T> documentConfig;
-  late SelectionState<T> selectionState;
+class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
+  // bool building = true;
+  double columnWidth = SelectionState.instance.columnWidth;
   @override
-  void didChangeDependencies() {
-    documentScreenConfig = DocumentScreenConfig.of(context)!;
-    documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
-    selectionState = documentScreenConfig.selectionState as SelectionState<T>;
-    super.didChangeDependencies();
+  void initState() {
+    super.initState();
+
+    SelectionState.instance.addListener(updatePadding);
+  }
+
+  updatePadding() {
+    if (SelectionState.instance.columnWidth != columnWidth) {
+      setState(() {
+        columnWidth = SelectionState.instance.columnWidth;
+      });
+    }
+  }
+
+  @override
+  dispose() {
+    super.dispose();
+    SelectionState.instance.removeListener(updatePadding);
   }
 
   @override
   Widget build(BuildContext context) {
-    Console.log("build documentBodyLoader ${widget.key.toString()}", scope: "fframeLog.DocumentBodyLoader", level: LogLevel.fframe);
-    documentScreenConfig = DocumentScreenConfig.of(context)!;
-    documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
-    //TODO: (AZ) remap from SelectionState<T> to SelectedDocument<T>
-    selectionState = documentScreenConfig.selectionState as SelectionState<T>;
-
-    return DocumentBody<T>(
-      key: ValueKey("documentBody_${widget.key.toString()}"),
-      documentScreenConfig: documentScreenConfig,
-      documentConfig: documentConfig,
-      selectionState: selectionState,
+    Console.log("Build _DocumentBodyWatcherState", scope: "fframeLog.DocumentBodyWatcher", level: LogLevel.fframe);
+    return AnimatedPadding(
+      padding: EdgeInsets.only(
+        left: columnWidth,
+      ),
+      duration: const Duration(seconds: 1),
+      child: ListenableBuilder(
+        listenable: SelectionState.instance,
+        builder: ((context, child) {
+          if (SelectionState.instance.activeTracker == null) {
+            return const IgnorePointer();
+          }
+          String queryStringIdParam = SelectionState.instance.activeTracker!.documentBody.documentConfig.queryStringIdParam;
+          String documentId = SelectionState.instance.activeTracker!.selectedDocument.documentId;
+          navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: {queryStringIdParam: documentId}));
+          return SizedBox.expand(
+            child: SelectionState.instance.activeTracker!.documentBody,
+          );
+        }),
+      ),
     );
+    // });
   }
 }
 
-class DocumentBody<T> extends StatelessWidget {
+class DocumentBody<T> extends StatefulWidget {
   const DocumentBody({
     super.key,
-    required this.documentScreenConfig,
     required this.documentConfig,
-    required this.selectionState,
+    required this.selectedDocument,
   });
 
-  final DocumentScreenConfig documentScreenConfig;
   final DocumentConfig<T> documentConfig;
-  final SelectionState<T> selectionState;
+  final SelectedDocument<T> selectedDocument;
+
+  @override
+  State<DocumentBody<T>> createState() => _DocumentBodyState<T>();
+}
+
+class _DocumentBodyState<T> extends State<DocumentBody<T>> {
+  final widgetKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    Console.log("(re)build documentBody ${key.toString()}", scope: "fframeLog.DocumentBody", level: LogLevel.fframe);
+    //Initialize the shadowed and casted variables
 
-    String tabIndexKey = documentScreenConfig.documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
+    final FFrameUser user = Fframe.of(context)!.user!;
+    final DocumentConfig<T> documentConfig = widget.documentConfig;
+    final Document<T> document = documentConfig.document;
+    final SelectedDocument<T> selectedDocument = widget.selectedDocument;
+    final T data = selectedDocument.data;
+
+    final DocumentHeaderBuilder<T>? documentHeaderBuilder = document.documentHeaderBuilder; // as DocumentHeaderBuilder<T>?;
+    final TitleBuilder<T> titleBuilder = documentConfig.titleBuilder;
+    final List<Widget Function(T)>? contextCards = documentConfig.contextCardBuilders;
+    final ExtraActionButtonsBuilder<T>? extraActionButtons = documentConfig.document.extraActionButtons; // as ExtraActionButtonsBuilder<T>?;
+    final DocumentTabsBuilder<T> documentTabsBuilder = document.documentTabsBuilder;
+
+    //Track this in the selectedDocument itself, as it is needed for the validator.
+    selectedDocument.documentTabs = documentTabsBuilder(context, data, selectedDocument.readOnly, selectedDocument.isNew, user);
+
+    //Prepare the tabs
+    String tabIndexKey = documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
     int tabIndex = int.parse(FRouter.of(context).queryStringParam(tabIndexKey) ?? "0");
 
-    documentConfig.document.activeTabs = documentConfig.document.documentTabsBuilder!(context, selectionState.data as T, selectionState.readOnly, selectionState.isNew, Fframe.of(context)!.user);
-
-    if (documentConfig.document.activeTabs!.isNotEmpty) {
-      return DefaultTabController(
+    return Hero(
+      tag: selectedDocument.trackerId,
+      child: DefaultTabController(
         animationDuration: Duration.zero,
-        length: documentConfig.document.activeTabs!.length,
+        length: selectedDocument.documentTabs.length,
         // The Builder widget is used to have a different BuildContext to access
         // closest DefaultTabController.
         child: Builder(
@@ -77,12 +119,16 @@ class DocumentBody<T> extends StatelessWidget {
               () {
                 if (!tabController.indexIsChanging) {
                   Console.log("Navigate to tab ${tabController.index}", scope: "fframeLog.DocumentBody", level: LogLevel.prod);
-                  if (!documentScreenConfig.selectionState.readOnly && !documentScreenConfig.selectionState.isNew) {
-                    int errorTab = documentScreenConfig.validate(context: context);
-                    if (errorTab == -1 || documentScreenConfig.selectionState.isNew) {
+                  if (!selectedDocument.readOnly && !selectedDocument.isNew) {
+                    int errorTab = selectedDocument.validate(context: context);
+                    if (errorTab == -1 || selectedDocument.isNew) {
                       tabIndex = tabController.index;
                       FRouter.of(context).updateQueryString(queryParameters: {tabIndexKey: "${tabController.index}"});
-                      documentConfig.preloadPageController.animateToPage(tabController.index, duration: const Duration(microseconds: 250), curve: Curves.easeOutCirc);
+                      documentConfig.preloadPageController.animateToPage(
+                        tabController.index,
+                        duration: const Duration(microseconds: 250),
+                        curve: Curves.easeOutCirc,
+                      );
                     } else {
                       //Undo the user tab change
                       tabController.index = tabIndex;
@@ -90,186 +136,225 @@ class DocumentBody<T> extends StatelessWidget {
                   } else {
                     tabIndex = tabController.index;
                     FRouter.of(context).updateQueryString(queryParameters: {tabIndexKey: "${tabController.index}"});
-                    documentConfig.preloadPageController.animateToPage(tabController.index, duration: const Duration(microseconds: 250), curve: Curves.easeOutCirc);
+                    documentConfig.preloadPageController.animateToPage(
+                      tabController.index,
+                      duration: const Duration(microseconds: 250),
+                      curve: Curves.easeOutCirc,
+                    );
                   }
                 }
               },
             );
 
-            return LayoutBuilder(
-              builder: (context, constraints) {
-                final double docCanvasWidth = constraints.maxWidth;
-                final bool contextDrawerOpen = docCanvasWidth > 1000;
-
-                return Column(
-                  children: [
-                    if (documentConfig.document.documentHeaderBuilder != null)
-                      SizedBox(
-                        height: 40.0,
-                        width: double.infinity,
-                        child: documentConfig.document.documentHeaderBuilder!(context, documentScreenConfig.selectionState.data),
-                      ),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Flexible(
-                            fit: FlexFit.tight,
-                            child: DefaultTabController(
-                              length: documentConfig.document.activeTabs!.length,
-                              child: Scaffold(
-                                endDrawer: (documentConfig.document.contextCards != null && documentConfig.document.contextCards!.isNotEmpty)
-                                    ? ContextCanvas(
-                                        contextWidgets: documentConfig.document.contextCards!
-                                            .map(
-                                              (contextCardBuilder) => contextCardBuilder(documentScreenConfig.selectionState.data),
-                                            )
-                                            .toList(),
-                                      )
-                                    : null,
-                                primary: false,
-                                backgroundColor: Theme.of(context).colorScheme.secondary,
-                                body: Column(
+            return Column(
+              children: [
+                if (documentHeaderBuilder != null)
+                  SizedBox(
+                    height: 40.0,
+                    width: double.infinity,
+                    child: documentHeaderBuilder(context, data),
+                  ),
+                Expanded(
+                  child: Row(
+                    children: [
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: DefaultTabController(
+                            length: selectedDocument.documentTabs.length,
+                            child: Scaffold(
+                              appBar: AppBar(
+                                flexibleSpace: Row(
                                   children: [
-                                    Expanded(
-                                      child: NestedScrollView(
-                                          physics: documentConfig.document.scrollableHeader ? const AlwaysScrollableScrollPhysics() : const NeverScrollableScrollPhysics(),
-                                          // physics:
-                                          //     const NeverScrollableScrollPhysics(),
-                                          headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-                                            return <Widget>[
-                                              SliverAppBar(
-                                                actions: const [IgnorePointer()], //To surpess the hamburger
-                                                primary: false,
-                                                toolbarHeight: documentConfig.titleBuilder == null ? 0 : kToolbarHeight,
-                                                title: documentConfig.titleBuilder == null ? const IgnorePointer() : documentConfig.titleBuilder!(context, documentScreenConfig.selectionState.data),
-                                                pinned: false,
-                                                backgroundColor: Theme.of(context).colorScheme.secondary,
-                                                bottom: calculateTabBar(
-                                                  context: context,
-                                                  document: documentConfig.document,
-                                                  controller: tabController,
-                                                ),
-                                              ),
-                                            ];
-                                          },
-                                          body: PreloadPageView.builder(
-                                            itemCount: documentConfig.document.activeTabs!.length,
-                                            preloadPagesCount: documentConfig.document.activeTabs!.length,
-                                            physics: const NeverScrollableScrollPhysics(),
-                                            controller: documentConfig.preloadPageController,
-                                            itemBuilder: (
-                                              BuildContext context,
-                                              int position,
-                                            ) {
-                                              Console.log(
-                                                "Preloading PreloadPageView_${documentScreenConfig.selectionState.docId}_${tabController.index}",
-                                                scope: "fframe.DocumentBody.PageView",
-                                                level: LogLevel.fframe,
-                                              );
-                                              DocumentTab<T> currentTab = documentConfig.document.activeTabs![position];
-                                              currentTab.formKey = GlobalKey<FormState>();
-                                              bool preloadCurrentTab = true;
-                                              if (!documentConfig.document.prefetchTabs) {
-                                                preloadCurrentTab = tabController.index == position;
-                                              }
-                                              return Padding(
-                                                padding: const EdgeInsets.all(8.0),
-                                                child: Container(
-                                                  color: Theme.of(context).colorScheme.tertiary,
-                                                  key: ValueKey("PreloadPageView_${documentScreenConfig.selectionState.docId}_${tabController.index}"),
-                                                  child: Scaffold(
-                                                    primary: false,
-                                                    body: Form(
-                                                      key: currentTab.formKey,
-                                                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                                                      child: preloadCurrentTab
-                                                          ? currentTab.lockViewportScroll
-                                                              ? SizedBox(
-                                                                  height: double.infinity,
-                                                                  width: double.infinity,
-                                                                  child: SizedBox.expand(
-                                                                    child: ClipRect(
-                                                                      child: OverflowBox(
-                                                                        alignment: Alignment.topLeft,
-                                                                        child: currentTab.childBuilder(
-                                                                          documentScreenConfig.selectionState.data,
-                                                                          documentScreenConfig.selectionState.readOnly,
-                                                                        ),
-                                                                      ),
-                                                                    ),
+                                    ...selectedDocument.iconButtons(context)!,
+                                    // Add any extra configured buttons to the list
+                                    if (extraActionButtons != null)
+                                      ...extraActionButtons(
+                                        context,
+                                        selectedDocument,
+                                        selectedDocument.readOnly,
+                                        selectedDocument.isNew,
+                                        Fframe.of(context)!.user,
+                                      ),
+                                  ],
+                                ),
+                                actions: [
+                                  if (document.showCloseButton)
+                                    IconButton(
+                                      tooltip: L10n.string(
+                                        "iconbutton_document_close",
+                                        placeholder: "Minimize this document",
+                                        namespace: 'fframe',
+                                      ),
+                                      icon: Icon(
+                                        Icons.minimize,
+                                        color: Theme.of(context).colorScheme.onBackground,
+                                      ),
+                                      onPressed: () {
+                                        SelectionState.instance.minimizeDocument(selectedDocument);
+                                      },
+                                    ),
+                                  IconButton(
+                                    tooltip: L10n.string(
+                                      "iconbutton_document_close",
+                                      placeholder: "Close this document",
+                                      namespace: 'fframe',
+                                    ),
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: Theme.of(context).colorScheme.onBackground,
+                                    ),
+                                    onPressed: () {
+                                      selectedDocument.close(context: context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                              endDrawer: (contextCards != null && contextCards.isNotEmpty)
+                                  ? ContextCanvas(
+                                      selectedDocument: selectedDocument,
+                                      contextWidgets: contextCards
+                                          .map(
+                                            (contextCardBuilder) => contextCardBuilder(data),
+                                          )
+                                          .toList(),
+                                    )
+                                  : null,
+                              primary: false,
+                              backgroundColor: Theme.of(context).colorScheme.secondary,
+                              body: Column(children: [
+                                Expanded(
+                                  child: NestedScrollView(
+                                    physics: document.scrollableHeader ? const AlwaysScrollableScrollPhysics() : const NeverScrollableScrollPhysics(),
+                                    // physics:
+                                    //     const NeverScrollableScrollPhysics(),
+                                    headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+                                      return <Widget>[
+                                        SliverAppBar(
+                                          actions: const [IgnorePointer()], //To surpess the hamburger
+                                          primary: false,
+                                          toolbarHeight: kToolbarHeight,
+                                          title: titleBuilder(context, data),
+                                          pinned: false,
+                                          backgroundColor: Theme.of(context).colorScheme.secondary,
+                                          bottom: calculateTabBar(
+                                            context: context,
+                                            activeTabs: selectedDocument.documentTabs,
+                                            controller: tabController,
+                                          ),
+                                        ),
+                                      ];
+                                    },
+                                    body: PreloadPageView.builder(
+                                      itemCount: selectedDocument.documentTabs.length,
+                                      preloadPagesCount: selectedDocument.documentTabs.length,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      controller: documentConfig.preloadPageController,
+                                      itemBuilder: (
+                                        BuildContext context,
+                                        int position,
+                                      ) {
+                                        Console.log(
+                                          "Preloading PreloadPageView_${selectedDocument.documentId}_${tabController.index}",
+                                          scope: "fframe.DocumentBody.PageView",
+                                          level: LogLevel.fframe,
+                                        );
+                                        DocumentTab<T> currentTab = selectedDocument.documentTabs[position];
+
+                                        currentTab.formKey = GlobalKey<FormState>();
+                                        bool preloadCurrentTab = true;
+                                        if (!document.prefetchTabs) {
+                                          preloadCurrentTab = tabController.index == position;
+                                        }
+                                        return Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Container(
+                                            color: Theme.of(context).colorScheme.tertiary,
+                                            key: ValueKey("PreloadPageView_${selectedDocument.documentId}_${tabController.index}"),
+                                            child: Scaffold(
+                                              primary: false,
+                                              body: Form(
+                                                key: currentTab.formKey,
+                                                autovalidateMode: AutovalidateMode.onUserInteraction,
+                                                child: preloadCurrentTab
+                                                    ? currentTab.lockViewportScroll
+                                                        ? SizedBox(
+                                                            height: double.infinity,
+                                                            width: double.infinity,
+                                                            child: SizedBox.expand(
+                                                              child: ClipRect(
+                                                                child: OverflowBox(
+                                                                  alignment: Alignment.topLeft,
+                                                                  child: currentTab.childBuilder(
+                                                                    data,
+                                                                    selectedDocument.readOnly,
                                                                   ),
-                                                                )
-                                                              : SizedBox.expand(
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : MaterialApp(
+                                                            theme: Fframe.of(context)!.lightMode,
+                                                            darkTheme: Fframe.of(context)!.darkMode,
+                                                            themeMode: Fframe.of(context)!.themeMode,
+                                                            debugShowCheckedModeBanner: Fframe.of(context)!.debugShowCheckedModeBanner,
+                                                            builder: (context, child) {
+                                                              return Scaffold(
+                                                                body: SizedBox.expand(
                                                                   child: ClipRect(
                                                                     child: OverflowBox(
                                                                       alignment: Alignment.topLeft,
                                                                       child: SingleChildScrollView(
                                                                         child: currentTab.childBuilder(
-                                                                          documentScreenConfig.selectionState.data,
-                                                                          documentScreenConfig.selectionState.readOnly,
+                                                                          data,
+                                                                          selectedDocument.readOnly,
                                                                         ),
                                                                       ),
                                                                     ),
                                                                   ),
-                                                                )
-                                                          : Placeholder(
-                                                              child: Center(child: Text("auto: $position")),
-                                                            ),
-                                                    ),
-                                                    floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
-                                                    bottomNavigationBar: BottomAppBar(
-                                                      elevation: 0,
-                                                      color: Theme.of(context).colorScheme.background,
-                                                      shape: const CircularNotchedRectangle(),
-                                                      child: IconTheme(
-                                                        data: IconThemeData(color: Theme.of(context).colorScheme.onPrimary),
-                                                        child: Row(
-                                                          children: [
-                                                            ...documentScreenConfig.iconButtons<T>(context)!,
-                                                            //Add any extra configured buttons to the list
-                                                            if (documentConfig.document.extraActionButtons != null)
-                                                              ...documentConfig.document.extraActionButtons!(context, selectionState.data as T, selectionState.readOnly, selectionState.isNew, Fframe.of(context)!.user),
-                                                          ],
-                                                        ),
+                                                                ),
+                                                              );
+                                                            },
+                                                          )
+                                                    : Placeholder(
+                                                        child: Center(child: Text("auto: $position")),
                                                       ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          )),
+                                              ),
+                                              floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
+                                            ),
+                                          ),
+                                        );
+                                      },
                                     ),
-                                  ],
+                                  ),
                                 ),
-                              ),
+                              ]),
+                            )
+
+                            // ContextDrawer<T>(
+                            //   contextDrawerOpen: contextDrawerOpen,
+                            //   selectedDocument: selectedDocument,
+                            // ),
+
+                            // ),
                             ),
-                          ),
-                          ContextDrawer<T>(
-                            contextDrawerOpen: contextDrawerOpen,
-                          ),
-                        ],
-                        // ),
                       ),
-                    ),
-                  ],
-                );
-              },
+                    ],
+                  ),
+                ),
+              ],
             );
           },
         ),
-      );
-    } else {
-      return Fframe.of(context)!.showErrorPage(context: context, errorText: "Incorrect form configuration");
-    }
+      ),
+    );
   }
 }
 
 calculateTabBar({
   required BuildContext context,
-  required Document document,
+  required List<DocumentTab> activeTabs,
   required TabController controller,
 }) {
-  List<DocumentTab> activeTabs = document.activeTabs!;
   if (activeTabs.length != 1) {
     return TabBar(
       controller: controller,
@@ -279,5 +364,19 @@ calculateTabBar({
     );
   } else {
     return null;
+  }
+}
+
+class ChildWidget extends StatefulWidget {
+  const ChildWidget({super.key});
+
+  @override
+  State<ChildWidget> createState() => _ChildWidgetState();
+}
+
+class _ChildWidgetState extends State<ChildWidget> {
+  @override
+  Widget build(BuildContext context) {
+    return Container();
   }
 }

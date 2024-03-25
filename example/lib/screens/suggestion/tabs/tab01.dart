@@ -5,10 +5,10 @@ import 'package:example/models/suggestion.dart';
 
 class Tab01 extends StatefulWidget {
   const Tab01({
-    Key? key,
+    super.key,
     required this.suggestion,
     required this.readOnly,
-  }) : super(key: key);
+  });
   final Suggestion suggestion;
   final bool readOnly;
 

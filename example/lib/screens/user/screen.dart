@@ -10,8 +10,8 @@ import 'package:example/models/appuser.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<UsersScreen> createState() => _UsersScreenState();
@@ -72,7 +72,7 @@ class _UsersScreenState extends State<UsersScreen> {
   Document<AppUser> _document() {
     return Document<AppUser>(
       autoSave: false,
-      extraActionButtons: (BuildContext context, AppUser appUser, bool isReadOnly, bool isNew, FFrameUser? user) {
+      extraActionButtons: (BuildContext context, SelectedDocument selectedDocument, bool isReadOnly, bool isNew, FFrameUser? user) {
         return [
           if (user != null && user.hasRole("firestoreaccess"))
             IconButton(
@@ -81,7 +81,7 @@ class _UsersScreenState extends State<UsersScreen> {
                 String domain = "https://console.cloud.google.com";
                 String application = "firestore/databases/-default-/data/panel";
                 String collection = "users";
-                String docId = appUser.uid ?? "";
+                String docId = selectedDocument.data.uid ?? "";
                 String gcpProject = Fframe.of(context)!.firebaseOptions.projectId;
                 Uri url = Uri.parse("$domain/$application/$collection/$docId?&project=$gcpProject");
                 launchUrl(url);
