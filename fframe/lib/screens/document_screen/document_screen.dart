@@ -115,26 +115,6 @@ class DocumentScreen<T> extends StatelessWidget {
           ],
         ),
         const DocumentBodyWatcher(),
-        // Consumer(
-        //   builder: (context, ref, child) {
-        //     QueryState queryState = ref.read(queryStateProvider);
-        //     return Text(queryState.queryString); // Hello world
-        //   },
-        // ),
-        // ListenableBuilder(
-        //     listenable: SelectionState.instance,
-        //     builder: (context, child) {
-        //       double columnWidth = SelectionState.instance.columnWidth;
-        //       return SizedBox.expand(
-        //         child: AnimatedPadding(
-        //           padding: EdgeInsets.only(
-        //             left: columnWidth,
-        //           ),
-        //           duration: const Duration(seconds: 5),
-        //           child: const DocumentBodyWatcher(),
-        //         ),
-        //       );
-        //     }),
       ],
     );
   }
@@ -198,11 +178,16 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     SelectedDocument.createNew(documentConfig: documentConfig);
   }
 
-// save<T>
-//   create<T>({required BuildContext context}) {
-//     DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
-//     SelectedDocument<T>.createNew(documentConfig: documentConfig);
-//   }
+  save({required BuildContext context, bool closeAfterSave = false}) {
+    SelectedDocument? selectedDocument = SelectionState.instance.activeDocument;
+    if (selectedDocument != null) {
+      if (closeAfterSave) {
+        selectedDocument.update();
+      } else {
+        selectedDocument.save(context: context, closeAfterSave: closeAfterSave);
+      }
+    }
+  }
 }
 
 class DocumentScreenLoader<T> extends StatefulWidget {
