@@ -200,13 +200,13 @@ typedef ListGridValueBuilderFunction<T> = Function(
 
 typedef ListGridCellBuilderFunction<T> = Widget Function(
   BuildContext context,
-  T? data,
+  SelectedDocument<T> selectedDocument,
   Function? onChange,
 );
 
 typedef ListGridCellControlsBuilderFunction<T> = List<IconButton> Function(
   BuildContext context,
   FFrameUser? user,
-  SelectedDocument<T>? data,
+  SelectedDocument<T>? selectedDocument,
   String stringValue,
 );

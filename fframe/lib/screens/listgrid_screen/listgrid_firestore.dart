@@ -389,7 +389,7 @@ class ListGridEndless<T> extends StatelessWidget {
     for (ListGridColumn<T> columnSetting in columnSettings) {
       if (columnSetting.visible) {
         if (columnSetting.cellBuilder != null) {
-          Widget cellWidget = columnSetting.cellBuilder!(context, selectedDocument.data, () {});
+          Widget cellWidget = columnSetting.cellBuilder!(context, selectedDocument, () {});
           output.add(
             ListGridBuilderCell<T>(
               listGridController: listGridController,

@@ -191,14 +191,18 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 
   void selectDocument<T>(BuildContext context, SelectedDocument<T> selectedDocument) {
     Console.log("*** DocumentScreen.selectDocument<T> is deprecated please replace is with selectedDocument.open() ***", scope: "DocumentScreen", level: LogLevel.dev, color: ConsoleColor.red);
-    debugger(); //This is to annoy developers to make the change mentioned in the previous line, and change to code to be in the lines below.
     selectedDocument.open();
   }
 
-  create<T>({required BuildContext context}) {
-    DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
-    SelectedDocument<T>.createNew(documentConfig: documentConfig);
+  void create<T>({BuildContext? context}) {
+    SelectedDocument.createNew(documentConfig: documentConfig);
   }
+
+// save<T>
+//   create<T>({required BuildContext context}) {
+//     DocumentConfig<T> documentConfig = this.documentConfig as DocumentConfig<T>;
+//     SelectedDocument<T>.createNew(documentConfig: documentConfig);
+//   }
 }
 
 class DocumentScreenLoader<T> extends StatefulWidget {

@@ -42,10 +42,10 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
       saveDocument,
     ) {
       return Switch(
-        value: (suggestion?.active ?? false),
+        value: (suggestion.data.active ?? false),
         activeColor: SignalColors().constAccentColor,
         onChanged: (bool value) {
-          suggestion?.active = value;
+          suggestion.data.active = value;
           // saveDocument();
         },
       );
@@ -60,7 +60,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
         children: [
           renderButtons(
             context: context,
-            suggestion: suggestion!,
+            suggestion: suggestion,
           ),
         ],
       );
@@ -271,7 +271,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ),
 ];
 
-Row renderButtons({required BuildContext context, required Suggestion suggestion}) {
+Row renderButtons({required BuildContext context, required SelectedDocument<Suggestion> suggestion}) {
   return Row(
     children: [
       Tooltip(
