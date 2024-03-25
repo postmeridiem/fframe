@@ -275,9 +275,9 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
                 ),
               );
             },
-            childBuilder: (suggestion, readOnly) {
+            childBuilder: (selectedDocument, readOnly) {
               return Tab01(
-                suggestion: suggestion,
+                suggestion: selectedDocument.data,
                 readOnly: readOnly,
                 // user: user,
               );
@@ -295,9 +295,9 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
               ),
             );
           },
-          childBuilder: (suggestion, readOnly) {
+          childBuilder: (selectedDocument, readOnly) {
             return Tab02(
-              suggestion: suggestion,
+              suggestion: selectedDocument.data,
               readOnly: readOnly,
             );
           },
@@ -313,9 +313,9 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
               ),
             );
           },
-          childBuilder: (suggestion, readOnly) {
+          childBuilder: (selectedDocument, readOnly) {
             return Tab03(
-              suggestion: suggestion,
+              suggestion: selectedDocument.data,
               readOnly: readOnly,
             );
           },

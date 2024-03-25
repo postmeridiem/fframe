@@ -104,9 +104,9 @@ class _UsersScreenState extends State<UsersScreen> {
                 ),
               );
             },
-            childBuilder: (user, readOnly) {
+            childBuilder: (selecedDocument, readOnly) {
               return ProfileTab(
-                user: user,
+                user: selecedDocument.data,
               );
             },
           ),
@@ -119,9 +119,9 @@ class _UsersScreenState extends State<UsersScreen> {
                 ),
               );
             },
-            childBuilder: (user, readOnly) {
+            childBuilder: (selecedDocument, readOnly) {
               return RolesTab(
-                user: user,
+                user: selecedDocument.data,
               );
             },
           ),

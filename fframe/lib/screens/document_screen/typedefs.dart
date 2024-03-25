@@ -44,7 +44,7 @@ typedef DocumentStream<T> = Stream<DocumentSnapshot> Function(
 typedef DocumentTabBuilder<T> = Widget Function(FFrameUser? user);
 
 typedef DocumentTabChildBuilder<T> = Widget Function(
-  T data,
+  SelectedDocument<T> data,
   bool isReadOnly,
 );
 

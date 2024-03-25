@@ -38,7 +38,6 @@ class _SettingScreenState extends State<SettingScreen> {
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
-
         showCreateButton: false,
         builder: (_, selected, data, __) {
           return SettingListItem(
@@ -71,7 +70,8 @@ Document<Setting> settingDocument() {
               ),
             );
           },
-          childBuilder: (setting, readOnly) {
+          childBuilder: (selectedDocument, readOnly) {
+            Setting setting = selectedDocument.data;
             switch (setting.id) {
               case "01-generalsettings":
                 {

@@ -85,7 +85,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
     final DocumentConfig<T> documentConfig = widget.documentConfig;
     final Document<T> document = documentConfig.document;
     final SelectedDocument<T> selectedDocument = widget.selectedDocument;
-    final T data = selectedDocument.data;
+    // final T data = selectedDocument.data;
 
     final DocumentHeaderBuilder<T>? documentHeaderBuilder = document.documentHeaderBuilder; // as DocumentHeaderBuilder<T>?;
     final TitleBuilder<T> titleBuilder = documentConfig.titleBuilder;
@@ -94,7 +94,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
     final DocumentTabsBuilder<T> documentTabsBuilder = document.documentTabsBuilder;
 
     //Track this in the selectedDocument itself, as it is needed for the validator.
-    selectedDocument.documentTabs = documentTabsBuilder(context, data, selectedDocument.readOnly, selectedDocument.isNew, user);
+    selectedDocument.documentTabs = documentTabsBuilder(context, selectedDocument.data, selectedDocument.readOnly, selectedDocument.isNew, user);
 
     //Prepare the tabs
     String tabIndexKey = documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
@@ -152,7 +152,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                   SizedBox(
                     height: 40.0,
                     width: double.infinity,
-                    child: documentHeaderBuilder(context, data),
+                    child: documentHeaderBuilder(context, selectedDocument.data),
                   ),
                 Expanded(
                   child: Row(
@@ -214,7 +214,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                       selectedDocument: selectedDocument,
                                       contextWidgets: contextCards
                                           .map(
-                                            (contextCardBuilder) => contextCardBuilder(data),
+                                            (contextCardBuilder) => contextCardBuilder(selectedDocument.data),
                                           )
                                           .toList(),
                                     )
@@ -233,7 +233,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                           actions: const [IgnorePointer()], //To surpess the hamburger
                                           primary: false,
                                           toolbarHeight: kToolbarHeight,
-                                          title: titleBuilder(context, data),
+                                          title: titleBuilder(context, selectedDocument.data),
                                           pinned: false,
                                           backgroundColor: Theme.of(context).colorScheme.secondary,
                                           bottom: calculateTabBar(
@@ -285,7 +285,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                                                 child: OverflowBox(
                                                                   alignment: Alignment.topLeft,
                                                                   child: currentTab.childBuilder(
-                                                                    data,
+                                                                    selectedDocument,
                                                                     selectedDocument.readOnly,
                                                                   ),
                                                                 ),
@@ -305,7 +305,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                                                       alignment: Alignment.topLeft,
                                                                       child: SingleChildScrollView(
                                                                         child: currentTab.childBuilder(
-                                                                          data,
+                                                                          selectedDocument,
                                                                           selectedDocument.readOnly,
                                                                         ),
                                                                       ),
