@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
-import 'package:fframe/helpers/console_logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // import 'package:example/services/suggestion_service.dart';
@@ -63,6 +62,17 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         );
       },
 
+      query: (query) {
+        // return query.where("active", isNull: true);
+        switch (widget.suggestionQueryState) {
+          case SuggestionQueryStates.active:
+            return query.where("active", isEqualTo: true);
+
+          case SuggestionQueryStates.done:
+            return query.where("active", isEqualTo: false);
+        }
+      },
+
       // query: (Query<Suggestion> query) {
       //   return query.where("active", isEqualTo: null);
       // },
@@ -115,17 +125,6 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       //     ),
       //   ],
       // ),
-
-      query: (query) {
-        // return query.where("active", isNull: true);
-        switch (widget.suggestionQueryState) {
-          case SuggestionQueryStates.active:
-            return query.where("active", isEqualTo: true);
-
-          case SuggestionQueryStates.done:
-            return query.where("active", isEqualTo: false);
-        }
-      },
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
@@ -208,12 +207,12 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         ],
       ),
       // Center part, shows a firestore doc. Tabs possible
-      document: suggestionDocument(context),
+      document: suggestionDocument(),
     );
   }
 }
 
-Document<Suggestion> suggestionDocument(BuildContext context) {
+Document<Suggestion> suggestionDocument() {
   return Document<Suggestion>(
     scrollableHeader: false,
     showCloseButton: true,
@@ -263,9 +262,8 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
       ];
     },
     documentTabsBuilder: (context, suggestion, isReadOnly, isNew, fFrameUser) {
-      List<DocumentTab<Suggestion>> output = [];
-      if (fFrameUser!.hasRole('user')) {
-        output.add(
+      return [
+        if (fFrameUser!.hasRole('user') || fFrameUser.hasRole('fietsbel'))
           DocumentTab<Suggestion>(
             tabBuilder: (user) {
               return Tab(
@@ -283,9 +281,6 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
               );
             },
           ),
-        );
-      }
-      output.add(
         DocumentTab<Suggestion>(
           tabBuilder: (user) {
             return const Tab(
@@ -302,8 +297,6 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
             );
           },
         ),
-      );
-      output.add(
         DocumentTab<Suggestion>(
           tabBuilder: (user) {
             return const Tab(
@@ -320,9 +313,7 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
             );
           },
         ),
-      );
-
-      return output;
+      ];
     },
     contextCards: [
       (suggestion) => ContextCard(

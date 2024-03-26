@@ -237,10 +237,8 @@ class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with 
       }
 
       switch (documentConfig.currentViewType) {
-        // case ViewType.none:
-        //   return DocumentBodyWatcher<T>(
-        //     key: ValueKey("DocumentBodyWatcher_${documentConfig.collection}"),
-        //   );
+        case ViewType.none:
+          return const IgnorePointer();
         case ViewType.list:
           SelectionState.instance.columnWidth = documentConfig.documentList?.columnWidth ?? 0;
           return Row(

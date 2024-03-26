@@ -1,5 +1,4 @@
 import 'package:fframe/fframe.dart';
-import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/routers/navigation_route.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/providers/state_providers.dart';

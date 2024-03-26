@@ -5,7 +5,7 @@ import 'package:flutterfire_ui/auth.dart';
 
 import 'package:fframe/fframe.dart';
 import 'package:example/themes/themes.dart';
-import 'package:fframe/helpers/console_logger.dart';
+
 import 'package:fframe/helpers/l10n.dart';
 import 'package:example/pages/empty_page.dart';
 import 'package:example/pages/error_page.dart';

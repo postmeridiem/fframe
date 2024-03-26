@@ -79,7 +79,7 @@ class DocumentConfig<T> extends ChangeNotifier {
       case ViewType.swimlanes:
         return [ViewType.swimlanes];
       case ViewType.none:
-        return [];
+        return [ViewType.none];
     }
   }
 
@@ -151,8 +151,6 @@ class DocumentTab<T> {
     required this.childBuilder,
     this.lockViewportScroll = false,
   });
-
-  save() {}
 }
 
 class DocumentList<T> extends ListConfig {

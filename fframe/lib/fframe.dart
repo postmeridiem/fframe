@@ -36,7 +36,6 @@ import 'package:fframe/helper_widgets/confirmation_dialog.dart';
 import 'package:fframe/helper_widgets/init_l10n.dart';
 
 import 'package:fframe/helpers/l10n.dart';
-import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/helpers/icons.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -76,6 +75,7 @@ part 'package:fframe/models/navigation_config.dart';
 part 'package:fframe/services/target_state.dart';
 part 'package:fframe/services/query_state.dart';
 part 'package:fframe/controllers/selection_state_controller.dart';
+part 'package:fframe/helpers/console_logger.dart';
 
 part 'screens/document_screen/models.dart';
 part 'screens/document_screen/typedefs.dart';

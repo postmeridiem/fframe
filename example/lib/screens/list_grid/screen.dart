@@ -90,7 +90,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
       ),
 
       // Center part, shows a firestore doc. Tabs possible
-      document: suggestionDocument(context),
+      document: suggestionDocument(),
       // document: _document(),
     );
   }

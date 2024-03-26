@@ -2,7 +2,6 @@
 
 import 'package:fframe/components/auth/decorations.dart';
 import 'package:fframe/fframe.dart';
-import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:flutterfire_ui/auth.dart';

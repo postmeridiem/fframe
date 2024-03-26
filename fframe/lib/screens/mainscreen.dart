@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import 'package:fframe/constants/constants.dart';
 import 'package:fframe/providers/state_providers.dart';
-import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/fframe.dart';
 
@@ -139,7 +138,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                         TargetState targetState = ref.watch(targetStateProvider);
                         Console.log("MainScreen Consumer builder '${targetState.navigationTarget.title}'", scope: "fframeLog.MainScreen", level: LogLevel.fframe, color: ConsoleColor.green);
 
-                    
                         return AnimatedSwitcher(
                           duration: const Duration(milliseconds: 250),
                           child: Container(
@@ -166,7 +164,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     super.dispose();
   }
 }
-
 
 class ProfileButton extends StatefulWidget {
   const ProfileButton({super.key});
