@@ -213,7 +213,7 @@ class SelectedDocument<T> {
     if (data != null) {
       _data = data;
     } else if (this.documentSnapshot != null) {
-      load(documentConfig: this.documentConfig, documentId: _id!);
+      _data = (documentSnapshot!.exists) ? documentSnapshot!.data() : null;
     } else {
       _data = documentConfig.createNew();
     }

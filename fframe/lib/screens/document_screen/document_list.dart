@@ -120,25 +120,8 @@ class DocumentListBody<T> extends StatefulWidget {
 class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
   @override
   Widget build(BuildContext context) {
-    // ScreenSize screenSize = (MediaQuery.of(context).size.width <= 599)
-    //     ? ScreenSize.phone
-    //     : (MediaQuery.of(context).size.width < 1000)
-    //         ? ScreenSize.tablet
-    //         : ScreenSize.large;
-
     Console.log("Build documentListLoader with key: listScaffold_${widget.key.toString()}", scope: "fframeLog.DocumentListBody", level: LogLevel.fframe);
 
-    // double columnWidth = 250;
-    // if (ScreenSize.phone == screenSize) {
-    //   columnWidth = MediaQuery.of(context).size.width;
-    //   Map<String, String>? queryParameters = widget.ref.watch(queryStateProvider).queryParameters;
-    //   if (queryParameters != null) {
-    //     if (queryParameters.isNotEmpty) {
-    //       //Some document is loaded, and we are on a phone. Don't show the selector
-    //       columnWidth = 0;
-    //     }
-    //   }
-    // }
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
 
     return SizedBox(
@@ -163,8 +146,8 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
                 children: [
                   GetDocumentCount<T>(documentConfig: widget.documentConfig, headerType: HeaderType.header),
                   Expanded(
-                    child: AnimatedBuilder(
-                        animation: widget.documentScreenConfig.fireStoreQueryState,
+                    child: ListenableBuilder(
+                        listenable: widget.documentScreenConfig.fireStoreQueryState,
                         builder: (context, child) {
                           Query<T> query = widget.documentScreenConfig.fireStoreQueryState.currentQuery() as Query<T>;
                           return Column(

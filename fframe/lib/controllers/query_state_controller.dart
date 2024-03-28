@@ -7,7 +7,7 @@ class FireStoreQueryState<T> with ChangeNotifier {
   final Query<T> Function(Query<T>)? initialQuery;
   final Query<T> Function(Query<T>)? listQuery;
   late Query<T> baseQuery;
-  late FirestoreQueryBuilderSnapshot queryBuilderSnapshot;
+  late FirestoreQueryBuilderSnapshot<T> queryBuilderSnapshot;
   final Map<String, Query<T> Function(Query<T>)> _queryComponents = {};
 
   final String collection;
@@ -41,15 +41,16 @@ class FireStoreQueryState<T> with ChangeNotifier {
     }
   }
 
-  addQueryComponent({required String id, required Query<T> Function(Query<T>) queryComponent}) {
+  addQueryComponent({
+    required String id,
+    required Query<T> Function(Query<T>) queryComponent,
+    bool notify = true,
+  }) {
     _queryComponents[id] = queryComponent;
-    notifyListeners();
+    if (notify) notifyListeners();
   }
 
-  queryComponents(List<Query<T>> queryComponents) {
-    // _queryComponents = queryComponents;
-    notifyListeners();
-  }
+  Map<String, Query<T> Function(Query<T>)> get queryComponents => _queryComponents;
 
   Query<T> firstDocumentQuery() {
     Query<T> query = baseQuery;

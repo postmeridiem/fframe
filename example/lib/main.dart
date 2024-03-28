@@ -1,4 +1,5 @@
 import 'package:example/firebase_options.dart';
+import 'package:example/screens/customwidget/navigation.dart';
 import 'package:example/screens/swimlanes/swimlanes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterfire_ui/auth.dart';
@@ -38,7 +39,7 @@ class MainApp extends StatelessWidget {
       navigationTargets: [
         suggestionNavigationTarget,
         tabloaderNavigationTarget,
-        // userListNavigationTarget,
+        customNavigationTarget,
         listGridNavigationTarget,
         listGridSingleColumnNavigationTarget,
         swimlanesNavigationTarget,
@@ -107,8 +108,7 @@ class MainApp extends StatelessWidget {
       providerConfigs: const [
         // EmailProviderConfiguration(),
         GoogleProviderConfiguration(
-          clientId:
-              "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
+          clientId: "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
       debugShowCheckedModeBanner: false,
@@ -119,13 +119,11 @@ class MainApp extends StatelessWidget {
       ],
       postLoad: (context) async {
         // you can omit this optional event handler
-        Console.log("Executing postLoad code from main.dart",
-            scope: "exampleApp.postLoad", level: LogLevel.dev);
+        Console.log("Executing postLoad code from main.dart", scope: "exampleApp.postLoad", level: LogLevel.dev);
       },
       postSignOut: (context) async {
         // you can omit this optional event handler
-        Console.log("Executing postSignOut code from main.dart",
-            scope: "exampleApp.postSignOut", level: LogLevel.dev);
+        Console.log("Executing postSignOut code from main.dart", scope: "exampleApp.postSignOut", level: LogLevel.dev);
       },
       // postSignIn: (
       //   context,

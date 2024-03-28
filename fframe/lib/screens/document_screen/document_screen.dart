@@ -15,6 +15,7 @@ class DocumentScreen<T> extends StatelessWidget {
     this.dataGrid,
     this.listGrid,
     this.swimlanes,
+    this.customViewTypeBuilder,
     this.viewType = ViewType.auto,
     this.autoSelectFirst = false,
     this.query,
@@ -33,6 +34,7 @@ class DocumentScreen<T> extends StatelessWidget {
   final DataGridConfig<T>? dataGrid;
   final ListGridConfig<T>? listGrid;
   final SwimlanesConfig<T>? swimlanes;
+  final CustomViewTypeBuilder<T>? customViewTypeBuilder;
   final ViewType viewType;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
@@ -88,6 +90,7 @@ class DocumentScreen<T> extends StatelessWidget {
                     documentList: documentList,
                     dataGridConfig: dataGrid,
                     listGridConfig: listGrid,
+                    customViewTypeBuilder: customViewTypeBuilder,
                     swimlanes: swimlanes,
                     initialViewType: viewType,
                     autoSelectFirst: autoSelectFirst,
@@ -288,6 +291,15 @@ class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with 
           return FirestoreSwimlanes<T>(
             documentConfig: documentConfig,
             query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
+          );
+        case ViewType.custom:
+          if (documentConfig.customViewTypeBuilder == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Custom widget not defined");
+
+          return ListenableBuilder(
+            listenable: DocumentScreenConfig.of(context)!.fireStoreQueryState,
+            builder: ((context, child) {
+              return documentConfig.customViewTypeBuilder!(context, DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>, documentConfig, Fframe.of(context)?.user);
+            }),
           );
         default:
           return Fframe.of(context)?.navigationConfig.errorPage.contentPane ??

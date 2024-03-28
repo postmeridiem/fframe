@@ -20,6 +20,13 @@ typedef ExtraActionButtonsBuilder<T> = List<Widget> Function(
   FFrameUser? user,
 );
 
+typedef CustomViewTypeBuilder<T> = Widget Function(
+  BuildContext context,
+  Query<T> fireStoreQueryState,
+  DocumentConfig<T> documentConfig,
+  FFrameUser? user,
+);
+
 typedef DocumentListItemBuilder<T> = Widget Function(
   BuildContext context,
   bool selected,

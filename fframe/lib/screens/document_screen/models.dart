@@ -26,7 +26,10 @@ class DocumentConfig<T> extends ChangeNotifier {
     this.dataGridConfig,
     this.listGridConfig,
     this.swimlanes,
+    this.customViewTypeBuilder,
     this.columnWidth = 0.0,
+    this.mdi = false,
+    this.mdiItems = 8,
     required this.autoSelectFirst,
     required this.document,
     this.contextCardBuilders,
@@ -39,6 +42,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   final DataGridConfig<T>? dataGridConfig;
   final ListGridConfig<T>? listGridConfig;
   final SwimlanesConfig<T>? swimlanes;
+  final CustomViewTypeBuilder<T>? customViewTypeBuilder;
   final TitleBuilder<T> titleBuilder;
   final Document<T> document;
   final String queryStringIdParam;
@@ -51,6 +55,8 @@ class DocumentConfig<T> extends ChangeNotifier {
   final T Function() createNew;
   final T? Function(T)? preSave;
   final T Function(T)? preOpen;
+  final bool mdi;
+  final int mdiItems;
   final String? Function(T)? createDocumentId;
   final List<ContextCardBuilder<T>>? contextCardBuilders;
   final bool embeddedDocument;
@@ -70,16 +76,8 @@ class DocumentConfig<T> extends ChangeNotifier {
         if (dataGridConfig != null) returnValue.add(ViewType.grid);
         if (returnValue.isEmpty) returnValue.add(ViewType.none);
         return returnValue;
-      case ViewType.listgrid:
-        return [ViewType.listgrid];
-      case ViewType.list:
-        return [ViewType.list];
-      case ViewType.grid:
-        return [ViewType.grid];
-      case ViewType.swimlanes:
-        return [ViewType.swimlanes];
-      case ViewType.none:
-        return [ViewType.none];
+      default:
+        return [initialViewType];
     }
   }
 
@@ -98,7 +96,15 @@ class DocumentConfig<T> extends ChangeNotifier {
   }
 }
 
-enum ViewType { auto, list, grid, listgrid, swimlanes, none }
+enum ViewType {
+  auto,
+  list,
+  grid,
+  listgrid,
+  swimlanes,
+  custom,
+  none,
+}
 
 class Document<T> {
   Document({
