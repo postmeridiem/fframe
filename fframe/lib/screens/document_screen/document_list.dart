@@ -1,6 +1,6 @@
 part of '../../fframe.dart';
 
-class DocumentListItem<T> extends ConsumerWidget {
+class DocumentListItem<T> extends StatelessWidget {
   const DocumentListItem({
     super.key,
     required this.selectedDocument,
@@ -11,7 +11,7 @@ class DocumentListItem<T> extends ConsumerWidget {
   final bool hoverSelect;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     DocumentConfig<T> documentConfig = selectedDocument.documentConfig;
     DocumentListItemBuilder<T> documentListItemBuilder = documentConfig.documentList!.builder;
     try {

@@ -88,7 +88,13 @@ class SelectionState with ChangeNotifier {
     //Update the route
     navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: {selectedDocument.documentConfig.queryStringIdParam: selectedDocument.documentId}));
     //Minimize any full screen document
-    _minimize(viewType: SelectionStateViewType.maximized);
+
+    if (selectedDocument.documentConfig.mdi == true) {
+      _minimize(viewType: SelectionStateViewType.maximized);
+    } else {
+      activeDocument?.close(skipWarning: true);
+    }
+
     if (_selectionState.containsKey(trackerId)) {
       //The document is already loaded, but possibly with the wrong viewType
       maximizeDocument(selectedDocument);
@@ -354,7 +360,7 @@ class SelectedDocument<T> {
     }
   }
 
-  close({required BuildContext context, bool skipWarning = false}) async {
+  close({BuildContext? context, bool skipWarning = false}) async {
     bool isDirty = false;
 
     //ToDo => check dirty state
@@ -365,7 +371,7 @@ class SelectedDocument<T> {
       return;
     }
     if (await (confirmationDialog(
-            context: context,
+            context: context!,
             cancelText: L10n.string(
               "iconbutton_document_close_cancel",
               placeholder: "Cancel",

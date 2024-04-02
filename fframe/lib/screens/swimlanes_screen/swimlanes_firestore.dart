@@ -1,6 +1,6 @@
 part of '../../fframe.dart';
 
-class FirestoreSwimlanes<T> extends ConsumerStatefulWidget {
+class FirestoreSwimlanes<T> extends StatefulWidget {
   const FirestoreSwimlanes({
     super.key,
     required this.documentConfig,
@@ -19,7 +19,7 @@ class FirestoreSwimlanes<T> extends ConsumerStatefulWidget {
   FirestoreSwimlanesState createState() => FirestoreSwimlanesState<T>();
 }
 
-class FirestoreSwimlanesState<T> extends ConsumerState<FirestoreSwimlanes<T>> {
+class FirestoreSwimlanesState<T> extends State<FirestoreSwimlanes<T>> {
   late List<SwimlaneSetting<T>> swimlaneSettings;
 
   @override

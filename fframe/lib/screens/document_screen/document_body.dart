@@ -195,7 +195,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                   ],
                                 ),
                                 actions: [
-                                  if (document.showCloseButton)
+                                  if (documentConfig.mdi)
                                     IconButton(
                                       tooltip: L10n.string(
                                         "iconbutton_document_close",
@@ -210,20 +210,21 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                         SelectionState.instance.minimizeDocument(selectedDocument);
                                       },
                                     ),
-                                  IconButton(
-                                    tooltip: L10n.string(
-                                      "iconbutton_document_close",
-                                      placeholder: "Close this document",
-                                      namespace: 'fframe',
+                                  if (document.showCloseButton)
+                                    IconButton(
+                                      tooltip: L10n.string(
+                                        "iconbutton_document_close",
+                                        placeholder: "Close this document",
+                                        namespace: 'fframe',
+                                      ),
+                                      icon: Icon(
+                                        Icons.close,
+                                        color: Theme.of(context).colorScheme.onBackground,
+                                      ),
+                                      onPressed: () {
+                                        selectedDocument.close(context: context);
+                                      },
                                     ),
-                                    icon: Icon(
-                                      Icons.close,
-                                      color: Theme.of(context).colorScheme.onBackground,
-                                    ),
-                                    onPressed: () {
-                                      selectedDocument.close(context: context);
-                                    },
-                                  ),
                                 ],
                               ),
                               endDrawer: (contextCards != null && contextCards.isNotEmpty)

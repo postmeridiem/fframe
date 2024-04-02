@@ -46,7 +46,7 @@ class _UsersScreenState extends State<UsersScreen> {
       // Optional ListGrid widget
       viewType: ViewType.listgrid,
       listGrid: ListGridConfig<AppUser>(
-        searchHint: "search user names",
+        searchHint: "Search user name",
         // widgetBackgroundColor: Colors.amber,
         // widgetColor: Colors.pink,
         // widgetTextColor: Colors.pink,

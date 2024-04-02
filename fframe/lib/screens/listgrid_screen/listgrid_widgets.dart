@@ -1017,7 +1017,7 @@ class _ListGridBuilderCellState<T> extends State<ListGridBuilderCell<T>> {
               );
             } else {
               if (listGridController.listGridConfig.openDocumentOnClick) {
-                widget.selectedDocument.select();
+                widget.selectedDocument.open();
               }
             }
           },
