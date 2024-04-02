@@ -122,6 +122,7 @@ class DatabaseService<T> {
               id: documentSnapshot.id,
               documentConfig: documentConfig,
               documentSnapshot: documentSnapshot,
+              data: documentSnapshot.data(),
             );
           }).toList());
     }

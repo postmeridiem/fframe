@@ -128,7 +128,6 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
-        columnWidth: 250.0,
         footerBuilder: (context, documentCount) {
           return Column(
             children: [

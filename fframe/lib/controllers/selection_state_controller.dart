@@ -37,14 +37,14 @@ class SelectionState with ChangeNotifier {
 
   SelectionState();
 
-  double _columnWidth = 0.0;
+  EdgeInsets _padding = EdgeInsets.zero;
 
-  set columnWidth(double columnWidth) {
-    _columnWidth = columnWidth;
+  set padding(EdgeInsets padding) {
+    _padding = padding;
     notifyListeners();
   }
 
-  double get columnWidth => _columnWidth;
+  EdgeInsets get padding => _padding;
 
   SelectionStateTracker? get activeTracker {
     return _selectionState.firstWhereOrNull(

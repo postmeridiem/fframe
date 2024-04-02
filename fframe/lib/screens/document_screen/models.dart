@@ -1,10 +1,10 @@
 part of '../../fframe.dart';
 
 class ListConfig<T> {
-  final double columnWidth;
+  final EdgeInsets contentPadding;
 
-  ListConfig({
-    this.columnWidth = 0,
+  const ListConfig({
+    this.contentPadding = EdgeInsets.zero,
   });
 }
 
@@ -26,7 +26,7 @@ class DocumentConfig<T> extends ChangeNotifier {
     this.dataGridConfig,
     this.listGridConfig,
     this.swimlanes,
-    this.customViewTypeBuilder,
+    this.customList,
     this.columnWidth = 0.0,
     this.mdi = false,
     this.mdiItems = 8,
@@ -42,7 +42,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   final DataGridConfig<T>? dataGridConfig;
   final ListGridConfig<T>? listGridConfig;
   final SwimlanesConfig<T>? swimlanes;
-  final CustomViewTypeBuilder<T>? customViewTypeBuilder;
+  final CustomList<T>? customList;
   final TitleBuilder<T> titleBuilder;
   final Document<T> document;
   final String queryStringIdParam;
@@ -159,8 +159,17 @@ class DocumentTab<T> {
   });
 }
 
+class CustomList<T> extends ListConfig {
+  final CustomViewTypeBuilder<T>? builder;
+
+  CustomList({
+    super.contentPadding,
+    required this.builder,
+  });
+}
+
 class DocumentList<T> extends ListConfig {
-  DocumentList({
+  const DocumentList({
     required this.builder,
     this.headerBuilder,
     this.footerBuilder,
@@ -168,7 +177,7 @@ class DocumentList<T> extends ListConfig {
     this.showSeparator = true,
     this.showCreateButton = true,
     this.seperatorHeight = 1,
-    super.columnWidth = 250,
+    super.contentPadding = const EdgeInsets.only(left: 250.0),
   });
   final DocumentListItemBuilder<T> builder;
   final DocumentListHeaderBuilder<T>? headerBuilder;
@@ -179,7 +188,7 @@ class DocumentList<T> extends ListConfig {
   final double seperatorHeight;
 }
 
-class ListGrid<T> {
+class ListGrid<T> extends ListConfig {
   const ListGrid({
     required this.builder,
     this.headerBuilder,

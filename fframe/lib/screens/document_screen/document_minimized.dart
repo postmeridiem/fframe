@@ -8,7 +8,7 @@ class MinimizedDocumentsWatcher extends StatefulWidget {
 }
 
 class _MinimizedDocumentsWatcherState extends State<MinimizedDocumentsWatcher> {
-  double columnWidth = SelectionState.instance.columnWidth;
+  EdgeInsets padding = SelectionState.instance.padding;
   @override
   void initState() {
     super.initState();
@@ -17,9 +17,9 @@ class _MinimizedDocumentsWatcherState extends State<MinimizedDocumentsWatcher> {
   }
 
   updatePadding() {
-    if (SelectionState.instance.columnWidth != columnWidth) {
+    if (SelectionState.instance.padding != padding) {
       setState(() {
-        columnWidth = SelectionState.instance.columnWidth;
+        padding = SelectionState.instance.padding;
       });
     }
   }
@@ -33,9 +33,7 @@ class _MinimizedDocumentsWatcherState extends State<MinimizedDocumentsWatcher> {
   @override
   Widget build(BuildContext context) {
     return AnimatedPadding(
-      padding: EdgeInsets.only(
-        left: columnWidth,
-      ),
+      padding: padding,
       duration: const Duration(seconds: 1),
       child: Padding(
         padding: const EdgeInsets.all(4.0),

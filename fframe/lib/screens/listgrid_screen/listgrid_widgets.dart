@@ -13,6 +13,10 @@ class ListGridHeader<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // SchedulerBinding.instance.addPostFrameCallback((_) {
+    //   SelectionState.instance.padding = SelectionState.instance.padding.add(EdgeInsets.only(top: context.size!.height)) as EdgeInsets;
+    // });
+
     ListGridController listGridController = ListGridController.of(context);
     return SizedBox(
       height: listGridController.headerHeight,
@@ -151,34 +155,46 @@ class ListGridHeader<T> extends StatelessWidget {
   }
 }
 
-class ListGridSearchWidget<T> extends StatelessWidget {
+class ListGridSearchWidget<T> extends StatefulWidget {
   const ListGridSearchWidget({
     super.key,
     required this.listGridController,
     // required this.documentOpen,
   });
   final ListGridController listGridController;
-  // final bool documentOpen;
+
+  @override
+  State<ListGridSearchWidget<T>> createState() => _ListGridSearchWidgetState<T>();
+}
+
+class _ListGridSearchWidgetState<T> extends State<ListGridSearchWidget<T>> {
+  final height = 40.0;
+
+  @override
+  void initState() {
+    SelectionState.instance.padding = SelectionState.instance.padding.add(EdgeInsets.only(top: height)) as EdgeInsets;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    Color widgetColor = listGridController.widgetColor;
-    double calculatedWidth = listGridController.calculatedWidth;
+    Color widgetColor = widget.listGridController.widgetColor;
+    double calculatedWidth = widget.listGridController.calculatedWidth;
 
     ///lalalala
     List<InputChip> searchChips = [];
 
-    if (listGridController.searchableColumns.length > 1) {
-      for (int searchableColumnIndex in listGridController.searchableColumns) {
-        ListGridColumn searchableColumn = listGridController.columnSettings[searchableColumnIndex];
+    if (widget.listGridController.searchableColumns.length > 1) {
+      for (int searchableColumnIndex in widget.listGridController.searchableColumns) {
+        ListGridColumn searchableColumn = widget.listGridController.columnSettings[searchableColumnIndex];
         searchChips.add(
           InputChip(
             label: Text(
               searchableColumn.label,
-              style: TextStyle(color: listGridController.widgetColor),
+              style: TextStyle(color: widget.listGridController.widgetColor),
             ),
-            backgroundColor: listGridController.widgetBackgroundColor,
-            disabledColor: listGridController.widgetBackgroundColor,
+            backgroundColor: widget.listGridController.widgetBackgroundColor,
+            disabledColor: widget.listGridController.widgetBackgroundColor,
           ),
         );
       }
@@ -193,45 +209,41 @@ class ListGridSearchWidget<T> extends StatelessWidget {
         focusColor: widgetColor,
       ),
       child: SizedBox(
-        height: 40,
+        height: height,
         width: calculatedWidth,
         child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
           ),
           // color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(0),
-            child: TextField(
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                fontSize: 16,
-              ),
-              decoration: InputDecoration(
-                hintText: listGridController.listGridConfig.searchHint,
-                hintStyle: TextStyle(
-                  color: Theme.of(context).disabledColor,
-                ),
-                contentPadding: const EdgeInsets.all(10.0),
-                focusColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
-              ),
-              onChanged: (String value) {
-                ListGridController.of(context).searchString = value;
-              },
+          child: TextField(
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 16,
             ),
+            decoration: InputDecoration(
+              hintText: widget.listGridController.listGridConfig.searchHint,
+              hintStyle: TextStyle(
+                color: Theme.of(context).disabledColor,
+              ),
+              contentPadding: const EdgeInsets.all(10.0),
+              focusColor: Theme.of(context).colorScheme.onSurfaceVariant,
+              prefixIcon: Icon(
+                Icons.search,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+            onChanged: (String value) {
+              ListGridController.of(context).searchString = value;
+            },
           ),
         ),
-        // color:
       ),
     );
   }
 }
 
-class ListGridActionBarWidget<T> extends StatelessWidget {
+class ListGridActionBarWidget<T> extends StatefulWidget {
   const ListGridActionBarWidget({
     super.key,
     required this.listGridController,
@@ -240,12 +252,25 @@ class ListGridActionBarWidget<T> extends StatelessWidget {
   final ListGridController listGridController;
 
   @override
+  State<ListGridActionBarWidget<T>> createState() => _ListGridActionBarWidgetState<T>();
+}
+
+class _ListGridActionBarWidgetState<T> extends State<ListGridActionBarWidget<T>> {
+  final height = 36.0;
+
+  @override
+  void initState() {
+    SelectionState.instance.padding = SelectionState.instance.padding.add(EdgeInsets.only(top: height)) as EdgeInsets;
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    ListGridConfig<T> listGridConfig = listGridController.listGridConfig as ListGridConfig<T>;
-    double calculatedWidth = listGridController.calculatedWidth;
-    Color widgetColor = listGridController.widgetColor;
-    Color widgetBackgroundColor = listGridController.widgetBackgroundColor;
-    double cellBorder = listGridController.cellBorder;
+    ListGridConfig<T> listGridConfig = widget.listGridController.listGridConfig as ListGridConfig<T>;
+    double calculatedWidth = widget.listGridController.calculatedWidth;
+    Color widgetColor = widget.listGridController.widgetColor;
+    Color widgetBackgroundColor = widget.listGridController.widgetBackgroundColor;
+    double cellBorder = widget.listGridController.cellBorder;
     return Theme(
       data: ThemeData(
         textSelectionTheme: TextSelectionThemeData(
@@ -256,25 +281,22 @@ class ListGridActionBarWidget<T> extends StatelessWidget {
         focusColor: widgetColor,
       ),
       child: SizedBox(
-        height: 36,
+        height: height,
         width: calculatedWidth,
-        child: Padding(
-          padding: const EdgeInsets.all(0),
-          child: Container(
-            decoration: BoxDecoration(
-              color: widgetBackgroundColor,
-              border: Border(
-                bottom: cellBorder > 0
-                    ? BorderSide(
-                        color: widgetColor,
-                        width: cellBorder,
-                      )
-                    : BorderSide.none,
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: widgetBackgroundColor,
+            border: Border(
+              bottom: cellBorder > 0
+                  ? BorderSide(
+                      color: widgetColor,
+                      width: cellBorder,
+                    )
+                  : BorderSide.none,
             ),
-            child: Row(
-              children: renderActionBar(actionBar: listGridConfig.actionBar),
-            ),
+          ),
+          child: Row(
+            children: renderActionBar(actionBar: listGridConfig.actionBar),
           ),
         ),
         // color:
@@ -289,7 +311,7 @@ class ListGridActionBarWidget<T> extends StatelessWidget {
       bool isMenuHeader = actionMenu.menuItems.length > 1;
       output.add(
         ListGridActionMenuWidget<T>(
-          listGridController: listGridController,
+          listGridController: widget.listGridController,
           actionMenu: actionMenu,
           isMenuHeader: isMenuHeader,
         ),

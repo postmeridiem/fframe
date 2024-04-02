@@ -107,4 +107,9 @@ class Suggestion {
       "changeHistory": FieldValue.arrayUnion([changeHistory]),
     };
   }
+
+  @override
+  String toString() {
+    return toFirestore().toString();
+  }
 }

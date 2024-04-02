@@ -1,6 +1,6 @@
 part of '../../fframe.dart';
 
-class FirestoreListGrid<T> extends ConsumerStatefulWidget {
+class FirestoreListGrid<T> extends StatefulWidget {
   const FirestoreListGrid({
     super.key,
     required this.documentConfig,
@@ -17,7 +17,7 @@ class FirestoreListGrid<T> extends ConsumerStatefulWidget {
   FirestoreListGridState createState() => FirestoreListGridState<T>();
 }
 
-class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
+class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
   final ScrollController _horizontal = ScrollController();
 
   late List<ListGridColumn<T>> columnSettings;
@@ -44,15 +44,6 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
 
   @override
   Widget build(BuildContext context) {
-    // QueryState queryState = ref.watch(queryStateProvider);
-
-    // Map<String, String> params = queryState.queryParameters ?? {};
-    // bool documentOpen = params.containsKey("id");
-
-    // if (params.containsKey("new") && params["new"] == "true") {
-    //   documentOpen = true;
-    // }
-
     return ListGridController(
       context: context,
       documentConfig: widget.documentConfig,
@@ -64,11 +55,10 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
       ),
       child: Builder(
         builder: (BuildContext context) {
-          return AnimatedBuilder(
-              animation: ListGridController.of(context).notifier,
+          return ListenableBuilder(
+              listenable: ListGridController.of(context).notifier,
               builder: (context, child) {
                 ListGridController listGridController = ListGridController.of(context);
-                // DocumentConfig<T> documentConfig = listGridController.documentConfig as DocumentConfig<T>;
                 ListGridNotifier<T> listGridNotifier = listGridController.notifier as ListGridNotifier<T>;
 
                 // if (documentOpen) {
@@ -234,10 +224,10 @@ class FirestoreListGridState<T> extends ConsumerState<FirestoreListGrid<T>> {
     );
   }
 
-  double calculateWidth(double calculatedMinWidth, double viewportWidth) {
-    double calculatedWidth = calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
-    return calculatedWidth;
-  }
+  // double calculateWidth(double calculatedMinWidth, double viewportWidth) {
+  //   double calculatedWidth = calculatedMinWidth > viewportWidth ? calculatedMinWidth : viewportWidth;
+  //   return calculatedWidth;
+  // }
 
   double getViewportWidth(BuildContext context) {
     double viewportWidth = ((MediaQuery.of(context).size.width > 1000) ? (MediaQuery.of(context).size.width - 100) : (MediaQuery.of(context).size.width + 0));
@@ -303,8 +293,6 @@ class ListGridEndless<T> extends StatelessWidget {
             documentConfig: listGridController.documentConfig as DocumentConfig<T>,
             data: documentSnapshot.data(),
           );
-          // final String documentId = selectedDocument.id;
-          // final T document = queryDocumentSnapshot.data();
 
           return Table(
               columnWidths: listGridController.columnWidths,

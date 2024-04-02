@@ -69,51 +69,42 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         }
       },
 
-      customViewTypeBuilder: (context, query, documentConfig, user) {
-        query = query.limit(5);
-        return Column(
-          children: [
-            FutureBuilder<int>(
-              future: DatabaseService<Suggestion>().selecteDocumentCount(
-                query: query,
-                documentConfig: documentConfig,
+      customList: CustomList(
+        contentPadding: const EdgeInsets.only(top: 80.0),
+        builder: (context, query, documentConfig, user) {
+          query = query.limit(5);
+          return Column(
+            children: [
+              FutureBuilder<int>(
+                future: DatabaseService<Suggestion>().selecteDocumentCount(
+                  query: query,
+                  documentConfig: documentConfig,
+                ),
+                builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                  if (snapshot.hasData) return Text("${snapshot.data}");
+                  return const SizedBox(
+                    width: 8,
+                    height: 8,
+                    child: CircularProgressIndicator(),
+                  );
+                },
               ),
-              builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                if (snapshot.hasData) return Text("${snapshot.data}");
-                return const SizedBox(
-                  width: 8,
-                  height: 8,
-                  child: CircularProgressIndicator(),
-                );
-              },
-            ),
-            StreamBuilder(
-              stream: DatabaseService<Suggestion>().selectedDocumentStream(
-                query: query.limit(1),
-                documentConfig: documentConfig,
+              StreamBuilder(
+                stream: DatabaseService<Suggestion>().selectedDocumentStream(
+                  query: query.limit(1),
+                  documentConfig: documentConfig,
+                ),
+                builder: (BuildContext context, AsyncSnapshot<List<SelectedDocument<Suggestion>>> selectedDocumentsSnaphot) {
+                  if (!selectedDocumentsSnaphot.hasData) return const CircularProgressIndicator();
+                  SelectedDocument<Suggestion> selectedDocument = selectedDocumentsSnaphot.data!.first;
+                  selectedDocument.select();
+                  return Text(selectedDocument.data.createdBy.toString());
+                },
               ),
-              builder: (BuildContext context, AsyncSnapshot<List<SelectedDocument<Suggestion>>> selectedDocumentsSnaphot) {
-                if (!selectedDocumentsSnaphot.hasData) return const CircularProgressIndicator();
-                SelectedDocument<Suggestion> selectedDocument = selectedDocumentsSnaphot.data!.first;
-                // selectedDocument.open();
-                return Text(selectedDocument.data.description ?? "?");
-              },
-            ),
-            // FirestoreQueryBuilder<Suggestion>(
-            //   query: query,
-            //   builder: (
-            //     BuildContext context,
-            //     FirestoreQueryBuilderSnapshot<Suggestion> queryBuilderSnapshot,
-            //     Widget? child,
-            //   ) {
-            //     return Placeholder(
-            //       child: Text("${queryBuilderSnapshot.docs.length}"),
-            //     );
-            //   },
-            // ),
-          ],
-        );
-      },
+            ],
+          );
+        },
+      ),
 
       // Center part, shows a firestore doc. Tabs possible
       document: suggestionDocument(),

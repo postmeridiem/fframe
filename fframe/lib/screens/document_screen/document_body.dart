@@ -11,7 +11,7 @@ class DocumentBodyWatcher extends StatefulWidget {
 
 class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
   // bool building = true;
-  double columnWidth = SelectionState.instance.columnWidth;
+  EdgeInsets padding = SelectionState.instance.padding;
   @override
   void initState() {
     super.initState();
@@ -20,9 +20,9 @@ class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
   }
 
   updatePadding() {
-    if (SelectionState.instance.columnWidth != columnWidth) {
+    if (SelectionState.instance.padding != padding) {
       setState(() {
-        columnWidth = SelectionState.instance.columnWidth;
+        padding = SelectionState.instance.padding;
       });
     }
   }
@@ -37,9 +37,7 @@ class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
   Widget build(BuildContext context) {
     Console.log("Build _DocumentBodyWatcherState", scope: "fframeLog.DocumentBodyWatcher", level: LogLevel.fframe);
     return AnimatedPadding(
-      padding: EdgeInsets.only(
-        left: columnWidth,
-      ),
+      padding: padding,
       duration: const Duration(seconds: 1),
       child: ListenableBuilder(
         listenable: SelectionState.instance,
@@ -51,7 +49,26 @@ class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
           String documentId = SelectionState.instance.activeTracker!.selectedDocument.documentId;
           navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: {queryStringIdParam: documentId}));
           return SizedBox.expand(
-            child: SelectionState.instance.activeTracker!.documentBody,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border(
+                  left: BorderSide(
+                    width: 1,
+                    color: Theme.of(context).colorScheme.background,
+                  ),
+                  top: BorderSide(
+                    width: 1,
+                    color: Theme.of(context).colorScheme.background,
+                  ),
+                  right: BorderSide(
+                    width: 1,
+                    color: Theme.of(context).colorScheme.background,
+                  ),
+                ),
+              ),
+              // color: Theme.of(context).colorScheme.surface,
+              child: SelectionState.instance.activeTracker!.documentBody,
+            ),
           );
         }),
       ),

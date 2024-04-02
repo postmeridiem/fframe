@@ -15,7 +15,7 @@ class DocumentScreen<T> extends StatelessWidget {
     this.dataGrid,
     this.listGrid,
     this.swimlanes,
-    this.customViewTypeBuilder,
+    this.customList,
     this.viewType = ViewType.auto,
     this.autoSelectFirst = false,
     this.query,
@@ -34,7 +34,7 @@ class DocumentScreen<T> extends StatelessWidget {
   final DataGridConfig<T>? dataGrid;
   final ListGridConfig<T>? listGrid;
   final SwimlanesConfig<T>? swimlanes;
-  final CustomViewTypeBuilder<T>? customViewTypeBuilder;
+  final CustomList<T>? customList;
   final ViewType viewType;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
@@ -90,7 +90,7 @@ class DocumentScreen<T> extends StatelessWidget {
                     documentList: documentList,
                     dataGridConfig: dataGrid,
                     listGridConfig: listGrid,
-                    customViewTypeBuilder: customViewTypeBuilder,
+                    customList: customList,
                     swimlanes: swimlanes,
                     initialViewType: viewType,
                     autoSelectFirst: autoSelectFirst,
@@ -243,7 +243,9 @@ class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with 
         case ViewType.none:
           return const IgnorePointer();
         case ViewType.list:
-          SelectionState.instance.columnWidth = documentConfig.documentList?.columnWidth ?? 0;
+          if (documentConfig.documentList == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Document list widget not defined");
+
+          SelectionState.instance.padding = documentConfig.documentList?.contentPadding ?? EdgeInsets.zero;
           return Row(
             children: [
               DocumentListLoader<T>(
@@ -253,7 +255,9 @@ class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with 
             ],
           );
         case ViewType.grid:
-          SelectionState.instance.columnWidth = documentConfig.dataGridConfig!.columnWidth;
+          if (documentConfig.dataGridConfig == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Data grid widget not defined");
+
+          SelectionState.instance.padding = documentConfig.dataGridConfig?.contentPadding ?? EdgeInsets.zero;
           return SizedBox.expand(
             child: ClipRect(
               child: OverflowBox(
@@ -274,7 +278,9 @@ class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with 
             ),
           );
         case ViewType.listgrid:
-          SelectionState.instance.columnWidth = documentConfig.listGridConfig!.columnWidth;
+          if (documentConfig.listGridConfig == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "List grid widget not defined");
+
+          SelectionState.instance.padding = documentConfig.listGridConfig?.contentPadding ?? EdgeInsets.zero;
           return SizedBox.expand(
             child: ClipRect(
               child: OverflowBox(
@@ -287,18 +293,20 @@ class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with 
             ),
           );
         case ViewType.swimlanes:
-          SelectionState.instance.columnWidth = documentConfig.swimlanes!.columnWidth;
+          if (documentConfig.swimlanes == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Swimlane widget not defined");
+
+          SelectionState.instance.padding = documentConfig.swimlanes?.contentPadding ?? EdgeInsets.zero;
           return FirestoreSwimlanes<T>(
             documentConfig: documentConfig,
             query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
           );
         case ViewType.custom:
-          if (documentConfig.customViewTypeBuilder == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Custom widget not defined");
-
+          if (documentConfig.customList == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Custom widget not defined");
+          SelectionState.instance.padding = documentConfig.customList?.contentPadding ?? EdgeInsets.zero;
           return ListenableBuilder(
             listenable: DocumentScreenConfig.of(context)!.fireStoreQueryState,
             builder: ((context, child) {
-              return documentConfig.customViewTypeBuilder!(context, DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>, documentConfig, Fframe.of(context)?.user);
+              return documentConfig.customList!.builder!(context, DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>, documentConfig, Fframe.of(context)?.user);
             }),
           );
         default:

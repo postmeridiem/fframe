@@ -125,7 +125,7 @@ class _DocumentListBodyState<T> extends State<DocumentListBody<T>> {
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
 
     return SizedBox(
-      width: documentConfig.documentList?.columnWidth ?? 0,
+      width: documentConfig.documentList?.contentPadding.left ?? 0,
       child: Container(
         key: ValueKey("listScaffold_${widget.key.toString()}"),
         child: Scaffold(

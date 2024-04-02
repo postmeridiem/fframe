@@ -16,7 +16,7 @@ class ListGridController extends InheritedModel<ListGridController> {
     listGridConfig = documentConfig.listGridConfig!;
     _columnWidths = {};
     double calculatedMinWidth = 0;
-
+    double selectionColumnWidth = 0;
     // count  action bar items to see if
     // the actionbar should be drawm
     _enableActionBar = (listGridConfig.actionBar.isNotEmpty) ? true : false;
@@ -30,7 +30,7 @@ class ListGridController extends InheritedModel<ListGridController> {
     if (listGridConfig.rowsSelectable) {
       // this grid has row selection enabled.
       // draw an extra column for the check box
-      double selectionColumnWidth = 40;
+      selectionColumnWidth = 40;
       calculatedMinWidth += selectionColumnWidth;
       _columnWidths.addAll({columnCount: FixedColumnWidth(selectionColumnWidth)});
       columnCount += 1;
@@ -64,6 +64,10 @@ class ListGridController extends InheritedModel<ListGridController> {
     }
     _viewportWidth = _getViewportWidth(viewportSize: viewportSize);
     _calculatedWidth = _calculateWidth(calculatedMinWidth, viewportWidth);
+
+    if ((documentConfig.listGridConfig?.hideListOnDocumentOpen ?? false) == false) {
+      SelectionState.instance.padding = EdgeInsets.only(left: listGridConfig.columnSettings.first.columnWidth + selectionColumnWidth);
+    }
   }
 
   final ListGridNotifier notifier;
