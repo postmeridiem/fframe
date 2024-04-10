@@ -51,28 +51,24 @@ class FFrameUser extends StateNotifier {
     List<String> roles = [];
 
     Map<String, dynamic>? claims = idTokenResult.claims;
-
     if (claims != null && claims.containsKey("roles") == true) {
-      Map<String, dynamic>? claims = idTokenResult.claims;
+      Console.log(
+        "Has roles in ${claims["roles"].runtimeType} as ${claims["roles"].toString()}",
+        scope: "FFrameUser.fromFirebaseUserr",
+        level: LogLevel.fframe,
+      );
 
-      if (claims != null && claims.containsKey("roles") == true) {
-        Console.log(
-          "Has roles in ${claims["roles"].runtimeType}",
-          scope: "FFrameUser.fromFirebaseUserr",
-          level: LogLevel.fframe,
-        );
-
-        if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
-          roles = List<String>.from(claims["roles"]);
-        } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
-          roles = List<String>.from(claims["roles"]);
-        } else {
-          //Legacy mode... it's a map..
-          Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
-          rolesMap.removeWhere((key, value) => value == false);
-          roles = List<String>.from(rolesMap.keys);
-        }
+      if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
+        roles = List<String>.from(claims["roles"]);
+      } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
+        roles = List<String>.from(claims["roles"]);
+      } else {
+        //Legacy mode... it's a map..
+        Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
+        rolesMap.removeWhere((key, value) => value == false);
+        roles = List<String>.from(rolesMap.keys);
       }
+
       roles = roles.map((role) => role.toLowerCase()).toList();
     }
 
