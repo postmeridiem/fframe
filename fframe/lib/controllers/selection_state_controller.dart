@@ -434,7 +434,10 @@ class SelectedDocument<T> {
     if (isNew == true) {
       docId = _createNewDocumentId(data: data as T);
     }
-    isNew
+    if (data != null) {
+      _data = data;
+    }
+    isNew 
         ? await DatabaseService<T>().createDocument(
             collection: documentConfig.collection,
             documentId: docId,

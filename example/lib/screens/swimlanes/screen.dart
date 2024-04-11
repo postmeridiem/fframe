@@ -89,13 +89,27 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
           },
         ),
         assignee: SwimlanesAssignee<Suggestion>(
-          setAssignee: (suggestion, roles, user) {
-//TODO: User picker dialog
-            return null;
+          unsetAssignee: (suggestion) {
+            //TODO: User picker dialog
+            suggestion.assignee = null;
+            return suggestion;
+          },
+          setAssignee: (suggestion, user) {
+            //TODO: User picker dialog
+            suggestion.assignee = user.uid;
+            return suggestion;
+          },
+          isAssignee: (suggestion, user) {
+            return suggestion.assignee == user.uid;
           },
         ),
         // getDueDate: (suggestion) => suggestion.dueDate,
-        taskWidget: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionCard(
+        taskWidgetHeader: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionHeader(
+          selectedDocument: selectedDocument,
+          swimlanesConfig: swimlanesConfig,
+          fFrameUser: fFrameUser,
+        ),
+        taskWidgetBody: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionCard(
           selectedDocument: selectedDocument,
           swimlanesConfig: swimlanesConfig,
           fFrameUser: fFrameUser,
@@ -109,32 +123,38 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
   }
 }
 
-class SuggestionCard extends StatelessWidget {
-  const SuggestionCard({
+class SuggestionHeader extends StatelessWidget {
+  SuggestionHeader({
     super.key,
     required this.selectedDocument,
     required this.swimlanesConfig,
     required this.fFrameUser,
-  });
+  }) : suggestion = selectedDocument.data;
   final SelectedDocument<Suggestion> selectedDocument;
   final SwimlanesConfig<Suggestion> swimlanesConfig;
   final FFrameUser fFrameUser;
+  final Suggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
-    Suggestion suggestion = selectedDocument.data;
-    return SizedBox(
-      height: 150,
-      child: Placeholder(
-        child: Center(
-          child: Column(
-            children: [
-              SelectableText("$selectedDocument.id"),
-              Text("${suggestion.priority}"),
-            ],
-          ),
-        ),
-      ),
-    );
+    return Text(suggestion.name ?? "?");
+  }
+}
+
+class SuggestionCard extends StatelessWidget {
+  SuggestionCard({
+    super.key,
+    required this.selectedDocument,
+    required this.swimlanesConfig,
+    required this.fFrameUser,
+  }) : suggestion = selectedDocument.data;
+  final SelectedDocument<Suggestion> selectedDocument;
+  final SwimlanesConfig<Suggestion> swimlanesConfig;
+  final FFrameUser fFrameUser;
+  final Suggestion suggestion;
+
+  @override
+  Widget build(BuildContext context) {
+    return SelectableText("${suggestion.priority}");
   }
 }

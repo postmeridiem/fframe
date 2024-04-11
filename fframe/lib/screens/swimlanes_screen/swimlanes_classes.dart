@@ -1,13 +1,14 @@
 part of '../../fframe.dart';
 
-class SwimlanesConfig<T> extends ListConfig{
+class SwimlanesConfig<T> extends ListConfig {
   SwimlanesConfig({
     required this.swimlaneSettings,
     required this.trackerId,
     required this.getStatus,
     required this.getTitle,
     required this.getDescription,
-    required this.taskWidget,
+    required this.taskWidgetHeader,
+    required this.taskWidgetBody,
     this.getPriority,
     this.assignee,
     this.myId,
@@ -44,31 +45,30 @@ class SwimlanesConfig<T> extends ListConfig{
   final SwimlanesAssignee<T>? assignee;
   final String Function(T) getDescription;
   final double Function(T)? getPriority;
-  final Widget Function(SelectedDocument<T>, SwimlanesConfig<T>, FFrameUser) taskWidget;
+  final Widget Function(SelectedDocument<T>, SwimlanesConfig<T>, FFrameUser) taskWidgetHeader;
+  final Widget Function(SelectedDocument<T>, SwimlanesConfig<T>, FFrameUser) taskWidgetBody;
 }
 
 class SwimlanesFollowing<T> {
   SwimlanesFollowing({
-    this.isFollowing,
-    this.startFollowing,
-    this.stopFollowing,
-  }) : assert(
-          // Ensure if isFollowing is set, both startFollowing and unstartFollowing must also be set
-          (isFollowing == null && startFollowing == null && stopFollowing == null) || (isFollowing != null && startFollowing != null && stopFollowing != null),
-          'If isFollowing is set, both startFollowing and unstartFollowing must also be set.',
-        );
-  final bool Function(T, FFrameUser)? isFollowing;
-  final T Function(T, FFrameUser)? startFollowing;
-  final T Function(T, FFrameUser)? stopFollowing;
+    required this.isFollowing,
+    required this.startFollowing,
+    required this.stopFollowing,
+  });
+  final bool Function(T, FFrameUser) isFollowing;
+  final T Function(T, FFrameUser) startFollowing;
+  final T Function(T, FFrameUser) stopFollowing;
 }
 
 class SwimlanesAssignee<T> {
   SwimlanesAssignee({
-    this.getAssignee,
-    this.setAssignee,
+    required this.isAssignee,
+    required this.setAssignee,
+    required this.unsetAssignee,
   });
-  final String? Function(T)? getAssignee;
-  final T? Function(T, List<String>, FFrameUser)? setAssignee;
+  final bool Function(T, FFrameUser) isAssignee;
+  final T Function(T, FFrameUser) setAssignee;
+  final T Function(T) unsetAssignee;
 }
 
 class SwimlanesActionMenu<T> {

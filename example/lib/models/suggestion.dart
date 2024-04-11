@@ -10,6 +10,8 @@ class Suggestion {
     this.fieldTab2,
     this.fieldTab3,
     this.name,
+    this.assignee,
+    this.followers,
     this.status,
     this.active,
     this.icon,
@@ -52,6 +54,11 @@ class Suggestion {
       id: snapshot.id,
       status: json['status'],
       name: json['name'],
+      assignee: json['assignee'],
+      followers: (json['followers'] as List<dynamic>?) // Optional safety handling
+              ?.map((item) => item.toString())
+              .toList() ??
+          [],
       fieldTab1: json['fieldTab1'],
       fieldTab2: json['fieldTab2'],
       fieldTab3: json['fieldTab3'],
@@ -98,6 +105,8 @@ class Suggestion {
       "status": status,
       "priority": priority,
       "icon": icon,
+      "assignee": assignee,
+      "followers": followers,
       "fieldTab1": fieldTab1,
       "fieldTab2": fieldTab2,
       "fieldTab3": fieldTab3,
