@@ -51,29 +51,41 @@ class FFrameUser extends StateNotifier {
     List<String> roles = [];
 
     Map<String, dynamic>? claims = idTokenResult.claims;
-
     if (claims != null && claims.containsKey("roles") == true) {
-      Map<String, dynamic>? claims = idTokenResult.claims;
+      Console.log(
+        "Has roles in ${claims["roles"].runtimeType} as ${claims["roles"].toString()}",
+        scope: "FFrameUser.fromFirebaseUser",
+        level: LogLevel.fframe,
+      );
 
-      if (claims != null && claims.containsKey("roles") == true) {
-        Console.log(
-          "Has roles in ${claims["roles"].runtimeType}",
-          scope: "FFrameUser.fromFirebaseUserr",
-          level: LogLevel.fframe,
-        );
-
-        if ("${claims["roles"].runtimeType}".toLowerCase() == "JSArray<dynamic>".toLowerCase()) {
-          roles = List<String>.from(claims["roles"]);
-        } else if (List<dynamic> == claims["roles"].runtimeType || List<String> == claims["roles"].runtimeType) {
-          roles = List<String>.from(claims["roles"]);
-        } else {
-          //Legacy mode... it's a map..
-          Map<String, dynamic>? rolesMap = Map<String, dynamic>.from(claims["roles"]);
-          rolesMap.removeWhere((key, value) => value == false);
-          roles = List<String>.from(rolesMap.keys);
+      for (var element in claims["roles"]) {
+        if (element is String) {
+          roles.add(element.toLowerCase());
+        } else if (element is Map<String, dynamic>) {
+          for (var entry in element.entries) {
+            // Check if the value is a boolean and true, then add the key
+            if (entry.value is bool && entry.value == true) {
+              roles.add(entry.key.toLowerCase());
+            }
+          }
+        } else if (element is List) {
+          for (var item in element) {
+            roles.add(item.toString().toLowerCase()); // Recursively process each item
+          }
+        } else if (element != null) {
+          roles.add(element.toString().toLowerCase());
         }
+
+        if (element is String) {
+          roles.add(element);
+        } else if (element != null) {
+          // Convert non-null, non-string elements to strings in some way
+          roles.add(element.toString());
+        }
+        // Optionally handle nulls or other types differently
       }
-      roles = roles.map((role) => role.toLowerCase()).toList();
+
+      roles = roles.map((role) => role.toLowerCase()).toSet().toList(); // Convert back to a list if you need a list;
     }
 
     return FFrameUser(
