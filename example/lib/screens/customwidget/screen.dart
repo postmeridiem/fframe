@@ -72,42 +72,68 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       customList: CustomList(
         contentPadding: const EdgeInsets.only(top: 80.0),
         builder: (context, query, documentConfig, user) {
-          query = query.limit(5);
-          return Column(
-            children: [
-              FutureBuilder<int>(
-                future: DatabaseService<Suggestion>().selecteDocumentCount(
-                  query: query,
-                  documentConfig: documentConfig,
-                ),
-                builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-                  if (snapshot.hasData) return Text("${snapshot.data}");
-                  return const SizedBox(
-                    width: 8,
-                    height: 8,
-                    child: CircularProgressIndicator(),
-                  );
-                },
-              ),
-              StreamBuilder(
-                stream: DatabaseService<Suggestion>().selectedDocumentStream(
-                  query: query.limit(1),
-                  documentConfig: documentConfig,
-                ),
-                builder: (BuildContext context, AsyncSnapshot<List<SelectedDocument<Suggestion>>> selectedDocumentsSnaphot) {
-                  if (!selectedDocumentsSnaphot.hasData) return const CircularProgressIndicator();
-                  SelectedDocument<Suggestion> selectedDocument = selectedDocumentsSnaphot.data!.first;
-                  selectedDocument.select();
-                  return Text(selectedDocument.data.createdBy.toString());
-                },
-              ),
-            ],
-          );
+          query = query.limit(1);
+          return ContentSelector(context: context, query: query, documentConfig: documentConfig, user: user);
         },
       ),
 
       // Center part, shows a firestore doc. Tabs possible
       document: suggestionDocument(),
+    );
+  }
+}
+
+class ContentSelector<Suggestion> extends StatefulWidget {
+  const ContentSelector({
+    super.key,
+    required this.context,
+    required this.query,
+    required this.documentConfig,
+    this.user,
+  });
+  final BuildContext context;
+  final Query<Suggestion> query;
+  final DocumentConfig<Suggestion> documentConfig;
+  final FFrameUser? user;
+  @override
+  State<ContentSelector> createState() => _ContentSelectorState<Suggestion>();
+}
+
+class _ContentSelectorState<Suggestion> extends State<ContentSelector<Suggestion>> {
+  @override
+  Widget build(BuildContext context) {
+    DocumentConfig<Suggestion> documentConfig = widget.documentConfig;
+    Query<Suggestion> query = widget.query;
+
+    return Column(
+      children: [
+        FutureBuilder<int>(
+          future: DatabaseService<Suggestion>().selecteDocumentCount(
+            query: query,
+            documentConfig: documentConfig,
+          ),
+          builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+            if (snapshot.hasData) return Text("${snapshot.data}");
+            return const SizedBox(
+              width: 8,
+              height: 8,
+              child: CircularProgressIndicator(),
+            );
+          },
+        ),
+        StreamBuilder(
+          stream: DatabaseService<Suggestion>().selectedDocumentStream(
+            query: query.limit(1),
+            documentConfig: documentConfig,
+          ),
+          builder: (BuildContext context, AsyncSnapshot<List<SelectedDocument<Suggestion>>> selectedDocumentsSnaphot) {
+            if (!selectedDocumentsSnaphot.hasData) return const CircularProgressIndicator();
+            SelectedDocument<Suggestion> selectedDocument = selectedDocumentsSnaphot.data!.first;
+            selectedDocument.select();
+            return IgnorePointer();
+          },
+        ),
+      ],
     );
   }
 }
