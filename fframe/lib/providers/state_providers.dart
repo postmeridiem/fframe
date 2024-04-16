@@ -7,6 +7,6 @@ final targetStateProvider = StateProvider<TargetState>((ref) {
   return targetState;
 });
 
-final queryStateProvider = StateProvider<QueryState>((ref) {
-  return QueryState.instance;
-});
+// final queryStateProvider = StateProvider<QueryState>((ref) {
+//   return QueryState.instance;
+// });

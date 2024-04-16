@@ -11,6 +11,7 @@ class SelectionStateTracker<T> {
   SelectionStateTracker({
     required this.selectedDocument,
     required this.trackerId,
+    required this.queryParameters,
     this.viewType = SelectionStateViewType.maximized,
   }) {
     selectedDocument.selectionStateTracker = this;
@@ -18,6 +19,7 @@ class SelectionStateTracker<T> {
   SelectionStateViewType viewType = SelectionStateViewType.maximized;
   final String trackerId;
   final SelectedDocument<T> selectedDocument;
+  final Map<String, String> queryParameters;
   int minimizedPosition = 0;
 
   DocumentBody<T> get documentBody => DocumentBody<T>(
@@ -27,6 +29,36 @@ class SelectionStateTracker<T> {
 
   Text titleBuilder({required BuildContext context}) {
     return selectedDocument.documentConfig.titleBuilder(context, selectedDocument.data);
+  }
+
+  Widget titleIcon() {
+    //TODO
+    return const Icon(Icons.no_crash_outlined);
+  }
+
+  clearQueryParameters() {
+    queryParameters.clear();
+  }
+
+  void updateQueryString(Map<String, String> queryString) {
+    for (var queryStringElement in queryString.entries) {
+      queryParameters[queryStringElement.key] = queryStringElement.value;
+    }
+  }
+
+  setQueryParameter({required String key, required String value}) {
+    queryParameters[key] = value;
+  }
+
+  clearQueryParameter({required String key}) {
+    if (queryParameters.containsKey(key)) {
+      queryParameters.remove(key);
+    }
+  }
+
+  String? queryStringParam(String key) => queryParameters[key];
+  String get queryString {
+    return queryParameters.entries.map((queryParameter) => "${queryParameter.key}=${queryParameter.value}").join("&");
   }
 }
 
@@ -79,14 +111,20 @@ class SelectionState with ChangeNotifier {
 
   clear() {
     _selectionState.clear();
-    navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: null));
-    notifyListeners();
+    navigationNotifier.processRouteInformation();
+    // navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: null));
+    // notifyListeners();
   }
 
   selectDocument<T>(SelectedDocument<T> selectedDocument) {
+    // NavigationNotifier local = NavigationNotifier.instance;
+    // if (NavigationNotifier.instance.isBuilding) {
+    //   debugger();
+    // }
+
     String trackerId = selectedDocument.trackerId;
     //Update the route
-    navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: {selectedDocument.documentConfig.queryStringIdParam: selectedDocument.documentId}));
+    navigationNotifier.processRouteInformation();
     //Minimize any full screen document
 
     if (selectedDocument.documentConfig.mdi == true) {
@@ -110,6 +148,7 @@ class SelectionState with ChangeNotifier {
         () => SelectionStateTracker<T>(
           selectedDocument: selectedDocument,
           trackerId: trackerId,
+          queryParameters: {selectedDocument.documentConfig.queryStringIdParam: selectedDocument.documentId},
         ),
       );
 
@@ -125,6 +164,7 @@ class SelectionState with ChangeNotifier {
         selectionStateTracker.viewType = SelectionStateViewType.minimized;
       }
     });
+    navigationNotifier.processRouteInformation();
   }
 
   maximizeDocument<T>(SelectedDocument<T> selectedDocument) {
@@ -134,20 +174,24 @@ class SelectionState with ChangeNotifier {
     if (activeDocumentId == null || trackerId != activeDocumentId) {
       //Minimize any full screen document
       _minimize(viewType: SelectionStateViewType.maximized);
-      navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: {selectedDocument.documentConfig.queryStringIdParam: selectedDocument.documentId}));
+      // QueryState.instance.queryParameters = {selectedDocument.documentConfig.queryStringIdParam: selectedDocument.documentId};
+      navigationNotifier.processRouteInformation();
 
       //Activate the selected document
       _selectionState[trackerId]?.viewType = SelectionStateViewType.maximized;
-      notifyListeners();
+      // notifyListeners();
     }
+    navigationNotifier.processRouteInformation();
   }
 
   minimizeDocument<T>(SelectedDocument<T> selectedDocument) {
     //Minimize the selected document
     if (_changeViewType(selectedDocument: selectedDocument, viewType: SelectionStateViewType.minimized)) {
-      navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: null));
-      notifyListeners();
+      // QueryState.instance.queryParameters = null;
+      navigationNotifier.processRouteInformation();
+      // notifyListeners();
     }
+    navigationNotifier.processRouteInformation();
   }
 
   bool _changeViewType<T>({required SelectedDocument<T> selectedDocument, required SelectionStateViewType viewType}) {
@@ -155,6 +199,7 @@ class SelectionState with ChangeNotifier {
     String trackerId = selectedDocument.trackerId;
     if (_selectionState.containsKey(trackerId)) {
       _selectionState[trackerId]?.viewType = viewType;
+      navigationNotifier.processRouteInformation();
       return true;
     }
     return false;
@@ -162,12 +207,13 @@ class SelectionState with ChangeNotifier {
 
   closeDocument<T>(SelectedDocument<T> selectedDocument) {
     if (selectedDocument.trackerId == activeDocument?.trackerId) {
-      navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: null));
+      // TODO: Perform a dirty document check
     }
     if (_selectionState.containsKey(selectedDocument.trackerId)) {
       _selectionState.remove(selectedDocument.trackerId);
       notifyListeners();
     }
+    navigationNotifier.processRouteInformation();
   }
 
   closeActiveDocument() {
@@ -195,6 +241,38 @@ class SelectionState with ChangeNotifier {
   }) {
     return _selectionState.containsKey(SelectedDocument(documentConfig: documentConfig, id: documentId).trackerId);
   }
+
+  //Navigation and QueryString related
+
+  Uri? pendingUri;
+  SelectionState fromUri({required Uri uri}) {
+    pendingUri = uri;
+    return this;
+  }
+
+  String get queryString {
+    return activeTracker?.queryString ?? "";
+    // return _queryParameters?.entries.map((queryParameter) => "${queryParameter.key}=${queryParameter.value}").join("&") ?? "";
+  }
+
+  Map<String, String>? get queryParameters {
+    return activeTracker?.queryParameters;
+  }
+
+  String? queryStringParam(String key) => activeTracker?.queryStringParam(key);
+
+  void clearQueryParameters() {
+    closeActiveDocument();
+  }
+
+  void updateQueryString(Map<String, String> queryString) {
+    activeTracker?.updateQueryString(queryString);
+  }
+
+  // //This is triggered when the URL changes
+  // processRouteInformation() {
+  //   debugger();
+  // }
 }
 
 class SelectedDocument<T> {
@@ -437,7 +515,7 @@ class SelectedDocument<T> {
     if (data != null) {
       _data = data;
     }
-    isNew 
+    isNew
         ? await DatabaseService<T>().createDocument(
             collection: documentConfig.collection,
             documentId: docId,

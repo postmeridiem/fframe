@@ -203,16 +203,17 @@ class DocumentScreenLoader<T> extends StatefulWidget {
 }
 
 class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with SingleTickerProviderStateMixin {
+  late DocumentConfig<T> documentConfig;
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => navigationNotifier.markBuildDone());
+    WidgetsBinding.instance.addPostFrameCallback((_) => navigationNotifier.markBuildDone(documentConfig));
   }
 
   @override
   Widget build(BuildContext context) {
     Console.log("Build DocumentScreenLoader: ${widget.key.toString()}", scope: "fframeLog.DocumentScreenLoader", level: LogLevel.fframe);
-    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
+    documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
 
     // double columnWidth = 0;
     // if (documentConfig.currentViewType case ViewType.list) {
@@ -230,14 +231,14 @@ class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with 
     return Consumer(builder: (context, ref, child) {
       ref.watch(targetStateProvider);
 
-      //(pre-load the query-string. If any.
-      QueryState queryState = ref.read(queryStateProvider);
-      if (queryState.queryString.isNotEmpty && queryState.queryParameters!.containsKey(documentConfig.queryStringIdParam)) {
-        SelectedDocument.load<T>(
-          documentConfig: documentConfig,
-          documentId: queryState.queryParameters![documentConfig.queryStringIdParam],
-        );
-      }
+      // //(pre-load the query-string. If any.
+      // // QueryState queryState = ref.read(queryStateProvider);
+      // if (queryState.queryString.isNotEmpty && queryState.queryParameters!.containsKey(documentConfig.queryStringIdParam)) {
+      //   SelectedDocument.load<T>(
+      //     documentConfig: documentConfig,
+      //     documentId: queryState.queryParameters![documentConfig.queryStringIdParam],
+      //   );
+      // }
 
       switch (documentConfig.currentViewType) {
         case ViewType.none:

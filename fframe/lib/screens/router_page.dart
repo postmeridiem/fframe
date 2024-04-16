@@ -39,17 +39,17 @@ class FRouter extends InheritedWidget {
   ///Path and replace QS
   ///FRouter.of(context).navigateTo(navigationTarget: widget.navigationTarget, queryParameters: {"id": "cow"}, resetQueryString: true);
   navigateTo<T>({required NavigationTarget navigationTarget, Map<String, String>? queryParameters, bool? resetQueryString = true, T? context}) {
-    QueryState queryState = ref.read(queryStateProvider);
+    //  queryState = ref.read(queryStateProvider);
 
-    QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
+    //  newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
     Console.log(
-      "Update route to /${navigationTarget.path} with query: `${newQueryState.toString()}`. Reset queryString: $resetQueryString",
+      "Update route to /${navigationTarget.path} with query: `${queryParameters.toString()}`. Reset queryString: $resetQueryString",
       scope: "fframeLog.FRouter.navigateTo",
       level: LogLevel.prod,
     );
 
     TargetState targetState = TargetState.processRouteRequest(navigationTarget: navigationTarget);
-    navigationNotifier.processRouteInformation(targetState: targetState, queryState: newQueryState);
+    navigationNotifier.processRouteInformation(targetState: targetState);
   }
 
   TargetState get currentTargetState {
@@ -63,45 +63,44 @@ class FRouter extends InheritedWidget {
   navigateToRoute<T>(BuildContext context, {required String route, String id = ''}) {
     bool idMode = id == '' ? false : true;
     Console.log("Update route to $route ${idMode ? "into id: $id" : ""}", scope: "fframeLog.navigateToRoute", level: LogLevel.prod);
-    Map<String, String> queryParameters = idMode ? {"id": id} : {};
+    // Map<String, String> queryParameters = idMode ? {"id": id} : {};
 
     NavigationTarget navigationTarget = Fframe.of(context)!.navigationConfig.navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == route);
 
-    QueryState newQueryState = QueryState(queryParameters: queryParameters);
+    // QueryState newQueryState = QueryState(queryParameters: queryParameters);
 
     TargetState targetState = TargetState.processRouteRequest(navigationTarget: navigationTarget);
-    navigationNotifier.processRouteInformation(targetState: targetState, queryState: newQueryState);
+    navigationNotifier.processRouteInformation(targetState: targetState);
   }
 
-  navigateToRouteFromNavigationTargets<T>(List<NavigationTarget> navigationTargets, {required String route, String id = ''}) {
-    bool idMode = id == '' ? false : true;
-    Console.log(
-      "Update route to $route ${idMode ? "into id: $id" : ""}",
-      scope: "fframeLog.FRouter.navigateToRouteFromNavigationTargets",
-      level: LogLevel.prod,
-    );
-    Map<String, String> queryParameters = idMode ? {"id": id} : {};
-    List<String> routeSegments = route.split('/');
-    String selector1 = routeSegments[0];
-    String selector2 = routeSegments[0];
-    NavigationTarget? target;
+  // navigateToRouteFromNavigationTargets<T>(List<NavigationTarget> navigationTargets, {required String route, String id = ''}) {
+  //   bool idMode = id == '' ? false : true;
+  //   Console.log(
+  //     "Update route to $route ${idMode ? "into id: $id" : ""}",
+  //     scope: "fframeLog.FRouter.navigateToRouteFromNavigationTargets",
+  //     level: LogLevel.prod,
+  //   );
+  //   List<String> routeSegments = route.split('/');
+  //   String selector1 = routeSegments[0];
+  //   String selector2 = routeSegments[0];
+  //   NavigationTarget? target;
 
-    for (int i = 0; i < routeSegments.length; i++) {
-      if (i == 0) {
-        target = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == selector1);
-      } else {
-        String segment = routeSegments[i];
-        selector1 += "/${routeSegments[i - 1]}/$segment";
-        selector2 += "/$segment";
-        target = target!.navigationTabs!.firstWhere((NavigationTab tab) => (tab.path == selector1 || tab.path == selector2));
-      }
-    }
+  //   for (int i = 0; i < routeSegments.length; i++) {
+  //     if (i == 0) {
+  //       target = navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.path == selector1);
+  //     } else {
+  //       String segment = routeSegments[i];
+  //       selector1 += "/${routeSegments[i - 1]}/$segment";
+  //       selector2 += "/$segment";
+  //       target = target!.navigationTabs!.firstWhere((NavigationTab tab) => (tab.path == selector1 || tab.path == selector2));
+  //     }
+  //   }
 
-    QueryState newQueryState = QueryState(queryParameters: queryParameters);
+  //   // QueryState newQueryState = QueryState(queryParameters: queryParameters);
 
-    TargetState targetState = TargetState.processRouteRequest(navigationTarget: target!);
-    navigationNotifier.processRouteInformation(targetState: targetState, queryState: newQueryState);
-  }
+  //   TargetState targetState = TargetState.processRouteRequest(navigationTarget: target!);
+  //   navigationNotifier.processRouteInformation(targetState: targetState);
+  // }
 
   ///Only QS (persist path and existing QS values)
   ///FRouter.of(context).updateQueryString(queryString: {"id": "cow"});
@@ -113,38 +112,43 @@ class FRouter extends InheritedWidget {
       scope: "fframeLog.FRouter.updateQueryString",
       level: LogLevel.fframe,
     );
-    QueryState queryState = ref.read(queryStateProvider);
+    if (resetQueryString == true) {
+      SelectionState.instance.clearQueryParameters();
+    } else {
+      SelectionState.instance.updateQueryString(queryParameters);
+    }
 
-    QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
-    Console.log(
-      newQueryState.toString(),
-      scope: "fframeLog.FRouter.updateQueryString",
-      level: LogLevel.fframe,
-    );
+    // QueryState queryState = ref.read(queryStateProvider);
 
-    navigationNotifier.processRouteInformation(queryState: newQueryState);
+    // QueryState newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
+    // Console.log(
+    //   newQueryState.toString(),
+    //   scope: "fframeLog.FRouter.updateQueryString",
+    //   level: LogLevel.fframe,
+    // );
+
+    navigationNotifier.processRouteInformation();
   }
 
   //Get a value from the QueryString
-  bool get isQueryStringEmpty {
-    QueryState queryState = ref.read(queryStateProvider);
-    return queryState.queryParameters?.isEmpty ?? true;
-  }
+  // bool get isQueryStringEmpty {
+  //   QueryState queryState = ref.read(queryStateProvider);
+  //   return queryState.queryParameters?.isEmpty ?? true;
+  // }
 
   //Get a value from the QueryString
   bool hasQueryStringParam(String key) {
-    QueryState queryState = ref.read(queryStateProvider);
-    return queryState.queryParameters?.containsKey(key) ?? false;
+    return SelectionState.instance.queryParameters?.containsKey(key) ?? false;
   }
 
-  //Get a value from the QueryString
-  String? queryStringParam(String key) {
-    QueryState queryState = ref.read(queryStateProvider);
-    if ((queryState.queryParameters?.containsKey(key) ?? false) == true) {
-      return queryState.queryParameters![key];
-    }
-    return null;
-  }
+  // //Get a value from the QueryString
+  // String? queryStringParam(String key) {
+  //   QueryState queryState = ref.read(queryStateProvider);
+  //   if ((queryState.queryParameters?.containsKey(key) ?? false) == true) {
+  //     return queryState.queryParameters![key];
+  //   }
+  //   return null;
+  // }
 
   ///Request a logout
   signOut() {

@@ -15,7 +15,6 @@ class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
   @override
   void initState() {
     super.initState();
-
     SelectionState.instance.addListener(updatePadding);
   }
 
@@ -45,9 +44,6 @@ class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
           if (SelectionState.instance.activeTracker == null) {
             return const IgnorePointer();
           }
-          String queryStringIdParam = SelectionState.instance.activeTracker!.documentBody.documentConfig.queryStringIdParam;
-          String documentId = SelectionState.instance.activeTracker!.selectedDocument.documentId;
-          navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: {queryStringIdParam: documentId}));
           return SizedBox.expand(
             child: Container(
               decoration: BoxDecoration(
@@ -115,7 +111,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
 
     //Prepare the tabs
     String tabIndexKey = documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
-    int tabIndex = int.parse(FRouter.of(context).queryStringParam(tabIndexKey) ?? "0");
+    int tabIndex = int.parse(SelectionState.instance.queryStringParam(tabIndexKey) ?? "0");
 
     return Hero(
       tag: selectedDocument.trackerId,

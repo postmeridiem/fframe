@@ -73,7 +73,7 @@ part 'package:fframe/models/router_config.dart';
 part 'package:fframe/models/navigation_config.dart';
 
 part 'package:fframe/services/target_state.dart';
-part 'package:fframe/services/query_state.dart';
+// part 'package:fframe/services/query_state.dart';
 part 'package:fframe/controllers/selection_state_controller.dart';
 part 'package:fframe/helpers/console_logger.dart';
 

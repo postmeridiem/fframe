@@ -20,59 +20,59 @@ final navigationProvider = ChangeNotifierProvider<NavigationNotifier>(
 class NextState {
   NextState({
     required this.targetState,
-    required this.queryState,
+    required this.selectionState,
   });
 
   final TargetState targetState;
-  final QueryState queryState;
+  final SelectionState selectionState;
 }
 
 class NavigationNotifier extends ChangeNotifier {
-  final Ref ref;
-  Uri? _uri;
+  static final NavigationNotifier instance = NavigationNotifier._internal();
+  NavigationNotifier._internal();
+
+  late Ref ref;
+  Uri? _uri = Uri();
   List<NextState> nextState = [];
-  FFrameUser? fFrameUser;
+  late FFrameUser? fFrameUser;
 
   TargetState? _targetState;
-  QueryState? _queryState;
-  // NavigationTarget? _postSignInTarget;
   bool _isbuilding = false;
   bool _buildPending = false;
 
-  // bool? _isSignedIn;
-
   // NavigationConfig navigationConfig = FRouterConfig.instance.navigationConfig;
-  NavigationConfig _initialNavigationConfig = FRouterConfig.instance.navigationConfig;
+  late NavigationConfig _initialNavigationConfig = FRouterConfig.instance.navigationConfig;
 
-  NavigationNotifier({required this.ref, required this.fFrameUser, required NavigationConfig navigationConfig}) {
+  factory NavigationNotifier({required Ref ref, FFrameUser? fFrameUser, required NavigationConfig navigationConfig}) {
     Console.log(
       "init NavigationNotifier",
       scope: "fframeLog.NavigationNotifier",
       level: LogLevel.dev,
     );
-    _initialNavigationConfig = navigationConfig;
-    // _filterNavigationRoutes(navigationConfig);
-    QueryState.instance.addListener(queryStateListener);
-    // FirebaseAuth.instance.authStateChanges().listen((User? user) => authChangeListener(user));
+    instance.ref = ref;
+    instance.fFrameUser = fFrameUser;
+    instance._initialNavigationConfig = navigationConfig;
+    SelectionState.instance.addListener(instance.selectionStateListener);
+    return instance;
   }
 
   @override
   void dispose() {
-    QueryState.instance.removeListener(queryStateListener);
+    SelectionState.instance.removeListener(selectionStateListener);
     super.dispose();
   }
 
   int? selectedNavRailIndex;
   bool get isSignedIn => FRouterConfig.instance.user == null ? false : true;
 
-  queryStateListener() {
+  selectionStateListener() {
     Console.log(
-      "queryStateListener",
+      "selectionStateListener",
       scope: "fframeLog.NavigationNotifier.currentTarget",
       level: LogLevel.dev,
     );
 
-    processRouteInformation(queryState: QueryState.instance);
+    processRouteInformation();
   }
 
   TargetState? get currentTarget {
@@ -144,35 +144,35 @@ class NavigationNotifier extends ChangeNotifier {
       );
     } else {
       TargetState? targetState = TargetState.fromUri(this, uri);
-      QueryState? queryState = QueryState.fromUri(uri);
+      SelectionState selectionState = SelectionState.instance.fromUri(uri: uri);
 
       Console.log(
-        "Parsing path: /#/${targetState.navigationTarget.path} query: ${queryState.toString()}",
+        "Parsing path: /#/${targetState.navigationTarget.path} query: ${selectionState.toString()}",
         scope: "fframeLog.NavigationNotifier.parseRouteInformation",
         level: LogLevel.fframe,
       );
 
       if (uri.path != "/") {
         Console.log(
-          "Store initial link for later use: ${targetState.navigationTarget.title} ${queryState.queryString}",
+          "Store initial link for later use: ${targetState.navigationTarget.title} ${selectionState.queryString}",
           scope: "fframeLog.NavigationNotifier.parseRouteInformation",
           level: LogLevel.fframe,
         );
-        nextState.add(NextState(targetState: targetState, queryState: queryState));
+        nextState.add(NextState(targetState: targetState, selectionState: selectionState));
       }
 
-      processRouteInformation(targetState: targetState, queryState: queryState);
+      processRouteInformation(targetState: targetState, selectionState: selectionState);
     }
   }
 
-  processRouteInformation({TargetState? targetState, QueryState? queryState}) {
+  processRouteInformation({TargetState? targetState, SelectionState? selectionState}) {
     Console.log(
       "processRouteInformation",
       scope: "fframeLog.NavigationNotifier.processRouteInformation",
       level: LogLevel.fframe,
     );
     _targetState = targetState ?? ref.read(targetStateProvider);
-    _queryState = queryState ?? ref.read(queryStateProvider);
+    // _selectionState = selectionState ?? SelectionState.instance;
 
     uri = composeUri();
   }
@@ -189,12 +189,13 @@ class NavigationNotifier extends ChangeNotifier {
             ? _targetState!.navigationTarget.path
             : "/";
 
-    String queryComponent = (_queryState == null) ? _uri?.query ?? "" : _queryState!.queryString;
-    Uri uri = Uri.parse("/$pathComponent${queryComponent != "" ? "?$queryComponent" : ""}".replaceAll("//", "/"));
+    // debugger();
+    String queryString = SelectionState.instance.queryString;
+    Uri uri = Uri.parse("/$pathComponent${queryString != "" ? "?$queryString" : ""}".replaceAll("//", "/"));
 
     //Trigger the setter and te external method with it;
     Console.log(
-      "Created URI for: ${uri.toString()} from path: $pathComponent and query: $queryComponent",
+      "Created URI for: ${uri.toString()} from path: $pathComponent and query: $queryString",
       scope: "fframeLog.NavigationNotifier.composeUri",
       level: LogLevel.dev,
     );
@@ -204,24 +205,25 @@ class NavigationNotifier extends ChangeNotifier {
     return uri;
   }
 
-  markBuildDone() {
+  markBuildDone<T>(DocumentConfig<T> documentConfig) async {
     _isbuilding = false;
-    _buildPending == true;
     Console.log(
       "Mark build done",
       scope: "fframeLog.NavigationNotifier.markBuildDone buildPending: $_buildPending",
       level: LogLevel.fframe,
     );
-    if (_buildPending) {
+    if (SelectionState.instance.pendingUri != null && SelectionState.instance.pendingUri!.query != "") {
+      // if (_buildPending) {
       _buildPending = false;
 
-      if (navigationNotifier.nextState.isNotEmpty) {
-        NextState nextState = navigationNotifier.nextState.first;
-        processRouteInformation(targetState: nextState.targetState, queryState: nextState.queryState);
+      String? docId = SelectionState.instance.pendingUri!.queryParameters[documentConfig.queryStringIdParam];
+      if (docId != null) {
+        SelectedDocument<T> selectedDocument = SelectedDocument<T>(id: docId, documentConfig: documentConfig);
+        selectedDocument.open();
       }
 
-      updateProviders();
-      notifyListeners();
+      // updateProviders();
+      // notifyListeners();
     }
   }
 
@@ -244,13 +246,17 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   set uri(Uri? uri) {
+    if (_uri == uri) {
+      return;
+    }
+
     Console.log(
       "NavigationService.setUri: ${uri.toString()} was: $_uri",
       scope: "fframeLog.NavigationNotifier.uri",
       level: LogLevel.fframe,
     );
 
-    if (_uri == uri && _buildPending == false) {
+    if (_buildPending == true) {
       return;
     }
 
@@ -286,7 +292,6 @@ class NavigationNotifier extends ChangeNotifier {
     );
 
     StateController<TargetState> targetStateNotifier = ref.read(targetStateProvider.notifier);
-    StateController<QueryState> queryStateNotifier = ref.read(queryStateProvider.notifier);
 
     if (targetStateNotifier.state.navigationTarget.path != _targetState!.navigationTarget.path) {
       Console.log(
@@ -296,15 +301,15 @@ class NavigationNotifier extends ChangeNotifier {
       );
       targetStateNotifier.update((state) => _targetState!);
     }
-    if (queryStateNotifier.state.queryString != _queryState!.queryString) {
-      Console.log(
-        "Update queryState to ${_queryState!.queryString}",
-        scope: "fframeLog.NavigationNotifier.updateProviders",
-        level: LogLevel.fframe,
-      );
-      QueryState.instance.notifyListeners();
-      queryStateNotifier.update((state) => _queryState!);
-    }
+    // if (SelectionState.instance.queryString != _selectionState!.queryString) {
+    //   Console.log(
+    //     "Update selectionState to ${_selectionState!.queryString}",
+    //     scope: "fframeLog.NavigationNotifier.updateProviders",
+    //     level: LogLevel.fframe,
+    //   );
+    //   // QueryState.instance.notifyListeners();
+    //   // selectionStateNotifier.update((state) => _selectionState!);
+    // }
   }
 
   set isBuilding(bool isBuilding) {

@@ -20,10 +20,10 @@ class UsersScreen extends StatefulWidget {
 class _UsersScreenState extends State<UsersScreen> {
   @override
   Widget build(BuildContext context) {
-    bool profileMode = getProfileMode();
-    if (profileMode) {
-      return const UserProfileScreen();
-    }
+    // bool profileMode = getProfileMode();
+    // if (profileMode) {
+    //   return const UserProfileScreen();
+    // }
     return DocumentScreen<AppUser>(
       // formKey: GlobalKey<FormState>(),
       collection: "users",
@@ -130,14 +130,14 @@ class _UsersScreenState extends State<UsersScreen> {
     );
   }
 
-  bool getProfileMode() {
-    String? id = FRouter.of(context).queryStringParam("id");
-    if (id != null && id == "profile") {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  // bool getProfileMode() {
+  //   String? id = FRouter.of(context).queryStringParam("id");
+  //   if (id != null && id == "profile") {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 }
 
 // class ProfileWidget extends StatelessWidget {

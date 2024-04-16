@@ -129,7 +129,7 @@ class _ContentSelectorState<Suggestion> extends State<ContentSelector<Suggestion
           builder: (BuildContext context, AsyncSnapshot<List<SelectedDocument<Suggestion>>> selectedDocumentsSnaphot) {
             if (!selectedDocumentsSnaphot.hasData) return const CircularProgressIndicator();
             SelectedDocument<Suggestion> selectedDocument = selectedDocumentsSnaphot.data!.first;
-
+            selectedDocument.select();
             return IconButton(
                 onPressed: () {
                   selectedDocument.select();
