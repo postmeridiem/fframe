@@ -33,7 +33,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         return suggestion.toFirestore();
       },
       createDocumentId: (suggestion) {
-        return "${suggestion.name}";
+        return suggestion.name;
       },
 
       preSave: (Suggestion suggestion) {

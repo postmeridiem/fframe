@@ -53,13 +53,13 @@
 //   }
 
 //   static QueryState _defaultRoute() {
-//     if (navigationNotifier.nextState.isNotEmpty) {
+//     if (NavigationNotifier.instance.nextState.isNotEmpty) {
 //       Console.log(
-//         "Route to ${navigationNotifier.nextState.first.queryState.queryString}",
+//         "Route to ${NavigationNotifier.instance.nextState.first.queryState.queryString}",
 //         scope: "fframeLog.QueryState.defaultroute",
 //         level: LogLevel.fframe,
 //       );
-//       return navigationNotifier.nextState.first.queryState;
+//       return NavigationNotifier.instance.nextState.first.queryState;
 //     }
 
 //     return QueryState();

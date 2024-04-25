@@ -1,6 +1,6 @@
 name: fframe
 description: The FlutFrame package.
-version: 0.1.100+02
+version: 0.1.100+023
 homepage: fframe.app
 
 publish_to: none
@@ -21,7 +21,7 @@ dependencies:
   flutterfire_ui: 
   file_picker:
   firebase_analytics:
-  flutter_riverpod: 
+  # flutter_riverpod: 
   clipboard:
   url_launcher: 
   cloud_functions:

@@ -100,6 +100,18 @@ class ContentSelector<Suggestion> extends StatefulWidget {
 }
 
 class _ContentSelectorState<Suggestion> extends State<ContentSelector<Suggestion>> {
+  SelectedDocument<Suggestion>? selectedDocument;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => postFrameCallback);
+  }
+
+  postFrameCallback() {
+    selectedDocument?.open();
+  }
+
   @override
   Widget build(BuildContext context) {
     DocumentConfig<Suggestion> documentConfig = widget.documentConfig;
@@ -128,11 +140,11 @@ class _ContentSelectorState<Suggestion> extends State<ContentSelector<Suggestion
           ),
           builder: (BuildContext context, AsyncSnapshot<List<SelectedDocument<Suggestion>>> selectedDocumentsSnaphot) {
             if (!selectedDocumentsSnaphot.hasData) return const CircularProgressIndicator();
-            SelectedDocument<Suggestion> selectedDocument = selectedDocumentsSnaphot.data!.first;
-            selectedDocument.select();
+            this.selectedDocument = selectedDocumentsSnaphot.data!.first;
+
             return IconButton(
                 onPressed: () {
-                  selectedDocument.select();
+                  this.selectedDocument?.select();
                 },
                 icon: const Icon(Icons.open_in_new));
           },

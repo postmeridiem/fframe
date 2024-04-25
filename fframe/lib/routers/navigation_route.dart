@@ -6,8 +6,8 @@ class FNavigationRouteInformationParser extends RouteInformationParser<Navigatio
   @override
   Future<NavigationNotifier> parseRouteInformation(RouteInformation routeInformation) async {
     Console.log("parseRouteInformation to ${routeInformation.uri}", scope: "fframeLog.FNavigationRouteInformationParser.parseRouteInformation", level: LogLevel.dev);
-    navigationNotifier.parseRouteInformation(uri: routeInformation.uri);
-    return navigationNotifier;
+    NavigationNotifier.instance.parseRouteInformation(uri: routeInformation.uri);
+    return NavigationNotifier.instance;
   }
 
   @override
@@ -36,7 +36,7 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
       level: LogLevel.dev,
     );
 
-    navigationNotifier.addListener(_navigationNotifierListener);
+    NavigationNotifier.instance.addListener(_navigationNotifierListener);
   }
 
   _navigationNotifierListener() {
@@ -59,7 +59,7 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
 
     // currentConfiguration?.uri?.path;
     // navigationNotifier.notifyListeners();
-    return navigationNotifier;
+    return NavigationNotifier.instance;
   }
 
   @override
@@ -99,7 +99,7 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
 
   @override
   void dispose() {
-    navigationNotifier.removeListener(_navigationNotifierListener);
+    NavigationNotifier.instance.removeListener(_navigationNotifierListener);
     super.dispose();
   }
 }

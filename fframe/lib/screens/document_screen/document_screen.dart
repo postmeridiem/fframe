@@ -68,6 +68,31 @@ class DocumentScreen<T> extends StatelessWidget {
       embeddedDocument = true;
     }
 
+    DocumentConfig<T> documentConfig = DocumentConfig<T>(
+      formKey: formKey,
+      collection: collection,
+      documentList: documentList,
+      dataGridConfig: dataGrid,
+      listGridConfig: listGrid,
+      customList: customList,
+      swimlanes: swimlanes,
+      initialViewType: viewType,
+      autoSelectFirst: autoSelectFirst,
+      queryStringIdParam: queryStringIdParam ?? this.queryStringIdParam,
+      createNew: createNew,
+      createDocumentId: createDocumentId,
+      preSave: preSave,
+      preOpen: preOpen,
+      document: document,
+      toFirestore: toFirestore,
+      fromFirestore: fromFirestore,
+      query: query,
+      searchConfig: searchConfig,
+      titleBuilder: titleBuilder,
+      contextCardBuilders: contextCardBuilders,
+      embeddedDocument: embeddedDocument ?? false,
+    );
+
     return Stack(
       children: [
         Column(
@@ -84,31 +109,9 @@ class DocumentScreen<T> extends StatelessWidget {
                     listQuery: queryBuilder,
                   ),
                   fFrameUser: fFrameUser,
-                  documentConfig: DocumentConfig<T>(
-                    formKey: formKey,
-                    collection: collection,
-                    documentList: documentList,
-                    dataGridConfig: dataGrid,
-                    listGridConfig: listGrid,
-                    customList: customList,
-                    swimlanes: swimlanes,
-                    initialViewType: viewType,
-                    autoSelectFirst: autoSelectFirst,
-                    queryStringIdParam: queryStringIdParam ?? this.queryStringIdParam,
-                    createNew: createNew,
-                    createDocumentId: createDocumentId,
-                    preSave: preSave,
-                    preOpen: preOpen,
-                    document: document,
-                    toFirestore: toFirestore,
-                    fromFirestore: fromFirestore,
-                    query: query,
-                    searchConfig: searchConfig,
-                    titleBuilder: titleBuilder,
-                    contextCardBuilders: contextCardBuilders,
-                    embeddedDocument: embeddedDocument ?? false,
-                  ),
+                  documentConfig: documentConfig,
                   child: DocumentScreenLoader<T>(
+                    documentConfig: documentConfig,
                     key: ValueKey("DocumentScreenLoader_$collection"),
                   ),
                 ),
@@ -178,7 +181,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
   }
 
   void create<T>({BuildContext? context}) {
-    SelectedDocument.createNew(documentConfig: documentConfig);
+    SelectedDocument<T>.createNew(documentConfig: documentConfig as DocumentConfig<T>);
   }
 
   save({required BuildContext context, bool closeAfterSave = false}) {
@@ -196,24 +199,43 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
 class DocumentScreenLoader<T> extends StatefulWidget {
   final int rowsPerPage;
 
-  const DocumentScreenLoader({super.key, this.rowsPerPage = -1});
-
+  const DocumentScreenLoader({
+    super.key,
+    required this.documentConfig,
+    this.rowsPerPage = -1,
+  });
+  final DocumentConfig<T> documentConfig;
   @override
   State<StatefulWidget> createState() => _DocumentScreenLoaderState<T>();
 }
 
 class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with SingleTickerProviderStateMixin {
-  late DocumentConfig<T> documentConfig;
+  late DocumentConfig<T> documentConfig = widget.documentConfig;
+  late ViewType viewType = widget.documentConfig.currentViewType;
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => navigationNotifier.markBuildDone(documentConfig));
+    // this.documentConfig = widget.documentConfig;
+    WidgetsBinding.instance.addPostFrameCallback((_) => NavigationNotifier.instance.markBuildDone(documentConfig));
+    TargetState.instance.addListener(_changeListener);
+  }
+
+  @override
+  void dispose() {
+    TargetState.instance.removeListener(_changeListener);
+    super.dispose();
+  }
+
+  void _changeListener() {
+    if (documentConfig.mdi == false) {
+      SelectionState.instance.closeAllDocuments();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     Console.log("Build DocumentScreenLoader: ${widget.key.toString()}", scope: "fframeLog.DocumentScreenLoader", level: LogLevel.fframe);
-    documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
+    // documentConfig = DocumentScreenConfig.of(context)?.documentConfig as DocumentConfig<T>;
 
     // double columnWidth = 0;
     // if (documentConfig.currentViewType case ViewType.list) {
@@ -228,98 +250,89 @@ class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with 
     // }
 
     //Switches between view types
-    return Consumer(builder: (context, ref, child) {
-      ref.watch(targetStateProvider);
+    // return ListenableBuilder(
+    //     listenable: TargetState.instance,
+    //     builder: (context, _) {
+    switch (viewType) {
+      case ViewType.none:
+        return const IgnorePointer();
+      case ViewType.list:
+        if (documentConfig.documentList == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Document list widget not defined");
 
-      // //(pre-load the query-string. If any.
-      // // QueryState queryState = ref.read(queryStateProvider);
-      // if (queryState.queryString.isNotEmpty && queryState.queryParameters!.containsKey(documentConfig.queryStringIdParam)) {
-      //   SelectedDocument.load<T>(
-      //     documentConfig: documentConfig,
-      //     documentId: queryState.queryParameters![documentConfig.queryStringIdParam],
-      //   );
-      // }
+        SelectionState.instance.padding = documentConfig.documentList?.contentPadding ?? EdgeInsets.zero;
+        return Row(
+          children: [
+            DocumentListLoader<T>(
+              key: ValueKey("DocumentListBuilder_${documentConfig.collection}"),
+            ),
+            Expanded(child: FRouter.of(context).emptyPage()),
+          ],
+        );
+      case ViewType.grid:
+        if (documentConfig.dataGridConfig == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Data grid widget not defined");
 
-      switch (documentConfig.currentViewType) {
-        case ViewType.none:
-          return const IgnorePointer();
-        case ViewType.list:
-          if (documentConfig.documentList == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Document list widget not defined");
-
-          SelectionState.instance.padding = documentConfig.documentList?.contentPadding ?? EdgeInsets.zero;
-          return Row(
-            children: [
-              DocumentListLoader<T>(
-                key: ValueKey("DocumentListBuilder_${documentConfig.collection}"),
-              ),
-              Expanded(child: FRouter.of(context).emptyPage()),
-            ],
-          );
-        case ViewType.grid:
-          if (documentConfig.dataGridConfig == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Data grid widget not defined");
-
-          SelectionState.instance.padding = documentConfig.dataGridConfig?.contentPadding ?? EdgeInsets.zero;
-          return SizedBox.expand(
-            child: ClipRect(
-              child: OverflowBox(
-                alignment: Alignment.topLeft,
-                child: Stack(
-                  children: [
-                    FirestoreDataGrid<T>(
-                      dataGridConfig: documentConfig.dataGridConfig!,
-                      query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
-                      rowsPerPage: documentConfig.dataGridConfig!.rowsPerPage,
-                      dataRowHeight: documentConfig.dataGridConfig!.rowHeight,
-                      documentConfig: documentConfig,
-                    ),
-                    if (documentConfig.documentList != null) DataGridToggle<T>(),
-                  ],
-                ),
+        SelectionState.instance.padding = documentConfig.dataGridConfig?.contentPadding ?? EdgeInsets.zero;
+        return SizedBox.expand(
+          child: ClipRect(
+            child: OverflowBox(
+              alignment: Alignment.topLeft,
+              child: Stack(
+                children: [
+                  FirestoreDataGrid<T>(
+                    dataGridConfig: documentConfig.dataGridConfig!,
+                    query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
+                    rowsPerPage: documentConfig.dataGridConfig!.rowsPerPage,
+                    dataRowHeight: documentConfig.dataGridConfig!.rowHeight,
+                    documentConfig: documentConfig,
+                  ),
+                  if (documentConfig.documentList != null) DataGridToggle<T>(),
+                ],
               ),
             ),
-          );
-        case ViewType.listgrid:
-          if (documentConfig.listGridConfig == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "List grid widget not defined");
+          ),
+        );
+      case ViewType.listgrid:
+        if (documentConfig.listGridConfig == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "List grid widget not defined");
 
-          SelectionState.instance.padding = documentConfig.listGridConfig?.contentPadding ?? EdgeInsets.zero;
-          return SizedBox.expand(
-            child: ClipRect(
-              child: OverflowBox(
-                alignment: Alignment.topLeft,
-                child: FirestoreListGrid<T>(
-                  documentConfig: documentConfig,
-                  query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
-                ),
+        SelectionState.instance.padding = documentConfig.listGridConfig?.contentPadding ?? EdgeInsets.zero;
+        return SizedBox.expand(
+          child: ClipRect(
+            child: OverflowBox(
+              alignment: Alignment.topLeft,
+              child: FirestoreListGrid<T>(
+                documentConfig: documentConfig,
+                query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
               ),
             ),
-          );
-        case ViewType.swimlanes:
-          if (documentConfig.swimlanes == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Swimlane widget not defined");
+          ),
+        );
+      case ViewType.swimlanes:
+        if (documentConfig.swimlanes == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Swimlane widget not defined");
 
-          SelectionState.instance.padding = documentConfig.swimlanes?.contentPadding ?? EdgeInsets.zero;
-          return FirestoreSwimlanes<T>(
-            documentConfig: documentConfig,
-            query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
-          );
-        case ViewType.custom:
-          if (documentConfig.customList == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Custom widget not defined");
-          SelectionState.instance.padding = documentConfig.customList?.contentPadding ?? EdgeInsets.zero;
-          return ListenableBuilder(
-            listenable: DocumentScreenConfig.of(context)!.fireStoreQueryState,
-            builder: ((context, child) {
-              return documentConfig.customList!.builder!(context, DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>, documentConfig, Fframe.of(context)?.user);
-            }),
-          );
-        default:
-          return Fframe.of(context)?.navigationConfig.errorPage.contentPane ??
-              const Icon(
-                Icons.error,
-                color: Colors.red,
-              );
-      }
-      // },
-      // );
-    });
+        SelectionState.instance.padding = documentConfig.swimlanes?.contentPadding ?? EdgeInsets.zero;
+        return FirestoreSwimlanes<T>(
+          documentConfig: documentConfig,
+          query: DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>,
+        );
+      case ViewType.custom:
+        if (documentConfig.customList == null) return Fframe.of(context)!.showErrorPage(context: context, errorText: "Custom widget not defined");
+        SelectionState.instance.padding = documentConfig.customList?.contentPadding ?? EdgeInsets.zero;
+        return ListenableBuilder(
+          listenable: DocumentScreenConfig.of(context)!.fireStoreQueryState,
+          builder: ((context, child) {
+            return documentConfig.customList!.builder!(context, DocumentScreenConfig.of(context)!.fireStoreQueryState.currentQuery() as Query<T>, documentConfig, Fframe.of(context)?.user);
+          }),
+        );
+      default:
+        return Fframe.of(context)?.navigationConfig.errorPage.contentPane ??
+            const Icon(
+              Icons.error,
+              color: Colors.red,
+            );
+    }
+    // },
+    // );
+    // });
   }
 }
 

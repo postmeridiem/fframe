@@ -111,7 +111,7 @@ class FRouterConfig {
               Set<String> interSection = userRolesSet.intersection(targetRolesSet);
               Console.log(
                 "${navigationTarget.title}/${navigationTab.title} => ${interSection.isEmpty ? "no access" : "allow access"} (user: ${userRolesSet.toString()} path: ${targetRolesSet.toString()})",
-                scope: "fframeLog.NavigationNotifier.navigationRoutes.get",
+                scope: "fframeLog.NavigationNotifier.instance.navigationRoutes.get",
                 level: LogLevel.fframe,
               );
               return interSection.isEmpty;
@@ -122,7 +122,7 @@ class FRouterConfig {
             //No role based limitations apply
             Console.log(
               "${navigationTarget.title} => allow",
-              scope: "fframeLog.NavigationNotifier.navigationRoutes.get",
+              scope: "fframeLog.NavigationNotifier.instance.navigationRoutes.get",
               level: LogLevel.fframe,
             );
             return false;
@@ -134,7 +134,7 @@ class FRouterConfig {
           Set<String> interSection = userRolesSet.intersection(targetRolesSet);
           Console.log(
             "${navigationTarget.title} => ${interSection.isEmpty ? "no access" : "access"} (user: ${userRolesSet.toString()} path: ${targetRolesSet.toString()})",
-            scope: "fframeLog.NavigationNotifier.navigationRoutes.get",
+            scope: "fframeLog.NavigationNotifier.instance.navigationRoutes.get",
             level: LogLevel.fframe,
           );
           return interSection.isEmpty;

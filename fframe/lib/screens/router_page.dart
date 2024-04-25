@@ -6,15 +6,7 @@ class RouterPage extends Page {
   @override
   Route createRoute(BuildContext context) {
     Console.log("RouterPage.createRoute", scope: "fframeLog.RouterPage", level: LogLevel.fframe);
-    return MaterialPageRoute(
-      settings: this,
-      builder: (BuildContext context) => Consumer(builder: (context, ref, child) {
-        Console.log("Build FRouter", scope: "fframeLog.RouterPage", level: LogLevel.fframe);
-        return FRouter(
-          ref: ref,
-        );
-      }),
-    );
+    return MaterialPageRoute(settings: this, builder: (BuildContext context) => const FRouter());
   }
 }
 
@@ -23,11 +15,11 @@ class RouterPage extends Page {
 class FRouter extends InheritedWidget {
   const FRouter({
     super.key,
-    required this.ref,
+    // required this.ref,
     // required this.signedIn,
     // this.roles,
   }) : super(child: const RouterScreen());
-  final WidgetRef ref;
+  // final WidgetRef ref;
 
   // final bool signedIn;
   // final List<String>? roles;
@@ -48,12 +40,12 @@ class FRouter extends InheritedWidget {
       level: LogLevel.prod,
     );
 
-    TargetState targetState = TargetState.processRouteRequest(navigationTarget: navigationTarget);
-    navigationNotifier.processRouteInformation(targetState: targetState);
+    TargetState.instance.processRouteRequest(navigationTarget: navigationTarget);
+    NavigationNotifier.instance.processRouteInformation(targetState: TargetState.instance);
   }
 
   TargetState get currentTargetState {
-    return ref.read(targetStateProvider);
+    return TargetState.instance;
   }
 
   ///Text based route Only
@@ -69,8 +61,8 @@ class FRouter extends InheritedWidget {
 
     // QueryState newQueryState = QueryState(queryParameters: queryParameters);
 
-    TargetState targetState = TargetState.processRouteRequest(navigationTarget: navigationTarget);
-    navigationNotifier.processRouteInformation(targetState: targetState);
+    TargetState.instance.processRouteRequest(navigationTarget: navigationTarget);
+    NavigationNotifier.instance.processRouteInformation();
   }
 
   // navigateToRouteFromNavigationTargets<T>(List<NavigationTarget> navigationTargets, {required String route, String id = ''}) {
@@ -99,7 +91,7 @@ class FRouter extends InheritedWidget {
   //   // QueryState newQueryState = QueryState(queryParameters: queryParameters);
 
   //   TargetState targetState = TargetState.processRouteRequest(navigationTarget: target!);
-  //   navigationNotifier.processRouteInformation(targetState: targetState);
+  //   NavigationNotifier.instance.processRouteInformation(targetState: targetState);
   // }
 
   ///Only QS (persist path and existing QS values)
@@ -127,7 +119,7 @@ class FRouter extends InheritedWidget {
     //   level: LogLevel.fframe,
     // );
 
-    navigationNotifier.processRouteInformation();
+    NavigationNotifier.instance.processRouteInformation();
   }
 
   //Get a value from the QueryString
@@ -152,17 +144,17 @@ class FRouter extends InheritedWidget {
 
   ///Request a logout
   signOut() {
-    // navigationNotifier.signOut();
+    // NavigationNotifier.instance.signOut();
   }
 
   // ///Notify a login, optionally parse a list of current user roles
   // signIn({List<String>? roles}) {
-  //   navigationNotifier.signIn(roles: roles);
+  //   NavigationNotifier.instance.signIn(roles: roles);
   // }
 
   //Current auth state
   bool get isSignedIn {
-    return navigationNotifier.isSignedIn;
+    return NavigationNotifier.instance.isSignedIn;
   }
 
   Widget waitPage({required BuildContext context, String? text}) {
@@ -187,7 +179,7 @@ class FRouter extends InheritedWidget {
         padding: EdgeInsets.zero,
         children: [
           drawerHeader ?? const IgnorePointer(),
-          ...navigationNotifier.navigationConfig.navigationTargets
+          ...NavigationNotifier.instance.navigationConfig.navigationTargets
               .where(
                 ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
               )
@@ -226,16 +218,16 @@ class FRouter extends InheritedWidget {
                   ],
                 ),
               ),
-          if (!navigationNotifier.isSignedIn && navigationNotifier.navigationConfig.signInConfig.signInTarget.destination != null)
+          if (!NavigationNotifier.instance.isSignedIn && NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget.destination != null)
             ListTile(
-              leading: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination?.icon,
-              title: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
+              leading: NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget.destination?.icon,
+              title: NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
               onTap: () {
-                navigateTo(navigationTarget: navigationNotifier.navigationConfig.signInConfig.signInTarget);
+                navigateTo(navigationTarget: NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget);
                 Navigator.pop(context);
               },
             ),
-          if (signOutDestination != null && navigationNotifier.isSignedIn)
+          if (signOutDestination != null && NavigationNotifier.instance.isSignedIn)
             ListTile(
               leading: signOutDestination.icon,
               title: signOutDestination.navigationLabel(),
@@ -255,7 +247,7 @@ class FRouter extends InheritedWidget {
       scope: "fframeLog.FRouter.hasTabs",
       level: LogLevel.prod,
     );
-    return navigationNotifier.hasTabs;
+    return NavigationNotifier.instance.hasTabs;
   }
 
   int get tabLength {
@@ -265,7 +257,7 @@ class FRouter extends InheritedWidget {
       level: LogLevel.prod,
       color: ConsoleColor.yellow,
     );
-    return navigationNotifier.navigationTabs.length;
+    return NavigationNotifier.instance.navigationTabs.length;
   }
 
   int get currentTab {
@@ -275,8 +267,8 @@ class FRouter extends InheritedWidget {
       level: LogLevel.prod,
       color: ConsoleColor.yellow,
     );
-    int index = navigationNotifier.navigationTabs.indexWhere(
-      (NavigationTab navigationTab) => navigationTab.path == navigationNotifier.currentTarget!.navigationTarget.path,
+    int index = NavigationNotifier.instance.navigationTabs.indexWhere(
+      (NavigationTab navigationTab) => navigationTab.path == NavigationNotifier.instance.currentTarget!.navigationTarget.path,
     );
     return index == -1 ? 0 : index;
   }
@@ -289,8 +281,8 @@ class FRouter extends InheritedWidget {
       color: ConsoleColor.yellow,
     );
     if (!tabController.indexIsChanging) {
-      NavigationTarget currentTarget = navigationNotifier.currentTarget!.navigationTarget;
-      NavigationTarget pendingTarget = navigationNotifier.navigationTabs[tabController.index];
+      NavigationTarget currentTarget = NavigationNotifier.instance.currentTarget!.navigationTarget;
+      NavigationTarget pendingTarget = NavigationNotifier.instance.navigationTabs[tabController.index];
 
       pendingTarget = (pendingTarget.navigationTabs != null && pendingTarget.navigationTabs!.isNotEmpty) ? pendingTarget.navigationTabs!.first : pendingTarget;
 
@@ -306,7 +298,7 @@ class FRouter extends InheritedWidget {
   }
 
   List<Tab> tabBar(BuildContext context) {
-    List<Tab> filteredTabs = navigationNotifier.navigationTabs
+    List<Tab> filteredTabs = NavigationNotifier.instance.navigationTabs
         .where(
           ((NavigationTab navigationTab) => navigationTab.destination != null),
         )
@@ -330,10 +322,10 @@ class FRouter extends InheritedWidget {
 
   Widget navigationRail() {
     return AnimatedBuilder(
-        animation: navigationNotifier,
+        animation: NavigationNotifier.instance,
         builder: (context, child) {
           List<NavigationRailDestination> destinations = [
-            ...navigationNotifier.navigationConfig.navigationTargets
+            ...NavigationNotifier.instance.navigationConfig.navigationTargets
                 .where(
                   ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
                 )
@@ -345,21 +337,21 @@ class FRouter extends InheritedWidget {
                     padding: navigationTarget.destination!.padding,
                   ),
                 ),
-            if (!navigationNotifier.isSignedIn && navigationNotifier.navigationConfig.signInConfig.signInTarget.destination != null)
+            if (!NavigationNotifier.instance.isSignedIn && NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget.destination != null)
               NavigationRailDestination(
-                icon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.icon,
-                selectedIcon: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
-                label: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
-                padding: navigationNotifier.navigationConfig.signInConfig.signInTarget.destination!.padding,
+                icon: NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget.destination!.icon,
+                selectedIcon: NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget.destination!.selectedIcon,
+                label: NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget.destination!.navigationLabel(),
+                padding: NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget.destination!.padding,
               ),
           ];
 
-          if (navigationNotifier.navigationConfig.navigationTargets.length >= 2) {
-            navigationNotifier.selectedNavRailIndex = 0;
-            NavigationTarget? currentTarget = navigationNotifier.currentTarget?.navigationTarget;
+          if (NavigationNotifier.instance.navigationConfig.navigationTargets.length >= 2) {
+            NavigationNotifier.instance.selectedNavRailIndex = 0;
+            NavigationTarget? currentTarget = NavigationNotifier.instance.currentTarget?.navigationTarget;
 
             if (currentTarget != null) {
-              for (NavigationTarget navigationTarget in navigationNotifier.navigationConfig.navigationTargets.where(
+              for (NavigationTarget navigationTarget in NavigationNotifier.instance.navigationConfig.navigationTargets.where(
                 ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
               )) {
                 if (currentTarget.path == navigationTarget.path) {
@@ -369,27 +361,29 @@ class FRouter extends InheritedWidget {
                   //This is a subpath
                   break; //Jump from the loop
                 } else {
-                  navigationNotifier.selectedNavRailIndex = navigationNotifier.selectedNavRailIndex! + 1;
+                  NavigationNotifier.instance.selectedNavRailIndex = NavigationNotifier.instance.selectedNavRailIndex! + 1;
                 }
               }
             }
 
-            if (navigationNotifier.selectedNavRailIndex == null || navigationNotifier.selectedNavRailIndex! < 0 || navigationNotifier.selectedNavRailIndex! > navigationNotifier.navigationConfig.navigationTargets.length) {
-              navigationNotifier.selectedNavRailIndex = 0;
+            if (NavigationNotifier.instance.selectedNavRailIndex == null ||
+                NavigationNotifier.instance.selectedNavRailIndex! < 0 ||
+                NavigationNotifier.instance.selectedNavRailIndex! > NavigationNotifier.instance.navigationConfig.navigationTargets.length) {
+              NavigationNotifier.instance.selectedNavRailIndex = 0;
             }
 
             //Prevent null values
-            // print(navigationNotifier.selectedNavRailIndex);
-            // navigationNotifier.selectedNavRailIndex == 0 ? navigationNotifier.selectedNavRailIndex = 1 : navigationNotifier.selectedNavRailIndex;
-            // debugger(when: navigationNotifier.selectedNavRailIndex == null);
-            // debugger(when: navigationNotifier.selectedNavRailIndex! < destinations.length);
+            // print(NavigationNotifier.instance.selectedNavRailIndex);
+            // NavigationNotifier.instance.selectedNavRailIndex == 0 ? NavigationNotifier.instance.selectedNavRailIndex = 1 : NavigationNotifier.instance.selectedNavRailIndex;
+            // debugger(when: NavigationNotifier.instance.selectedNavRailIndex == null);
+            // debugger(when: NavigationNotifier.instance.selectedNavRailIndex! < destinations.length);
 
             return NavigationRail(
-              selectedIndex: navigationNotifier.selectedNavRailIndex,
+              selectedIndex: NavigationNotifier.instance.selectedNavRailIndex,
               onDestinationSelected: (int index) {
-                if (index < navigationNotifier.navigationConfig.navigationTargets.length) {
-                  navigationNotifier.selectedNavRailIndex = index;
-                  NavigationTarget navigationTarget = navigationNotifier.navigationConfig.navigationTargets[index];
+                if (index < NavigationNotifier.instance.navigationConfig.navigationTargets.length) {
+                  NavigationNotifier.instance.selectedNavRailIndex = index;
+                  NavigationTarget navigationTarget = NavigationNotifier.instance.navigationConfig.navigationTargets[index];
                   navigateTo(navigationTarget: navigationTarget);
                 } else {
                   Console.log(
@@ -399,7 +393,7 @@ class FRouter extends InheritedWidget {
                   );
 
                   if (!isSignedIn) {
-                    NavigationTarget navigationTarget = navigationNotifier.navigationConfig.signInConfig.signInTarget;
+                    NavigationTarget navigationTarget = NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget;
                     navigateTo(navigationTarget: navigationTarget);
                   }
                 }

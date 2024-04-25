@@ -7,7 +7,6 @@ export 'package:firebase_auth/firebase_auth.dart';
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:firebase_storage/firebase_storage.dart';
 export 'package:flutterfire_ui/firestore.dart';
-export 'package:flutter_riverpod/flutter_riverpod.dart';
 export 'package:url_launcher/url_launcher.dart';
 export 'package:clipboard/clipboard.dart';
 export 'package:shimmer/shimmer.dart';
@@ -38,7 +37,6 @@ import 'package:fframe/helper_widgets/init_l10n.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/helpers/icons.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutterfire_ui/auth.dart';
 import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 
@@ -48,6 +46,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutterfire_ui/firestore.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:crypto/crypto.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

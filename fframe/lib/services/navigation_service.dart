@@ -1,21 +1,20 @@
 import 'package:fframe/fframe.dart';
 import 'package:fframe/routers/navigation_route.dart';
 import 'package:flutter/material.dart';
-import 'package:fframe/providers/state_providers.dart';
 
 late FNavigationRouteInformationParser routeInformationParser;
-late NavigationNotifier navigationNotifier;
+
 late FNavigationRouterDelegate routerDelegate;
 
-final navigationProvider = ChangeNotifierProvider<NavigationNotifier>(
-  (ref) {
-    return NavigationNotifier(
-      ref: ref,
-      fFrameUser: null,
-      navigationConfig: FRouterConfig.instance.navigationConfig,
-    );
-  },
-);
+// final navigationProvider = ChangeNotifierProvider<NavigationNotifier>(
+//   (ref) {
+//     return NavigationNotifier(
+//       ref: ref,
+//       fFrameUser: null,
+//       navigationConfig: FRouterConfig.instance.navigationConfig,
+//     );
+//   },
+// );
 
 class NextState {
   NextState({
@@ -31,25 +30,25 @@ class NavigationNotifier extends ChangeNotifier {
   static final NavigationNotifier instance = NavigationNotifier._internal();
   NavigationNotifier._internal();
 
-  late Ref ref;
+  // late Ref ref;
   Uri? _uri = Uri();
   List<NextState> nextState = [];
   late FFrameUser? fFrameUser;
 
-  TargetState? _targetState;
+  // TargetState? _targetState;
   bool _isbuilding = false;
   bool _buildPending = false;
 
   // NavigationConfig navigationConfig = FRouterConfig.instance.navigationConfig;
   late NavigationConfig _initialNavigationConfig = FRouterConfig.instance.navigationConfig;
 
-  factory NavigationNotifier({required Ref ref, FFrameUser? fFrameUser, required NavigationConfig navigationConfig}) {
+  factory NavigationNotifier({FFrameUser? fFrameUser, required NavigationConfig navigationConfig}) {
     Console.log(
       "init NavigationNotifier",
       scope: "fframeLog.NavigationNotifier",
       level: LogLevel.dev,
     );
-    instance.ref = ref;
+    // instance.ref = ref;
     instance.fFrameUser = fFrameUser;
     instance._initialNavigationConfig = navigationConfig;
     SelectionState.instance.addListener(instance.selectionStateListener);
@@ -81,7 +80,7 @@ class NavigationNotifier extends ChangeNotifier {
       scope: "fframeLog.NavigationNotifier.currentTarget",
       level: LogLevel.dev,
     );
-    return _targetState;
+    return TargetState.instance;
   }
 
   bool get hasTabs {
@@ -90,7 +89,7 @@ class NavigationNotifier extends ChangeNotifier {
       scope: "fframeLog.NavigationNotifier.hasTabs",
       level: LogLevel.dev,
     );
-    return _targetState!.navigationTarget is NavigationTab;
+    return TargetState.instance.navigationTarget is NavigationTab;
   }
 
   bool get hasSubTabs {
@@ -103,12 +102,12 @@ class NavigationNotifier extends ChangeNotifier {
     //   return false;
     // }
 
-    if (_targetState!.navigationTarget is NavigationTab) {
-      NavigationTab navigationTab = _targetState!.navigationTarget as NavigationTab;
+    if (TargetState.instance.navigationTarget is NavigationTab) {
+      NavigationTab navigationTab = TargetState.instance.navigationTarget as NavigationTab;
       return navigationTab.navigationTabs != null || (navigationTab.navigationTabs != null && navigationTab.navigationTabs!.isNotEmpty) || (navigationTab.parentTarget is NavigationTab);
     }
     return false;
-    // return _targetState!.navigationTarget.navigationTabs != null || (_targetState!.navigationTarget.navigationTabs != null && _targetState!.navigationTarget.navigationTabs!.isNotEmpty);
+    // return TargetState.instance.navigationTarget.navigationTabs != null || (TargetState.instance.navigationTarget.navigationTabs != null && TargetState.instance.navigationTarget.navigationTabs!.isNotEmpty);
   }
 
   List<NavigationTab> get navigationTabs {
@@ -117,8 +116,8 @@ class NavigationNotifier extends ChangeNotifier {
       scope: "fframeLog.NavigationNotifier.navigationTabs",
       level: LogLevel.fframe,
     );
-    if (_targetState!.navigationTarget is NavigationTab) {
-      NavigationTab currentTab = _targetState!.navigationTarget as NavigationTab;
+    if (TargetState.instance.navigationTarget is NavigationTab) {
+      NavigationTab currentTab = TargetState.instance.navigationTarget as NavigationTab;
       NavigationTarget parentTarget = currentTab.parentTarget!;
       return parentTarget.navigationTabs!;
     }
@@ -143,7 +142,8 @@ class NavigationNotifier extends ChangeNotifier {
         level: LogLevel.fframe,
       );
     } else {
-      TargetState? targetState = TargetState.fromUri(this, uri);
+      TargetState? targetState = TargetState.instance;
+      targetState.fromUri(this, uri);
       SelectionState selectionState = SelectionState.instance.fromUri(uri: uri);
 
       Console.log(
@@ -171,7 +171,7 @@ class NavigationNotifier extends ChangeNotifier {
       scope: "fframeLog.NavigationNotifier.processRouteInformation",
       level: LogLevel.fframe,
     );
-    _targetState = targetState ?? ref.read(targetStateProvider);
+    // _targetState = targetState ?? ref.read(targetStateProvider);
     // _selectionState = selectionState ?? SelectionState.instance;
 
     uri = composeUri();
@@ -183,11 +183,7 @@ class NavigationNotifier extends ChangeNotifier {
       scope: "fframeLog.NavigationNotifier.composeUri",
       level: LogLevel.fframe,
     );
-    String pathComponent = (_targetState == null)
-        ? _uri?.path ?? "/"
-        : _targetState!.navigationTarget.path.isNotEmpty
-            ? _targetState!.navigationTarget.path
-            : "/";
+    String pathComponent = TargetState.instance.navigationTarget.path.isNotEmpty ? TargetState.instance.navigationTarget.path : "/";
 
     // debugger();
     String queryString = SelectionState.instance.queryString;
@@ -273,7 +269,7 @@ class NavigationNotifier extends ChangeNotifier {
     }
 
     if (_isbuilding != false || _buildPending != true) {
-      updateProviders();
+      // updateProviders();
       notifyListeners();
     } else {
       Console.log(
@@ -284,33 +280,33 @@ class NavigationNotifier extends ChangeNotifier {
     }
   }
 
-  updateProviders() {
-    Console.log(
-      "NavigationService.updateProviders",
-      scope: "fframeLog.NavigationNotifier.updateProviders",
-      level: LogLevel.fframe,
-    );
+  // updateProviders() {
+  //   Console.log(
+  //     "NavigationService.updateProviders",
+  //     scope: "fframeLog.NavigationNotifier.updateProviders",
+  //     level: LogLevel.fframe,
+  //   );
 
-    StateController<TargetState> targetStateNotifier = ref.read(targetStateProvider.notifier);
+  //   // StateController<TargetState> targetStateNotifier = ref.read(targetStateProvider.notifier);
 
-    if (targetStateNotifier.state.navigationTarget.path != _targetState!.navigationTarget.path) {
-      Console.log(
-        "Update targetState to ${_targetState!.navigationTarget.title} ${_targetState!.navigationTarget.path}",
-        scope: "fframeLog.NavigationNotifier.updateProviders",
-        level: LogLevel.fframe,
-      );
-      targetStateNotifier.update((state) => _targetState!);
-    }
-    // if (SelectionState.instance.queryString != _selectionState!.queryString) {
-    //   Console.log(
-    //     "Update selectionState to ${_selectionState!.queryString}",
-    //     scope: "fframeLog.NavigationNotifier.updateProviders",
-    //     level: LogLevel.fframe,
-    //   );
-    //   // QueryState.instance.notifyListeners();
-    //   // selectionStateNotifier.update((state) => _selectionState!);
-    // }
-  }
+  //   // if (targetStateNotifier.state.navigationTarget.path != TargetState.instance.navigationTarget.path) {
+  //   //   Console.log(
+  //   //     "Update targetState to ${TargetState.instance.navigationTarget.title} ${TargetState.instance.navigationTarget.path}",
+  //   //     scope: "fframeLog.NavigationNotifier.updateProviders",
+  //   //     level: LogLevel.fframe,
+  //   //   );
+  //   //   targetStateNotifier.update((state) => TargetState.instance);
+  //   // }
+  //   // if (SelectionState.instance.queryString != _selectionState!.queryString) {
+  //   //   Console.log(
+  //   //     "Update selectionState to ${_selectionState!.queryString}",
+  //   //     scope: "fframeLog.NavigationNotifier.updateProviders",
+  //   //     level: LogLevel.fframe,
+  //   //   );
+  //   //   // QueryState.instance.notifyListeners();
+  //   //   // selectionStateNotifier.update((state) => _selectionState!);
+  //   // }
+  // }
 
   set isBuilding(bool isBuilding) {
     Console.log(
@@ -326,7 +322,7 @@ class NavigationNotifier extends ChangeNotifier {
         level: LogLevel.fframe,
       );
       _buildPending = false;
-      updateProviders();
+      // updateProviders();
     }
   }
 

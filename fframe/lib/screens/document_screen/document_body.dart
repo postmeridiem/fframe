@@ -16,6 +16,7 @@ class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
   void initState() {
     super.initState();
     SelectionState.instance.addListener(updatePadding);
+    // TargetState.instance.addListener(targetStateListener);
   }
 
   updatePadding() {
@@ -30,7 +31,15 @@ class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
   dispose() {
     super.dispose();
     SelectionState.instance.removeListener(updatePadding);
+    // TargetState.instance.removeListener(targetStateListener);
   }
+
+  // void targetStateListener() {
+  //   // debugger();
+  //   // if (SelectionState.instance.activeDocument == null) {
+  //   //   debugger();
+  //   // }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -246,8 +255,8 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                         SliverAppBar(
                                           actions: const [IgnorePointer()], //To surpess the hamburger
                                           primary: false,
-                                          toolbarHeight: kToolbarHeight,
-                                          title: titleBuilder(context, selectedDocument.data),
+                                          toolbarHeight: documentConfig.hideTitle ? 0 : kToolbarHeight,
+                                          title: documentConfig.hideTitle ? const IgnorePointer() : titleBuilder(context, selectedDocument.data),
                                           pinned: false,
                                           backgroundColor: Theme.of(context).colorScheme.secondary,
                                           bottom: calculateTabBar(

@@ -1,6 +1,6 @@
 part of '../../fframe.dart';
 
-class FFrameUser extends StateNotifier {
+class FFrameUser extends ChangeNotifier {
   FFrameUser({
     this.id,
     this.uid,
@@ -10,7 +10,7 @@ class FFrameUser extends StateNotifier {
     this.metaData,
     roles,
     this.firebaseUser,
-  }) : super(null) {
+  }) : super() {
     timeStamp = DateTime.now();
     _roles = roles;
   }

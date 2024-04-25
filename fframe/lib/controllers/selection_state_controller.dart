@@ -57,6 +57,7 @@ class SelectionStateTracker<T> {
   }
 
   String? queryStringParam(String key) => queryParameters[key];
+
   String get queryString {
     return queryParameters.entries.map((queryParameter) => "${queryParameter.key}=${queryParameter.value}").join("&");
   }
@@ -111,20 +112,21 @@ class SelectionState with ChangeNotifier {
 
   clear() {
     _selectionState.clear();
-    navigationNotifier.processRouteInformation();
-    // navigationNotifier.processRouteInformation(queryState: QueryState(queryParameters: null));
+    NavigationNotifier.instance.processRouteInformation();
+    // NavigationNotifier.instance.processRouteInformation(queryState: QueryState(queryParameters: null));
     // notifyListeners();
   }
 
   selectDocument<T>(SelectedDocument<T> selectedDocument) {
-    // NavigationNotifier local = NavigationNotifier.instance;
-    // if (NavigationNotifier.instance.isBuilding) {
+    //Cannot keep a pendingUri on top of any other load
+    pendingUri = null;
+    // NavigationNotifier.instance local = NavigationNotifier.instance.instance;
+    // if (NavigationNotifier.instance.instance.isBuilding) {
     //   debugger();
     // }
 
     String trackerId = selectedDocument.trackerId;
-    //Update the route
-    navigationNotifier.processRouteInformation();
+
     //Minimize any full screen document
 
     if (selectedDocument.documentConfig.mdi == true) {
@@ -154,6 +156,9 @@ class SelectionState with ChangeNotifier {
 
       if (_selectionState.length > 8) _selectionState.remove(_selectionState.entries.first.key);
 
+      //Update the route
+      NavigationNotifier.instance.processRouteInformation();
+
       notifyListeners();
     }
   }
@@ -164,7 +169,7 @@ class SelectionState with ChangeNotifier {
         selectionStateTracker.viewType = SelectionStateViewType.minimized;
       }
     });
-    navigationNotifier.processRouteInformation();
+    NavigationNotifier.instance.processRouteInformation();
   }
 
   maximizeDocument<T>(SelectedDocument<T> selectedDocument) {
@@ -175,23 +180,23 @@ class SelectionState with ChangeNotifier {
       //Minimize any full screen document
       _minimize(viewType: SelectionStateViewType.maximized);
       // QueryState.instance.queryParameters = {selectedDocument.documentConfig.queryStringIdParam: selectedDocument.documentId};
-      navigationNotifier.processRouteInformation();
+      NavigationNotifier.instance.processRouteInformation();
 
       //Activate the selected document
       _selectionState[trackerId]?.viewType = SelectionStateViewType.maximized;
       // notifyListeners();
     }
-    navigationNotifier.processRouteInformation();
+    NavigationNotifier.instance.processRouteInformation();
   }
 
   minimizeDocument<T>(SelectedDocument<T> selectedDocument) {
     //Minimize the selected document
     if (_changeViewType(selectedDocument: selectedDocument, viewType: SelectionStateViewType.minimized)) {
       // QueryState.instance.queryParameters = null;
-      navigationNotifier.processRouteInformation();
+      NavigationNotifier.instance.processRouteInformation();
       // notifyListeners();
     }
-    navigationNotifier.processRouteInformation();
+    NavigationNotifier.instance.processRouteInformation();
   }
 
   bool _changeViewType<T>({required SelectedDocument<T> selectedDocument, required SelectionStateViewType viewType}) {
@@ -199,7 +204,7 @@ class SelectionState with ChangeNotifier {
     String trackerId = selectedDocument.trackerId;
     if (_selectionState.containsKey(trackerId)) {
       _selectionState[trackerId]?.viewType = viewType;
-      navigationNotifier.processRouteInformation();
+      NavigationNotifier.instance.processRouteInformation();
       return true;
     }
     return false;
@@ -213,7 +218,7 @@ class SelectionState with ChangeNotifier {
       _selectionState.remove(selectedDocument.trackerId);
       notifyListeners();
     }
-    navigationNotifier.processRouteInformation();
+    NavigationNotifier.instance.processRouteInformation();
   }
 
   closeActiveDocument() {
@@ -221,6 +226,10 @@ class SelectionState with ChangeNotifier {
     if (selectedDocument != null) {
       closeDocument(selectedDocument);
     }
+  }
+
+  closeAllDocuments() {
+    _selectionState.clear();
   }
 
   closeSelectedDocument<T>(SelectedDocument<T> selectedDocument) {
@@ -251,7 +260,10 @@ class SelectionState with ChangeNotifier {
   }
 
   String get queryString {
-    return activeTracker?.queryString ?? "";
+    if (activeTracker != null) {
+      return activeTracker!.queryString;
+    }
+    return "";
     // return _queryParameters?.entries.map((queryParameter) => "${queryParameter.key}=${queryParameter.value}").join("&") ?? "";
   }
 
@@ -280,6 +292,7 @@ class SelectedDocument<T> {
   late DocumentSnapshot<T>? documentSnapshot;
   late List<DocumentTab<T>> documentTabs;
   late Type type;
+  late List<int> _fingerPrint;
   String? _id;
   T? _data;
   bool? _readOnly;
@@ -346,9 +359,37 @@ class SelectedDocument<T> {
     }
   }
 
+  List<int> _createFingerPrint() {
+    Map<String, dynamic> sortedMap = Map.fromEntries(documentConfig.toFirestore(data, SetOptions(merge: true)).entries.toList()..sort((e1, e2) => e1.key.compareTo(e2.key)));
+    List<int> bytes = utf8.encode(sortedMap.toString());
+    return md5.convert(bytes).bytes;
+  }
+
   SelectedDocument<T> open() {
-    SelectionState.instance.selectDocument(this);
+    //Run the pre-open script (if any)
+    if (documentConfig.preOpen != null) {
+      this.data = documentConfig.preOpen!(data);
+    }
+    _fingerPrint = _createFingerPrint();
+
+    SelectionState.instance.selectDocument<T>(this);
     return this;
+  }
+
+  bool get isDirty {
+    List<int> currentFingerprint = _createFingerPrint();
+
+    if (currentFingerprint.length != _fingerPrint.length) {
+      return true; // Fingerprints are different (lengths don't match)
+    }
+
+    for (int i = 0; i < currentFingerprint.length; i++) {
+      if (currentFingerprint[i] != _fingerPrint[i]) {
+        return true; // Fingerprints are different
+      }
+    }
+
+    return false;
   }
 
   snackbar({required BuildContext context, required SnackBar snackbar}) {
@@ -439,11 +480,6 @@ class SelectedDocument<T> {
   }
 
   close({BuildContext? context, bool skipWarning = false}) async {
-    bool isDirty = false;
-
-    //ToDo => check dirty state
-
-    // SelectedDocument<T> documentToClose = SelectionState.instance.activeDocument! as SelectedDocument<T>;
     if (isDirty == false || this.readOnly == true || skipWarning == true) {
       SelectionState.instance.closeSelectedDocument(this);
       return;
@@ -530,6 +566,8 @@ class SelectedDocument<T> {
             fromFirestore: documentConfig.fromFirestore,
             toFirestore: documentConfig.toFirestore,
           );
+    //Update the fingerprint
+    _fingerPrint = _createFingerPrint();
   }
 
   save({required BuildContext context, bool closeAfterSave = true, T? data}) async {
@@ -571,6 +609,9 @@ class SelectedDocument<T> {
           if (context.mounted) {
             close(context: context, skipWarning: true);
           }
+        } else {
+          //Update the fingerprint
+          _fingerPrint = _createFingerPrint();
         }
       } else {
         Console.log("ERROR: Save failed", scope: "fframeLog.DocumentScreen.save", level: LogLevel.prod);
@@ -791,10 +832,10 @@ class SelectedDocument<T> {
     bool openAfterCreate = true,
   }) {
     T creationData = documentConfig.createNew();
-
+    String? createDocumentId = documentConfig.createDocumentId!(creationData);
     SelectedDocument<T> selectedDocument = SelectedDocument<T>(
       documentConfig: documentConfig,
-      id: null,
+      id: createDocumentId ?? "new",
       data: creationData, //This goes back to the intantiator
     );
     return openAfterCreate ? selectedDocument.open() : selectedDocument;

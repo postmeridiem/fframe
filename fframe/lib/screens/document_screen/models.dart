@@ -28,6 +28,7 @@ class DocumentConfig<T> extends ChangeNotifier {
     this.swimlanes,
     this.customList,
     this.columnWidth = 0.0,
+    this.hideTitle = false,
     this.mdi = false,
     this.mdiItems = 8,
     required this.autoSelectFirst,
@@ -48,6 +49,7 @@ class DocumentConfig<T> extends ChangeNotifier {
   final String queryStringIdParam;
   final String collection;
   final bool autoSelectFirst;
+  final bool hideTitle;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final Query<T> Function(Query<T> query)? query;

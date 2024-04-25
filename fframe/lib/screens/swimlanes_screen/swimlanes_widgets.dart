@@ -683,7 +683,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                             int docIndex = index ~/ 2;
                             final selectedDocument = selectedDocuments[docIndex];
 
-                            int? nextPriority = isNextPriority(selectedDocuments, docIndex);
+                            // int? nextPriority = isNextPriority(selectedDocuments, docIndex);
 
                             GlobalKey dragKey = GlobalKey();
                             if (index.isEven) {

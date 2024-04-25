@@ -89,14 +89,11 @@ class _DocumentListLoaderState<T> extends State<DocumentListLoader<T>> {
     DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
 
-    return Consumer(
-      builder: (context, ref, _) => DocumentListBody<T>(
-        key: ValueKey("documentListBody_${widget.key.toString()}"),
-        scrollController: scrollController,
-        documentScreenConfig: documentScreenConfig,
-        documentConfig: documentConfig,
-        ref: ref,
-      ),
+    return DocumentListBody<T>(
+      key: ValueKey("documentListBody_${widget.key.toString()}"),
+      scrollController: scrollController,
+      documentScreenConfig: documentScreenConfig,
+      documentConfig: documentConfig,
     );
   }
 }
@@ -107,12 +104,12 @@ class DocumentListBody<T> extends StatefulWidget {
     required this.scrollController,
     required this.documentScreenConfig,
     required this.documentConfig,
-    required this.ref,
+    // required this.ref,
   });
   final ScrollController scrollController;
   final DocumentScreenConfig documentScreenConfig;
   final DocumentConfig<T> documentConfig;
-  final WidgetRef ref;
+  // final WidgetRef ref;
   @override
   State<DocumentListBody<T>> createState() => _DocumentListBodyState<T>();
 }

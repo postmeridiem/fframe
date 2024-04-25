@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
-class UserProfileScreen extends ConsumerStatefulWidget {
+class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({
     super.key,
   });
 
   @override
-  ConsumerState<UserProfileScreen> createState() => _UserProfileScreenState();
+  State<UserProfileScreen> createState() => _UserProfileScreenState();
 }
 
-class _UserProfileScreenState extends ConsumerState<UserProfileScreen> {
+class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     FFrameUser? fFrameUser = Fframe.of(context)?.user;

@@ -138,11 +138,9 @@ class FFramePreload extends StatelessWidget {
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
 
-    return const ProviderScope(
-      child: RootRestorationScope(
-        restorationId: 'fframe',
-        child: FframeFirebaseLoader(),
-      ),
+    return const RootRestorationScope(
+      restorationId: 'fframe',
+      child: FframeFirebaseLoader(),
     );
   }
 }
