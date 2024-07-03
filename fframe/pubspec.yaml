@@ -21,7 +21,6 @@ dependencies:
   flutterfire_ui: 
   file_picker:
   firebase_analytics:
-  # flutter_riverpod: 
   clipboard:
   url_launcher: 
   cloud_functions:
