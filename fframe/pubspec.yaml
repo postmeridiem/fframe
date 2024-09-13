@@ -15,9 +15,10 @@ dependencies:
   intl: ^0.19.0
   firebase_core: 
   firebase_ui_oauth:
+  firebase_ui_oauth_google:
   flutter_signin_button:
   google_sign_in:
-  firebase_ui_oauth_google:
+  google_sign_in_web:
   firebase_auth:
   firebase_auth_web: 
   firebase_ui_auth:

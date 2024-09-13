@@ -33,6 +33,10 @@ dependencies:
   url_launcher: 
   intl: ^0.19.0
   firebase_auth:
+  firebase_ui_oauth:
+  firebase_ui_oauth_google:
+  google_sign_in:
+  google_sign_in_web:
 
 dev_dependencies:
   flutter_test:

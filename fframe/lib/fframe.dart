@@ -3,7 +3,9 @@
 library fframe;
 
 export 'package:firebase_core/firebase_core.dart';
+export 'package:firebase_auth/firebase_auth.dart';
 export 'package:google_sign_in/google_sign_in.dart';
+export 'package:google_sign_in_web/google_sign_in_web.dart';
 export 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:firebase_storage/firebase_storage.dart';
@@ -29,6 +31,7 @@ import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_sign_in_web/google_sign_in_web.dart';
 import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 
 import 'package:fframe/providers/providers.dart';

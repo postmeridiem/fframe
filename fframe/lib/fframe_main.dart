@@ -70,7 +70,7 @@ class Fframe extends InheritedWidget {
   final String title;
 
   final FirebaseOptions firebaseOptions;
-  final List<OAuthProvider>? providerConfigs;
+  final List<GoogleProvider>? providerConfigs;
   final NavigationConfig navigationConfig;
   final ThemeData darkMode;
   final ThemeData lightMode;

@@ -3,7 +3,7 @@ import 'package:example/screens/signInPage/signin_page_screen.dart';
 
 final signInPageNavigationTarget = NavigationTarget(
   contentPane: const SignInPage(
-    title: 'Welcome to FlutFrame Demooo',
+    title: 'Welcome to FlutFrame Demo',
     useFlutterFireUI: true,
   ),
   path: "signin",
