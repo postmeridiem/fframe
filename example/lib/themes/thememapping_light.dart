@@ -17,7 +17,6 @@ final ThemeData appLightTheme = ThemeData(
   dividerColor: lightModeConfig.constDividerColor,
   disabledColor: Colors.grey.shade400,
   unselectedWidgetColor: lightModeConfig.constUnselectedColor,
-  errorColor: lightModeConfig.signalColors.constErrorColor,
   hintColor: lightModeConfig.signalColors.constSuccessColor,
   colorScheme: ColorScheme(
     brightness: lightModeConfig.brightness,

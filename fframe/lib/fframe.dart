@@ -3,10 +3,10 @@
 library fframe;
 
 export 'package:firebase_core/firebase_core.dart';
-export 'package:firebase_auth/firebase_auth.dart';
+export 'package:google_sign_in/google_sign_in.dart';
+export 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:firebase_storage/firebase_storage.dart';
-export 'package:flutterfire_ui/firestore.dart';
 export 'package:url_launcher/url_launcher.dart';
 export 'package:clipboard/clipboard.dart';
 export 'package:shimmer/shimmer.dart';
@@ -24,8 +24,12 @@ import 'package:fframe/controllers/query_state_controller.dart';
 import 'package:fframe/screens/document_screen/document_search.dart';
 
 import 'package:fframe/services/navigation_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_ui_oauth_google/firebase_ui_oauth_google.dart';
 
 import 'package:fframe/providers/providers.dart';
 import 'package:fframe/routers/navigation_route.dart';
@@ -37,14 +41,11 @@ import 'package:fframe/helper_widgets/init_l10n.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/helpers/icons.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutterfire_ui/auth.dart';
 import 'package:intl/intl.dart' show toBeginningOfSentenceCase;
 
 import 'package:fframe/screens/screens.dart';
 import 'package:fframe/services/database_service.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutterfire_ui/firestore.dart';
 import 'package:crypto/crypto.dart';
 
 import 'package:firebase_storage/firebase_storage.dart';

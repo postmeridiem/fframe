@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../fframe.dart';
-import '../helpers/l10n.dart';
+import 'package:fframe/helpers/l10n.dart';
 
 class DatabaseService<T> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -105,17 +107,13 @@ class DatabaseService<T> {
     Query<T>? query,
   }) {
     if (query == null) {
-      return FirebaseFirestore.instance
-          .collection(documentConfig.collection)
-          .withConverter(fromFirestore: documentConfig.fromFirestore, toFirestore: documentConfig.toFirestore)
-          .snapshots()
-          .map((querySnapshot) => querySnapshot.docs.map((documentSnapshot) {
-                return SelectedDocument<T>(
-                  id: documentSnapshot.id,
-                  documentConfig: documentConfig,
-                  documentSnapshot: documentSnapshot,
-                );
-              }).toList());
+      return FirebaseFirestore.instance.collection(documentConfig.collection).withConverter(fromFirestore: documentConfig.fromFirestore, toFirestore: documentConfig.toFirestore).snapshots().map((querySnapshot) => querySnapshot.docs.map((documentSnapshot) {
+            return SelectedDocument<T>(
+              id: documentSnapshot.id,
+              documentConfig: documentConfig,
+              documentSnapshot: documentSnapshot,
+            );
+          }).toList());
     } else {
       return query.withConverter(fromFirestore: documentConfig.fromFirestore, toFirestore: documentConfig.toFirestore).snapshots().map((querySnapshot) => querySnapshot.docs.map((documentSnapshot) {
             return SelectedDocument<T>(

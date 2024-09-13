@@ -1,4 +1,5 @@
 import 'package:example/screens/suggestion/screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
@@ -41,7 +42,8 @@ class _ListGridScreenState extends State<ListGridScreen> {
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
+            "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget

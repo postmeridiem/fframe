@@ -1,5 +1,6 @@
 import 'package:example/screens/suggestion/suggestion.dart';
 import 'package:fframe/services/database_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 import 'package:example/models/suggestion.dart';
@@ -47,7 +48,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
+            "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Required title widget
@@ -73,7 +75,11 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         contentPadding: const EdgeInsets.only(top: 80.0),
         builder: (context, query, documentConfig, user) {
           query = query.limit(1);
-          return ContentSelector(context: context, query: query, documentConfig: documentConfig, user: user);
+          return ContentSelector(
+              context: context,
+              query: query,
+              documentConfig: documentConfig,
+              user: user);
         },
       ),
 
@@ -99,7 +105,8 @@ class ContentSelector<Suggestion> extends StatefulWidget {
   State<ContentSelector> createState() => _ContentSelectorState<Suggestion>();
 }
 
-class _ContentSelectorState<Suggestion> extends State<ContentSelector<Suggestion>> {
+class _ContentSelectorState<Suggestion>
+    extends State<ContentSelector<Suggestion>> {
   SelectedDocument<Suggestion>? selectedDocument;
 
   @override
@@ -138,8 +145,11 @@ class _ContentSelectorState<Suggestion> extends State<ContentSelector<Suggestion
             query: query.limit(1),
             documentConfig: documentConfig,
           ),
-          builder: (BuildContext context, AsyncSnapshot<List<SelectedDocument<Suggestion>>> selectedDocumentsSnaphot) {
-            if (!selectedDocumentsSnaphot.hasData) return const CircularProgressIndicator();
+          builder: (BuildContext context,
+              AsyncSnapshot<List<SelectedDocument<Suggestion>>>
+                  selectedDocumentsSnaphot) {
+            if (!selectedDocumentsSnaphot.hasData)
+              return const CircularProgressIndicator();
             this.selectedDocument = selectedDocumentsSnaphot.data!.first;
 
             return IconButton(

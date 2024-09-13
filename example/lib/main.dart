@@ -1,8 +1,8 @@
 import 'package:example/firebase_options.dart';
 import 'package:example/screens/customwidget/navigation.dart';
 import 'package:example/screens/swimlanes/swimlanes.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutterfire_ui/auth.dart';
 
 import 'package:fframe/fframe.dart';
 import 'package:example/themes/themes.dart';
@@ -20,9 +20,8 @@ import 'package:example/screens/user/user.dart';
 import 'package:example/screens/user_profile/user_profile.dart';
 import 'package:example/screens/list_grid/list_grid.dart';
 import 'package:example/screens/list_grid_single_column_widget/list_grid_single_colum.dart';
-import 'package:flutterfire_ui/i10n.dart';
 
-import 'helpers/header_buttons.dart';
+import 'package:example/helpers/header_buttons.dart';
 
 void main() {
   // usePathUrlStrategy();
@@ -85,8 +84,8 @@ class MainApp extends StatelessWidget {
       // widget localizations. Stuff you can't reach otherwise, basically.
       localizationsDelegates: [
         // ... app-specific localization delegate[s] here
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
+        // GlobalMaterialLocalizations.delegate,
+        // GlobalWidgetsLocalizations.delegate,
       ],
 
       // set the source configuration
@@ -105,10 +104,11 @@ class MainApp extends StatelessWidget {
       themeMode: ThemeMode.system,
       l10nConfig: l10nConfig,
       consoleLogger: Console(logThreshold: LogLevel.fframe),
-      providerConfigs: const [
+      providerConfigs: [
         // EmailProviderConfiguration(),
-        GoogleProviderConfiguration(
-          clientId: "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
+        GoogleProvider(
+          clientId:
+              "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
       debugShowCheckedModeBanner: false,
@@ -119,11 +119,13 @@ class MainApp extends StatelessWidget {
       ],
       postLoad: (context) async {
         // you can omit this optional event handler
-        Console.log("Executing postLoad code from main.dart", scope: "exampleApp.postLoad", level: LogLevel.dev);
+        Console.log("Executing postLoad code from main.dart",
+            scope: "exampleApp.postLoad", level: LogLevel.dev);
       },
       postSignOut: (context) async {
         // you can omit this optional event handler
-        Console.log("Executing postSignOut code from main.dart", scope: "exampleApp.postSignOut", level: LogLevel.dev);
+        Console.log("Executing postSignOut code from main.dart",
+            scope: "exampleApp.postSignOut", level: LogLevel.dev);
       },
       // postSignIn: (
       //   context,

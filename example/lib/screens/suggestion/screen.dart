@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_import, unnecessary_null_comparison, use_super_parameters
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -47,11 +48,14 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         return suggestion;
       },
 
-      viewType: widget.suggestionQueryState == SuggestionQueryStates.active ? ViewType.auto : ViewType.grid,
+      viewType: widget.suggestionQueryState == SuggestionQueryStates.active
+          ? ViewType.auto
+          : ViewType.grid,
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
+            "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -182,9 +186,11 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             headerBuilder: (() => const DataColumn(
                   label: Text("Name"),
                 )),
-            dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
+            dataCellBuilder: ((Suggestion suggestion, Function save) =>
+                DataCell(
                   Text(suggestion.name ?? "?"),
-                  onTap: () => Console.log("onTap ${suggestion.name}", scope: "exampleApp.Suggestions", level: LogLevel.dev),
+                  onTap: () => Console.log("onTap ${suggestion.name}",
+                      scope: "exampleApp.Suggestions", level: LogLevel.dev),
                   placeholder: false,
                 )),
           ),
@@ -192,7 +198,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             headerBuilder: (() => const DataColumn(
                   label: Text("Active"),
                 )),
-            dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
+            dataCellBuilder: ((Suggestion suggestion, Function save) =>
+                DataCell(
                   Switch(
                     value: (suggestion.active ?? false),
                     onChanged: (bool value) {
@@ -250,7 +257,8 @@ Document<Suggestion> suggestionDocument() {
               String collection = "suggestions";
               String docId = selectedDocument.data.id ?? "";
               String gcpProject = Fframe.of(context)!.firebaseOptions.projectId;
-              Uri url = Uri.parse("$domain/$application/$collection/$docId?&project=$gcpProject");
+              Uri url = Uri.parse(
+                  "$domain/$application/$collection/$docId?&project=$gcpProject");
               launchUrl(url);
             },
             icon: Icon(

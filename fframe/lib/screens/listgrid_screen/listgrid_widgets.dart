@@ -203,7 +203,7 @@ class _ListGridSearchWidgetState<T> extends State<ListGridSearchWidget<T>> {
       data: ThemeData(
         textSelectionTheme: TextSelectionThemeData(
           cursorColor: Theme.of(context).colorScheme.onSurfaceVariant,
-          selectionColor: Theme.of(context).colorScheme.onBackground,
+          selectionColor: Theme.of(context).colorScheme.onSurface,
           selectionHandleColor: widgetColor,
         ),
         focusColor: widgetColor,

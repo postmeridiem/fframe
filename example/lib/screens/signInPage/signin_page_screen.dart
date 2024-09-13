@@ -2,9 +2,9 @@
 
 import 'package:fframe/components/auth/decorations.dart';
 import 'package:fframe/fframe.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-import 'package:flutterfire_ui/auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class SignInPage extends StatefulWidget {
@@ -30,11 +30,11 @@ class _SignInPageState extends State<SignInPage> {
     Console.log("Opening signIn page", scope: "exampleApp.SignIn", level: LogLevel.prod);
 
     // List<ProviderConfiguration>? providerConfigs = Fframe.of(context)?.providerConfigs;
-    List<ProviderConfiguration>? providerConfigurations = Fframe.of(context)?.providerConfigs?.where((ProviderConfiguration providerConfiguration) {
+    List<OAuthProvider>? providerConfigurations = Fframe.of(context)?.providerConfigs?.where((OAuthProvider providerConfiguration) {
       return providerConfiguration.providerId == "google.com";
     }).toList();
     if (providerConfigurations != null && providerConfigurations.isNotEmpty) {
-      GoogleProviderConfiguration providerConfiguration = providerConfigurations.first as GoogleProviderConfiguration;
+      GoogleProvider providerConfiguration = providerConfigurations.first as GoogleProvider;
       webClientId = providerConfiguration.clientId;
     }
 
