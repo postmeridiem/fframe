@@ -1,14 +1,11 @@
 // ignore_for_file: depend_on_referenced_packages
-
-import 'package:fframe/components/auth/decorations.dart';
 import 'package:fframe/fframe.dart';
-import 'package:fframe/helpers/console_logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_signin_button/flutter_signin_button.dart';
-import 'package:flutterfire_ui/auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
 class SignInPage extends StatefulWidget {
+  // ignore: use_super_parameters
   const SignInPage({
     Key? key,
     required this.title,
@@ -30,11 +27,11 @@ class _SignInPageState extends State<SignInPage> {
     Console.log("Opening signIn page", scope: "exampleApp.SignIn", level: LogLevel.prod);
 
     // List<ProviderConfiguration>? providerConfigs = Fframe.of(context)?.providerConfigs;
-    List<ProviderConfiguration>? providerConfigurations = Fframe.of(context)?.providerConfigs?.where((ProviderConfiguration providerConfiguration) {
+    List<GoogleProvider>? providerConfigurations = Fframe.of(context)?.providerConfigs?.where((GoogleProvider providerConfiguration) {
       return providerConfiguration.providerId == "google.com";
     }).toList();
     if (providerConfigurations != null && providerConfigurations.isNotEmpty) {
-      GoogleProviderConfiguration providerConfiguration = providerConfigurations.first as GoogleProviderConfiguration;
+      GoogleProvider providerConfiguration = providerConfigurations.first as GoogleProvider;
       webClientId = providerConfiguration.clientId;
     }
 
@@ -81,11 +78,27 @@ class _SignInPageState extends State<SignInPage> {
       Fframe.of(context)!.showErrorPage(context: context, errorText: "Missign auth provider configuration");
     }
 
+    // return AuthStateListener<OAuthController>(
+    //   child: OAuthProviderButton(
+    //     // or any other OAuthProvider
+    //     provider: GoogleProvider(clientId: GOOGLE_CLIENT_ID),
+    //   ),
+    //   listener: (oldState, newState, ctrl) {
+    //     if (newState is SignedIn) {
+    //       Navigator.pushReplacementNamed(context, '/profile');
+    //     }
+    //     return null;
+    //   },
+    // );
+
+    // return const Padding(
+    //   padding: EdgeInsets.only(bottom: 8),
+    //   child: Text("aaaaaaaa"),
+    // );
+
     return SignInScreen(
-      providerConfigs: Fframe.of(context)?.providerConfigs,
+      providers: Fframe.of(context)?.providerConfigs,
       showAuthActionSwitch: false,
-      headerBuilder: headerImage('assets/images/flutter_mono.png'),
-      sideBuilder: sideImage('assets/images/flutter_mono.png'),
       subtitleBuilder: (context, action) {
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
@@ -95,19 +108,19 @@ class _SignInPageState extends State<SignInPage> {
           ),
         );
       },
-      // footerBuilder: (context, action) {
-      //   return Center(
-      //     child: Padding(
-      //       padding: const EdgeInsets.only(top: 20),
-      //       child: Text(
-
-      //         action == AuthAction.signIn ? 'By signing in, you agree to our terms and conditions.' : 'SHOULD NEVER BE AVAILABLE',
-      //         style: const TextStyle(color: Colors.grey),
-      //       ),
-      //     ),
-      //   );
-      // },
     );
+    // footerBuilder: (context, action) {
+    //   return Center(
+    //     child: Padding(
+    //       padding: const EdgeInsets.only(top: 20),
+    //       child: Text(
+
+    //         action == AuthAction.signIn ? 'By signing in, you agree to our terms and conditions.' : 'SHOULD NEVER BE AVAILABLE',
+    //         style: const TextStyle(color: Colors.grey),
+    //       ),
+    //     ),
+    //   );
+    // },
   }
 
   silentSignOut() async {}

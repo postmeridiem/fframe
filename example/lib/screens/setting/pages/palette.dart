@@ -1,8 +1,9 @@
 import 'package:example/themes/config.dart';
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:fframe/helpers/console_logger.dart';
 
 class PaletteForm extends StatefulWidget {
+  // ignore: use_super_parameters
   const PaletteForm({Key? key}) : super(key: key);
 
   @override
@@ -257,9 +258,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurfaceVariant,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
@@ -290,9 +289,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimaryContainer,
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
@@ -323,9 +320,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSecondaryContainer,
+                              color: Theme.of(context).colorScheme.onSecondaryContainer,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
@@ -387,9 +382,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onErrorContainer,
+                              color: Theme.of(context).colorScheme.onErrorContainer,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),
@@ -421,10 +414,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 ".constAccentColor",
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
                               ),
                             )),
                           ),
@@ -438,10 +428,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 ".constWaitingColor",
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
                               ),
                             )),
                           ),
@@ -455,10 +442,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 ".constRunningColor",
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
                               ),
                             )),
                           ),
@@ -472,10 +456,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 ".constSuccessColor",
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
                               ),
                             )),
                           ),
@@ -489,10 +470,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 ".constWarningColor",
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
                               ),
                             )),
                           ),
@@ -506,10 +484,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                               padding: const EdgeInsets.all(8.0),
                               child: Text(
                                 ".constErrorColor",
-                                style: TextStyle(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onPrimaryContainer),
+                                style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
                               ),
                             )),
                           ),

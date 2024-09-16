@@ -1,6 +1,6 @@
 // import 'package:fframe/helper_widgets/confirmation_dialog.dart';
+import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:fframe/helpers/console_logger.dart';
 
 // import 'package:example/helpers/prompts.dart';
 import 'package:fframe/helpers/prompts.dart';
@@ -8,7 +8,7 @@ import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/helpers/fframe_prefs.dart';
 
 class SettingsGeneralForm extends StatefulWidget {
-  const SettingsGeneralForm({Key? key}) : super(key: key);
+  const SettingsGeneralForm({super.key});
 
   @override
   State<SettingsGeneralForm> createState() => _SettingsGeneralFormState();
@@ -43,21 +43,14 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
             const Text("FFrame Prompt examples"),
             OutlinedButton(
               onPressed: () {
-                promptOK(
-                    context: context,
-                    title: "Please Be Aware",
-                    message:
-                        "Some text explaining why you are seeing this popup.");
+                promptOK(context: context, title: "Please Be Aware", message: "Some text explaining why you are seeing this popup.");
                 // App.l10nConfig.locale = const Locale('nl','');
               },
               child: const Text("Test promptOK"),
             ),
             OutlinedButton(
               onPressed: () {
-                promptOKCancel(
-                    context: context,
-                    title: "Please Confirm",
-                    message: "Some text explaining the choice you have now.");
+                promptOKCancel(context: context, title: "Please Confirm", message: "Some text explaining the choice you have now.");
                 // App.l10nConfig.locale = const Locale('nl','');
               },
               child: const Text("Test promptOKCancel"),
@@ -66,10 +59,7 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
             const Text("FFrame L10N examples"),
             OutlinedButton(
               onPressed: () {
-                promptOK(
-                    context: context,
-                    title: "testing l108 pull",
-                    message: label);
+                promptOK(context: context, title: "testing l108 pull", message: label);
                 // App.l10nConfig.locale = const Locale('nl','');
               },
               child: const Text("This is the placeholder and text at dev time"),
@@ -99,20 +89,16 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
                 FframePrefs.getThemeMode().then((value) {
                   switch (value) {
                     case ThemeMode.dark:
-                      promptOK(
-                          context: context, title: "dark", message: "dark");
+                      promptOK(context: context, title: "dark", message: "dark");
                       break;
                     case ThemeMode.light:
-                      promptOK(
-                          context: context, title: "light", message: "light");
+                      promptOK(context: context, title: "light", message: "light");
                       break;
                     case ThemeMode.system:
-                      promptOK(
-                          context: context, title: "system", message: "system");
+                      promptOK(context: context, title: "system", message: "system");
                       break;
                     default:
-                      promptOK(
-                          context: context, title: "dunno", message: "dunno");
+                      promptOK(context: context, title: "dunno", message: "dunno");
                   }
                 });
               },

@@ -5,10 +5,10 @@ import 'package:example/models/suggestion.dart';
 
 class DocTab extends StatelessWidget {
   const DocTab({
-    Key? key,
+    super.key,
     required this.suggestion,
     required this.readOnly,
-  }) : super(key: key);
+  });
   final Suggestion suggestion;
   final bool readOnly;
 

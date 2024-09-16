@@ -1,11 +1,11 @@
 import 'package:fframe/services/navigation_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fframe/constants/constants.dart';
-import 'package:fframe/providers/state_providers.dart';
-import 'package:fframe/helpers/console_logger.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:fframe/fframe.dart';
+
 // import 'package:url_launcher/url_launcher.dart';
 
 // import '../helpers/profile_buttons.dart';
@@ -131,19 +131,20 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                   //       )
                   //     : null,
                 ),
-                body: Consumer(
-                  builder: (context, ref, child) {
-                    TargetState targetState = ref.watch(targetStateProvider);
-                    Console.log("MainScreen Consumer builder '${targetState.navigationTarget.title}'", scope: "fframeLog.MainScreen", level: LogLevel.fframe, color: ConsoleColor.green);
-
-                    return AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      child: Container(
-                        key: ValueKey("navTarget_${targetState.navigationTarget.title}"),
-                        child: targetState.navigationTarget.contentPane,
-                      ),
-                    );
-                  },
+                body: Stack(
+                  children: [
+                    ListenableBuilder(
+                      listenable: TargetState.instance,
+                      builder: (context, _) {
+                        NavigationTarget navigationTarget = TargetState.instance.navigationTarget;
+                        return Container(
+                          key: ValueKey("navTarget_${navigationTarget.path}"),
+                          child: navigationTarget.contentPane,
+                        );
+                      },
+                    ),
+                    const MinimizedDocumentsWatcher(),
+                  ],
                 ),
               ),
             ),
@@ -268,18 +269,19 @@ class _ProfileButtonState extends State<ProfileButton> {
                         // ),
                         onTap: () {
                           // FRouter.of(context).navigateToRoute(context, route: "profile");
-                          List<NavigationTarget> navigationTargets = navigationNotifier.navigationConfig.navigationTargets;
+                          List<NavigationTarget> navigationTargets = NavigationNotifier.instance.navigationConfig.navigationTargets;
                           NavigationTarget profilePageTarget = navigationTargets.firstWhere(
                             (NavigationTarget navigationTarget) {
                               return navigationTarget.profilePage == true;
                             },
                             orElse: () {
-                              return navigationNotifier.navigationConfig.errorPage;
+                              return NavigationNotifier.instance.navigationConfig.errorPage;
                             },
                           );
-
-                          navigationNotifier.processRouteInformation(
-                            targetState: TargetState(navigationTarget: profilePageTarget),
+                          NavigationNotifier.instance.processRouteInformation(
+                            targetState: TargetState(
+                              navigationTarget: profilePageTarget,
+                            ),
                           );
                           overlayEntry.remove();
                           // FRouter.of(context).navigateTo(navigationTarget: profilePageTarget);

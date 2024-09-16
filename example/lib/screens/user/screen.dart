@@ -10,8 +10,8 @@ import 'package:example/models/appuser.dart';
 
 class UsersScreen extends StatefulWidget {
   const UsersScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<UsersScreen> createState() => _UsersScreenState();
@@ -20,10 +20,10 @@ class UsersScreen extends StatefulWidget {
 class _UsersScreenState extends State<UsersScreen> {
   @override
   Widget build(BuildContext context) {
-    bool profileMode = getProfileMode();
-    if (profileMode) {
-      return const UserProfileScreen();
-    }
+    // bool profileMode = getProfileMode();
+    // if (profileMode) {
+    //   return const UserProfileScreen();
+    // }
     return DocumentScreen<AppUser>(
       // formKey: GlobalKey<FormState>(),
       collection: "users",
@@ -46,7 +46,7 @@ class _UsersScreenState extends State<UsersScreen> {
       // Optional ListGrid widget
       viewType: ViewType.listgrid,
       listGrid: ListGridConfig<AppUser>(
-        searchHint: "search user names",
+        searchHint: "Search user name",
         // widgetBackgroundColor: Colors.amber,
         // widgetColor: Colors.pink,
         // widgetTextColor: Colors.pink,
@@ -72,7 +72,7 @@ class _UsersScreenState extends State<UsersScreen> {
   Document<AppUser> _document() {
     return Document<AppUser>(
       autoSave: false,
-      extraActionButtons: (BuildContext context, AppUser appUser, bool isReadOnly, bool isNew, FFrameUser? user) {
+      extraActionButtons: (BuildContext context, SelectedDocument selectedDocument, bool isReadOnly, bool isNew, FFrameUser? user) {
         return [
           if (user != null && user.hasRole("firestoreaccess"))
             IconButton(
@@ -81,7 +81,7 @@ class _UsersScreenState extends State<UsersScreen> {
                 String domain = "https://console.cloud.google.com";
                 String application = "firestore/databases/-default-/data/panel";
                 String collection = "users";
-                String docId = appUser.uid ?? "";
+                String docId = selectedDocument.data.uid ?? "";
                 String gcpProject = Fframe.of(context)!.firebaseOptions.projectId;
                 Uri url = Uri.parse("$domain/$application/$collection/$docId?&project=$gcpProject");
                 launchUrl(url);
@@ -104,9 +104,9 @@ class _UsersScreenState extends State<UsersScreen> {
                 ),
               );
             },
-            childBuilder: (user, readOnly) {
+            childBuilder: (selecedDocument, readOnly) {
               return ProfileTab(
-                user: user,
+                user: selecedDocument.data,
               );
             },
           ),
@@ -119,9 +119,9 @@ class _UsersScreenState extends State<UsersScreen> {
                 ),
               );
             },
-            childBuilder: (user, readOnly) {
+            childBuilder: (selecedDocument, readOnly) {
               return RolesTab(
-                user: user,
+                user: selecedDocument.data,
               );
             },
           ),
@@ -130,14 +130,14 @@ class _UsersScreenState extends State<UsersScreen> {
     );
   }
 
-  bool getProfileMode() {
-    String? id = FRouter.of(context).queryStringParam("id");
-    if (id != null && id == "profile") {
-      return true;
-    } else {
-      return false;
-    }
-  }
+  // bool getProfileMode() {
+  //   String? id = FRouter.of(context).queryStringParam("id");
+  //   if (id != null && id == "profile") {
+  //     return true;
+  //   } else {
+  //     return false;
+  //   }
+  // }
 }
 
 // class ProfileWidget extends StatelessWidget {

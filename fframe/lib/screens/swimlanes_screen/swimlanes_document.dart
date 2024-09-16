@@ -1,6 +1,6 @@
 part of '../../fframe.dart';
 
-// class SwimlanesDocument<T> extends ConsumerStatefulWidget {
+// class SwimlanesDocument<T> extends StatefulWidget {
 //   const SwimlanesDocument({
 //     super.key,
 //     required this.documentConfig,
@@ -14,10 +14,10 @@ part of '../../fframe.dart';
 //   final bool documentOpen;
 
 //   @override
-//   ConsumerState<SwimlanesDocument<T>> createState() => _SwimlanesDocumentState<T>();
+//   State<SwimlanesDocument<T>> createState() => _SwimlanesDocumentState<T>();
 // }
 
-// class _SwimlanesDocumentState<T> extends ConsumerState<SwimlanesDocument<T>> {
+// class _SwimlanesDocumentState<T> extends State<SwimlanesDocument<T>> {
 //   @override
 //   Widget build(BuildContext context) {
 //     if (widget.documentOpen) {

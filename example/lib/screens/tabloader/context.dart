@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:example/models/suggestion.dart';
 
 class ContextCard<T> extends StatelessWidget {
-  const ContextCard({Key? key, required this.suggestion}) : super(key: key);
+  const ContextCard({super.key, required this.suggestion});
   final Suggestion suggestion;
 
   @override

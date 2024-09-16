@@ -5,6 +5,7 @@ import 'package:example/models/setting.dart';
 import 'setting.dart';
 
 class SettingScreen<Setting> extends StatefulWidget {
+  // ignore: use_super_parameters
   const SettingScreen({Key? key}) : super(key: key);
 
   @override
@@ -69,7 +70,8 @@ Document<Setting> settingDocument() {
               ),
             );
           },
-          childBuilder: (setting, readOnly) {
+          childBuilder: (selectedDocument, readOnly) {
+            Setting setting = selectedDocument.data;
             switch (setting.id) {
               case "01-generalsettings":
                 {

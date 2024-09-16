@@ -1,5 +1,6 @@
 // ignore_for_file: unnecessary_null_comparison
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
@@ -11,9 +12,9 @@ enum ListGridQueryStates { active, inactive }
 
 class ListGridScreen<Suggestion> extends StatefulWidget {
   const ListGridScreen({
-    Key? key,
+    super.key,
     required this.listgridQueryState,
-  }) : super(key: key);
+  });
   final ListGridQueryStates listgridQueryState;
 
   @override
@@ -43,7 +44,8 @@ class _ListGridScreenState extends State<ListGridScreen> {
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
+            "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -90,7 +92,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
       ),
 
       // Center part, shows a firestore doc. Tabs possible
-      document: suggestionDocument(context),
+      document: suggestionDocument(),
       // document: _document(),
     );
   }

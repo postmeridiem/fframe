@@ -1,11 +1,20 @@
 part of '../../fframe.dart';
 
+class ListConfig<T> {
+  final EdgeInsets contentPadding;
+
+  const ListConfig({
+    this.contentPadding = EdgeInsets.zero,
+  });
+}
+
 class DocumentConfig<T> extends ChangeNotifier {
   DocumentConfig({
     required this.formKey,
     required this.collection,
     required this.createNew,
     required this.initialViewType,
+    required this.titleBuilder,
     this.preSave,
     this.preOpen,
     this.createDocumentId,
@@ -17,7 +26,11 @@ class DocumentConfig<T> extends ChangeNotifier {
     this.dataGridConfig,
     this.listGridConfig,
     this.swimlanes,
-    this.titleBuilder,
+    this.customList,
+    this.columnWidth = 0.0,
+    this.hideTitle = false,
+    this.mdi = false,
+    this.mdiItems = 8,
     required this.autoSelectFirst,
     required this.document,
     this.contextCardBuilders,
@@ -30,11 +43,13 @@ class DocumentConfig<T> extends ChangeNotifier {
   final DataGridConfig<T>? dataGridConfig;
   final ListGridConfig<T>? listGridConfig;
   final SwimlanesConfig<T>? swimlanes;
-  final TitleBuilder<T>? titleBuilder;
+  final CustomList<T>? customList;
+  final TitleBuilder<T> titleBuilder;
   final Document<T> document;
   final String queryStringIdParam;
   final String collection;
   final bool autoSelectFirst;
+  final bool hideTitle;
   final T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore;
   final Map<String, Object?> Function(T, SetOptions?) toFirestore;
   final Query<T> Function(Query<T> query)? query;
@@ -42,18 +57,19 @@ class DocumentConfig<T> extends ChangeNotifier {
   final T Function() createNew;
   final T? Function(T)? preSave;
   final T Function(T)? preOpen;
+  final bool mdi;
+  final int mdiItems;
   final String? Function(T)? createDocumentId;
-  final List<ContextCardBuilder>? contextCardBuilders;
+  final List<ContextCardBuilder<T>>? contextCardBuilders;
   final bool embeddedDocument;
   final ViewType initialViewType;
-
+  final double columnWidth;
   late PreloadPageController preloadPageController;
   late PageController pageController;
   late TabController tabController;
   ViewType? _viewType;
 
   List<ViewType> get allowedViewTypes {
-    //TODO: this needs to be cleaned up after listgrid is mature
     switch (initialViewType) {
       case ViewType.auto:
         List<ViewType> returnValue = [];
@@ -62,16 +78,8 @@ class DocumentConfig<T> extends ChangeNotifier {
         if (dataGridConfig != null) returnValue.add(ViewType.grid);
         if (returnValue.isEmpty) returnValue.add(ViewType.none);
         return returnValue;
-      case ViewType.listgrid:
-        return [ViewType.listgrid];
-      case ViewType.list:
-        return [ViewType.list];
-      case ViewType.grid:
-        return [ViewType.grid];
-      case ViewType.swimlanes:
-        return [ViewType.swimlanes];
-      case ViewType.none:
-        return [];
+      default:
+        return [initialViewType];
     }
   }
 
@@ -90,7 +98,15 @@ class DocumentConfig<T> extends ChangeNotifier {
   }
 }
 
-enum ViewType { auto, list, grid, listgrid, swimlanes, none }
+enum ViewType {
+  auto,
+  list,
+  grid,
+  listgrid,
+  swimlanes,
+  custom,
+  none,
+}
 
 class Document<T> {
   Document({
@@ -112,7 +128,7 @@ class Document<T> {
     this.prefetchTabs = true,
   });
   final Key? key;
-  final DocumentTabsBuilder<T>? documentTabsBuilder;
+  final DocumentTabsBuilder<T> documentTabsBuilder;
   final DocumentHeaderBuilder<T>? documentHeaderBuilder;
   final List<ContextCardBuilder>? contextCards;
   final ExtraActionButtonsBuilder<T>? extraActionButtons;
@@ -145,7 +161,16 @@ class DocumentTab<T> {
   });
 }
 
-class DocumentList<T> {
+class CustomList<T> extends ListConfig {
+  final CustomViewTypeBuilder<T>? builder;
+
+  CustomList({
+    super.contentPadding,
+    required this.builder,
+  });
+}
+
+class DocumentList<T> extends ListConfig {
   const DocumentList({
     required this.builder,
     this.headerBuilder,
@@ -154,6 +179,7 @@ class DocumentList<T> {
     this.showSeparator = true,
     this.showCreateButton = true,
     this.seperatorHeight = 1,
+    super.contentPadding = const EdgeInsets.only(left: 250.0),
   });
   final DocumentListItemBuilder<T> builder;
   final DocumentListHeaderBuilder<T>? headerBuilder;
@@ -164,7 +190,7 @@ class DocumentList<T> {
   final double seperatorHeight;
 }
 
-class ListGrid<T> {
+class ListGrid<T> extends ListConfig {
   const ListGrid({
     required this.builder,
     this.headerBuilder,

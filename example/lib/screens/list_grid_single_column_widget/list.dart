@@ -14,7 +14,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
         children: [
           renderButtons(
             context: context,
-            suggestion: suggestion!,
+            selectedDocument: suggestion,
           ),
         ],
       );
@@ -22,7 +22,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ),
 ];
 
-Row renderButtons({required BuildContext context, required Suggestion suggestion}) {
+Row renderButtons({required BuildContext context, required SelectedDocument<Suggestion> selectedDocument}) {
   return Row(
     children: [
       Tooltip(

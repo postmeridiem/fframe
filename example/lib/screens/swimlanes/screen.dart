@@ -1,4 +1,5 @@
 import 'package:example/models/suggestion.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 
@@ -9,9 +10,9 @@ enum SwimlanesQueryStates { active, inactive }
 
 class SwimlanesScreen extends StatefulWidget {
   const SwimlanesScreen({
-    Key? key,
+    super.key,
     required this.swimlanesQueryState,
-  }) : super(key: key);
+  });
   final SwimlanesQueryStates swimlanesQueryState;
 
   @override
@@ -41,7 +42,8 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
+            "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -76,7 +78,9 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
         getPriority: (suggestion) => suggestion.priority,
         myId: (user) => user.uid!,
         following: SwimlanesFollowing<Suggestion>(
-          isFollowing: (suggestion, user) => suggestion.followers != null && suggestion.followers!.contains(user.uid),
+          isFollowing: (suggestion, user) =>
+              suggestion.followers != null &&
+              suggestion.followers!.contains(user.uid),
           startFollowing: (suggestion, user) {
             suggestion.followers ??= [];
             suggestion.followers!.add(user.uid!);
@@ -89,13 +93,29 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
           },
         ),
         assignee: SwimlanesAssignee<Suggestion>(
-          setAssignee: (suggestion, roles, user) {
-//TODO: User picker dialog
-            return null;
+          unsetAssignee: (suggestion) {
+            //TODO: User picker dialog
+            suggestion.assignee = null;
+            return suggestion;
+          },
+          setAssignee: (suggestion, user) {
+            //TODO: User picker dialog
+            suggestion.assignee = user.uid;
+            return suggestion;
+          },
+          isAssignee: (suggestion, user) {
+            return suggestion.assignee == user.uid;
           },
         ),
         // getDueDate: (suggestion) => suggestion.dueDate,
-        taskWidget: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionCard(
+        taskWidgetHeader: (selectedDocument, swimlanesConfig, fFrameUser) =>
+            SuggestionHeader(
+          selectedDocument: selectedDocument,
+          swimlanesConfig: swimlanesConfig,
+          fFrameUser: fFrameUser,
+        ),
+        taskWidgetBody: (selectedDocument, swimlanesConfig, fFrameUser) =>
+            SuggestionCard(
           selectedDocument: selectedDocument,
           swimlanesConfig: swimlanesConfig,
           fFrameUser: fFrameUser,
@@ -104,37 +124,43 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
       ),
 
       // Center part, shows a firestore doc. Tabs possible
-      document: suggestionDocument(context),
+      document: suggestionDocument(),
     );
   }
 }
 
-class SuggestionCard extends StatelessWidget {
-  const SuggestionCard({
-    Key? key,
+class SuggestionHeader extends StatelessWidget {
+  SuggestionHeader({
+    super.key,
     required this.selectedDocument,
     required this.swimlanesConfig,
     required this.fFrameUser,
-  }) : super(key: key);
+  }) : suggestion = selectedDocument.data;
   final SelectedDocument<Suggestion> selectedDocument;
   final SwimlanesConfig<Suggestion> swimlanesConfig;
   final FFrameUser fFrameUser;
+  final Suggestion suggestion;
 
   @override
   Widget build(BuildContext context) {
-    Suggestion suggestion = selectedDocument.data as Suggestion;
-    return SizedBox(
-      height: 150,
-      child: Placeholder(
-        child: Center(
-          child: Column(
-            children: [
-              SelectableText("${selectedDocument.id}"),
-              Text("${suggestion.priority}"),
-            ],
-          ),
-        ),
-      ),
-    );
+    return Text(suggestion.name ?? "?");
+  }
+}
+
+class SuggestionCard extends StatelessWidget {
+  SuggestionCard({
+    super.key,
+    required this.selectedDocument,
+    required this.swimlanesConfig,
+    required this.fFrameUser,
+  }) : suggestion = selectedDocument.data;
+  final SelectedDocument<Suggestion> selectedDocument;
+  final SwimlanesConfig<Suggestion> swimlanesConfig;
+  final FFrameUser fFrameUser;
+  final Suggestion suggestion;
+
+  @override
+  Widget build(BuildContext context) {
+    return SelectableText("${suggestion.priority}");
   }
 }

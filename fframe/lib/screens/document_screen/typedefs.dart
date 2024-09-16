@@ -14,9 +14,16 @@ typedef DocumentTabsBuilder<T> = List<DocumentTab<T>> Function(
 
 typedef ExtraActionButtonsBuilder<T> = List<Widget> Function(
   BuildContext context,
-  T data,
+  SelectedDocument<T> selectedDocument,
   bool isReadOnly,
   bool isNew,
+  FFrameUser? user,
+);
+
+typedef CustomViewTypeBuilder<T> = Widget Function(
+  BuildContext context,
+  Query<T> fireStoreQueryState,
+  DocumentConfig<T> documentConfig,
   FFrameUser? user,
 );
 
@@ -44,11 +51,11 @@ typedef DocumentStream<T> = Stream<DocumentSnapshot> Function(
 typedef DocumentTabBuilder<T> = Widget Function(FFrameUser? user);
 
 typedef DocumentTabChildBuilder<T> = Widget Function(
-  T data,
+  SelectedDocument<T> data,
   bool isReadOnly,
 );
 
-typedef TitleBuilder<T> = Widget? Function(
+typedef TitleBuilder<T> = Text Function(
   BuildContext context,
   T data,
 );

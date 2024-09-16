@@ -17,7 +17,6 @@ final ThemeData appDarkTheme = ThemeData(
   dividerColor: darkModeConfig.constDividerColor,
   disabledColor: Colors.grey.shade400,
   unselectedWidgetColor: darkModeConfig.constUnselectedColor,
-  errorColor: darkModeConfig.signalColors.constErrorColor,
   hintColor: darkModeConfig.signalColors.constSuccessColor,
   shadowColor: darkModeConfig.constPrimaryColor,
   colorScheme: ColorScheme(

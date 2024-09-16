@@ -42,10 +42,10 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
       saveDocument,
     ) {
       return Switch(
-        value: (suggestion?.active ?? false),
+        value: (suggestion.data.active ?? false),
         activeColor: SignalColors().constAccentColor,
         onChanged: (bool value) {
-          suggestion?.active = value;
+          suggestion.data.active = value;
           // saveDocument();
         },
       );
@@ -60,7 +60,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
         children: [
           renderButtons(
             context: context,
-            suggestion: suggestion!,
+            suggestion: suggestion,
           ),
         ],
       );
@@ -85,12 +85,12 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     cellControlsBuilder: (
       context,
       user,
-      contextDocument,
+      selectedDocument,
       stringValue,
     ) {
       return renderCreatedByCellIcons(
         context: context,
-        contextDocument: contextDocument!,
+        selectedDocument: selectedDocument!,
         stringValue: stringValue,
       );
     },
@@ -271,8 +271,7 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
   ),
 ];
 
-Row renderButtons(
-    {required BuildContext context, required Suggestion suggestion}) {
+Row renderButtons({required BuildContext context, required SelectedDocument<Suggestion> suggestion}) {
   return Row(
     children: [
       Tooltip(
@@ -329,7 +328,7 @@ Row renderButtons(
 
 List<IconButton> renderCreatedByCellIcons({
   required BuildContext context,
-  required SelectedDocument<Suggestion> contextDocument,
+  required SelectedDocument<Suggestion> selectedDocument,
   required String stringValue,
 }) {
   return [
@@ -349,7 +348,7 @@ List<IconButton> renderCreatedByCellIcons({
                 Icons.date_range,
               ),
               title: Text(
-                dateTimeTextTS(contextDocument.data!.creationDate as Timestamp),
+                dateTimeTextTS(selectedDocument.data.creationDate as Timestamp),
               ),
               textColor: Colors.amber[900],
             ),
@@ -361,7 +360,7 @@ List<IconButton> renderCreatedByCellIcons({
     ),
     IconButton(
       onPressed: () {
-        contextDocument.data!.active = false;
+        selectedDocument.data.active = false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: ListTile(
@@ -386,8 +385,8 @@ class SuggestionListItem extends StatelessWidget {
     required this.suggestion,
     required this.selected,
     required this.user,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   final Suggestion suggestion;
   final FFrameUser? user;
   final bool selected;

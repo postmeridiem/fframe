@@ -14,8 +14,8 @@ List<ListGridActionMenu<Suggestion>> listgridActionMenu() {
             label: "Create new ...",
             icon: Icons.playlist_add_outlined,
             processSelection: false,
-            onClick: (context, user, _, DocumentScreenConfig? documentScreenConfig) {
-              documentScreenConfig!.selectDocument(context, documentScreenConfig.create<Suggestion>(context: context));
+            onClick: (context, user, _, documentConfig) {
+              documentConfig.createNew();
               return;
             }),
       ],
@@ -28,7 +28,7 @@ List<ListGridActionMenu<Suggestion>> listgridActionMenu() {
           label: "Set inactive",
           icon: Icons.toggle_off_outlined,
           onClick: (BuildContext context, FFrameUser? user, SelectedDocument<Suggestion>? selectedDocument, _) {
-            selectedDocument?.data?.active = false;
+            selectedDocument?.data.active = false;
             return selectedDocument;
           },
         ),
@@ -36,7 +36,7 @@ List<ListGridActionMenu<Suggestion>> listgridActionMenu() {
           label: "Set Active",
           icon: Icons.toggle_on,
           onClick: (BuildContext context, FFrameUser? user, SelectedDocument<Suggestion>? selectedDocument, _) {
-            selectedDocument?.data?.active = true;
+            selectedDocument?.data.active = true;
             return selectedDocument;
           },
         ),

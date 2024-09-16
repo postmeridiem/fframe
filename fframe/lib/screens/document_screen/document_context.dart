@@ -1,7 +1,12 @@
 part of '../../fframe.dart';
 
-class ContextCanvas extends StatelessWidget {
-  const ContextCanvas({super.key, required this.contextWidgets});
+class ContextCanvas<T> extends StatelessWidget {
+  const ContextCanvas({
+    super.key,
+    required this.selectedDocument,
+    required this.contextWidgets,
+  });
+  final SelectedDocument<T> selectedDocument;
   final List<Widget> contextWidgets;
 
   @override
@@ -28,13 +33,14 @@ class ContextDrawer<T> extends StatelessWidget {
   const ContextDrawer({
     super.key,
     required this.contextDrawerOpen,
+    required this.selectedDocument,
   });
 
+  final SelectedDocument<T> selectedDocument;
   final bool contextDrawerOpen;
 
   @override
   Widget build(BuildContext context) {
-    DocumentScreenConfig documentScreenConfig = DocumentScreenConfig.of(context)!;
     DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
     if (contextDrawerOpen) {
       // if the document canvas gets too small, render this
@@ -42,9 +48,10 @@ class ContextDrawer<T> extends StatelessWidget {
         return SizedBox(
           width: 250,
           child: ContextCanvas(
+            selectedDocument: selectedDocument,
             contextWidgets: documentConfig.document.contextCards!
                 .map(
-                  (contextCardBuilder) => contextCardBuilder(documentScreenConfig.selectionState.data),
+                  (contextCardBuilder) => contextCardBuilder(selectedDocument._data as T),
                 )
                 .toList(),
           ),

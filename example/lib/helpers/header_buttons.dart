@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:fframe/helpers/l10n.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class BarButtonShare extends ConsumerWidget {
-  const BarButtonShare({Key? key}) : super(key: key);
+class BarButtonShare extends StatelessWidget {
+  const BarButtonShare({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return IconButton(
       onPressed: () {
         String url = "${Uri.base}";
@@ -36,11 +36,11 @@ class BarButtonShare extends ConsumerWidget {
   }
 }
 
-class BarButtonDuplicate extends ConsumerWidget {
-  const BarButtonDuplicate({Key? key}) : super(key: key);
+class BarButtonDuplicate extends StatelessWidget {
+  const BarButtonDuplicate({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return IconButton(
       onPressed: () {
         launchUrl(Uri.base).then((_) {
@@ -67,8 +67,8 @@ class BarButtonDuplicate extends ConsumerWidget {
 
 class BarButtonFeedback extends StatelessWidget {
   const BarButtonFeedback({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
   @override
   Widget build(BuildContext context) {
     return IconButton(

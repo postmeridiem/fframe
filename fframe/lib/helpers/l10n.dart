@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:fframe/fframe.dart';
-import 'package:fframe/helpers/console_logger.dart';
 
 class L10n {
   static final L10n instance = L10n._internal();

@@ -9,8 +9,8 @@ enum TabloaderQueryStates { active, done }
 
 class TabloaderScreen<Tabloader> extends StatefulWidget {
   const TabloaderScreen({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<TabloaderScreen> createState() => _TabloaderScreenState();
@@ -79,9 +79,9 @@ Document<FframePage> tabLoaderDocument(BuildContext context) {
               text: "TAB 1",
             );
           },
-          childBuilder: (page, readOnly) {
+          childBuilder: (selectedDocument, readOnly) {
             return Tab01(
-              page: page,
+              page: selectedDocument.data,
               readOnly: readOnly,
               // user: user,
             );
@@ -93,9 +93,9 @@ Document<FframePage> tabLoaderDocument(BuildContext context) {
               text: "TAB 2",
             );
           },
-          childBuilder: (page, readOnly) {
+          childBuilder: (selectedDocument, readOnly) {
             return Tab02(
-              page: page,
+              page: selectedDocument.data,
               readOnly: readOnly,
             );
           },
@@ -106,9 +106,9 @@ Document<FframePage> tabLoaderDocument(BuildContext context) {
               text: "TAB 3",
             );
           },
-          childBuilder: (page, readOnly) {
+          childBuilder: (selectedDocument, readOnly) {
             return Tab03(
-              page: page,
+              page: selectedDocument.data,
               readOnly: readOnly,
             );
           },

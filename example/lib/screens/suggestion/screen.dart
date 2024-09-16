@@ -1,8 +1,8 @@
-// ignore_for_file: unnecessary_import, unnecessary_null_comparison
+// ignore_for_file: unnecessary_import, unnecessary_null_comparison, use_super_parameters
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
-import 'package:fframe/helpers/console_logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // import 'package:example/services/suggestion_service.dart';
@@ -34,7 +34,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         return suggestion.toFirestore();
       },
       createDocumentId: (suggestion) {
-        return "${suggestion.name}";
+        return suggestion.name;
       },
 
       preSave: (Suggestion suggestion) {
@@ -48,11 +48,14 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         return suggestion;
       },
 
-      viewType: widget.suggestionQueryState == SuggestionQueryStates.active ? ViewType.auto : ViewType.grid,
+      viewType: widget.suggestionQueryState == SuggestionQueryStates.active
+          ? ViewType.auto
+          : ViewType.grid,
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
+            "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -61,6 +64,17 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
           data.name ?? "New Suggestion",
           style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
         );
+      },
+
+      query: (query) {
+        // return query.where("active", isNull: true);
+        switch (widget.suggestionQueryState) {
+          case SuggestionQueryStates.active:
+            return query.where("active", isEqualTo: true);
+
+          case SuggestionQueryStates.done:
+            return query.where("active", isEqualTo: false);
+        }
       },
 
       // query: (Query<Suggestion> query) {
@@ -115,17 +129,6 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
       //     ),
       //   ],
       // ),
-
-      query: (query) {
-        // return query.where("active", isNull: true);
-        switch (widget.suggestionQueryState) {
-          case SuggestionQueryStates.active:
-            return query.where("active", isEqualTo: true);
-
-          case SuggestionQueryStates.done:
-            return query.where("active", isEqualTo: false);
-        }
-      },
 
       // Optional Left hand (navigation/document selection pane)
       documentList: DocumentList(
@@ -183,9 +186,11 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             headerBuilder: (() => const DataColumn(
                   label: Text("Name"),
                 )),
-            dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
+            dataCellBuilder: ((Suggestion suggestion, Function save) =>
+                DataCell(
                   Text(suggestion.name ?? "?"),
-                  onTap: () => Console.log("onTap ${suggestion.name}", scope: "exampleApp.Suggestions", level: LogLevel.dev),
+                  onTap: () => Console.log("onTap ${suggestion.name}",
+                      scope: "exampleApp.Suggestions", level: LogLevel.dev),
                   placeholder: false,
                 )),
           ),
@@ -193,7 +198,8 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
             headerBuilder: (() => const DataColumn(
                   label: Text("Active"),
                 )),
-            dataCellBuilder: ((Suggestion suggestion, Function save) => DataCell(
+            dataCellBuilder: ((Suggestion suggestion, Function save) =>
+                DataCell(
                   Switch(
                     value: (suggestion.active ?? false),
                     onChanged: (bool value) {
@@ -207,12 +213,12 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         ],
       ),
       // Center part, shows a firestore doc. Tabs possible
-      document: suggestionDocument(context),
+      document: suggestionDocument(),
     );
   }
 }
 
-Document<Suggestion> suggestionDocument(BuildContext context) {
+Document<Suggestion> suggestionDocument() {
   return Document<Suggestion>(
     scrollableHeader: false,
     showCloseButton: true,
@@ -222,22 +228,22 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
     showDeleteButton: true,
     showSaveButton: true,
     showValidateButton: true,
-    extraActionButtons: (context, suggestion, isReadOnly, isNew, user) {
+    extraActionButtons: (context, selectedDocument, isReadOnly, isNew, user) {
       return [
-        if (suggestion.active == false)
+        if (selectedDocument.data.active == false)
           TextButton.icon(
             onPressed: () {
-              suggestion.active = true;
-              DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+              selectedDocument.data.active = true;
+              selectedDocument.save(context: context);
             },
             icon: const Icon(Icons.check, color: Colors.redAccent),
             label: const Text("Mark as Active"),
           ),
-        if (suggestion.active == true)
+        if (selectedDocument.data.active == true)
           TextButton.icon(
             onPressed: () {
-              suggestion.active = false;
-              DocumentScreenConfig.of(context)!.save<Suggestion>(context: context, closeAfterSave: false);
+              selectedDocument.data.active = false;
+              selectedDocument.save(context: context);
             },
             icon: const Icon(Icons.close, color: Colors.greenAccent),
             label: const Text("Mark as Done"),
@@ -249,9 +255,10 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
               String domain = "https://console.cloud.google.com";
               String application = "firestore/databases/-default-/data/panel";
               String collection = "suggestions";
-              String docId = suggestion.id ?? "";
+              String docId = selectedDocument.data.id ?? "";
               String gcpProject = Fframe.of(context)!.firebaseOptions.projectId;
-              Uri url = Uri.parse("$domain/$application/$collection/$docId?&project=$gcpProject");
+              Uri url = Uri.parse(
+                  "$domain/$application/$collection/$docId?&project=$gcpProject");
               launchUrl(url);
             },
             icon: Icon(
@@ -262,9 +269,8 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
       ];
     },
     documentTabsBuilder: (context, suggestion, isReadOnly, isNew, fFrameUser) {
-      List<DocumentTab<Suggestion>> output = [];
-      if (fFrameUser!.hasRole('user')) {
-        output.add(
+      return [
+        if (fFrameUser!.hasRole('user') || fFrameUser.hasRole('fietsbel'))
           DocumentTab<Suggestion>(
             tabBuilder: (user) {
               return Tab(
@@ -274,17 +280,14 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
                 ),
               );
             },
-            childBuilder: (suggestion, readOnly) {
+            childBuilder: (selectedDocument, readOnly) {
               return Tab01(
-                suggestion: suggestion,
+                suggestion: selectedDocument.data,
                 readOnly: readOnly,
                 // user: user,
               );
             },
           ),
-        );
-      }
-      output.add(
         DocumentTab<Suggestion>(
           tabBuilder: (user) {
             return const Tab(
@@ -294,15 +297,13 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
               ),
             );
           },
-          childBuilder: (suggestion, readOnly) {
+          childBuilder: (selectedDocument, readOnly) {
             return Tab02(
-              suggestion: suggestion,
+              suggestion: selectedDocument.data,
               readOnly: readOnly,
             );
           },
         ),
-      );
-      output.add(
         DocumentTab<Suggestion>(
           tabBuilder: (user) {
             return const Tab(
@@ -312,16 +313,14 @@ Document<Suggestion> suggestionDocument(BuildContext context) {
               ),
             );
           },
-          childBuilder: (suggestion, readOnly) {
+          childBuilder: (selectedDocument, readOnly) {
             return Tab03(
-              suggestion: suggestion,
+              suggestion: selectedDocument.data,
               readOnly: readOnly,
             );
           },
         ),
-      );
-
-      return output;
+      ];
     },
     contextCards: [
       (suggestion) => ContextCard(

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class EmptyPage extends StatefulWidget {
-  const EmptyPage({Key? key}) : super(key: key);
+  const EmptyPage({super.key});
 
   @override
   State<EmptyPage> createState() => _EmptyPageState();

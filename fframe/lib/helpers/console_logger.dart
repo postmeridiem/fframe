@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+part of '../fframe.dart';
 
 class Console {
   static final Console instance = Console._internal();

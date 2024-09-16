@@ -70,7 +70,7 @@ class Fframe extends InheritedWidget {
   final String title;
 
   final FirebaseOptions firebaseOptions;
-  final List<ProviderConfiguration>? providerConfigs;
+  final List<GoogleProvider>? providerConfigs;
   final NavigationConfig navigationConfig;
   final ThemeData darkMode;
   final ThemeData lightMode;
@@ -105,6 +105,15 @@ class Fframe extends InheritedWidget {
     return FRouter.of(context).waitPage(context: context);
   }
 
+  void showSnackBar({required BuildContext context, String? message, Icon? icon, SnackBar? snackBar}) {
+    assert(!(message == null && snackBar == null)); // Ensure not both are null
+    if (snackBar != null) {
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else if (message != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), duration: const Duration(seconds: 3)));
+    }
+  }
+
   void setThemeMode({required ThemeMode newThemeMode}) {
     themeMode = newThemeMode;
   }
@@ -129,11 +138,9 @@ class FFramePreload extends StatelessWidget {
   Widget build(BuildContext context) {
     WidgetsFlutterBinding.ensureInitialized();
 
-    return const ProviderScope(
-      child: RootRestorationScope(
-        restorationId: 'fframe',
-        child: FframeFirebaseLoader(),
-      ),
+    return const RootRestorationScope(
+      restorationId: 'fframe',
+      child: FframeFirebaseLoader(),
     );
   }
 }
@@ -157,8 +164,9 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
 
   @override
   Widget build(BuildContext context) {
+    FirebaseOptions firebaseOptions = Fframe.of(context)!.firebaseOptions;
     return FutureBuilder<FirebaseApp>(
-      future: Firebase.initializeApp(options: Fframe.of(context)!.firebaseOptions),
+      future: Firebase.initializeApp(options: firebaseOptions),
       builder: (BuildContext context, AsyncSnapshot<FirebaseApp> snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
