@@ -1,4 +1,4 @@
-part of '../../fframe.dart';
+part of 'package:fframe/fframe.dart';
 
 class SwimlanesConfig<T> extends ListConfig {
   SwimlanesConfig({

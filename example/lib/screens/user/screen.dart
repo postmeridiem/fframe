@@ -33,9 +33,14 @@ class _UsersScreenState extends State<UsersScreen> {
       // query: (Query<AppUser> query) {
       //   return query.orderBy("lastName");
       // },
-      titleBuilder: (context, data) {
+
+      documentTitle: (context, data) {
+        return data.displayName ?? "New User";
+      },
+
+      headerBuilder: (BuildContext context, String documentTitle, AppUser data) {
         return Text(
-          data.displayName ?? "New User",
+          documentTitle,
           style: TextStyle(
             fontSize: 16,
             color: Theme.of(context).colorScheme.onSurface,
@@ -47,21 +52,6 @@ class _UsersScreenState extends State<UsersScreen> {
       viewType: ViewType.listgrid,
       listGrid: ListGridConfig<AppUser>(
         searchHint: "Search user name",
-        // widgetBackgroundColor: Colors.amber,
-        // widgetColor: Colors.pink,
-        // widgetTextColor: Colors.pink,
-        // widgetTextSize: 20,
-        // widgetAccentColor: Colors.cyan,
-        // rowBorder: 1,
-        // cellBorder: 1,
-        // cellPadding: const EdgeInsets.all(16),
-        // cellVerticalAlignment: TableCellVerticalAlignment.top,
-        // cellBackgroundColor: Colors.amber,
-        // // defaultTextStyle: const TextStyle(fontSize: 16, color: Colors.amber),
-        // showHeader: false,
-        // // showFooter: false,
-        // rowsSelectable: true,
-        // actionBar: sampleActionMenus(),
         columnSettings: listGridColumns,
       ),
 

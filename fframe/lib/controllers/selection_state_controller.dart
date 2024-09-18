@@ -27,8 +27,8 @@ class SelectionStateTracker<T> {
         documentConfig: selectedDocument.documentConfig,
       );
 
-  Text titleBuilder({required BuildContext context}) {
-    return selectedDocument.documentConfig.titleBuilder(context, selectedDocument.data);
+  String documentTitle({required BuildContext context}) {
+    return selectedDocument.documentConfig.documentTitle(context, selectedDocument.data);
   }
 
   Widget titleIcon() {

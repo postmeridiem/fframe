@@ -1,11 +1,12 @@
-part of '../../fframe.dart';
+part of 'package:fframe/fframe.dart';
 
 class DocumentScreen<T> extends StatelessWidget {
   DocumentScreen({
     super.key,
     required this.collection,
     required this.createNew,
-    required this.titleBuilder,
+    required this.documentTitle,
+    this.headerBuilder,
     this.preSave,
     this.preOpen,
     this.createDocumentId,
@@ -38,7 +39,8 @@ class DocumentScreen<T> extends StatelessWidget {
   final ViewType viewType;
   final Query<T> Function(Query<T> query)? query;
   final SearchConfig<T>? searchConfig;
-  final TitleBuilder<T> titleBuilder;
+  final TitleBuilder<T> documentTitle;
+  final HeaderBuilder<T>? headerBuilder;
   final Document<T> document;
   final String queryStringIdParam;
   final String collection;
@@ -68,6 +70,11 @@ class DocumentScreen<T> extends StatelessWidget {
       embeddedDocument = true;
     }
 
+    bool hideTitle = false;
+    if (headerBuilder == null) {
+      hideTitle = true;
+    }
+
     DocumentConfig<T> documentConfig = DocumentConfig<T>(
       formKey: formKey,
       collection: collection,
@@ -88,7 +95,9 @@ class DocumentScreen<T> extends StatelessWidget {
       fromFirestore: fromFirestore,
       query: query,
       searchConfig: searchConfig,
-      titleBuilder: titleBuilder,
+      documentTitle: documentTitle,
+      headerBuilder: headerBuilder,
+      hideTitle: hideTitle,
       contextCardBuilders: contextCardBuilders,
       embeddedDocument: embeddedDocument ?? false,
     );

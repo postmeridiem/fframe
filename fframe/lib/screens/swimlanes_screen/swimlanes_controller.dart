@@ -1,4 +1,4 @@
-part of '../../fframe.dart';
+part of 'package:fframe/fframe.dart';
 
 // ignore: must_be_immutable
 class SwimlanesController extends InheritedModel<SwimlanesController> {

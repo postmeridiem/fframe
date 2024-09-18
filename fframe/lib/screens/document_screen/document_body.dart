@@ -1,4 +1,4 @@
-part of '../../fframe.dart';
+part of 'package:fframe/fframe.dart';
 
 class DocumentBodyWatcher extends StatefulWidget {
   const DocumentBodyWatcher({
@@ -59,15 +59,15 @@ class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
                 border: Border(
                   left: BorderSide(
                     width: 1,
-                    color: Theme.of(context).colorScheme.background,
+                    color: Theme.of(context).colorScheme.surface,
                   ),
                   top: BorderSide(
                     width: 1,
-                    color: Theme.of(context).colorScheme.background,
+                    color: Theme.of(context).colorScheme.surface,
                   ),
                   right: BorderSide(
                     width: 1,
-                    color: Theme.of(context).colorScheme.background,
+                    color: Theme.of(context).colorScheme.surface,
                   ),
                 ),
               ),
@@ -110,7 +110,8 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
     // final T data = selectedDocument.data;
 
     final DocumentHeaderBuilder<T>? documentHeaderBuilder = document.documentHeaderBuilder; // as DocumentHeaderBuilder<T>?;
-    final TitleBuilder<T> titleBuilder = documentConfig.titleBuilder;
+    final TitleBuilder<T> documentTitle = documentConfig.documentTitle;
+    final HeaderBuilder<T>? headerBuilder = documentConfig.headerBuilder;
     final List<Widget Function(T)>? contextCards = documentConfig.contextCardBuilders;
     final ExtraActionButtonsBuilder<T>? extraActionButtons = documentConfig.document.extraActionButtons; // as ExtraActionButtonsBuilder<T>?;
     final DocumentTabsBuilder<T> documentTabsBuilder = document.documentTabsBuilder;
@@ -167,6 +168,10 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                 }
               },
             );
+            Widget documentTitleHeader = const IgnorePointer();
+            if (headerBuilder != null) {
+              documentTitleHeader = headerBuilder(context, documentTitle(context, selectedDocument.data), selectedDocument.data);
+            }
 
             return Column(
               children: [
@@ -185,6 +190,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                             length: selectedDocument.documentTabs.length,
                             child: Scaffold(
                               appBar: AppBar(
+                                toolbarHeight: 40,
                                 flexibleSpace: Row(
                                   children: [
                                     ...selectedDocument.iconButtons(context)!,
@@ -256,7 +262,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                           actions: const [IgnorePointer()], //To surpess the hamburger
                                           primary: false,
                                           toolbarHeight: documentConfig.hideTitle ? 0 : kToolbarHeight,
-                                          title: documentConfig.hideTitle ? const IgnorePointer() : titleBuilder(context, selectedDocument.data),
+                                          title: documentTitleHeader,
                                           pinned: false,
                                           backgroundColor: Theme.of(context).colorScheme.secondary,
                                           bottom: calculateTabBar(

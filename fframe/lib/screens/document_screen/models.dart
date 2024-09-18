@@ -1,4 +1,4 @@
-part of '../../fframe.dart';
+part of 'package:fframe/fframe.dart';
 
 class ListConfig<T> {
   final EdgeInsets contentPadding;
@@ -14,7 +14,8 @@ class DocumentConfig<T> extends ChangeNotifier {
     required this.collection,
     required this.createNew,
     required this.initialViewType,
-    required this.titleBuilder,
+    required this.documentTitle,
+    this.headerBuilder,
     this.preSave,
     this.preOpen,
     this.createDocumentId,
@@ -44,7 +45,8 @@ class DocumentConfig<T> extends ChangeNotifier {
   final ListGridConfig<T>? listGridConfig;
   final SwimlanesConfig<T>? swimlanes;
   final CustomList<T>? customList;
-  final TitleBuilder<T> titleBuilder;
+  final TitleBuilder<T> documentTitle;
+  final HeaderBuilder<T>? headerBuilder;
   final Document<T> document;
   final String queryStringIdParam;
   final String collection;

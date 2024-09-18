@@ -1,6 +1,6 @@
 // ignore_for_file: use_super_parameters
 
-part of '../../fframe.dart';
+part of 'package:fframe/fframe.dart';
 
 // ignore: must_be_immutable
 class ListGridController extends InheritedModel<ListGridController> {

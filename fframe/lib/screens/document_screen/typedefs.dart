@@ -1,4 +1,4 @@
-part of '../../fframe.dart';
+part of 'package:fframe/fframe.dart';
 
 typedef ContextCardBuilder<T> = Widget Function(
   T data,
@@ -55,8 +55,14 @@ typedef DocumentTabChildBuilder<T> = Widget Function(
   bool isReadOnly,
 );
 
-typedef TitleBuilder<T> = Text Function(
+typedef TitleBuilder<T> = String Function(
   BuildContext context,
+  T data,
+);
+
+typedef HeaderBuilder<T> = Widget Function(
+  BuildContext context,
+  String documentTitle,
   T data,
 );
 

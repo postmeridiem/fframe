@@ -25,10 +25,15 @@ class _SettingScreenState extends State<SettingScreen> {
         return query.where("active", isEqualTo: true);
       },
       createNew: () => Setting(),
+
+      documentTitle: (context, data) {
+        return data.name ?? "New Setting";
+      },
+
       //Optional title widget
-      titleBuilder: (context, data) {
+      headerBuilder: (BuildContext context, String documentTitle, Setting data) {
         return Text(
-          data.name ?? "New Setting",
+          documentTitle,
           style: TextStyle(
             fontSize: 16,
             color: Theme.of(context).colorScheme.onSurface,

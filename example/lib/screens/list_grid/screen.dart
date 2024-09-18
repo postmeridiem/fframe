@@ -47,13 +47,23 @@ class _ListGridScreenState extends State<ListGridScreen> {
         createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
       ),
 
+      documentTitle: (context, data) {
+        return data.name ?? "New Suggestion";
+      },
+
       //Optional title widget
-      titleBuilder: (BuildContext context, Suggestion data) {
-        return Text(
-          data.name ?? "New Suggestion",
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
-          ),
+      headerBuilder: (BuildContext context, String documentTitle, Suggestion data) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.bug_report_outlined),
+            Text(
+              documentTitle,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
+            ),
+          ],
         );
       },
 

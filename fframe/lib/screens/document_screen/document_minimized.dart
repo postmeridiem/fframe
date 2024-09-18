@@ -1,4 +1,4 @@
-part of '../../fframe.dart';
+part of 'package:fframe/fframe.dart';
 
 class MinimizedDocumentsWatcher extends StatefulWidget {
   const MinimizedDocumentsWatcher({super.key});
@@ -87,7 +87,7 @@ class MinimizedDocument extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              selectionStateTracker.titleBuilder(context: context),
+              Text(selectionStateTracker.documentTitle(context: context)),
               IconButton(
                 icon: const Icon(
                   Icons.maximize,

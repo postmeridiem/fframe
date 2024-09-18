@@ -55,13 +55,18 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
       ),
 
-      //Optional title widget
-      titleBuilder: (BuildContext context, Suggestion data) {
-        return Text(
-          data.name ?? "New Suggestion",
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-        );
+      // string containing a document title for display purposes
+      documentTitle: (BuildContext context, Suggestion data) {
+        return data.name ?? "New Suggestion";
       },
+
+      //Optional title widget
+      // headerBuilder: (BuildContext context, String documentTitle, Suggestion data) {
+      //   return Text(
+      //     documentTitle,
+      //     style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+      //   );
+      // },
 
       query: (query) {
         // return query.where("active", isNull: true);

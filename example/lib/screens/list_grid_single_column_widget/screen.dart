@@ -45,10 +45,14 @@ class _ListGridScreenState extends State<ListGridScreen> {
         createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
       ),
 
+      documentTitle: (context, data) {
+        return data.name ?? "New Suggestion";
+      },
+
       //Optional title widget
-      titleBuilder: (BuildContext context, Suggestion data) {
+      headerBuilder: (BuildContext context, String documentTitle, Suggestion data) {
         return Text(
-          data.name ?? "New Suggestion",
+          documentTitle,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurface,
           ),
