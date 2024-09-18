@@ -856,7 +856,7 @@ class SelectedDocument<T> {
     return this.open();
   }
 
-  static Future<SelectedDocument?> load<T>({
+  static Future<SelectedDocument<T>?> load<T>({
     required DocumentConfig<T> documentConfig,
     required String documentId,
   }) async {
