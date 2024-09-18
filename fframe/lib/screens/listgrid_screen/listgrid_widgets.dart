@@ -689,7 +689,7 @@ class ListGridHeaderSortingWidget<T> extends StatelessWidget {
                         iconSize: 12,
                         color: (isSorted && !column.descending) ? widgetAccentColor : widgetColor,
                         style: const ButtonStyle(
-                          padding: MaterialStatePropertyAll<EdgeInsetsGeometry>(
+                          padding: WidgetStatePropertyAll<EdgeInsetsGeometry>(
                             EdgeInsets.all(0),
                           ),
                         ),
@@ -708,10 +708,10 @@ class ListGridHeaderSortingWidget<T> extends StatelessWidget {
                         iconSize: 12,
                         color: (isSorted && column.descending) ? widgetAccentColor : widgetColor,
                         style: ButtonStyle(
-                          surfaceTintColor: MaterialStatePropertyAll<Color>(
+                          surfaceTintColor: WidgetStatePropertyAll<Color>(
                             Colors.grey.shade500,
                           ),
-                          padding: const MaterialStatePropertyAll<EdgeInsetsGeometry>(
+                          padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
                             EdgeInsets.all(0),
                           ),
                         ),
@@ -849,8 +849,8 @@ class ListGridPaginator<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ButtonStyle buttonStyle = ButtonStyle(
-      iconColor: MaterialStatePropertyAll(widgetBackgroundColor),
-      backgroundColor: MaterialStatePropertyAll(widgetColor),
+      iconColor: WidgetStatePropertyAll(widgetBackgroundColor),
+      backgroundColor: WidgetStatePropertyAll(widgetColor),
     );
     return Row(
       children: [
@@ -1007,7 +1007,7 @@ class _ListGridBuilderCellState<T> extends State<ListGridBuilderCell<T>> {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.bottom,
       child: MouseRegion(
-        cursor: MaterialStateMouseCursor.clickable,
+        cursor: WidgetStateMouseCursor.clickable,
         child: GestureDetector(
           onTap: () {
             if (widget.column.onTableCellClick != null) {
@@ -1106,7 +1106,7 @@ class _ListGridDataCellState<T> extends State<ListGridDataCell<T>> {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.bottom,
       child: MouseRegion(
-        cursor: MaterialStateMouseCursor.clickable,
+        cursor: WidgetStateMouseCursor.clickable,
         onEnter: cellMouseIn,
         onExit: cellMouseOut,
         child: GestureDetector(

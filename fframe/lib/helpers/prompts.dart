@@ -55,7 +55,7 @@ Future<bool> promptOK({
                   minHeight: 150,
                   maxWidth: 250,
                 ),
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
@@ -150,7 +150,7 @@ Future<bool> promptOKCancel({
                   minHeight: 150,
                   maxWidth: 250,
                 ),
-                color: Theme.of(context).colorScheme.background,
+                color: Theme.of(context).colorScheme.surface,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(

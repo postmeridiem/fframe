@@ -66,7 +66,7 @@ class _SwimlaneHeadersState<T> extends State<SwimlaneHeaders<T>> {
                     opacity: filterOpacity,
                     // opacity: 1,
                     child: MouseRegion(
-                      cursor: MaterialStateMouseCursor.clickable,
+                      cursor: WidgetStateMouseCursor.clickable,
                       onEnter: (PointerEvent details) {
                         setState(() {
                           filterMenuOpen = true;
@@ -502,7 +502,7 @@ class _SwimlanesBuilderCellState<T> extends State<SwimlanesBuilderCell<T>> {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.bottom,
       child: MouseRegion(
-        cursor: MaterialStateMouseCursor.clickable,
+        cursor: WidgetStateMouseCursor.clickable,
         child: GestureDetector(
           onTap: () {
             widget.selectedDocument.open();

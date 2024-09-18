@@ -33,6 +33,7 @@ dependencies:
   firebase_ui_oauth_google:
   google_sign_in:
   google_sign_in_web:
+  firebase_core: ^3.5.0
 
 dev_dependencies:
   flutter_test:

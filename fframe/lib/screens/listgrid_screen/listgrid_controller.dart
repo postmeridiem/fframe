@@ -102,7 +102,7 @@ class ListGridController extends InheritedModel<ListGridController> {
   }
 
   Color get cellBackgroundColor {
-    return listGridConfig.cellBackgroundColor ?? theme.colorScheme.surfaceVariant;
+    return listGridConfig.cellBackgroundColor ?? theme.colorScheme.surfaceContainerHighest;
   }
 
   Color get widgetColor {
