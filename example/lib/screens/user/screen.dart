@@ -38,7 +38,7 @@ class _UsersScreenState extends State<UsersScreen> {
           data.displayName ?? "New User",
           style: TextStyle(
             fontSize: 16,
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         );
       },
@@ -88,7 +88,7 @@ class _UsersScreenState extends State<UsersScreen> {
               },
               icon: Icon(
                 Icons.table_chart_outlined,
-                color: Theme.of(context).colorScheme.onBackground,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
         ];

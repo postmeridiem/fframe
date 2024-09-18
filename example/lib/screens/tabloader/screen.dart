@@ -44,7 +44,7 @@ class _TabloaderScreenState extends State<TabloaderScreen> {
       titleBuilder: (BuildContext context, FframePage data) {
         return Text(
           data.name ?? "New Tabloader",
-          style: TextStyle(color: Theme.of(context).colorScheme.onBackground),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         );
       },
 

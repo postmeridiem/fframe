@@ -33,33 +33,29 @@ class _EmptyPageState extends State<EmptyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          AnimatedCrossFade(
-            alignment: Alignment.center,
-            duration: const Duration(milliseconds: 1250),
-            reverseDuration: const Duration(milliseconds: 1250),
-            firstChild: Icon(
-              Icons.coffee_outlined,
-              size: 32,
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
-            secondChild: Icon(
-              Icons.coffee_maker_outlined,
-              size: 32,
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
-            crossFadeState:
-                _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
-          ),
-          Text(
-            "Much empty",
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.onBackground,
-            ),
-          ),
-        ]);
+    return Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
+      AnimatedCrossFade(
+        alignment: Alignment.center,
+        duration: const Duration(milliseconds: 1250),
+        reverseDuration: const Duration(milliseconds: 1250),
+        firstChild: Icon(
+          Icons.coffee_outlined,
+          size: 32,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        secondChild: Icon(
+          Icons.coffee_maker_outlined,
+          size: 32,
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+        crossFadeState: _first ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+      ),
+      Text(
+        "Much empty",
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
+      ),
+    ]);
   }
 }

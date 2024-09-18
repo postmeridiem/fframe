@@ -24,7 +24,7 @@ class ContextCard<T> extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onPrimaryContainer,
                 )),
-            Divider(color: Theme.of(context).colorScheme.onBackground),
+            Divider(color: Theme.of(context).colorScheme.onSurface),
             Text(
               "injected widget goes here",
               style: TextStyle(

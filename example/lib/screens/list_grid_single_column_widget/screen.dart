@@ -42,8 +42,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
-            "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -51,7 +50,7 @@ class _ListGridScreenState extends State<ListGridScreen> {
         return Text(
           data.name ?? "New Suggestion",
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         );
       },

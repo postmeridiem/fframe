@@ -104,12 +104,12 @@ class _SettingsPagesFormState extends State<SettingsPagesForm> {
                           Icon(
                             Icons.arrow_back,
                             size: 32,
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                           Text(
                             "Select a page",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 20,
                             ),
                           ),
@@ -251,7 +251,7 @@ class _CurrentPageEditorState extends State<CurrentPageEditor> {
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
                   Icons.list,
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 32,
                 ),
               ),
@@ -273,7 +273,7 @@ class _CurrentPageEditorState extends State<CurrentPageEditor> {
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
                   Icons.save,
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 32,
                 ),
               ),

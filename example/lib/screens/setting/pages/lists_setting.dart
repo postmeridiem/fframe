@@ -101,12 +101,12 @@ class _SettingsListsFormState extends State<SettingsListsForm> {
                           Icon(
                             Icons.arrow_back,
                             size: 32,
-                            color: Theme.of(context).colorScheme.onBackground,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                           Text(
                             "Select a list",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 20,
                             ),
                           ),
@@ -272,7 +272,7 @@ class _CurrentListEditorState extends State<CurrentListEditor> {
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
                   Icons.list,
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 32,
                 ),
               ),
@@ -294,7 +294,7 @@ class _CurrentListEditorState extends State<CurrentListEditor> {
                 padding: const EdgeInsets.all(8.0),
                 child: Icon(
                   Icons.save,
-                  color: Theme.of(context).colorScheme.onBackground,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 32,
                 ),
               ),

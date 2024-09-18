@@ -63,7 +63,7 @@ class WaitPage extends StatelessWidget {
     //           child: Text(
     //             waitText,
     //             style: TextStyle(
-    //               color: Theme.of(context).colorScheme.onBackground,
+    //               color: Theme.of(context).colorScheme.onSurface,
     //             ),
     //             textAlign: TextAlign.center,
     //           ),

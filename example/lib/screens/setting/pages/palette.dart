@@ -87,7 +87,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                     const Padding(
                       padding: EdgeInsets.only(top: 12, left: 8),
                       child: Text(
-                        "colorScheme.background\ncolorScheme.onBackground",
+                        "colorScheme.background\ncolorScheme.onSurface",
                         style: TextStyle(
                           fontFamily: "OpenSans",
                         ),
@@ -103,7 +103,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                           child: Text(
                             "Sample Text",
                             style: TextStyle(
-                              color: Theme.of(context).colorScheme.onBackground,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 20,
                               fontFamily: "OpenSans",
                             ),

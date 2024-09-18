@@ -31,7 +31,7 @@ class _SettingScreenState extends State<SettingScreen> {
           data.name ?? "New Setting",
           style: TextStyle(
             fontSize: 16,
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         );
       },

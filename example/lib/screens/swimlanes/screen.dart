@@ -42,8 +42,7 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
 
       createNew: () => Suggestion(
         active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ??
-            "unknown at ${DateTime.now().toLocal()}",
+        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
       ),
 
       //Optional title widget
@@ -51,7 +50,7 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
         return Text(
           data.name ?? "New Suggestion",
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         );
       },
@@ -78,9 +77,7 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
         getPriority: (suggestion) => suggestion.priority,
         myId: (user) => user.uid!,
         following: SwimlanesFollowing<Suggestion>(
-          isFollowing: (suggestion, user) =>
-              suggestion.followers != null &&
-              suggestion.followers!.contains(user.uid),
+          isFollowing: (suggestion, user) => suggestion.followers != null && suggestion.followers!.contains(user.uid),
           startFollowing: (suggestion, user) {
             suggestion.followers ??= [];
             suggestion.followers!.add(user.uid!);
@@ -108,14 +105,12 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
           },
         ),
         // getDueDate: (suggestion) => suggestion.dueDate,
-        taskWidgetHeader: (selectedDocument, swimlanesConfig, fFrameUser) =>
-            SuggestionHeader(
+        taskWidgetHeader: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionHeader(
           selectedDocument: selectedDocument,
           swimlanesConfig: swimlanesConfig,
           fFrameUser: fFrameUser,
         ),
-        taskWidgetBody: (selectedDocument, swimlanesConfig, fFrameUser) =>
-            SuggestionCard(
+        taskWidgetBody: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionCard(
           selectedDocument: selectedDocument,
           swimlanesConfig: swimlanesConfig,
           fFrameUser: fFrameUser,

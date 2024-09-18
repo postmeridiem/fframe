@@ -12,8 +12,7 @@ class ContextCard extends StatelessWidget {
       child: SizedBox(
         width: double.infinity,
         child: Padding(
-          padding:
-              const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+          padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
           child: Column(children: [
             Text("Unnamed",
                 style: TextStyle(
@@ -22,7 +21,7 @@ class ContextCard extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onPrimaryContainer,
                 )),
-            Divider(color: Theme.of(context).colorScheme.onBackground),
+            Divider(color: Theme.of(context).colorScheme.onSurface),
             Text(
               "injected widget goes here",
               style: TextStyle(
