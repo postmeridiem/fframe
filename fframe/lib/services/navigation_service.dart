@@ -214,12 +214,8 @@ class NavigationNotifier extends ChangeNotifier {
 
       String? docId = SelectionState.instance.pendingUri!.queryParameters[documentConfig.queryStringIdParam];
       if (docId != null) {
-        SelectedDocument<T> selectedDocument = SelectedDocument<T>(id: docId, documentConfig: documentConfig);
-        selectedDocument.open();
+        SelectedDocument.load<T>(id: docId, documentConfig: documentConfig);
       }
-
-      // updateProviders();
-      // notifyListeners();
     }
   }
 

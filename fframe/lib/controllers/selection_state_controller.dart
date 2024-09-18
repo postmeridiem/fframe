@@ -307,10 +307,16 @@ class SelectedDocument<T> {
     bool isNew = false,
   }) {
     _id = id;
+
     if (data != null) {
+      //Data has been injected;
       _data = data;
     } else if (this.documentSnapshot != null) {
+      //There is a documentSnapshot which should hold dagta
       _data = (documentSnapshot!.exists) ? documentSnapshot!.data() : null;
+    } else if (id != _createNewDocumentId(data: data)) {
+      //There is a valid id, yet no data;
+      // throw ("Invalid instantiation, please insert data node or documentSnapshot node");
     } else {
       _data = documentConfig.createNew();
     }
@@ -858,16 +864,21 @@ class SelectedDocument<T> {
 
   static Future<SelectedDocument<T>?> load<T>({
     required DocumentConfig<T> documentConfig,
-    required String documentId,
+    required String id,
   }) async {
-    if (SelectionState.instance.isDocumentLoaded(documentConfig: documentConfig, documentId: documentId)) {
-      return Future.value(DatabaseService<T>().selectedDocument(documentId: documentId, documentConfig: documentConfig)).then((SelectedDocument<T>? selectedDocument) {
-        if (selectedDocument != null) {
-          return selectedDocument.open();
-        }
-        throw ("Document $documentId could not be loaded from ${documentConfig.collection}");
-      }).onError((error, stackTrace) => SelectionState.instance.clear());
-    }
-    return null;
+    // bool isAlreadyLoaded = SelectionState.instance.isDocumentLoaded(documentConfig: documentConfig, documentId: id);
+    // if (isAlreadyLoaded) {
+    //   debugPrint("Document is already in scope");
+    return Future.value(DatabaseService<T>().selectedDocument(documentId: id, documentConfig: documentConfig)).then((SelectedDocument<T>? selectedDocument) {
+      if (selectedDocument != null) {
+        return selectedDocument.open();
+      }
+      throw ("Document $id could not be loaded from ${documentConfig.collection}");
+    }).onError((error, stackTrace) => SelectionState.instance.clear());
+    // } else {
+    //   debugPrint("Document must be read from the database");
+
+    // }
+    // return null;
   }
 }
