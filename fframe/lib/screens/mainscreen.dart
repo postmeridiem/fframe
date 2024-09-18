@@ -90,34 +90,42 @@ class _MainScreenState extends State<MainScreen> {
                 ),
               ),
             ),
-          Expanded(
-            child: Scaffold(
-              primary: false,
-              appBar: FAppBarLoader(
-                context: context,
-              ),
-              body: Scaffold(
-                primary: false,
-                appBar: AppBar(
-                  toolbarHeight: 0,
-                ),
-                body: Stack(
-                  children: [
-                    ListenableBuilder(
-                      listenable: TargetState.instance,
-                      builder: (context, _) {
-                        NavigationTarget navigationTarget = TargetState.instance.navigationTarget;
-                        return Container(
-                          key: ValueKey("navTarget_${navigationTarget.path}"),
-                          child: navigationTarget.contentPane,
-                        );
-                      },
+          ListenableBuilder(
+            listenable: TargetState.instance,
+            builder: (context, _) {
+              NavigationTarget navigationTarget = TargetState.instance.navigationTarget;
+              return Expanded(
+                child: Scaffold(
+                  primary: false,
+                  appBar: FAppBarLoader(
+                    context: context,
+                  ),
+                  body: Scaffold(
+                    primary: false,
+                    appBar: AppBar(
+                      toolbarHeight: 0,
                     ),
-                    const MinimizedDocumentsWatcher(),
-                  ],
+                    body:
+                        // Stack(
+                        //   children: [
+                        // ListenableBuilder(
+                        //   listenable: TargetState.instance,
+                        //   builder: (context, _) {
+                        //     NavigationTarget navigationTarget = TargetState.instance.navigationTarget;
+                        //     return
+                        Container(
+                      key: ValueKey("navTarget_${navigationTarget.path}"),
+                      child: navigationTarget.contentPane,
+                      //   );
+                      // },
+                    ),
+                    //   const MinimizedDocumentsWatcher(),
+                    // ],
+                    // ),
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         ],
       ),
