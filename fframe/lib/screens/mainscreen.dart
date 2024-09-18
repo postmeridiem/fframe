@@ -39,96 +39,90 @@ class _MainScreenState extends State<MainScreen> {
 
     Console.log("Build to size: ${screenSize.toString()}", scope: "fframeLog.MainScreen", level: LogLevel.fframe);
 
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 2,
-        automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-        surfaceTintColor: Theme.of(context).colorScheme.primaryContainer,
-        title: Text(Fframe.of(context)?.title ?? ""),
-        leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
-            ? IconButton(
-                onPressed: () {
-                  if (_scaffoldKey.currentState!.isDrawerOpen) {
-                    _scaffoldKey.currentState!.closeDrawer();
-                  } else {
-                    _scaffoldKey.currentState!.openDrawer();
-                  }
-                },
-                icon: const Icon(Icons.menu))
-            : const IgnorePointer(),
-        actions: [
-          ...?Fframe.of(context)?.globalActions,
-          const ProfileButton(),
-        ],
-      ),
-      drawer: FRouter.of(context).drawer(
-        context: context,
-        drawerHeader: DrawerHeader(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
+    return Stack(
+      children: [
+        Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            centerTitle: true,
+            elevation: 2,
+            automaticallyImplyLeading: false,
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+            surfaceTintColor: Theme.of(context).colorScheme.primaryContainer,
+            title: Text(Fframe.of(context)?.title ?? ""),
+            leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
+                ? IconButton(
+                    onPressed: () {
+                      if (_scaffoldKey.currentState!.isDrawerOpen) {
+                        _scaffoldKey.currentState!.closeDrawer();
+                      } else {
+                        _scaffoldKey.currentState!.openDrawer();
+                      }
+                    },
+                    icon: const Icon(Icons.menu))
+                : const IgnorePointer(),
+            actions: [
+              ...?Fframe.of(context)?.globalActions,
+              const ProfileButton(),
+            ],
           ),
-          child: Text(
-            widget.appTitle,
-            style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
-          ),
-        ),
-      ),
-      body: Row(
-        children: [
-          if (screenSize == ScreenSize.large)
-            Container(
-              alignment: Alignment.topCenter,
-              color: Theme.of(context).colorScheme.surface,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: IntrinsicHeight(
-                  child: FRouter.of(context).navigationRail(),
-                ),
+          drawer: FRouter.of(context).drawer(
+            context: context,
+            drawerHeader: DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              child: Text(
+                widget.appTitle,
+                style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
               ),
             ),
-          ListenableBuilder(
-            listenable: TargetState.instance,
-            builder: (context, _) {
-              NavigationTarget navigationTarget = TargetState.instance.navigationTarget;
-              return Expanded(
-                child: Scaffold(
-                  primary: false,
-                  appBar: FAppBarLoader(
-                    context: context,
-                  ),
-                  body: Scaffold(
-                    primary: false,
-                    appBar: AppBar(
-                      toolbarHeight: 0,
+          ),
+          body: Row(
+            children: [
+              if (screenSize == ScreenSize.large)
+                Container(
+                  alignment: Alignment.topCenter,
+                  color: Theme.of(context).colorScheme.surface,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: IntrinsicHeight(
+                      child: FRouter.of(context).navigationRail(),
                     ),
-                    body:
-                        // Stack(
-                        //   children: [
-                        // ListenableBuilder(
-                        //   listenable: TargetState.instance,
-                        //   builder: (context, _) {
-                        //     NavigationTarget navigationTarget = TargetState.instance.navigationTarget;
-                        //     return
-                        Container(
-                      key: ValueKey("navTarget_${navigationTarget.path}"),
-                      child: navigationTarget.contentPane,
-                      //   );
-                      // },
-                    ),
-                    //   const MinimizedDocumentsWatcher(),
-                    // ],
-                    // ),
                   ),
                 ),
-              );
-            },
+              ListenableBuilder(
+                listenable: TargetState.instance,
+                builder: (context, _) {
+                  NavigationTarget navigationTarget = TargetState.instance.navigationTarget;
+                  return Expanded(
+                    child: Scaffold(
+                      primary: false,
+                      appBar: FAppBarLoader(
+                        context: context,
+                      ),
+                      body: Scaffold(
+                        primary: false,
+                        appBar: AppBar(
+                          toolbarHeight: 0,
+                        ),
+                        body: Container(
+                          key: ValueKey("navTarget_${navigationTarget.path}"),
+                          child: navigationTarget.contentPane,
+                          //   );
+                          // },
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        const MinimizedDocumentsWatcher(),
+      ],
     );
   }
 }
