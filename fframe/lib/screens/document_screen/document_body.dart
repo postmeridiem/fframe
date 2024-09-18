@@ -209,7 +209,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                       ),
                                       icon: Icon(
                                         Icons.minimize,
-                                        color: Theme.of(context).colorScheme.onBackground,
+                                        color: Theme.of(context).indicatorColor,
                                       ),
                                       onPressed: () {
                                         SelectionState.instance.minimizeDocument(selectedDocument);
@@ -224,7 +224,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                       ),
                                       icon: Icon(
                                         Icons.close,
-                                        color: Theme.of(context).colorScheme.onBackground,
+                                        color: Theme.of(context).indicatorColor,
                                       ),
                                       onPressed: () {
                                         selectedDocument.close(context: context);

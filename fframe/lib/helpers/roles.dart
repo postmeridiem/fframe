@@ -126,7 +126,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
                         onChanged: (bool newValue) => {
                           if (newValue == false) {removeUserRole(context, mapEntry.key)} else {addUserRole(context, mapEntry.key)}
                         },
-                        activeColor: Theme.of(context).colorScheme.onBackground,
+                        activeColor: Theme.of(context).indicatorColor,
                       ),
                     )
                     .toList(),

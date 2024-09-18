@@ -36,12 +36,13 @@ class DarkModeThemeConfig {
 
   // color that sets the default surface of the app
   // (window chrome)
-  Color constSurfaceColor = const Color.fromARGB(255, 78, 4, 31);
+  Color constSurfaceColor = const Color.fromARGB(255, 41, 3, 16);
   Color constOnSurfaceColor = const Color.fromARGB(255, 255, 255, 255);
 
   // color that sets the secondary surface of the app
   // (field backgrounds)
-  Color constSurfaceVariantColor = const Color.fromARGB(255, 71, 71, 71);
+  // Color constSurfaceVariantColor = const Color.fromARGB(255, 71, 71, 71);
+  Color constSurfaceVariantColor = const Color.fromARGB(255, 14, 13, 13);
   Color constOnSurfaceVariantColor = const Color.fromARGB(255, 238, 238, 238);
 
   // color that sets the primary accent color

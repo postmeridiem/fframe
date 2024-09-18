@@ -77,7 +77,7 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
   // late Map<String, bool> listGridSelection = {};
 
   Color get swimlaneBackgroundColor {
-    return swimlanesConfig.swimlaneBackgroundColor ?? theme.colorScheme.secondaryContainer;
+    return swimlanesConfig.swimlaneBackgroundColor ?? theme.colorScheme.surfaceVariant;
   }
 
   Color get swimlaneHeaderColor {
@@ -93,15 +93,15 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
   }
 
   Color get swimlaneSeparatorColor {
-    return swimlanesConfig.swimlaneHeaderSeparatorColor ?? theme.colorScheme.onBackground;
+    return swimlanesConfig.swimlaneHeaderSeparatorColor ?? theme.indicatorColor;
   }
 
   Color get taskCardColor {
-    return swimlanesConfig.taskCardColor ?? theme.colorScheme.surfaceVariant;
+    return swimlanesConfig.taskCardColor ?? theme.colorScheme.secondary;
   }
 
   Color get taskCardTextColor {
-    return swimlanesConfig.taskCardTextColor ?? theme.colorScheme.onSurfaceVariant;
+    return swimlanesConfig.taskCardTextColor ?? theme.colorScheme.onSecondary;
   }
 
   Color get taskCardHeaderColor {

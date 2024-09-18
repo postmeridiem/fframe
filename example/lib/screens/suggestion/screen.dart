@@ -240,7 +240,12 @@ Document<Suggestion> suggestionDocument() {
               selectedDocument.save(context: context);
             },
             icon: const Icon(Icons.close, color: Colors.greenAccent),
-            label: const Text("Mark as Done"),
+            label: Text(
+              "Mark as Done",
+              style: TextStyle(
+                color: Theme.of(context).indicatorColor,
+              ),
+            ),
           ),
         if (user != null && user.hasRole("firestoreaccess"))
           IconButton(
@@ -256,7 +261,7 @@ Document<Suggestion> suggestionDocument() {
             },
             icon: Icon(
               Icons.table_chart_outlined,
-              color: Theme.of(context).colorScheme.onSurface,
+              color: Theme.of(context).indicatorColor,
             ),
           ),
       ];
