@@ -610,7 +610,7 @@ class SelectedDocument<T> {
       if (saveResult.result) {
         //Success
         Console.log("Save was successfull", scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
-
+        _isNew = false;
         if (closeAfterSave) {
           if (context.mounted) {
             close(context: context, skipWarning: true);
@@ -843,6 +843,7 @@ class SelectedDocument<T> {
       documentConfig: documentConfig,
       id: createDocumentId ?? "new",
       data: creationData, //This goes back to the intantiator
+      isNew: true,
     );
     return openAfterCreate ? selectedDocument.open() : selectedDocument;
   }
@@ -855,6 +856,7 @@ class SelectedDocument<T> {
       documentConfig: documentConfig,
       id: null,
       data: data, //This goes back to the intantiator
+      isNew: true,
     );
   }
 
