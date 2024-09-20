@@ -579,6 +579,14 @@ class SelectedDocument<T> {
   save({required BuildContext context, bool closeAfterSave = true, T? data}) async {
     if (validate(context: context, moveToTab: true) == -1) {
       String? docId = documentId;
+
+      if (data == null && _data != null) {
+        //Accept the class level data
+        data = _data;
+      } else if (data == null) {
+        throw ("Unable to save a document that does not hold data.");
+      }
+
       if (isNew == true) {
         docId = _createNewDocumentId(data: data as T);
       }
