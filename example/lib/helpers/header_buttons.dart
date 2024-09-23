@@ -15,15 +15,17 @@ class BarButtonShare extends StatelessWidget {
       onPressed: () {
         String url = "${Uri.base}";
         FlutterClipboard.copy(url).then((_) {
-          return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(
-                L10n.string(
-                  "header_copydeeplink_message",
-                  placeholder: "Copied current location to clipboard.",
-                  namespace: 'fframe',
+          if (context.mounted) {
+            return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                  L10n.string(
+                    "header_copydeeplink_message",
+                    placeholder: "Copied current location to clipboard.",
+                    namespace: 'fframe',
+                  ),
                 ),
-              ),
-              behavior: SnackBarBehavior.floating));
+                behavior: SnackBarBehavior.floating));
+          }
         });
       },
       icon: const Icon(Icons.share),
@@ -44,15 +46,17 @@ class BarButtonDuplicate extends StatelessWidget {
     return IconButton(
       onPressed: () {
         launchUrl(Uri.base).then((_) {
-          return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(
-                L10n.string(
-                  "header_opennewtab_message",
-                  placeholder: "Duplicated current page in new tab.",
-                  namespace: 'fframe',
+          if (context.mounted) {
+            return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text(
+                  L10n.string(
+                    "header_opennewtab_message",
+                    placeholder: "Duplicated current page in new tab.",
+                    namespace: 'fframe',
+                  ),
                 ),
-              ),
-              behavior: SnackBarBehavior.floating));
+                behavior: SnackBarBehavior.floating));
+          }
         });
       },
       icon: const Icon(Icons.open_in_new),
@@ -74,7 +78,9 @@ class BarButtonFeedback extends StatelessWidget {
     return IconButton(
       onPressed: () {
         launchUrl(Uri.https("github.com", "postmeridiem/fframe/issues")).then((_) {
-          return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Opened issue tracker in a new tab."), behavior: SnackBarBehavior.floating));
+          if (context.mounted) {
+            return ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Opened issue tracker in a new tab."), behavior: SnackBarBehavior.floating));
+          }
         });
       },
       icon: const Icon(Icons.pest_control),

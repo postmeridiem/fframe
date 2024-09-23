@@ -31,7 +31,7 @@ class _SignInPageState extends State<SignInPage> {
       return providerConfiguration.providerId == "google.com";
     }).toList();
     if (providerConfigurations != null && providerConfigurations.isNotEmpty) {
-      GoogleProvider providerConfiguration = providerConfigurations.first as GoogleProvider;
+      GoogleProvider providerConfiguration = providerConfigurations.first;
       webClientId = providerConfiguration.clientId;
     }
 

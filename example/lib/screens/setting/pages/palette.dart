@@ -94,7 +94,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
-                      color: Theme.of(context).colorScheme.background,
+                      color: Theme.of(context).colorScheme.surface,
                       child: SizedBox(
                         height: 60,
                         width: 250,
@@ -249,7 +249,7 @@ class _PaletteFormFormState extends State<PaletteForm> {
                       ),
                     ),
                     Card(
-                      color: Theme.of(context).colorScheme.surfaceVariant,
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
                       child: SizedBox(
                         height: 60,
                         width: 250,

@@ -1,5 +1,4 @@
 import 'package:fframe/services/navigation_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fframe/constants/constants.dart';
@@ -23,9 +22,9 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
+class _MainScreenState extends State<MainScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  late TabController _tabController;
+
   // late TabController _subTabController;
   // late OverlayState overlayState;
   // late OverlayEntry overlayEntry;
@@ -40,124 +39,165 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
     Console.log("Build to size: ${screenSize.toString()}", scope: "fframeLog.MainScreen", level: LogLevel.fframe);
 
-    if (FRouter.of(context).hasTabs) {
-      _tabController = TabController(
-        initialIndex: FRouter.of(context).currentTab,
-        vsync: this,
-        length: FRouter.of(context).tabLength,
-      );
-
-      _tabController.addListener(
-        () => FRouter.of(context).tabSwitch(tabController: _tabController),
-      );
-    }
-
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        centerTitle: true,
-        elevation: 2,
-        automaticallyImplyLeading: false,
-        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-        surfaceTintColor: Theme.of(context).colorScheme.primaryContainer,
-        title: Text(Fframe.of(context)?.title ?? ""),
-        leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
-            ? IconButton(
-                onPressed: () {
-                  if (_scaffoldKey.currentState!.isDrawerOpen) {
-                    _scaffoldKey.currentState!.closeDrawer();
-                  } else {
-                    _scaffoldKey.currentState!.openDrawer();
-                  }
-                },
-                icon: const Icon(Icons.menu))
-            : const IgnorePointer(),
-        actions: [
-          ...?Fframe.of(context)?.globalActions,
-          const ProfileButton(),
-        ],
-      ),
-      drawer: FRouter.of(context).drawer(
-        context: context,
-        drawerHeader: DrawerHeader(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer,
+    return Stack(
+      children: [
+        Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            centerTitle: true,
+            elevation: 2,
+            automaticallyImplyLeading: false,
+            backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+            foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+            surfaceTintColor: Theme.of(context).colorScheme.primaryContainer,
+            title: Text(Fframe.of(context)?.title ?? ""),
+            leading: (ScreenSize.phone == screenSize || ScreenSize.tablet == screenSize)
+                ? IconButton(
+                    onPressed: () {
+                      if (_scaffoldKey.currentState!.isDrawerOpen) {
+                        _scaffoldKey.currentState!.closeDrawer();
+                      } else {
+                        _scaffoldKey.currentState!.openDrawer();
+                      }
+                    },
+                    icon: const Icon(Icons.menu))
+                : const IgnorePointer(),
+            actions: [
+              ...?Fframe.of(context)?.globalActions,
+              const ProfileButton(),
+            ],
           ),
-          child: Text(
-            widget.appTitle,
-            style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
-          ),
-        ),
-      ),
-      body: Row(
-        children: [
-          if (screenSize == ScreenSize.large)
-            Container(
-              alignment: Alignment.topCenter,
-              color: Theme.of(context).colorScheme.surface,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: IntrinsicHeight(
-                  child: FRouter.of(context).navigationRail(),
-                ),
+          drawer: FRouter.of(context).drawer(
+            context: context,
+            drawerHeader: DrawerHeader(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+              ),
+              child: Text(
+                widget.appTitle,
+                style: TextStyle(color: Theme.of(context).colorScheme.onPrimaryContainer),
               ),
             ),
-          Expanded(
-            child: Scaffold(
-              primary: false,
-              appBar: AppBar(
-                backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                toolbarHeight: 0,
-                bottom: (FRouter.of(context).hasTabs && FRouter.of(context).tabLength > 1)
-                    ? TabBar(
-                        labelColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                        unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                        controller: _tabController,
-                        tabs: FRouter.of(context).tabBar(context),
-                      )
-                    : null,
-              ),
-              body: Scaffold(
-                primary: false,
-                appBar: AppBar(
-                  toolbarHeight: 0,
-                  // bottom: FRouter.of(context).hasSubTabs
-                  //     ? TabBar(
-                  //         labelColor: Theme.of(context).colorScheme.onPrimaryContainer,
-                  //         unselectedLabelColor: Theme.of(context).colorScheme.onPrimaryContainer,
-                  //         controller: _subTabController,
-                  //         tabs: FRouter.of(context).subTabBar(context),
-                  //       )
-                  //     : null,
+          ),
+          body: Row(
+            children: [
+              if (screenSize == ScreenSize.large)
+                Container(
+                  alignment: Alignment.topCenter,
+                  color: Theme.of(context).colorScheme.surface,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: IntrinsicHeight(
+                      child: FRouter.of(context).navigationRail(),
+                    ),
+                  ),
                 ),
-                body: Stack(
-                  children: [
-                    ListenableBuilder(
-                      listenable: TargetState.instance,
-                      builder: (context, _) {
-                        NavigationTarget navigationTarget = TargetState.instance.navigationTarget;
-                        return Container(
+              ListenableBuilder(
+                listenable: TargetState.instance,
+                builder: (context, _) {
+                  NavigationTarget navigationTarget = TargetState.instance.navigationTarget;
+                  return Expanded(
+                    child: Scaffold(
+                      primary: false,
+                      appBar: FAppBarLoader(
+                        context: context,
+                      ),
+                      body: Scaffold(
+                        primary: false,
+                        appBar: AppBar(
+                          toolbarHeight: 0,
+                        ),
+                        body: Container(
                           key: ValueKey("navTarget_${navigationTarget.path}"),
                           child: navigationTarget.contentPane,
-                        );
-                      },
+                          //   );
+                          // },
+                        ),
+                      ),
                     ),
-                    const MinimizedDocumentsWatcher(),
-                  ],
-                ),
+                  );
+                },
               ),
-            ),
+            ],
           ),
-        ],
+        ),
+        const MinimizedDocumentsWatcher(),
+      ],
+    );
+  }
+}
+
+class FAppBarLoader extends StatelessWidget implements PreferredSizeWidget {
+  final BuildContext context;
+  const FAppBarLoader({super.key, required this.context});
+
+  @override
+  Widget build(BuildContext context) {
+    FRouter fRouter = FRouter.of(context);
+    return ListenableBuilder(
+        listenable: TargetState.instance,
+        builder: (context, _) {
+          final hasTabs = fRouter.hasTabs;
+          final tabLength = fRouter.tabLength;
+          if (hasTabs && tabLength > 1) {
+            return FAppBar(
+              hasTabs: hasTabs,
+              tabLength: tabLength,
+            );
+          } else {
+            return const IgnorePointer();
+          }
+        });
+  }
+
+  @override
+  Size get preferredSize => Size.fromHeight((FRouter.of(context).hasTabs && FRouter.of(context).tabLength > 1) ? kToolbarHeight : 0);
+}
+
+class FAppBar extends StatefulWidget {
+  final bool hasTabs;
+  final int tabLength;
+  const FAppBar({
+    super.key,
+    required this.hasTabs,
+    required this.tabLength,
+  });
+
+  @override
+  State<FAppBar> createState() => _FAppBarState();
+}
+
+class _FAppBarState extends State<FAppBar> with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  Widget build(BuildContext context) {
+    _tabController = TabController(
+      initialIndex: FRouter.of(context).currentTab,
+      vsync: this,
+      length: FRouter.of(context).tabLength,
+    );
+
+    _tabController.addListener(
+      () => FRouter.of(context).tabSwitch(tabController: _tabController),
+    );
+
+    return AppBar(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      toolbarHeight: kToolbarHeight,
+      bottom: TabBar(
+        labelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+        unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+        controller: _tabController, // Make sure this is initialized correctly
+        tabs: FRouter.of(context).tabBar(context),
       ),
     );
   }
 
   @override
   void dispose() {
-    // _tabController.dispose();
     super.dispose();
+    _tabController.dispose();
   }
 }
 

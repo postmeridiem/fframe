@@ -22,8 +22,7 @@ final listGridNavigationTarget = NavigationTarget(
       title: "Open",
       path: "open",
       private: true,
-      contentPane:
-          const ListGridScreen(listgridQueryState: ListGridQueryStates.active),
+      contentPane: const ListGridScreen(listgridQueryState: ListGridQueryStates.active),
       destination: Destination(
         icon: Icon(
           Icons.toggle_on,
@@ -45,8 +44,7 @@ final listGridNavigationTarget = NavigationTarget(
       title: "Done",
       path: "done",
       private: true,
-      contentPane: const ListGridScreen(
-          listgridQueryState: ListGridQueryStates.inactive),
+      contentPane: const ListGridScreen(listgridQueryState: ListGridQueryStates.inactive),
       destination: Destination(
         icon: const Icon(Icons.toggle_off_outlined),
         navigationLabel: () => Text(
@@ -59,6 +57,28 @@ final listGridNavigationTarget = NavigationTarget(
         tabLabel: () => L10n.string(
           'suggestions_tab_done',
           placeholder: 'Inactive',
+          namespace: 'global',
+        ),
+      ),
+      roles: ['Developer'],
+    ),
+    NavigationTab(
+      title: "All",
+      path: "all",
+      private: true,
+      contentPane: const ListGridScreen(listgridQueryState: ListGridQueryStates.inactive),
+      destination: Destination(
+        icon: const Icon(Icons.toggle_off_outlined),
+        navigationLabel: () => Text(
+          L10n.string(
+            'suggestions_tab_all',
+            placeholder: 'All',
+            namespace: 'global',
+          ),
+        ),
+        tabLabel: () => L10n.string(
+          'suggestions_tab_all',
+          placeholder: 'All',
           namespace: 'global',
         ),
       ),

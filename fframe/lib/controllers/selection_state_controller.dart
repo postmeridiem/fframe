@@ -307,10 +307,16 @@ class SelectedDocument<T> {
     bool isNew = false,
   }) {
     _id = id;
+
     if (data != null) {
+      //Data has been injected;
       _data = data;
     } else if (this.documentSnapshot != null) {
+      //There is a documentSnapshot which should hold dagta
       _data = (documentSnapshot!.exists) ? documentSnapshot!.data() : null;
+    } else if (id != _createNewDocumentId(data: data)) {
+      //There is a valid id, yet no data;
+      // throw ("Invalid instantiation, please insert data node or documentSnapshot node");
     } else {
       _data = documentConfig.createNew();
     }
@@ -573,6 +579,14 @@ class SelectedDocument<T> {
   save({required BuildContext context, bool closeAfterSave = true, T? data}) async {
     if (validate(context: context, moveToTab: true) == -1) {
       String? docId = documentId;
+
+      if (data == null && _data != null) {
+        //Accept the class level data
+        data = _data;
+      } else if (data == null) {
+        throw ("Unable to save a document that does not hold data.");
+      }
+
       if (isNew == true) {
         docId = _createNewDocumentId(data: data as T);
       }
@@ -604,7 +618,7 @@ class SelectedDocument<T> {
       if (saveResult.result) {
         //Success
         Console.log("Save was successfull", scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
-
+        _isNew = false;
         if (closeAfterSave) {
           if (context.mounted) {
             close(context: context, skipWarning: true);
@@ -837,6 +851,7 @@ class SelectedDocument<T> {
       documentConfig: documentConfig,
       id: createDocumentId ?? "new",
       data: creationData, //This goes back to the intantiator
+      isNew: true,
     );
     return openAfterCreate ? selectedDocument.open() : selectedDocument;
   }
@@ -849,6 +864,7 @@ class SelectedDocument<T> {
       documentConfig: documentConfig,
       id: null,
       data: data, //This goes back to the intantiator
+      isNew: true,
     );
   }
 
@@ -856,18 +872,23 @@ class SelectedDocument<T> {
     return this.open();
   }
 
-  static Future<SelectedDocument?> load<T>({
+  static Future<SelectedDocument<T>?> load<T>({
     required DocumentConfig<T> documentConfig,
-    required String documentId,
+    required String id,
   }) async {
-    if (SelectionState.instance.isDocumentLoaded(documentConfig: documentConfig, documentId: documentId)) {
-      return Future.value(DatabaseService<T>().selectedDocument(documentId: documentId, documentConfig: documentConfig)).then((SelectedDocument<T>? selectedDocument) {
-        if (selectedDocument != null) {
-          return selectedDocument.open();
-        }
-        throw ("Document $documentId could not be loaded from ${documentConfig.collection}");
-      }).onError((error, stackTrace) => SelectionState.instance.clear());
-    }
-    return null;
+    // bool isAlreadyLoaded = SelectionState.instance.isDocumentLoaded(documentConfig: documentConfig, documentId: id);
+    // if (isAlreadyLoaded) {
+    //   debugPrint("Document is already in scope");
+    return Future.value(DatabaseService<T>().selectedDocument(documentId: id, documentConfig: documentConfig)).then((SelectedDocument<T>? selectedDocument) {
+      if (selectedDocument != null) {
+        return selectedDocument.open();
+      }
+      throw ("Document $id could not be loaded from ${documentConfig.collection}");
+    }).onError((error, stackTrace) => SelectionState.instance.clear());
+    // } else {
+    //   debugPrint("Document must be read from the database");
+
+    // }
+    // return null;
   }
 }
