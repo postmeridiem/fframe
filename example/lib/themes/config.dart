@@ -21,7 +21,7 @@ class DarkModeThemeConfig {
   // DARK MODE =======
   final brightness = Brightness.dark;
   // color that sets the appbar, navrail, contextwidgets and FAB
-  Color constPrimaryColor = const Color.fromARGB(255, 41, 3, 16);
+  Color constPrimaryColor = const Color.fromARGB(255, 78, 6, 31);
   Color constOnPrimaryColor = const Color.fromARGB(255, 255, 255, 255);
 
   // color that sets 'secondary' level control widgets
@@ -31,12 +31,12 @@ class DarkModeThemeConfig {
 
   // color that sets 'tertiary' level control widgets
   // (the background of fields and the text that goes in there)
-  Color constTertiaryColor = const Color.fromARGB(255, 46, 3, 16);
+  Color constTertiaryColor = const Color.fromARGB(255, 14, 13, 13);
   Color constOnTertiaryColor = const Color.fromARGB(255, 238, 238, 238);
 
   // color that sets the default surface of the app
   // (window chrome)
-  Color constSurfaceColor = const Color.fromARGB(255, 41, 3, 16);
+  Color constSurfaceColor = const Color.fromARGB(255, 78, 6, 31);
   Color constOnSurfaceColor = const Color.fromARGB(255, 255, 255, 255);
 
   // color that sets the secondary surface of the app
@@ -57,7 +57,7 @@ class DarkModeThemeConfig {
   // color that sets the main background behind everything
   Color constBackgroundColor = const Color.fromARGB(255, 14, 13, 13);
   Color constOnBackgroundColor = const Color.fromARGB(255, 238, 238, 238);
-  Color constOnBackgroundColorFaded = const Color.fromARGB(255, 51, 2, 22);
+  Color constBackgroundColorFaded = const Color.fromARGB(255, 51, 2, 22);
 
   // signal color import
   SignalColors signalColors = SignalColors();

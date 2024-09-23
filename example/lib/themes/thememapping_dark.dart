@@ -22,9 +22,9 @@ final ThemeData appDarkTheme = ThemeData(
   colorScheme: ColorScheme(
     brightness: darkModeConfig.brightness,
     background: darkModeConfig.constBackgroundColor,
-    onBackground: darkModeConfig.constPrimaryAccentColor,
-    primary: darkModeConfig.constOnPrimaryColor,
-    onPrimary: darkModeConfig.constPrimaryColor,
+    onBackground: darkModeConfig.constOnBackgroundColor,
+    primary: darkModeConfig.constPrimaryColor,
+    onPrimary: darkModeConfig.constOnPrimaryColor,
     secondary: darkModeConfig.constSecondaryColor,
     onSecondary: darkModeConfig.constOnSecondaryColor,
     tertiary: darkModeConfig.constTertiaryColor,
