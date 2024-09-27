@@ -43,7 +43,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         ),
       );
     } catch (e) {
-      Console.log("ERROR: ${e.toString()}", scope: "exampleApp.addUserRole", level: LogLevel.prod);
+      Console.log("ERROR: ${e.toString()}", scope: "fframeAuth.addUserRole", level: LogLevel.prod);
     }
   }
 
@@ -72,7 +72,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         ),
       );
     } catch (e) {
-      Console.log("ERROR: ${e.toString()}", scope: "exampleApp.removeUserRole", level: LogLevel.prod);
+      Console.log("ERROR: ${e.toString()}", scope: "fframeAuth.removeUserRole", level: LogLevel.prod);
     }
   }
 
@@ -98,7 +98,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         ),
       );
     } catch (e) {
-      Console.log("ERROR: ${e.toString()}", scope: "exampleApp.getUserRoles", level: LogLevel.prod);
+      Console.log("ERROR: ${e.toString()}", scope: "fframeAuth.getUserRoles", level: LogLevel.prod);
     }
     return [];
   }
