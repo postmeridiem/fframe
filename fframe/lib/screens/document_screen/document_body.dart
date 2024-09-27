@@ -92,6 +92,7 @@ class DocumentBody<T> extends StatefulWidget {
 class _DocumentBodyState<T> extends State<DocumentBody<T>> {
   final widgetKey = GlobalKey();
   bool showContextDrawer = false;
+  bool showContextDrawerButtons = false;
   ScreenSize? screenSize = ScreenSize.unknown;
   @override
   Widget build(BuildContext context) {
@@ -117,45 +118,49 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
     String tabIndexKey = documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
     int tabIndex = int.parse(SelectionState.instance.queryStringParam(tabIndexKey) ?? "0");
 
-    if (screenSize == ScreenSize.unknown) {
-      //Initial load
-      if (ScreenSize.large ==
+    //Prepare the context card toggler
+    if (contextCards != null && contextCards.isNotEmpty) {
+      showContextDrawerButtons = true;
+      if (screenSize == ScreenSize.unknown) {
+        //Initial load
+        if (ScreenSize.large ==
+            ((MediaQuery.of(context).size.width <= 400)
+                ? ScreenSize.phone
+                : (MediaQuery.of(context).size.width < 1000)
+                    ? ScreenSize.tablet
+                    : ScreenSize.large)) {
+          //Prepare for large screen
+          showContextDrawer = true;
+          screenSize = ScreenSize.large;
+        } else {
+          //Prepare for smaller screen
+          showContextDrawer = false;
+          screenSize = ((MediaQuery.of(context).size.width <= 400)
+              ? ScreenSize.phone
+              : (MediaQuery.of(context).size.width < 1000)
+                  ? ScreenSize.tablet
+                  : ScreenSize.large);
+        }
+      } else if (screenSize !=
           ((MediaQuery.of(context).size.width <= 400)
               ? ScreenSize.phone
               : (MediaQuery.of(context).size.width < 1000)
                   ? ScreenSize.tablet
                   : ScreenSize.large)) {
-        //Prepare for large screen
-        showContextDrawer = true;
-        screenSize = ScreenSize.large;
-      } else {
-        //Prepare for smaller screen
-        showContextDrawer = false;
-        screenSize = ((MediaQuery.of(context).size.width <= 400)
+        //The type of screen has changed
+        ScreenSize newScreenSize = ((MediaQuery.of(context).size.width <= 400)
             ? ScreenSize.phone
             : (MediaQuery.of(context).size.width < 1000)
                 ? ScreenSize.tablet
                 : ScreenSize.large);
-      }
-    } else if (screenSize !=
-        ((MediaQuery.of(context).size.width <= 400)
-            ? ScreenSize.phone
-            : (MediaQuery.of(context).size.width < 1000)
-                ? ScreenSize.tablet
-                : ScreenSize.large)) {
-      //The type of screen has changed
-      ScreenSize newScreenSize = ((MediaQuery.of(context).size.width <= 400)
-          ? ScreenSize.phone
-          : (MediaQuery.of(context).size.width < 1000)
-              ? ScreenSize.tablet
-              : ScreenSize.large);
-      if (newScreenSize == ScreenSize.large) {
-        //Prepare for large screen
-        showContextDrawer = true;
-        screenSize = ScreenSize.large;
-      } else {
-        showContextDrawer = false;
-        screenSize = newScreenSize;
+        if (newScreenSize == ScreenSize.large) {
+          //Prepare for large screen
+          showContextDrawer = true;
+          screenSize = ScreenSize.large;
+        } else {
+          showContextDrawer = false;
+          screenSize = newScreenSize;
+        }
       }
     }
 
@@ -411,58 +416,66 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
             ),
           ),
         ),
-        Positioned(
-          bottom: 30.0,
-          right: 0,
-          child: Container(
-            height: 40.0,
-            width: 24.0,
-            decoration: BoxDecoration(color: Theme.of(context).canvasColor, shape: BoxShape.rectangle),
-          ),
-        ),
-        Positioned(
+        Visibility(
+          visible: showContextDrawerButtons,
+          child: Positioned(
             bottom: 30.0,
             right: 0,
             child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).canvasColor,
-                  shape: BoxShape.circle,
-                ),
-                child: (showContextDrawer != true)
-                    ? IconButton(
-                        tooltip: L10n.string(
-                          "iconbutton_document_contextshow",
-                          placeholder: "Show document context pane",
-                          namespace: 'fframe',
-                        ),
-                        icon: Icon(
-                          Icons.chevron_left,
-                          color: Theme.of(context).indicatorColor,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            showContextDrawer = !showContextDrawer;
-                          });
-                        },
-                      )
-                    : (showContextDrawer != false)
-                        ? IconButton(
-                            tooltip: L10n.string(
-                              "iconbutton_document_contexthide",
-                              placeholder: "Hide document context pane",
-                              namespace: 'fframe',
-                            ),
-                            icon: Icon(
-                              Icons.chevron_right,
-                              color: Theme.of(context).indicatorColor,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                showContextDrawer = !showContextDrawer;
-                              });
-                            },
-                          )
-                        : const IgnorePointer()))
+              height: 40.0,
+              width: 24.0,
+              decoration: BoxDecoration(color: Theme.of(context).canvasColor, shape: BoxShape.rectangle),
+            ),
+          ),
+        ),
+        Visibility(
+          visible: showContextDrawerButtons,
+          child: Positioned(
+            bottom: 30.0,
+            right: 0,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor,
+                shape: BoxShape.circle,
+              ),
+              child: (showContextDrawer != true)
+                  ? IconButton(
+                      tooltip: L10n.string(
+                        "iconbutton_document_contextshow",
+                        placeholder: "Show document context pane",
+                        namespace: 'fframe',
+                      ),
+                      icon: Icon(
+                        Icons.chevron_left,
+                        color: Theme.of(context).indicatorColor,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          showContextDrawer = !showContextDrawer;
+                        });
+                      },
+                    )
+                  : (showContextDrawer != false)
+                      ? IconButton(
+                          tooltip: L10n.string(
+                            "iconbutton_document_contexthide",
+                            placeholder: "Hide document context pane",
+                            namespace: 'fframe',
+                          ),
+                          icon: Icon(
+                            Icons.chevron_right,
+                            color: Theme.of(context).indicatorColor,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              showContextDrawer = !showContextDrawer;
+                            });
+                          },
+                        )
+                      : const IgnorePointer(),
+            ),
+          ),
+        ),
       ],
     );
   }
