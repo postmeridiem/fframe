@@ -34,7 +34,6 @@ class DocumentConfig<T> extends ChangeNotifier {
     this.mdiItems = 8,
     required this.autoSelectFirst,
     required this.document,
-    this.contextCardBuilders,
     this.queryStringIdParam = "id",
     this.embeddedDocument = false,
   });
@@ -62,7 +61,6 @@ class DocumentConfig<T> extends ChangeNotifier {
   final bool mdi;
   final int mdiItems;
   final String? Function(T)? createDocumentId;
-  final List<ContextCardBuilder<T>>? contextCardBuilders;
   final bool embeddedDocument;
   final ViewType initialViewType;
   final double columnWidth;
@@ -132,7 +130,7 @@ class Document<T> {
   final Key? key;
   final DocumentTabsBuilder<T> documentTabsBuilder;
   final DocumentHeaderBuilder<T>? documentHeaderBuilder;
-  final List<ContextCardBuilder>? contextCards;
+  final List<ContextCardBuilder<T>>? contextCards;
   final ExtraActionButtonsBuilder<T>? extraActionButtons;
   List<DocumentTab<T>>? activeTabs;
   final bool scrollableHeader;

@@ -16,4 +16,4 @@ Map<String, String> allClaims = {
   "runCreator": "Allow creating of a registered run",
 };
 
-enum ScreenSize { phone, tablet, large }
+enum ScreenSize { phone, tablet, large, unknown }

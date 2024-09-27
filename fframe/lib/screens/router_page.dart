@@ -242,21 +242,21 @@ class FRouter extends InheritedWidget {
   }
 
   bool get hasTabs {
-    Console.log(
-      "Check if there are tabs",
-      scope: "fframeLog.FRouter.hasTabs",
-      level: LogLevel.prod,
-    );
+    // Console.log(
+    //   "Check if there are tabs",
+    //   scope: "fframeLog.FRouter.hasTabs",
+    //   level: LogLevel.prod,
+    // );
     return NavigationNotifier.instance.hasTabs;
   }
 
   int get tabLength {
-    Console.log(
-      "Count the amount of tabs",
-      scope: "fframeLog.FRouter.tabLength",
-      level: LogLevel.prod,
-      color: ConsoleColor.yellow,
-    );
+    // Console.log(
+    //   "Count the amount of tabs",
+    //   scope: "fframeLog.FRouter.tabLength",
+    //   level: LogLevel.prod,
+    //   color: ConsoleColor.yellow,
+    // );
     return NavigationNotifier.instance.navigationTabs.length;
   }
 
@@ -366,9 +366,7 @@ class FRouter extends InheritedWidget {
               }
             }
 
-            if (NavigationNotifier.instance.selectedNavRailIndex == null ||
-                NavigationNotifier.instance.selectedNavRailIndex! < 0 ||
-                NavigationNotifier.instance.selectedNavRailIndex! > NavigationNotifier.instance.navigationConfig.navigationTargets.length) {
+            if (NavigationNotifier.instance.selectedNavRailIndex == null || NavigationNotifier.instance.selectedNavRailIndex! < 0 || NavigationNotifier.instance.selectedNavRailIndex! > NavigationNotifier.instance.navigationConfig.navigationTargets.length) {
               NavigationNotifier.instance.selectedNavRailIndex = 0;
             }
 
