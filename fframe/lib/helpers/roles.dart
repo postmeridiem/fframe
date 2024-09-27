@@ -26,7 +26,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         'role': role,
       });
       setState(() {
-        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
+        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString().toLowerCase()).toList();
       });
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return;
@@ -43,7 +43,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         ),
       );
     } catch (e) {
-      Console.log("ERROR: ${e.toString()}", scope: "exampleApp.addUserRole", level: LogLevel.prod);
+      Console.log("ERROR: ${e.toString()}", scope: "fframeAuth.addUserRole", level: LogLevel.prod);
     }
   }
 
@@ -55,7 +55,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         'role': role,
       });
       setState(() {
-        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
+        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString().toLowerCase()).toList();
       });
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return;
@@ -72,7 +72,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         ),
       );
     } catch (e) {
-      Console.log("ERROR: ${e.toString()}", scope: "exampleApp.removeUserRole", level: LogLevel.prod);
+      Console.log("ERROR: ${e.toString()}", scope: "fframeAuth.removeUserRole", level: LogLevel.prod);
     }
   }
 
@@ -82,7 +82,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
       HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
         'uid': widget.uid,
       });
-      return functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
+      return functionResults.data.map((roleDynamic) => roleDynamic.toString().toLowerCase()).toList();
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return [];
       ScaffoldMessenger.of(context).showSnackBar(
@@ -98,7 +98,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         ),
       );
     } catch (e) {
-      Console.log("ERROR: ${e.toString()}", scope: "exampleApp.getUserRoles", level: LogLevel.prod);
+      Console.log("ERROR: ${e.toString()}", scope: "fframeAuth.getUserRoles", level: LogLevel.prod);
     }
     return [];
   }
