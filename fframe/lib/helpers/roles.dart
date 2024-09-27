@@ -26,7 +26,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         'role': role,
       });
       setState(() {
-        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString().toLowerCase()).toList();
+        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
       });
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return;
@@ -55,7 +55,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
         'role': role,
       });
       setState(() {
-        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString().toLowerCase()).toList();
+        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
       });
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return;
@@ -82,7 +82,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
       HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
         'uid': widget.uid,
       });
-      return functionResults.data.map((roleDynamic) => roleDynamic.toString().toLowerCase()).toList();
+      return functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return [];
       ScaffoldMessenger.of(context).showSnackBar(
