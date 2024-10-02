@@ -75,20 +75,20 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   TargetState? get currentTarget {
-    Console.log(
-      "get currentTarget",
-      scope: "fframeLog.NavigationNotifier.currentTarget",
-      level: LogLevel.dev,
-    );
+    // Console.log(
+    //   "get currentTarget",
+    //   scope: "fframeLog.NavigationNotifier.currentTarget",
+    //   level: LogLevel.dev,
+    // );
     return TargetState.instance;
   }
 
   bool get hasTabs {
-    Console.log(
-      "get hasTabs",
-      scope: "fframeLog.NavigationNotifier.hasTabs",
-      level: LogLevel.dev,
-    );
+    // Console.log(
+    //   "get hasTabs",
+    //   scope: "fframeLog.NavigationNotifier.hasTabs",
+    //   level: LogLevel.dev,
+    // );
     return TargetState.instance.navigationTarget is NavigationTab;
   }
 
@@ -111,11 +111,11 @@ class NavigationNotifier extends ChangeNotifier {
   }
 
   List<NavigationTab> get navigationTabs {
-    Console.log(
-      "Getting navigation tabs",
-      scope: "fframeLog.NavigationNotifier.navigationTabs",
-      level: LogLevel.fframe,
-    );
+    // Console.log(
+    //   "Getting navigation tabs",
+    //   scope: "fframeLog.NavigationNotifier.navigationTabs",
+    //   level: LogLevel.fframe,
+    // );
     if (TargetState.instance.navigationTarget is NavigationTab) {
       NavigationTab currentTab = TargetState.instance.navigationTarget as NavigationTab;
       NavigationTarget parentTarget = currentTab.parentTarget!;

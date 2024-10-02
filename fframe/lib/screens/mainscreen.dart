@@ -110,8 +110,6 @@ class _MainScreenState extends State<MainScreen> {
                         body: Container(
                           key: ValueKey("navTarget_${navigationTarget.path}"),
                           child: navigationTarget.contentPane,
-                          //   );
-                          // },
                         ),
                       ),
                     ),

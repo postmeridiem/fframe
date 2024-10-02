@@ -25,6 +25,7 @@ class SuggestionScreen<Suggestion> extends StatefulWidget {
 class _SuggestionScreenState extends State<SuggestionScreen> {
   @override
   Widget build(BuildContext context) {
+    Document<Suggestion> document = suggestionDocument();
     return DocumentScreen<Suggestion>(
       //Indicate where the documents are located and how to convert them to and fromt their models.
       // formKey: GlobalKey<FormState>(),
@@ -212,7 +213,7 @@ class _SuggestionScreenState extends State<SuggestionScreen> {
         ],
       ),
       // Center part, shows a firestore doc. Tabs possible
-      document: suggestionDocument(),
+      document: document,
     );
   }
 }
@@ -326,7 +327,7 @@ Document<Suggestion> suggestionDocument() {
       ];
     },
     contextCards: [
-      (suggestion) => ContextCard(
+      (suggestion) => ContextCard<Suggestion>(
             suggestion: suggestion,
           ),
     ],

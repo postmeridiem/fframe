@@ -4,10 +4,10 @@ class ContextCanvas<T> extends StatelessWidget {
   const ContextCanvas({
     super.key,
     required this.selectedDocument,
-    required this.contextWidgets,
+    required this.contextCards,
   });
   final SelectedDocument<T> selectedDocument;
-  final List<Widget> contextWidgets;
+  final List<Widget Function(T)>? contextCards;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,11 @@ class ContextCanvas<T> extends StatelessWidget {
             padding: const EdgeInsets.all(4.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
-              children: contextWidgets,
+              children: contextCards!
+                  .map(
+                    (contextCardBuilder) => contextCardBuilder(selectedDocument.data),
+                  )
+                  .toList(),
             ),
           ),
         ),
@@ -34,26 +38,23 @@ class ContextDrawer<T> extends StatelessWidget {
     super.key,
     required this.contextDrawerOpen,
     required this.selectedDocument,
+    required this.contextCards,
   });
 
   final SelectedDocument<T> selectedDocument;
   final bool contextDrawerOpen;
+  final List<Widget Function(T)>? contextCards;
 
   @override
   Widget build(BuildContext context) {
-    DocumentConfig<T> documentConfig = DocumentScreenConfig.of(context)!.documentConfig as DocumentConfig<T>;
     if (contextDrawerOpen) {
       // if the document canvas gets too small, render this
-      if (documentConfig.document.contextCards != null && documentConfig.document.contextCards!.isNotEmpty) {
+      if (contextCards != null && contextCards!.isNotEmpty) {
         return SizedBox(
           width: 250,
           child: ContextCanvas(
             selectedDocument: selectedDocument,
-            contextWidgets: documentConfig.document.contextCards!
-                .map(
-                  (contextCardBuilder) => contextCardBuilder(selectedDocument._data as T),
-                )
-                .toList(),
+            contextCards: contextCards,
           ),
         );
       } else {

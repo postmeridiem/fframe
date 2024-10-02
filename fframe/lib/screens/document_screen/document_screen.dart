@@ -22,7 +22,6 @@ class DocumentScreen<T> extends StatelessWidget {
     this.query,
     this.searchConfig,
     required this.document,
-    this.contextCardBuilders,
     this.queryStringIdParam = "id",
     this.documentScreenHeaderBuilder,
     this.documentScreenFooterBuilder,
@@ -51,7 +50,6 @@ class DocumentScreen<T> extends StatelessWidget {
   final T Function(T)? preOpen;
   final bool autoSelectFirst;
   final String? Function(T)? createDocumentId;
-  final List<ContextCardBuilder>? contextCardBuilders;
   final DocumentScreenHeaderBuilder? documentScreenHeaderBuilder;
   final DocumentScreenFooterBuilder? documentScreenFooterBuilder;
 
@@ -98,7 +96,6 @@ class DocumentScreen<T> extends StatelessWidget {
       documentTitle: documentTitle,
       headerBuilder: headerBuilder,
       hideTitle: hideTitle,
-      contextCardBuilders: contextCardBuilders,
       embeddedDocument: embeddedDocument ?? false,
     );
 
