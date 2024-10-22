@@ -1,3 +1,4 @@
+import 'package:example/screens/customwidget/searchable_dropdown.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 
@@ -90,6 +91,25 @@ class _Tab01State extends State<Tab01> {
           )
         ],
       ),
+    );
+  }
+
+  Padding countryCodeSelection() {
+    TextEditingController countryCodeController = TextEditingController();
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SearchableDropdown(
+          label: 'Country',
+          controller: countryCodeController,
+          values: const ['value 1', 'value2, value3'],
+          onSelected: (value) {
+            if (value != null) {
+              setState(() {
+                countryCodeController.text = value;
+              });
+            }
+          }),
     );
   }
 }
