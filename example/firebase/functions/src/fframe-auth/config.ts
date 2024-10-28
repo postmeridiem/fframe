@@ -3,5 +3,5 @@
 export default {
     "initialUserRoles": { roles: ["SuperAdmin", "User"] },
     "defaultUserRoles": { roles: ["User"] },
-    "authorizedEmailMasks": ["@imagin.studio", "@churned.nl", "@zwaag.net", "@postmeridiem.net", "dehlak@gmail.com", "edwardbrosens@gmail.com"],
+    "authorizedEmailMasks": ["@imagin.studio", "imaginstudio.com", "@churned.nl", "@zwaag.net", "@postmeridiem.net", "dehlak@gmail.com", "edwardbrosens@gmail.com"],
 };
