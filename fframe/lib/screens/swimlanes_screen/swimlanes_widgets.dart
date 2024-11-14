@@ -447,13 +447,13 @@ class SwimlaneHeader<T> extends StatelessWidget {
                   color: swimlanesController.swimlaneHeaderTextColor,
                 ),
               ),
-              Text(
-                "countMessage",
-                style: TextStyle(
-                  fontSize: 10,
-                  color: swimlanesController.swimlaneHeaderTextColor,
-                ),
-              ),
+              // Text(
+              //   "countMessage",
+              //   style: TextStyle(
+              //     fontSize: 10,
+              //     color: swimlanesController.swimlaneHeaderTextColor,
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -501,15 +501,17 @@ class _SwimlanesBuilderCellState<T> extends State<SwimlanesBuilderCell<T>> {
   Widget build(BuildContext context) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.bottom,
-      child: MouseRegion(
-        cursor: WidgetStateMouseCursor.clickable,
-        child: GestureDetector(
-          onTap: () {
-            widget.selectedDocument.open();
-          },
-          child: widget.cellWidget,
-        ),
-      ),
+      child: widget.documentConfig.swimlanes?.openDocumentOnClick == true
+          ? MouseRegion(
+              cursor: WidgetStateMouseCursor.clickable,
+              child: GestureDetector(
+                onTap: () {
+                  widget.selectedDocument.open();
+                },
+                child: widget.cellWidget,
+              ),
+            )
+          : widget.cellWidget,
     );
   }
 }
@@ -998,7 +1000,11 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             child: GestureDetector(
-              onTap: () => selectedDocument.open(),
+              onTap: () {
+                if (swimlanesConfig.openDocumentOnClick) {
+                  selectedDocument.open();
+                }
+              },
               child: Card(
                 color: widget.color,
                 elevation: 4,
