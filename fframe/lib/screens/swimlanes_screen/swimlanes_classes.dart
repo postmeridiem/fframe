@@ -101,10 +101,10 @@ class SwimlaneSetting<T> {
   SwimlaneSetting({
     required this.id,
     required this.header,
-    required this.onLaneDrop,
-    required this.onPriorityChange,
-    required this.canChangePriority,
-    required this.canChangeSwimLane,
+    this.onLaneDrop,
+    this.onPriorityChange,
+    this.canChangePriority,
+    this.canChangeSwimLane,
     this.query,
     this.roles,
     this.swimlaneWidth = 200,
@@ -116,10 +116,10 @@ class SwimlaneSetting<T> {
   final double swimlaneWidth;
   final SwimlanesCardControlsBuilderFunction<T>? cardControlsBuilder;
   final Query<T>? Function(Query<T> query)? query;
-  final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int sourcePriority, int targetPriority) canChangePriority;
-  final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int? sourcePriority, int? targetPriority) canChangeSwimLane;
-  final T Function(T data, double? priority) onLaneDrop;
-  final T Function(T data, double? priority) onPriorityChange;
+  final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int sourcePriority, int targetPriority)? canChangePriority;
+  final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int? sourcePriority, int? targetPriority)? canChangeSwimLane;
+  final T Function(T data, double? priority)? onLaneDrop;
+  final T Function(T data, double? priority)? onPriorityChange;
   late int? swimlaneIndex;
   late bool hasAccess = false;
 }

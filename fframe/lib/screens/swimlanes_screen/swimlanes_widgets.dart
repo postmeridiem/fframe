@@ -915,10 +915,10 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = null;
         });
         T data = dragContext.data.selectedDocument.data;
-        if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id) {
-          data = widget.swimlaneSetting.onPriorityChange(data, widget.priority);
-        } else {
-          data = widget.swimlaneSetting.onLaneDrop(data, widget.priority);
+        if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlaneSetting.onPriorityChange != null) {
+          data = widget.swimlaneSetting.onPriorityChange!(data, widget.priority);
+        } else if (widget.swimlaneSetting.onLaneDrop != null) {
+          data = widget.swimlaneSetting.onLaneDrop!(data, widget.priority);
         }
         dragContext.data.selectedDocument.update(data: data);
       }),
@@ -933,22 +933,24 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = dragContext!.data;
         });
 
-        if (widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id && widget.swimlanesConfig.getPriority != null) {
-          return widget.swimlaneSetting.canChangePriority(
+        if (widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id && widget.swimlanesConfig.getPriority != null && widget.swimlaneSetting.canChangePriority != null) {
+          return widget.swimlaneSetting.canChangePriority!(
             dragContext.data.selectedDocument,
             widget.fFrameUser.roles,
             dragContext.data.sourceColumn.id,
             widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data).floor(),
             widget.priority!.floor(),
           );
-        } else {
-          return widget.swimlaneSetting.canChangeSwimLane(
+        } else if (widget.swimlaneSetting.canChangeSwimLane != null) {
+          return widget.swimlaneSetting.canChangeSwimLane!(
             dragContext.data.selectedDocument,
             widget.fFrameUser.roles,
             dragContext.data.sourceColumn.id,
             (widget.swimlanesConfig.getPriority != null) ? widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data).floor() : null,
             (widget.swimlanesConfig.getPriority != null) ? widget.priority!.floor() : null,
           );
+        } else {
+          return false;
         }
       }),
     ); // Insert a drop zone after each
