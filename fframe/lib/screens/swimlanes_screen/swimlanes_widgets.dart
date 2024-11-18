@@ -447,13 +447,13 @@ class SwimlaneHeader<T> extends StatelessWidget {
                   color: swimlanesController.swimlaneHeaderTextColor,
                 ),
               ),
-              Text(
-                "countMessage",
-                style: TextStyle(
-                  fontSize: 10,
-                  color: swimlanesController.swimlaneHeaderTextColor,
-                ),
-              ),
+              // Text(
+              //   "countMessage",
+              //   style: TextStyle(
+              //     fontSize: 10,
+              //     color: swimlanesController.swimlaneHeaderTextColor,
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -501,15 +501,17 @@ class _SwimlanesBuilderCellState<T> extends State<SwimlanesBuilderCell<T>> {
   Widget build(BuildContext context) {
     return TableCell(
       verticalAlignment: TableCellVerticalAlignment.bottom,
-      child: MouseRegion(
-        cursor: WidgetStateMouseCursor.clickable,
-        child: GestureDetector(
-          onTap: () {
-            widget.selectedDocument.open();
-          },
-          child: widget.cellWidget,
-        ),
-      ),
+      child: widget.documentConfig.swimlanes?.openDocumentOnClick == true
+          ? MouseRegion(
+              cursor: WidgetStateMouseCursor.clickable,
+              child: GestureDetector(
+                onTap: () {
+                  widget.selectedDocument.open();
+                },
+                child: widget.cellWidget,
+              ),
+            )
+          : widget.cellWidget,
     );
   }
 }
@@ -531,18 +533,21 @@ class Swimlanes<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<SwimlaneSetting<T>> swimlaneSettings = swimlanesController.swimlaneSettings as List<SwimlaneSetting<T>>;
     final FFrameUser fFrameUser = Fframe.of(context)!.user!;
-    return Container(
-      color: swimlanesController.swimlaneBackgroundColor,
-      child: Row(
-        children: swimlaneSettings
-            .map((swimlaneSetting) => Swimlane<T>(
-                  swimlanesController: swimlanesController,
-                  swimlanesConfig: swimlanesConfig,
-                  swimlaneSetting: swimlaneSetting,
-                  documentConfig: documentConfig,
-                  fFrameUser: fFrameUser,
-                ))
-            .toList(),
+    return Expanded(
+      child: Container(
+        color: swimlanesController.swimlaneBackgroundColor,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: swimlaneSettings
+              .map((swimlaneSetting) => Swimlane<T>(
+                    swimlanesController: swimlanesController,
+                    swimlanesConfig: swimlanesConfig,
+                    swimlaneSetting: swimlaneSetting,
+                    documentConfig: documentConfig,
+                    fFrameUser: fFrameUser,
+                  ))
+              .toList(),
+        ),
       ),
     );
   }
@@ -598,198 +603,218 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
 
     query = query.orderBy("priority");
 
-    return SizedBox(
-      height: (widget.swimlanesController.viewportSize.height - (105 + widget.swimlanesController.headerHeight)),
-      width: swimlanesConfig.swimlaneWidth,
-      child: StreamBuilder<QuerySnapshot<T>>(
-        stream: query.snapshots(),
-        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> snapshot) {
-          if (!snapshot.hasData) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else if (snapshot.hasError) {
-            //Something has gone wrong
-            return Fframe.of(context)!.showErrorPage(context: context, errorText: snapshot.error.toString());
-          } else {
-            List<SelectedDocument<T>> unfilteredDocuments = snapshot.data!.docs
-                .map(
-                  (QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
-                    data: queryDocument.data(),
-                    documentReference: queryDocument.reference,
-                    fromFirestore: widget.documentConfig.fromFirestore,
-                    toFirestore: widget.documentConfig.toFirestore,
-                  ),
-                )
-                .map((FirestoreDocument<T> firestoreDocument) => SelectedDocument(
-                      documentConfig: widget.documentConfig,
-                      id: firestoreDocument.documentReference.id,
-                      data: firestoreDocument.data,
-                    ))
-                .toList();
+    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+      return SizedBox(
+        height: constraints.maxHeight,
+        width: swimlanesConfig.swimlaneWidth,
+        child: StreamBuilder<QuerySnapshot<T>>(
+          stream: query.snapshots(),
+          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              //Something has gone wrong
+              return Fframe.of(context)!.showErrorPage(context: context, errorText: snapshot.error.toString());
+            } else {
+              List<SelectedDocument<T>> unfilteredDocuments = snapshot.data!.docs
+                  .map(
+                    (QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
+                      data: queryDocument.data(),
+                      documentReference: queryDocument.reference,
+                      fromFirestore: widget.documentConfig.fromFirestore,
+                      toFirestore: widget.documentConfig.toFirestore,
+                    ),
+                  )
+                  .map((FirestoreDocument<T> firestoreDocument) => SelectedDocument(
+                        documentConfig: widget.documentConfig,
+                        id: firestoreDocument.documentReference.id,
+                        data: firestoreDocument.data,
+                      ))
+                  .toList();
 
-            return ListenableBuilder(
-              listenable: widget.swimlanesController.notifier,
-              builder: (BuildContext context, Widget? child) {
-                SwimlanesFilterType filterType = widget.swimlanesController.notifier.filter;
+              return ListenableBuilder(
+                listenable: widget.swimlanesController.notifier,
+                builder: (BuildContext context, Widget? child) {
+                  SwimlanesFilterType filterType = widget.swimlanesController.notifier.filter;
 
-                List<SelectedDocument<T>> selectedDocuments = [...unfilteredDocuments];
-                Console.log("Swimlane rebuild ${filterType.toString()} for ${selectedDocuments.length} ");
+                  List<SelectedDocument<T>> selectedDocuments = [...unfilteredDocuments];
+                  Console.log("Swimlane rebuild ${filterType.toString()} for ${selectedDocuments.length} ");
 
-                switch (filterType) {
-                  case SwimlanesFilterType.unfiltered:
-                    break;
-                  case SwimlanesFilterType.assignedToMe:
-                    selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser));
-                    break;
-                  case SwimlanesFilterType.followedTasks:
-                    selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser));
-                    break;
-                  case SwimlanesFilterType.prioHigh:
-                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) < 4);
-                    break;
-                  case SwimlanesFilterType.prioLow:
-                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) >= 4 && swimlanesConfig.getPriority!(selectedDocument.data) < 7);
-                    break;
-                  case SwimlanesFilterType.prioNormal:
-                    selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) >= 7);
-                    break;
-                  default:
-                    break;
-                }
+                  switch (filterType) {
+                    case SwimlanesFilterType.unfiltered:
+                      break;
+                    case SwimlanesFilterType.assignedToMe:
+                      selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser));
+                      break;
+                    case SwimlanesFilterType.followedTasks:
+                      selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser));
+                      break;
+                    case SwimlanesFilterType.prioHigh:
+                      selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) < 4);
+                      break;
+                    case SwimlanesFilterType.prioLow:
+                      selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) >= 4 && swimlanesConfig.getPriority!(selectedDocument.data) < 7);
+                      break;
+                    case SwimlanesFilterType.prioNormal:
+                      selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) >= 7);
+                      break;
+                    default:
+                      break;
+                  }
 
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border(
-                      right: BorderSide(
-                        width: 2,
-                        color: widget.swimlanesController.swimlaneSeparatorColor,
+                  return Container(
+                    decoration: BoxDecoration(
+                      border: Border(
+                        right: BorderSide(
+                          width: 2,
+                          color: widget.swimlanesController.swimlaneSeparatorColor,
+                        ),
                       ),
                     ),
-                  ),
-                  child: (selectedDocuments.isEmpty)
-                      ? SwimlaneDropZone(
-                          swimlanesController: widget.swimlanesController,
-                          swimlanesConfig: swimlanesConfig,
-                          fFrameUser: widget.fFrameUser,
-                          width: swimlanesConfig.swimlaneWidth,
-                          swimlaneSetting: widget.swimlaneSetting,
-                        )
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: selectedDocuments.length * 2, // Double the count for drop zones and add 1 for the final drop zone
-                          itemBuilder: (context, index) {
-                            // Calculate index in the original documents list
-                            int docIndex = index ~/ 2;
-                            final selectedDocument = selectedDocuments[docIndex];
-
-                            // int? nextPriority = isNextPriority(selectedDocuments, docIndex);
-
-                            GlobalKey dragKey = GlobalKey();
-                            if (index.isEven) {
-                              final DragContext<T> dragContext = DragContext<T>(
-                                sourceColumn: widget.swimlaneSetting,
-                                selectedDocument: selectedDocument,
-                                dragKey: dragKey,
-                                buildContext: context,
-                              );
-
-                              return Column(
-                                children: [
-                                  // if (nextPriority != null)
-                                  //   Padding(
-                                  //     padding: const EdgeInsets.all(8.0),
-                                  //     child: Stack(
-                                  //       alignment: AlignmentDirectional.centerStart,
-                                  //       children: [
-                                  //         const Divider(),
-                                  //         CircleAvatar(child: Text(nextPriority.toString())),
-                                  //       ],
-                                  //     ),
-                                  //   ),
-                                  GestureDetector(
-                                    onTapDown: (_) => _getTaskCardHeight(dragContext.dragKey),
-                                    child: Draggable<DragContext<T>>(
-                                      data: dragContext,
-                                      feedback: SwimlanesTaskCard<T>(
-                                        selectedDocument: selectedDocument,
+                    child: (selectedDocuments.isEmpty && !swimlanesConfig.isReadOnly)
+                        ? SwimlaneDropZone(
+                            swimlanesController: widget.swimlanesController,
+                            swimlanesConfig: swimlanesConfig,
+                            fFrameUser: widget.fFrameUser,
+                            width: swimlanesConfig.swimlaneWidth,
+                            swimlaneSetting: widget.swimlaneSetting,
+                          )
+                        : ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2, // Double the count for drop zones and add 1 for the final drop zone
+                            itemBuilder: (context, index) {
+                              // Return only task cards if the swimlanes are read-only
+                              if (swimlanesConfig.isReadOnly) {
+                                return Column(
+                                  children: [
+                                    Builder(builder: (context) {
+                                      return SwimlanesTaskCard<T>(
+                                        selectedDocument: selectedDocuments[index],
                                         swimlanesController: widget.swimlanesController,
                                         swimlanesConfig: swimlanesConfig,
-                                        fFrameUser: widget.fFrameUser,
                                         color: widget.swimlanesController.taskCardColor,
-                                        width: swimlanesConfig.swimlaneWidth,
-                                        feedback: true,
-                                      ),
-                                      childWhenDragging: SwimlanesTaskCard<T>(
-                                        selectedDocument: selectedDocument,
-                                        swimlanesController: widget.swimlanesController,
-                                        swimlanesConfig: swimlanesConfig,
                                         fFrameUser: widget.fFrameUser,
-                                        color: widget.swimlanesController.taskCardColor,
                                         width: swimlanesConfig.swimlaneWidth,
-                                        childWhenDragging: true,
-                                      ),
-                                      child: Builder(builder: (context) {
-                                        return SwimlanesTaskCard<T>(
-                                          key: dragContext.dragKey,
+                                      );
+                                    }),
+                                  ],
+                                );
+                              }
+
+                              // Calculate index in the original documents list
+                              int docIndex = index ~/ 2;
+                              final selectedDocument = selectedDocuments[docIndex];
+
+                              // int? nextPriority = isNextPriority(selectedDocuments, docIndex);
+
+                              GlobalKey dragKey = GlobalKey();
+                              if (index.isEven) {
+                                final DragContext<T> dragContext = DragContext<T>(
+                                  sourceColumn: widget.swimlaneSetting,
+                                  selectedDocument: selectedDocument,
+                                  dragKey: dragKey,
+                                  buildContext: context,
+                                );
+
+                                return Column(
+                                  children: [
+                                    // if (nextPriority != null)
+                                    //   Padding(
+                                    //     padding: const EdgeInsets.all(8.0),
+                                    //     child: Stack(
+                                    //       alignment: AlignmentDirectional.centerStart,
+                                    //       children: [
+                                    //         const Divider(),
+                                    //         CircleAvatar(child: Text(nextPriority.toString())),
+                                    //       ],
+                                    //     ),
+                                    //   ),
+                                    GestureDetector(
+                                      onTapDown: (_) => _getTaskCardHeight(dragContext.dragKey),
+                                      child: Draggable<DragContext<T>>(
+                                        data: dragContext,
+                                        feedback: SwimlanesTaskCard<T>(
                                           selectedDocument: selectedDocument,
                                           swimlanesController: widget.swimlanesController,
                                           swimlanesConfig: swimlanesConfig,
-                                          color: widget.swimlanesController.taskCardColor,
                                           fFrameUser: widget.fFrameUser,
+                                          color: widget.swimlanesController.taskCardColor,
                                           width: swimlanesConfig.swimlaneWidth,
-                                        );
-                                      }),
+                                          feedback: true,
+                                        ),
+                                        childWhenDragging: SwimlanesTaskCard<T>(
+                                          selectedDocument: selectedDocument,
+                                          swimlanesController: widget.swimlanesController,
+                                          swimlanesConfig: swimlanesConfig,
+                                          fFrameUser: widget.fFrameUser,
+                                          color: widget.swimlanesController.taskCardColor,
+                                          width: swimlanesConfig.swimlaneWidth,
+                                          childWhenDragging: true,
+                                        ),
+                                        child: Builder(builder: (context) {
+                                          return SwimlanesTaskCard<T>(
+                                            key: dragContext.dragKey,
+                                            selectedDocument: selectedDocument,
+                                            swimlanesController: widget.swimlanesController,
+                                            swimlanesConfig: swimlanesConfig,
+                                            color: widget.swimlanesController.taskCardColor,
+                                            fFrameUser: widget.fFrameUser,
+                                            width: swimlanesConfig.swimlaneWidth,
+                                          );
+                                        }),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              );
-                            } else {
-                              // Calculate priority for drop zone
-                              double? dropZonePriority;
-                              if (swimlanesConfig.getPriority != null) {
-                                if (docIndex < selectedDocuments.length - 1) {
-                                  dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
-                                } else {
-                                  double lastPriority = swimlanesConfig.getPriority!(selectedDocuments[docIndex].data);
-                                  dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
+                                  ],
+                                );
+                              } else {
+                                // Calculate priority for drop zone
+                                double? dropZonePriority;
+                                if (swimlanesConfig.getPriority != null) {
+                                  if (docIndex < selectedDocuments.length - 1) {
+                                    dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
+                                  } else {
+                                    double lastPriority = swimlanesConfig.getPriority!(selectedDocuments[docIndex].data);
+                                    dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
+                                  }
                                 }
+                                // Add a drop zone between items
+                                return Column(
+                                  children: [
+                                    // if (nextPriority != null)
+                                    //   Padding(
+                                    //     padding: const EdgeInsets.all(8.0),
+                                    //     child: Stack(
+                                    //       alignment: AlignmentDirectional.centerStart,
+                                    //       children: [
+                                    //         const Divider(),
+                                    //         CircleAvatar(child: Text(nextPriority.toString())),
+                                    //       ],
+                                    //     ),
+                                    //   ),
+                                    SwimlaneDropZone(
+                                      swimlanesController: widget.swimlanesController,
+                                      swimlanesConfig: swimlanesConfig,
+                                      fFrameUser: widget.fFrameUser,
+                                      height: dropTargetHeight,
+                                      width: swimlanesConfig.swimlaneWidth,
+                                      swimlaneSetting: widget.swimlaneSetting,
+                                      priority: dropZonePriority,
+                                    ),
+                                  ],
+                                );
                               }
-                              // Add a drop zone between items
-                              return Column(
-                                children: [
-                                  // if (nextPriority != null)
-                                  //   Padding(
-                                  //     padding: const EdgeInsets.all(8.0),
-                                  //     child: Stack(
-                                  //       alignment: AlignmentDirectional.centerStart,
-                                  //       children: [
-                                  //         const Divider(),
-                                  //         CircleAvatar(child: Text(nextPriority.toString())),
-                                  //       ],
-                                  //     ),
-                                  //   ),
-                                  SwimlaneDropZone(
-                                    swimlanesController: widget.swimlanesController,
-                                    swimlanesConfig: swimlanesConfig,
-                                    fFrameUser: widget.fFrameUser,
-                                    height: dropTargetHeight,
-                                    width: swimlanesConfig.swimlaneWidth,
-                                    swimlaneSetting: widget.swimlaneSetting,
-                                    priority: dropZonePriority,
-                                  ),
-                                ],
-                              );
-                            }
-                          },
-                        ),
-                );
-              },
-            );
-          }
-        },
-      ),
-    );
+                            },
+                          ),
+                  );
+                },
+              );
+            }
+          },
+        ),
+      );
+    });
   }
 
   double? calculateDropTargetPriority(List<SelectedDocument<T>> items, int index) {
@@ -908,10 +933,10 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = null;
         });
         T data = dragContext.data.selectedDocument.data;
-        if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id) {
-          data = widget.swimlaneSetting.onPriorityChange(data, widget.priority);
-        } else {
-          data = widget.swimlaneSetting.onLaneDrop(data, widget.priority);
+        if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlaneSetting.onPriorityChange != null) {
+          data = widget.swimlaneSetting.onPriorityChange!(data, widget.priority);
+        } else if (widget.swimlaneSetting.onLaneDrop != null) {
+          data = widget.swimlaneSetting.onLaneDrop!(data, widget.priority);
         }
         dragContext.data.selectedDocument.update(data: data);
       }),
@@ -926,22 +951,24 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = dragContext!.data;
         });
 
-        if (widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id && widget.swimlanesConfig.getPriority != null) {
-          return widget.swimlaneSetting.canChangePriority(
+        if (widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id && widget.swimlanesConfig.getPriority != null && widget.swimlaneSetting.canChangePriority != null) {
+          return widget.swimlaneSetting.canChangePriority!(
             dragContext.data.selectedDocument,
             widget.fFrameUser.roles,
             dragContext.data.sourceColumn.id,
             widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data).floor(),
             widget.priority!.floor(),
           );
-        } else {
-          return widget.swimlaneSetting.canChangeSwimLane(
+        } else if (widget.swimlaneSetting.canChangeSwimLane != null) {
+          return widget.swimlaneSetting.canChangeSwimLane!(
             dragContext.data.selectedDocument,
             widget.fFrameUser.roles,
             dragContext.data.sourceColumn.id,
             (widget.swimlanesConfig.getPriority != null) ? widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data).floor() : null,
             (widget.swimlanesConfig.getPriority != null) ? widget.priority!.floor() : null,
           );
+        } else {
+          return false;
         }
       }),
     ); // Insert a drop zone after each
@@ -993,7 +1020,11 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
           child: Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
             child: GestureDetector(
-              onTap: () => selectedDocument.open(),
+              onTap: () {
+                if (swimlanesConfig.openDocumentOnClick) {
+                  selectedDocument.open();
+                }
+              },
               child: Card(
                 color: widget.color,
                 elevation: 4,

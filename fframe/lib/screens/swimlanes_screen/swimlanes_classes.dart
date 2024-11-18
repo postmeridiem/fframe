@@ -22,6 +22,8 @@ class SwimlanesConfig<T> extends ListConfig {
     this.taskCardHeaderColor,
     this.taskCardHeaderTextColor,
     this.swimlaneWidth = 400,
+    this.openDocumentOnClick = true,
+    this.isReadOnly = false,
   }) : assert(
             // Ensure myId is not null when any of the methods is set
             myId != null || assignee == null && assignee == null && following == null,
@@ -47,6 +49,8 @@ class SwimlanesConfig<T> extends ListConfig {
   final double Function(T)? getPriority;
   final Widget Function(SelectedDocument<T>, SwimlanesConfig<T>, FFrameUser) taskWidgetHeader;
   final Widget Function(SelectedDocument<T>, SwimlanesConfig<T>, FFrameUser) taskWidgetBody;
+  final bool openDocumentOnClick;
+  final bool isReadOnly;
 }
 
 class SwimlanesFollowing<T> {
@@ -99,10 +103,10 @@ class SwimlaneSetting<T> {
   SwimlaneSetting({
     required this.id,
     required this.header,
-    required this.onLaneDrop,
-    required this.onPriorityChange,
-    required this.canChangePriority,
-    required this.canChangeSwimLane,
+    this.onLaneDrop,
+    this.onPriorityChange,
+    this.canChangePriority,
+    this.canChangeSwimLane,
     this.query,
     this.roles,
     this.swimlaneWidth = 200,
@@ -114,10 +118,10 @@ class SwimlaneSetting<T> {
   final double swimlaneWidth;
   final SwimlanesCardControlsBuilderFunction<T>? cardControlsBuilder;
   final Query<T>? Function(Query<T> query)? query;
-  final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int sourcePriority, int targetPriority) canChangePriority;
-  final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int? sourcePriority, int? targetPriority) canChangeSwimLane;
-  final T Function(T data, double? priority) onLaneDrop;
-  final T Function(T data, double? priority) onPriorityChange;
+  final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int sourcePriority, int targetPriority)? canChangePriority;
+  final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int? sourcePriority, int? targetPriority)? canChangeSwimLane;
+  final T Function(T data, double? priority)? onLaneDrop;
+  final T Function(T data, double? priority)? onPriorityChange;
   late int? swimlaneIndex;
   late bool hasAccess = false;
 }
