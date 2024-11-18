@@ -673,7 +673,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                         ),
                       ),
                     ),
-                    child: (selectedDocuments.isEmpty)
+                    child: (selectedDocuments.isEmpty && !swimlanesConfig.isReadOnly)
                         ? SwimlaneDropZone(
                             swimlanesController: widget.swimlanesController,
                             swimlanesConfig: swimlanesConfig,
@@ -683,8 +683,26 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                           )
                         : ListView.builder(
                             shrinkWrap: true,
-                            itemCount: selectedDocuments.length * 2, // Double the count for drop zones and add 1 for the final drop zone
+                            itemCount: swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2, // Double the count for drop zones and add 1 for the final drop zone
                             itemBuilder: (context, index) {
+                              // Return only task cards if the swimlanes are read-only
+                              if (swimlanesConfig.isReadOnly) {
+                                return Column(
+                                  children: [
+                                    Builder(builder: (context) {
+                                      return SwimlanesTaskCard<T>(
+                                        selectedDocument: selectedDocuments[index],
+                                        swimlanesController: widget.swimlanesController,
+                                        swimlanesConfig: swimlanesConfig,
+                                        color: widget.swimlanesController.taskCardColor,
+                                        fFrameUser: widget.fFrameUser,
+                                        width: swimlanesConfig.swimlaneWidth,
+                                      );
+                                    }),
+                                  ],
+                                );
+                              }
+
                               // Calculate index in the original documents list
                               int docIndex = index ~/ 2;
                               final selectedDocument = selectedDocuments[docIndex];

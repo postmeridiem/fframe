@@ -23,6 +23,7 @@ class SwimlanesConfig<T> extends ListConfig {
     this.taskCardHeaderTextColor,
     this.swimlaneWidth = 400,
     this.openDocumentOnClick = true,
+    this.isReadOnly = false,
   }) : assert(
             // Ensure myId is not null when any of the methods is set
             myId != null || assignee == null && assignee == null && following == null,
@@ -49,6 +50,7 @@ class SwimlanesConfig<T> extends ListConfig {
   final Widget Function(SelectedDocument<T>, SwimlanesConfig<T>, FFrameUser) taskWidgetHeader;
   final Widget Function(SelectedDocument<T>, SwimlanesConfig<T>, FFrameUser) taskWidgetBody;
   final bool openDocumentOnClick;
+  final bool isReadOnly;
 }
 
 class SwimlanesFollowing<T> {
