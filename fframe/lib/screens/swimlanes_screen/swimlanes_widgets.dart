@@ -507,6 +507,9 @@ class _SwimlanesBuilderCellState<T> extends State<SwimlanesBuilderCell<T>> {
               child: GestureDetector(
                 onTap: () {
                   widget.selectedDocument.open();
+                  if (widget.documentConfig.swimlanes?.onOpenDocument != null) {
+                    widget.documentConfig.swimlanes!.onOpenDocument!();
+                  }
                 },
                 child: widget.cellWidget,
               ),
@@ -1047,6 +1050,9 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
               onTap: () {
                 if (swimlanesConfig.openDocumentOnClick) {
                   selectedDocument.open();
+                  if (swimlanesConfig.onOpenDocument != null) {
+                    swimlanesConfig.onOpenDocument!();
+                  }
                 }
               },
               child: Card(
