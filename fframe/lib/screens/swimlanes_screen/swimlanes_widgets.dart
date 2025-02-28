@@ -687,6 +687,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                             fFrameUser: widget.fFrameUser,
                             width: swimlanesConfig.swimlaneWidth,
                             swimlaneSetting: widget.swimlaneSetting,
+                            priority: 1.0,
                           )
                         : ListView.builder(
                             shrinkWrap: true,
@@ -831,7 +832,6 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                   );
                 },
               );
-             
             }
 
             return const Center(child: CircularProgressIndicator());
@@ -989,7 +989,7 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
             widget.fFrameUser.roles,
             dragContext.data.sourceColumn.id,
             (widget.swimlanesConfig.getPriority != null) ? widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data).floor() : null,
-            (widget.swimlanesConfig.getPriority != null) ? widget.priority!.floor() : null,
+            (widget.swimlanesConfig.getPriority != null) ? widget.priority?.floor() : null,
           );
         } else {
           return false;
