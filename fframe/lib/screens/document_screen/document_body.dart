@@ -281,7 +281,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                         ),
                                     ],
                                   ),
-                                  endDrawer: ContextCanvas<T>(selectedDocument: selectedDocument, contextCards: contextCards),
+                                  endDrawer: document.withEndDrawer ? ContextCanvas<T>(selectedDocument: selectedDocument, contextCards: contextCards) : null,
                                   primary: false,
                                   backgroundColor: Theme.of(context).colorScheme.secondary,
                                   body: Column(children: [
