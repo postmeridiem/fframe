@@ -12,9 +12,37 @@ List<ListGridColumn<Suggestion>> listGridColumns = [
     searchable: true,
     sortable: true,
     columnSizing: ListGridColumnSizingMode.fixed,
+    visible: true,
     columnWidth: 300,
     valueBuilder: (BuildContext context, Suggestion suggestion) {
       return suggestion.name;
+    },
+    cellControlsBuilder: (
+      context,
+      user,
+      suggestion,
+      stringValue,
+    ) {
+      return [
+        IconButton(
+          onPressed: () {
+            FlutterClipboard.copy(stringValue);
+          },
+          icon: const Icon(Icons.copy),
+          tooltip: 'Copy',
+        ),
+      ];
+    },
+  ),
+  ListGridColumn(
+    visible: false,
+    fieldName: 'createdBy',
+    searchable: true,
+    sortable: true,
+    columnSizing: ListGridColumnSizingMode.fixed,
+    columnWidth: 300,
+    valueBuilder: (BuildContext context, Suggestion suggestion) {
+      return suggestion.createdBy;
     },
     cellControlsBuilder: (
       context,
