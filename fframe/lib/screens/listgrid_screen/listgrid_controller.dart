@@ -455,6 +455,135 @@ class ListGridNotifier<T> extends ChangeNotifier {
   /// 1. apply the newly computedQuery as the current query
   /// 2. recalculate the result collection count
   /// 3. notify the listeners that a redraw is needed
+  // void _queryBuilder() {
+  //   Query outputQuery = _initialQuery as Query<T>;
+
+  //   // handle sorting
+  //   if (sortedColumnIndex != null) {
+  //     ListGridColumn sortedColumn = _columnSettings[sortedColumnIndex!];
+  //     Console.log(
+  //       "fframeLog.ListGridNotifier: column sorted, search on the ${sortedColumn.fieldName!} column",
+  //       level: LogLevel.fframe,
+  //     );
+
+  //     outputQuery = outputQuery.orderBy(sortedColumn.fieldName!, descending: sortedColumn.descending);
+
+  //     if (_columnSettings[sortedColumnIndex!].fieldName != null) {
+  //       String fieldName = _columnSettings[sortedColumnIndex!].fieldName!;
+  //       outputQuery = outputQuery.startsWith(fieldName, searchString!);
+  //     }
+  //   } else {
+  //     if (_searchableColumns.isNotEmpty) {
+  //       if (searchString != null && searchString!.isNotEmpty) {
+  //         Console.log("fframeLog.ListGridNotifier: searching for: $searchString");
+  //         if (_searchableColumns.length > 1) {
+  //           //TODO JPM: make multiple columns supported
+  //           //   Console.log("fframeLog.ListGridNotifier: ERROR: Multiple searchable columns not supported at this time. Please adjust configuratiossssssssssssssn");
+  //           //   List<Filter> currentFilters = [];
+  //           for (int searchableColumnIndex in _searchableColumns) {
+  //             String curSearch = searchString!;
+  //             ListGridColumn curColumn = _columnSettings[searchableColumnIndex];
+  //             if (curColumn.fieldName != null) {
+  //               String fieldName = curColumn.fieldName!;
+  //               if (curColumn.searchMask != null) {
+  //                 if (curColumn.searchMask!.toLowerCase) {
+  //                   curSearch = curSearch.toLowerCase();
+  //                 }
+  //                 curSearch = curSearch.replaceAll(
+  //                   curColumn.searchMask!.from,
+  //                   curColumn.searchMask!.to,
+  //                 );
+  //               }
+  //               // outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending); // Remove orderBy here, it's not needed and causes ordering issues
+  //               //currentFilters.add(Filter(fieldName, isEqualTo: curSearch));// Remove this too. isEqualTo is not supported with the startsWith query we use.
+  //               outputQuery = outputQuery.where(fieldName, isGreaterThanOrEqualTo: curSearch).where(fieldName, isLessThan: curSearch); //Use startswith like approach but multiple
+  //             }
+  //           }
+  //         } else {
+  //           if (_columnSettings[_searchableColumns.first].fieldName != null) {
+  //             String curSearch = searchString!;
+  //             ListGridColumn curColumn = _columnSettings[_searchableColumns.first];
+  //             String fieldName = curColumn.fieldName!;
+  //             // outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending); // Move the order by to the top.
+  //             if (curColumn.searchMask == null) {
+  //               outputQuery = outputQuery.startsWith(fieldName, curSearch);
+  //             } else {
+  //               if (curColumn.searchMask!.toLowerCase) {
+  //                 curSearch = curSearch.toLowerCase();
+  //               }
+  //               outputQuery = outputQuery.startsWith(
+  //                 fieldName,
+  //                 curSearch.replaceAll(
+  //                   curColumn.searchMask!.from,
+  //                   curColumn.searchMask!.to,
+  //                 ),
+  //               );
+  //             }
+  //           }
+  //         }
+  //       } else {
+  //         // no search string provided, and no column user sorted. make sure to sort the primary search column if available.
+
+  //         if (_columnSettings[_searchableColumns.first].fieldName != null) {
+  //           ListGridColumn curColumn = _columnSettings[_searchableColumns.first];
+  //           String fieldName = curColumn.fieldName!;
+  //           outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
+  //         }
+  //       }
+  //     } else {
+  //       Console.log(
+  //         "fframeLog.ListGridNotifier: no searchable column specified",
+  //         level: LogLevel.fframe,
+  //       );
+  //     }
+  //   }
+
+  //   // apply the newly computedQuery as the current query
+  //   _currentQuery = outputQuery as Query<T>;
+  //   Console.log(
+  //     "fframeLog.ListGridNotifier: ${outputQuery.parameters.toString()}",
+  //     level: LogLevel.fframe,
+  //   );
+
+  //   // the query has changed; recalculate the result collection count
+  //   _updateCollectionCount(query: _currentQuery as Query<T>);
+
+  //   // notify the listeners that a redraw is needed
+  //   notifyListeners();
+  // }
+
+  /// Builds the Firestore query based on the current search string and sorting preferences.
+  ///
+  /// This function is responsible for constructing the final Firestore query that will be
+  /// used to fetch data for the ListGrid. It takes into account the user's search input,
+  /// any applied sorting, and the configuration of searchable columns.
+  ///
+  /// The process involves several steps:
+  /// 1. **Sorting:** If a column is selected for sorting (`sortedColumnIndex` is not null),
+  ///    the query is ordered by that column's field, in either ascending or descending order.
+  /// 2. **Searching:** If a search string is provided (`searchString` is not null and not empty),
+  ///    and there are searchable columns, the query is filtered based on the search string.
+  ///    - **Multiple Searchable Columns:** If there are multiple searchable columns,
+  ///      it constructs a compound query using `whereIn`. This is achieved by running
+  ///      separate queries for each searchable column and then combining the results
+  ///      by their document IDs.
+  ///    - **Single Searchable Column:** If there's only one searchable column, it applies
+  ///      a `where` clause using `isGreaterThanOrEqualTo` and `isLessThan` to achieve
+  ///      a "starts with" effect.
+  ///    - **Search Masks:** If a column has a search mask, it applies the mask to the search string.
+  ///    - **Case Insensitive** If the search mask has the toLowerCase flag set, the search will be case insensitive
+  /// 3. **No Search or Sort:** If no search string is provided and no column is sorted,
+  ///    it defaults to sorting by the first searchable column (if available).
+  /// 4. **No Searchable Columns:** If no searchable columns are defined, a warning is logged.
+  /// 5. **Post-Query Processing:** The final query is then passed to the `_postQueryBuild`
+  ///    method for further processing and notification.
+  ///
+  /// If multiple searches are done, the query will be an 'or' query. If no search is performed, the results are orderd on the first sortable column.
+  ///
+  /// The `_postQueryBuild` function will then:
+  /// 1. apply the newly computedQuery as the current query
+  /// 2. recalculate the result collection count
+  /// 3. notify the listeners that a redraw is needed
   void _queryBuilder() {
     Query outputQuery = _initialQuery as Query<T>;
 
