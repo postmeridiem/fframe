@@ -26,8 +26,11 @@ exports.processSignUp = functions.region("europe-west1").auth.user().onCreate(as
       // Set custom user claims on this newly created user.
       await auth.setCustomUserClaims(user.uid, customClaims);
 
+      var tmpUser: any = (await auth.getUser(user.uid)).toJSON();
+      tmpUser.active = true;
+
       // Create an user firestore document in users collection. After refetching the user from auth
-      await db.collection("users").doc(user.uid).set((await auth.getUser(user.uid)).toJSON()).catch((reason) => {
+      await db.collection("users").doc(user.uid).set(tmpUser).catch((reason) => {
         throw new Error(reason);
       });
       console.log(`Processed ${user.email}`);
