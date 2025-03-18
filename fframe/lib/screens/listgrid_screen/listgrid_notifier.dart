@@ -1,6 +1,5 @@
-import 'package:fframe/extensions/extensions.dart';
 import 'package:flutter/foundation.dart';
-import 'package:fframe/fframe.dart'; 
+import 'package:fframe/fframe.dart';
 
 class ListGridNotifier<T> extends ChangeNotifier {
   ListGridNotifier({
@@ -57,6 +56,7 @@ class ListGridNotifier<T> extends ChangeNotifier {
   late List<ListGridColumn<T>> _columnSettings;
   late int? sortedColumnIndex;
   final List<SelectedDocument<T>> _selectedDocuments = [];
+  final List<DocumentSnapshot<T>> _allDocuments = []; // Store all fetched documents essential for client-side filtering
 
   String? get searchString {
     return _searchString;
@@ -72,8 +72,20 @@ class ListGridNotifier<T> extends ChangeNotifier {
     _queryBuilder();
   }
 
-  void _queryBuilder() {
+  Future<void> _fetchAllDocuments() async {
+    // Fetch all documents from the initial query
+    _allDocuments.clear();
+    QuerySnapshot<T> querySnapshot = await _initialQuery!.get();
+    _allDocuments.addAll(querySnapshot.docs);
+  }
+
+  void _queryBuilder() async {
     Query outputQuery = _initialQuery as Query<T>;
+
+    // Fetch all documents if not already fetched
+    if (_allDocuments.isEmpty) {
+      await _fetchAllDocuments();
+    }
 
     // handle sorting
     if (sortedColumnIndex != null) {
@@ -84,85 +96,17 @@ class ListGridNotifier<T> extends ChangeNotifier {
       );
 
       outputQuery = outputQuery.orderBy(sortedColumn.fieldName!, descending: sortedColumn.descending);
-
-      if (_columnSettings[sortedColumnIndex!].fieldName != null) {
-        String fieldName = _columnSettings[sortedColumnIndex!].fieldName!;
-        outputQuery = outputQuery.startsWith(fieldName, searchString!);
-      }
-    } else {
-      if (searchableColumns.isNotEmpty) {
-        if (searchString != null && searchString!.isNotEmpty) {
-          Console.log("fframeLog.ListGridNotifier: searching for: $searchString");
-          if (searchableColumns.length > 1) {
-            //TODO JPM: make multiple columns supported
-            Console.log("fframeLog.ListGridNotifier: ERROR: Multiple searchable columns not supported at this time. Please adjust configuration");
-            // List<Filter> currentFilters = [];
-            // for (int searchableColumnIndex in searchableColumns) {
-            //   String curSearch = searchString!;
-            //   ListGridColumn curColumn = _columnSettings[searchableColumnIndex];
-            //   if (curColumn.fieldName != null) {
-            //     String fieldName = curColumn.fieldName!;
-            //     outputQuery = outputQuery.orderBy(fieldName,
-            //         descending: curColumn.descending);
-            //     if (curColumn.searchMask != null) {
-            //       if (curColumn.searchMask!.toLowerCase) {
-            //         curSearch = curSearch.toLowerCase();
-            //       }
-            //       curSearch = curSearch.replaceAll(
-            //         curColumn.searchMask!.from,
-            //         curColumn.searchMask!.to,
-            //       );
-            //     }
-            //     currentFilters.add(Filter(fieldName, isEqualTo: curSearch));
-            //     outputQuery = outputQuery.startsWith(
-            //       fieldName,
-            //       curSearch,
-            //     );
-            //   }
-            //   outputQuery = outputQuery
-            //       .where(Filter.or(currentFilters[0], currentFilters[1]));
-            // }
-          } else {
-            if (_columnSettings[searchableColumns.first].fieldName != null) {
-              String curSearch = searchString!;
-              ListGridColumn curColumn = _columnSettings[searchableColumns.first];
-              String fieldName = curColumn.fieldName!;
-              outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
-              if (curColumn.searchMask == null) {
-                outputQuery = outputQuery.startsWith(fieldName, curSearch);
-              } else {
-                if (curColumn.searchMask!.toLowerCase) {
-                  curSearch = curSearch.toLowerCase();
-                }
-                outputQuery = outputQuery.startsWith(
-                  fieldName,
-                  curSearch.replaceAll(
-                    curColumn.searchMask!.from,
-                    curColumn.searchMask!.to,
-                  ),
-                );
-              }
-            }
-          }
-        } else {
-          // no search string provided, and no column user sorted. make sure to sort the primary search column if available.
-
-          if (_columnSettings[searchableColumns.first].fieldName != null) {
-            ListGridColumn curColumn = _columnSettings[searchableColumns.first];
-            String fieldName = curColumn.fieldName!;
-            outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
-          }
-        }
-      } else {
-        Console.log(
-          "fframeLog.ListGridNotifier: no searchable column specified",
-          level: LogLevel.fframe,
-        );
-      }
     }
 
-    // apply the newly computedQuery as the current query
-    _currentQuery = outputQuery as Query<T>;
+    // Apply filtering on the client-side
+    List<DocumentSnapshot<T>> filteredDocuments = _allDocuments;
+    if (searchString != null && searchString!.isNotEmpty) {
+      filteredDocuments = _filterDocuments(searchString!, filteredDocuments);
+    }
+
+    // Update the current query to reflect the filtered results
+    _currentQuery = _initialQuery!.where('__name__', whereIn: filteredDocuments.map((doc) => doc.id).toList());
+
     Console.log(
       "fframeLog.ListGridNotifier: ${outputQuery.parameters.toString()}",
       level: LogLevel.fframe,
@@ -173,6 +117,57 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
     // notify the listeners that a redraw is needed
     notifyListeners();
+  }
+
+  List<DocumentSnapshot<T>> _filterDocuments(
+    String searchString,
+    List<DocumentSnapshot<T>> documents,
+  ) {
+    List<DocumentSnapshot<T>> filteredDocs = [];
+    for (DocumentSnapshot<T> doc in documents) {
+      bool match = false;
+      for (int searchableColumnIndex in searchableColumns) {
+        ListGridColumn curColumn = _columnSettings[searchableColumnIndex];
+        if (curColumn.fieldName != null) {
+          String fieldName = curColumn.fieldName!;
+          dynamic fieldValue = doc.get(fieldName);
+
+          if (fieldValue != null) {
+            String stringValue = fieldValue.toString();
+            String curSearch = searchString;
+
+            if (curColumn.searchMask != null) {
+              if (curColumn.searchMask!.toLowerCase) {
+                stringValue = stringValue.toLowerCase();
+                curSearch = curSearch.toLowerCase();
+              }
+              curSearch = curSearch.replaceAll(
+                curColumn.searchMask!.from,
+                curColumn.searchMask!.to,
+              );
+            }
+            // Determine if we should use startsWith or contains based on user input
+            if (searchableColumns.length > 1) {
+              // Use contains if multiple searchable columns
+              if (stringValue.contains(curSearch)) {
+                match = true;
+                break;
+              }
+            } else {
+              // Use startsWith if only one searchable column
+              if (stringValue.toLowerCase().startsWith(curSearch.toLowerCase())) {
+                match = true;
+                break;
+              }
+            }
+          }
+        }
+      }
+      if (match) {
+        filteredDocs.add(doc);
+      }
+    }
+    return filteredDocs;
   }
 
   void sortColumn({required int columnIndex, bool descending = false}) {
