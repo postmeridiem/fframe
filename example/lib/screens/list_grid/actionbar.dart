@@ -43,10 +43,10 @@ List<ListGridActionMenu<Suggestion>> listgridActionMenu() {
     ListGridActionMenu<Suggestion>(
       menuItems: [
         ListGridActionMenuItem<Suggestion>(
-          label: "Delete",
+          label: "Delet",
           icon: Icons.delete_outline,
           onClick: (context, user, selectedDocument, _) {
-            debugPrint("NOT deleting ${selectedDocument.toString()}. Just printing this.");
+            debugPrint("NOT deleting ${selectedDocument.toString()}. Just printing this..");
             return;
           },
         ),
