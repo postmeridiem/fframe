@@ -83,6 +83,53 @@ typedef ListGridActionHandler<T> = SelectedDocument<T>? Function(
 );
 
 class ListGridColumn<T> {
+
+  final bool startsWithSearch;
+
+  /// Creates a [ListGridColumn] instance.
+  ///
+  /// The [label] is the text displayed in the column header.
+  ///
+  /// The [visible] flag determines if the column is visible.
+  ///
+  /// The [fieldName] is the name of the field in the data object that this column represents.
+  ///
+  /// The [searchable] flag determines if this column can be searched.
+  ///
+  /// The [searchMask] allows you to define a search mask for this column.
+  ///
+  /// The [sortable] flag determines if this column can be sorted.
+  ///
+  /// The [descending] flag determines the default sort order.
+  ///
+  /// The [valueBuilder] is a function that builds the value to be displayed in the cell.
+  ///
+  /// The [cellBuilder] is a function that builds the widget to be displayed in the cell.
+  ///
+  /// The [columnSizing] determines how the column is sized.
+  ///
+  /// The [columnWidth] is the width of the column.
+  ///
+  /// The [alignment] is the alignment of the cell content.
+  ///
+  /// The [cellColor] is the background color of the cell.
+  ///
+  /// The [textSelectable] flag determines if the text in the cell can be selected.
+  ///
+  /// The [generateTooltip] flag determines if a tooltip should be generated for the cell.
+  ///
+  /// The [cellControlsBuilder] is a function that builds the controls to be displayed in the cell.
+  ///
+  /// The [onTableCellClick] is a function that is called when the cell is clicked.
+  ///
+  /// The [startsWithSearch] flag determines if the search should use a "starts with" or "contains" matching strategy.
+  ///   - When set to `true`, the search will only match if the field's value *starts with* the search string.
+  ///   - When set to `false` (the default), the search will match if the field's value *contains* the search string anywhere within it.
+  ///
+  /// Example:
+  ///   - If `startsWithSearch` is `true` and the search string is "Jo", a field value of "John Doe" will match, but "Doe, John" will not.
+  ///   - If `startsWithSearch` is `false` and the search string is "Jo", both "John Doe" and "Doe, John" will match.
+
   ListGridColumn({
     this.label = '',
     this.visible = true,
@@ -101,6 +148,7 @@ class ListGridColumn<T> {
     this.generateTooltip = false,
     this.cellControlsBuilder,
     this.onTableCellClick,
+    this.startsWithSearch = true, // Default to true (instead of contains)
     // this.dynamicTextStyle,
     // this.dynamicBackgroundColor,
   });

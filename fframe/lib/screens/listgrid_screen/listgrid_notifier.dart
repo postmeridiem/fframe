@@ -127,35 +127,35 @@ class ListGridNotifier<T> extends ChangeNotifier {
     for (DocumentSnapshot<T> doc in documents) {
       bool match = false;
       for (int searchableColumnIndex in searchableColumns) {
-        ListGridColumn curColumn = _columnSettings[searchableColumnIndex];
-        if (curColumn.fieldName != null) {
-          String fieldName = curColumn.fieldName!;
+        ListGridColumn currentColumn = _columnSettings[searchableColumnIndex];
+        if (currentColumn.fieldName != null) {
+          String fieldName = currentColumn.fieldName!;
           dynamic fieldValue = doc.get(fieldName);
 
           if (fieldValue != null) {
             String stringValue = fieldValue.toString();
             String curSearch = searchString;
 
-            if (curColumn.searchMask != null) {
-              if (curColumn.searchMask!.toLowerCase) {
+            if (currentColumn.searchMask != null) {
+              if (currentColumn.searchMask!.toLowerCase) {
                 stringValue = stringValue.toLowerCase();
                 curSearch = curSearch.toLowerCase();
               }
               curSearch = curSearch.replaceAll(
-                curColumn.searchMask!.from,
-                curColumn.searchMask!.to,
+                currentColumn.searchMask!.from,
+                currentColumn.searchMask!.to,
               );
             }
             // Determine if we should use startsWith or contains based on user input
-            if (searchableColumns.length > 1) {
-              // Use contains if multiple searchable columns
-              if (stringValue.contains(curSearch)) {
+            if (currentColumn.startsWithSearch) {
+              // Use startsWith
+              if (stringValue.toLowerCase().startsWith(curSearch.toLowerCase())) {
                 match = true;
                 break;
               }
             } else {
-              // Use startsWith if only one searchable column
-              if (stringValue.toLowerCase().startsWith(curSearch.toLowerCase())) {
+              // Use contains
+              if (stringValue.contains(curSearch)) {
                 match = true;
                 break;
               }
