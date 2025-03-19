@@ -79,13 +79,14 @@ part 'package:fframe/services/target_state.dart';
 part 'package:fframe/controllers/selection_state_controller.dart';
 part 'package:fframe/helpers/console_logger.dart';
 
-part 'screens/document_screen/models.dart';
-part 'screens/document_screen/typedefs.dart';
-part 'screens/document_screen/document_minimized.dart';
-part 'screens/document_screen/document_context.dart';
-part 'screens/document_screen/document_screen.dart';
-part 'screens/document_screen/document_body.dart';
-part 'screens/document_screen/document_list.dart';
+part 'package:fframe/screens/document_screen/models.dart';
+part 'package:fframe/screens/document_screen/typedefs.dart';
+part 'package:fframe/screens/document_screen/document_minimized.dart';
+part 'package:fframe/screens/document_screen/document_context.dart';
+part 'package:fframe/screens/document_screen/document_screen.dart';
+part 'package:fframe/screens/document_screen/document_body.dart';
+part 'package:fframe/screens/document_screen/document_list.dart';
+
 part 'package:fframe/screens/datagrid_screen/datagrid_firestore.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_firestore.dart';
 part 'package:fframe/screens/listgrid_screen/listgrid_controller.dart';
@@ -96,8 +97,11 @@ part 'package:fframe/screens/swimlanes_screen/swimlanes_controller.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_document.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_widgets.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_classes.dart';
-part 'screens/router_page.dart';
+part 'package:fframe/screens/router_page.dart';
 
-part 'helpers/validator.dart';
-part 'helpers/load_extra_data.dart';
-part 'models/app_user.dart';
+part 'package:fframe/helpers/validator.dart';
+part 'package:fframe/helpers/load_extra_data.dart';
+part 'package:fframe/helpers/notifications.dart';
+
+part 'package:fframe/models/app_notification.dart';
+part 'package:fframe/models/app_user.dart';
