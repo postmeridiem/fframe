@@ -52,7 +52,8 @@ class Fframe extends InheritedWidget {
     required this.consoleLogger,
     this.themeMode = ThemeMode.system,
     this.providerConfigs,
-    this.debugShowCheckedModeBanner = true,
+    this.enableNotficationSystem = false,
+    this.debugShowCheckedModeBanner = false,
     this.globalActions,
     this.postLoad,
     this.postSignIn,
@@ -77,6 +78,7 @@ class Fframe extends InheritedWidget {
   late ThemeMode themeMode;
   final L10nConfig l10nConfig;
   final Console consoleLogger;
+  final bool enableNotficationSystem;
   final bool debugShowCheckedModeBanner;
   final List<Widget>? globalActions;
   final PostFunction? postLoad;

@@ -110,6 +110,7 @@ class MainApp extends StatelessWidget {
           clientId: "252859371693-n0lhonhub6tosste2ns0a0n4s923du2l.apps.googleusercontent.com",
         ),
       ],
+      enableNotficationSystem: true,
       debugShowCheckedModeBanner: false,
       globalActions: const [
         BarButtonShare(),
