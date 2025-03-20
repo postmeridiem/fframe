@@ -126,6 +126,7 @@ class Document<T> {
     this.showSaveButton = true,
     this.showDeleteButton = false,
     this.prefetchTabs = true,
+    this.withEndDrawer = true,
   });
   final Key? key;
   final DocumentTabsBuilder<T> documentTabsBuilder;
@@ -144,6 +145,7 @@ class Document<T> {
   bool showValidateButton;
   bool showSaveButton;
   bool prefetchTabs;
+  bool withEndDrawer;
 }
 
 class DocumentTab<T> {

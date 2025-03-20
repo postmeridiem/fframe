@@ -585,40 +585,47 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
     return 10.0;
   }
 
+  final int _documentsPerPage = 20;
+
   @override
   Widget build(BuildContext context) {
     final SwimlanesConfig<T> swimlanesConfig = widget.swimlanesController.swimlanesConfig as SwimlanesConfig<T>;
 
-    //Fetch the initial query
-    Query<T> query = DatabaseService<T>().query(
+    // Fetch the initial query
+    Query<T> baseQuery = DatabaseService<T>().query(
       collection: widget.documentConfig.collection,
       fromFirestore: widget.documentConfig.fromFirestore,
       queryBuilder: widget.documentConfig.query,
     );
 
-    //Append the lane query
+    // Append the lane query
     if (widget.swimlaneSetting.query != null) {
-      query = widget.swimlaneSetting.query!(query)!;
+      baseQuery = widget.swimlaneSetting.query!(baseQuery)!;
     }
 
-    query = query.orderBy("priority");
+    baseQuery = baseQuery.orderBy("priority");
 
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       return SizedBox(
         height: constraints.maxHeight,
         width: swimlanesConfig.swimlaneWidth,
-        child: StreamBuilder<QuerySnapshot<T>>(
-          stream: query.snapshots(),
-          builder: (BuildContext context, AsyncSnapshot<QuerySnapshot<T>> snapshot) {
-            if (!snapshot.hasData) {
+        child: FirestoreQueryBuilder<T>(
+          query: baseQuery,
+          pageSize: _documentsPerPage,
+          builder: (BuildContext context, FirestoreQueryBuilderSnapshot<T> snapshot, _) {
+            if (snapshot.isFetching) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
-            } else if (snapshot.hasError) {
-              //Something has gone wrong
+            }
+
+            if (snapshot.hasError) {
+              // Something has gone wrong
               return Fframe.of(context)!.showErrorPage(context: context, errorText: snapshot.error.toString());
-            } else {
-              List<SelectedDocument<T>> unfilteredDocuments = snapshot.data!.docs
+            }
+
+            if (snapshot.hasData) {
+              List<SelectedDocument<T>> unfilteredDocuments = snapshot.docs
                   .map(
                     (QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
                       data: queryDocument.data(),
@@ -680,11 +687,18 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                             fFrameUser: widget.fFrameUser,
                             width: swimlanesConfig.swimlaneWidth,
                             swimlaneSetting: widget.swimlaneSetting,
+                            priority: 1.0,
                           )
                         : ListView.builder(
                             shrinkWrap: true,
                             itemCount: swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2, // Double the count for drop zones and add 1 for the final drop zone
                             itemBuilder: (context, index) {
+                              if (snapshot.hasMore && index + 1 == snapshot.docs.length) {
+                                // Tell FirestoreQueryBuilder to try to obtain more items.
+                                // It is safe to call this function from within the build method.
+                                snapshot.fetchMore();
+                              }
+
                               // Return only task cards if the swimlanes are read-only
                               if (swimlanesConfig.isReadOnly) {
                                 return Column(
@@ -699,6 +713,10 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                         width: swimlanesConfig.swimlaneWidth,
                                       );
                                     }),
+                                    if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
+                                      const Center(
+                                        child: CircularProgressIndicator(),
+                                      )
                                   ],
                                 );
                               }
@@ -766,6 +784,10 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                         }),
                                       ),
                                     ),
+                                    if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
+                                      const Center(
+                                        child: CircularProgressIndicator(),
+                                      )
                                   ],
                                 );
                               } else {
@@ -811,6 +833,8 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                 },
               );
             }
+
+            return const Center(child: CircularProgressIndicator());
           },
         ),
       );
@@ -965,7 +989,7 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
             widget.fFrameUser.roles,
             dragContext.data.sourceColumn.id,
             (widget.swimlanesConfig.getPriority != null) ? widget.swimlanesConfig.getPriority!(dragContext.data.selectedDocument.data).floor() : null,
-            (widget.swimlanesConfig.getPriority != null) ? widget.priority!.floor() : null,
+            (widget.swimlanesConfig.getPriority != null) ? widget.priority?.floor() : null,
           );
         } else {
           return false;

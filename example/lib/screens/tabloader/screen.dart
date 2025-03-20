@@ -75,6 +75,7 @@ Document<FframePage> tabLoaderDocument(BuildContext context) {
     showSaveButton: false,
     showCloseButton: false,
     prefetchTabs: false,
+    withEndDrawer: false,
     documentTabsBuilder: (context, page, isReadOnly, isNew, fFrameUser) {
       return [
         DocumentTab<FframePage>(
