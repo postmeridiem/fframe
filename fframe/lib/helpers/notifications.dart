@@ -22,7 +22,11 @@ class FframeNotifications {
     FframeNotifications.instance.enabled = false;
   }
 
-  static void createNotification({required FframeNotification notification}) {
+  static void sendNotificationsToEmails({required List<String> emailAddresses, required FframeNotification notification}) {
+    Console.log("creating notification ${notification.messageTitle}", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+  }
+
+  static void sendNotificationsToUUIDs({required List<String> uuids, required FframeNotification notification}) {
     Console.log("creating notification ${notification.messageTitle}", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
   }
 }
