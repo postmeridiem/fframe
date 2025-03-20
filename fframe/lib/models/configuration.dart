@@ -2,7 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
 class Configuration extends ChangeNotifier {
-  Configuration({this.id, this.name, this.active, this.icon, this.order});
+  Configuration({
+    this.id,
+    this.name,
+    this.active,
+    this.icon,
+    this.order,
+  });
 
   fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
     Map<String, dynamic> json = snapshot.data()!;
