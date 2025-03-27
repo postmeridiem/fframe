@@ -2,7 +2,7 @@ import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
-class FframeRolesManager extends StatefulWidget {
+class FframeRolesManager<T extends Enum> extends StatefulWidget {
   const FframeRolesManager({
     super.key,
     required this.uid,
@@ -11,14 +11,14 @@ class FframeRolesManager extends StatefulWidget {
   });
 
   final Map<String, String> appRoles;
-  final Map<String, List<AppRoles>> roleGroups;
+  final Map<String, List<T>> roleGroups;
   final String uid;
 
   @override
   State<FframeRolesManager> createState() => _FframeRolesManagerState();
 }
 
-class _FframeRolesManagerState extends State<FframeRolesManager> {
+class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<T>> {
   List<String> userRoles = [];
 
   addUserRole(BuildContext context, String role) async {
@@ -106,7 +106,7 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
     return [];
   }
 
-  Future<void> assignRoleGroup(BuildContext context, String groupName, List<AppRoles> roles) async {
+  Future<void> assignRoleGroup(BuildContext context, String groupName, List<T> roles) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -192,44 +192,4 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
       },
     );
   }
-}
-
-enum AppRoles {
-  user,
-
-  userAdmin,
-  roleManager,
-
-  management,
-  lsTeam,
-  sales,
-  customerSupport,
-  innovationTeam,
-  modeller,
-  developer,
-
-  customerViewer,
-  customerActivator,
-  tailoringManager,
-  contractManager,
-  featureManager,
-  invoiceManager,
-  placeholderImageManager,
-
-  briefer,
-  briefingModerator,
-
-  dataResearcher,
-  dataModerator,
-
-  modelModerator,
-  mappingModerator,
-
-  interiorModeller,
-  interiorModerator,
-
-  powerToolFullAccess,
-  firestoreAccess,
-  superAdmin,
-  productConfigurator,
 }
