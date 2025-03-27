@@ -20,6 +20,39 @@ class FframeRolesManager<T extends Enum> extends StatefulWidget {
 
 class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<T>> {
   List<String> userRoles = [];
+  bool errorShown = false;
+
+  Future<void> showSingleErrorDialog(BuildContext context, String message) async {
+    if (errorShown) return;
+    errorShown = true;
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        content: Row(
+          children: [
+            Icon(Icons.error, color: Colors.amber[900]),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: TextStyle(color: Colors.amber[900]),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: const Text("OK"),
+            onPressed: () {
+              Navigator.of(context).pop();
+              errorShown = false;
+            },
+          )
+        ],
+      ),
+    );
+  }
 
   addUserRole(BuildContext context, String role) async {
     try {
@@ -33,32 +66,9 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       });
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return;
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: Colors.grey[900],
-          content: Row(
-            children: [
-              Icon(Icons.error, color: Colors.amber[900]),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "${e.message}",
-                  style: TextStyle(color: Colors.amber[900]),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          ],
-        ),
-      );
+      await showSingleErrorDialog(context, e.message ?? "Unknown error");
     } catch (e) {
-      Console.log("ERROR: ${e.toString()}", scope: "fframeAuth.addUserRole", level: LogLevel.prod);
+      Console.log("ERROR: \${e.toString()}", scope: "fframeAuth.addUserRole", level: LogLevel.prod);
     }
   }
 
@@ -74,32 +84,9 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       });
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return;
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: Colors.grey[900],
-          content: Row(
-            children: [
-              Icon(Icons.error, color: Colors.amber[900]),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "${e.message}",
-                  style: TextStyle(color: Colors.amber[900]),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          ],
-        ),
-      );
+      await showSingleErrorDialog(context, e.message ?? "Unknown error");
     } catch (e) {
-      Console.log("ERROR: ${e.toString()}", scope: "fframeAuth.removeUserRole", level: LogLevel.prod);
+      Console.log("ERROR: \${e.toString()}", scope: "fframeAuth.removeUserRole", level: LogLevel.prod);
     }
   }
 
@@ -112,32 +99,9 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       return functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return [];
-      showDialog(
-        context: context,
-        builder: (_) => AlertDialog(
-          backgroundColor: Colors.grey[900],
-          content: Row(
-            children: [
-              Icon(Icons.error, color: Colors.amber[900]),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  "${e.message}",
-                  style: TextStyle(color: Colors.amber[900]),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: const Text("OK"),
-              onPressed: () => Navigator.of(context).pop(),
-            )
-          ],
-        ),
-      );
+      await showSingleErrorDialog(context, e.message ?? "Unknown error");
     } catch (e) {
-      Console.log("ERROR: ${e.toString()}", scope: "fframeAuth.getUserRoles", level: LogLevel.prod);
+      Console.log("ERROR: \${e.toString()}", scope: "fframeAuth.getUserRoles", level: LogLevel.prod);
     }
     return [];
   }
@@ -147,7 +111,7 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       context: context,
       builder: (_) => AlertDialog(
         title: Text("Confirm Role Group Change"),
-        content: Text("This will remove all existing roles and assign only the ${groupName} roles. Proceed?"),
+        content: Text("This will remove all existing roles and assign only the \${groupName} roles. Proceed?"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
           ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text("Confirm")),
@@ -157,16 +121,18 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
 
     if (confirm != true) return;
 
-    for (final role in userRoles) {
-      await removeUserRole(context, role);
-    }
-
-    for (final roleEnum in roles) {
-      final roleKey = roleEnum.name;
-      final roleString = widget.appRoles[roleKey];
-      if (roleString != null) {
-        await addUserRole(context, roleKey);
-      }
+    try {
+      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-setUserRoles");
+      final newRoleKeys = roles.map((roleEnum) => roleEnum.name).toList();
+      final result = await callable({
+        'uid': widget.uid,
+        'roles': newRoleKeys,
+      });
+      setState(() {
+        userRoles = List<String>.from(result.data);
+      });
+    } catch (e) {
+      await showSingleErrorDialog(context, e.toString());
     }
   }
 
@@ -207,7 +173,7 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
                             onPressed: () => assignRoleGroup(context, entry.key, entry.value),
                             child: Material(
                               type: MaterialType.transparency,
-                              child: Text("Apply ${entry.key} Roles"),
+                              child: Text("Apply \${entry.key} Roles"),
                             ),
                           ),
                         );
