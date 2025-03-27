@@ -20,71 +20,6 @@ class FframeRolesManager<T extends Enum> extends StatefulWidget {
 
 class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<T>> {
   List<String> userRoles = [];
-  bool errorShown = false;
-
-  Future<void> showSingleErrorDialog(BuildContext context, String message) async {
-    if (errorShown) return;
-    errorShown = true;
-    await showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: Colors.grey[900],
-        content: Row(
-          children: [
-            Icon(Icons.error, color: Colors.amber[900]),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                message,
-                style: TextStyle(color: Colors.amber[900]),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            child: const Text("OK"),
-            onPressed: () {
-              Navigator.of(context).pop();
-              errorShown = false;
-            },
-          )
-        ],
-      ),
-    );
-  }
-
-  addUserRole(BuildContext context, String role) async {
-    try {
-      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-addUserRole");
-      HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
-        'uid': widget.uid,
-        'role': role,
-      });
-      setState(() {
-        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
-      });
-    } on FirebaseFunctionsException catch (e) {
-      if (!context.mounted) return;
-      await showSingleErrorDialog(context, e.message ?? "Unknown error");
-    }
-  }
-
-  removeUserRole(BuildContext context, String role) async {
-    try {
-      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-removeUserRole");
-      HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
-        'uid': widget.uid,
-        'role': role,
-      });
-      setState(() {
-        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
-      });
-    } on FirebaseFunctionsException catch (e) {
-      if (!context.mounted) return;
-      await showSingleErrorDialog(context, e.message ?? "Unknown error");
-    }
-  }
 
   Future<List<String>> getUserRoles(BuildContext context) async {
     try {
@@ -93,9 +28,8 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
         'uid': widget.uid,
       });
       return functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
-    } on FirebaseFunctionsException catch (e) {
-      if (!context.mounted) return [];
-      await showSingleErrorDialog(context, e.message ?? "Unknown error");
+    } catch (e) {
+      _showErrorDialog(context, e.toString());
     }
     return [];
   }
@@ -105,7 +39,7 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       context: context,
       builder: (_) => AlertDialog(
         title: Text("Confirm Role Group Change"),
-        content: Text("This will remove all existing roles and assign only the \${groupName} roles. Proceed?"),
+        content: Text("This will remove all existing roles and assign only the $groupName roles. Proceed?"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
           ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text("Confirm")),
@@ -117,17 +51,50 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
 
     try {
       HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-setUserRoles");
-      final newRoleKeys = roles.map((roleEnum) => roleEnum.name).toList();
-      final result = await callable({
+      final newRoles = roles.map((r) => r.name).toList();
+      HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
         'uid': widget.uid,
-        'roles': newRoleKeys,
+        'roles': newRoles,
       });
       setState(() {
-        userRoles = List<String>.from(result.data);
+        userRoles = functionResults.data.map((r) => r.toString()).toList();
       });
     } catch (e) {
-      await showSingleErrorDialog(context, e.toString());
+      _showErrorDialog(context, e.toString());
     }
+  }
+
+  Future<void> toggleUserRole(BuildContext context, String role, bool add) async {
+    try {
+      final functionName = add ? "fframeAuth-addUserRole" : "fframeAuth-removeUserRole";
+      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable(functionName);
+      HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
+        'uid': widget.uid,
+        'role': role,
+      });
+      setState(() {
+        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
+      });
+    } catch (e) {
+      _showErrorDialog(context, e.toString());
+    }
+  }
+
+  void _showErrorDialog(BuildContext context, String message) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        content: Row(
+          children: [
+            Icon(Icons.error, color: Colors.amber[900]),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message, style: TextStyle(color: Colors.amber[900]))),
+          ],
+        ),
+        actions: [TextButton(child: const Text("OK"), onPressed: () => Navigator.of(context).pop())],
+      ),
+    );
   }
 
   @override
@@ -159,15 +126,10 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
                               backgroundColor: Theme.of(context).colorScheme.tertiary,
                               foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () => assignRoleGroup(context, entry.key, entry.value),
-                            child: Material(
-                              type: MaterialType.transparency,
-                              child: Text("Apply ${entry.key} Roles"),
-                            ),
+                            child: Text("Apply ${entry.key} Roles"),
                           ),
                         );
                       }).toList(),
@@ -179,13 +141,7 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
                   (entry) => SwitchListTile(
                     title: Text(entry.value),
                     value: userRoles.contains(entry.key),
-                    onChanged: (bool newValue) {
-                      if (newValue) {
-                        addUserRole(context, entry.key);
-                      } else {
-                        removeUserRole(context, entry.key);
-                      }
-                    },
+                    onChanged: (bool newValue) => toggleUserRole(context, entry.key, newValue),
                     activeColor: Theme.of(context).indicatorColor,
                   ),
                 ),
