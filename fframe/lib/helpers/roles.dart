@@ -49,19 +49,8 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
 
     if (confirm != true) return;
 
-    try {
-      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-setUserRoles");
-      final newRoles = roles.map((r) => r.name).toList();
-      HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
-        'uid': widget.uid,
-        'roles': newRoles,
-      });
-      setState(() {
-        userRoles = functionResults.data.map((r) => r.toString()).toList();
-      });
-    } catch (e) {
-      _showErrorDialog(context, e.toString());
-    }
+    final newRoles = roles.map((r) => r.name).toList();
+    await assignMultipleRoles(context, newRoles);
   }
 
   Future<void> toggleUserRole(BuildContext context, String role, bool add) async {
@@ -71,6 +60,21 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
         'uid': widget.uid,
         'role': role,
+      });
+      setState(() {
+        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
+      });
+    } catch (e) {
+      _showErrorDialog(context, e.toString());
+    }
+  }
+
+  Future<void> assignMultipleRoles(BuildContext context, List<String> roles) async {
+    try {
+      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-setUserRoles");
+      HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
+        'uid': widget.uid,
+        'roles': roles,
       });
       setState(() {
         userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
