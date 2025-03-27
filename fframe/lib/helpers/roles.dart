@@ -67,8 +67,6 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return;
       await showSingleErrorDialog(context, e.message ?? "Unknown error");
-    } catch (e) {
-      Console.log("ERROR: \${e.toString()}", scope: "fframeAuth.addUserRole", level: LogLevel.prod);
     }
   }
 
@@ -85,8 +83,6 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return;
       await showSingleErrorDialog(context, e.message ?? "Unknown error");
-    } catch (e) {
-      Console.log("ERROR: \${e.toString()}", scope: "fframeAuth.removeUserRole", level: LogLevel.prod);
     }
   }
 
@@ -100,8 +96,6 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return [];
       await showSingleErrorDialog(context, e.message ?? "Unknown error");
-    } catch (e) {
-      Console.log("ERROR: \${e.toString()}", scope: "fframeAuth.getUserRoles", level: LogLevel.prod);
     }
     return [];
   }
@@ -152,7 +146,6 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
             }
             return Column(
               children: [
-                // Sticky role group buttons
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Padding(
@@ -173,7 +166,7 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
                             onPressed: () => assignRoleGroup(context, entry.key, entry.value),
                             child: Material(
                               type: MaterialType.transparency,
-                              child: Text("Apply \${entry.key} Roles"),
+                              child: Text("Apply ${entry.key} Roles"),
                             ),
                           ),
                         );
@@ -187,10 +180,10 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
                     title: Text(entry.value),
                     value: userRoles.contains(entry.key),
                     onChanged: (bool newValue) {
-                      if (newValue == false) {
-                        removeUserRole(context, entry.key);
-                      } else {
+                      if (newValue) {
                         addUserRole(context, entry.key);
+                      } else {
+                        removeUserRole(context, entry.key);
                       }
                     },
                     activeColor: Theme.of(context).indicatorColor,
