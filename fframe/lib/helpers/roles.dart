@@ -172,7 +172,10 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
                               ),
                             ),
                             onPressed: () => assignRoleGroup(context, entry.key, entry.value),
-                            child: Text("Apply ${entry.key} Roles"),
+                            child: Material(
+                              type: MaterialType.transparency,
+                              child: Text("Apply ${entry.key} Roles"),
+                            ),
                           ),
                         );
                       }).toList(),
