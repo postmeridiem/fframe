@@ -7,8 +7,11 @@ class FframeRolesManager extends StatefulWidget {
     super.key,
     required this.uid,
     required this.appRoles,
+    required this.roleGroups,
   });
+
   final Map<String, String> appRoles;
+  final Map<String, List<AppRoles>> roleGroups;
   final String uid;
 
   @override
@@ -103,35 +106,130 @@ class _FframeRolesManagerState extends State<FframeRolesManager> {
     return [];
   }
 
+  Future<void> assignRoleGroup(BuildContext context, String groupName, List<AppRoles> roles) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text("Confirm Role Group Change"),
+        content: Text("This will remove all existing roles and assign only the ${groupName} roles. Proceed?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
+          ElevatedButton(onPressed: () => Navigator.pop(context, true), child: const Text("Confirm")),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    for (final role in userRoles) {
+      await removeUserRole(context, role);
+    }
+
+    for (final roleEnum in roles) {
+      final roleKey = roleEnum.name;
+      final roleString = widget.appRoles[roleKey];
+      if (roleString != null) {
+        await addUserRole(context, roleKey);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<String>>(
-        future: getUserRoles(context),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.none:
-            case ConnectionState.active:
-            case ConnectionState.waiting:
-              return FRouter.of(context).waitPage(context: context, text: "Loading user roles");
-            case ConnectionState.done:
-              if (snapshot.hasData) {
-                userRoles = snapshot.data!;
-              }
-              return Column(
-                children: widget.appRoles.entries
-                    .map(
-                      (MapEntry mapEntry) => SwitchListTile(
-                        title: Text("${mapEntry.value}"),
-                        value: userRoles.contains(mapEntry.key),
-                        onChanged: (bool newValue) => {
-                          if (newValue == false) {removeUserRole(context, mapEntry.key)} else {addUserRole(context, mapEntry.key)}
-                        },
-                        activeColor: Theme.of(context).indicatorColor,
-                      ),
-                    )
-                    .toList(),
-              );
-          }
-        });
+      future: getUserRoles(context),
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+          case ConnectionState.active:
+          case ConnectionState.waiting:
+            return FRouter.of(context).waitPage(context: context, text: "Loading user roles");
+          case ConnectionState.done:
+            if (snapshot.hasData) {
+              userRoles = snapshot.data!;
+            }
+            return Column(
+              children: [
+                // Sticky role group buttons
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: widget.roleGroups.entries.map((entry) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                            ),
+                            onPressed: () => assignRoleGroup(context, entry.key, entry.value),
+                            child: Text("Apply ${entry.key} Roles"),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                const Divider(height: 32),
+                ...widget.appRoles.entries.map(
+                  (entry) => SwitchListTile(
+                    title: Text(entry.value),
+                    value: userRoles.contains(entry.key),
+                    onChanged: (bool newValue) {
+                      if (newValue == false) {
+                        removeUserRole(context, entry.key);
+                      } else {
+                        addUserRole(context, entry.key);
+                      }
+                    },
+                    activeColor: Theme.of(context).indicatorColor,
+                  ),
+                ),
+              ],
+            );
+        }
+      },
+    );
   }
+}
+
+enum AppRoles {
+  user,
+
+  userAdmin,
+  roleManager,
+
+  management,
+  lsTeam,
+  sales,
+  customerSupport,
+  innovationTeam,
+  modeller,
+  developer,
+
+  customerViewer,
+  customerActivator,
+  tailoringManager,
+  contractManager,
+  featureManager,
+  invoiceManager,
+  placeholderImageManager,
+
+  briefer,
+  briefingModerator,
+
+  dataResearcher,
+  dataModerator,
+
+  modelModerator,
+  mappingModerator,
+
+  interiorModeller,
+  interiorModerator,
+
+  powerToolFullAccess,
+  firestoreAccess,
+  superAdmin,
+  productConfigurator,
 }
