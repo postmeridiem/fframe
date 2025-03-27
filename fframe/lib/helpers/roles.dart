@@ -69,15 +69,33 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
     }
   }
 
-  Future<void> assignMultipleRoles(BuildContext context, List<String> roles) async {
+  Future<void> assignMultipleRoles(BuildContext context, List<String> newRoles) async {
     try {
-      HttpsCallable callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-setUserRoles");
-      HttpsCallableResult<List<dynamic>> functionResults = await callable(<String, dynamic>{
-        'uid': widget.uid,
-        'roles': roles,
-      });
+      // 1. Get current roles
+      final currentRoles = await getUserRoles(context);
+
+      // 2. Remove all current roles
+      for (final role in currentRoles) {
+        final callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-removeUserRole");
+        await callable({
+          'uid': widget.uid,
+          'role': role,
+        });
+      }
+
+      // 3. Add new roles
+      for (final role in newRoles) {
+        final callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-addUserRole");
+        await callable({
+          'uid': widget.uid,
+          'role': role,
+        });
+      }
+
+      // 4. Refresh roles state
+      final updatedRoles = await getUserRoles(context);
       setState(() {
-        userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
+        userRoles = updatedRoles;
       });
     } catch (e) {
       _showErrorDialog(context, e.toString());
