@@ -15,7 +15,7 @@ class FframeRolesManager<T extends Enum> extends StatefulWidget {
   final String uid;
 
   @override
-  State<FframeRolesManager> createState() => _FframeRolesManagerState();
+  State<FframeRolesManager> createState() => _FframeRolesManagerState<T>();
 }
 
 class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<T>> {
@@ -35,13 +35,13 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: ListTile(
-            leading: Icon(
-              Icons.error,
-              color: Colors.amber[900],
-            ),
-            title: Text('${e.message}'),
-            textColor: Colors.amber[900],
+          backgroundColor: Colors.grey[900],
+          content: Row(
+            children: [
+              Icon(Icons.error, color: Colors.amber[900]),
+              const SizedBox(width: 8),
+              Expanded(child: Text("${e.message}", style: TextStyle(color: Colors.amber[900]))),
+            ],
           ),
         ),
       );
@@ -64,13 +64,13 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: ListTile(
-            leading: Icon(
-              Icons.error,
-              color: Colors.amber[900],
-            ),
-            title: Text('${e.message}'),
-            textColor: Colors.amber[900],
+          backgroundColor: Colors.grey[900],
+          content: Row(
+            children: [
+              Icon(Icons.error, color: Colors.amber[900]),
+              const SizedBox(width: 8),
+              Expanded(child: Text("${e.message}", style: TextStyle(color: Colors.amber[900]))),
+            ],
           ),
         ),
       );
@@ -90,13 +90,13 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       if (!context.mounted) return [];
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: ListTile(
-            leading: Icon(
-              Icons.error,
-              color: Colors.amber[900],
-            ),
-            title: Text('${e.message}'),
-            textColor: Colors.amber[900],
+          backgroundColor: Colors.grey[900],
+          content: Row(
+            children: [
+              Icon(Icons.error, color: Colors.amber[900]),
+              const SizedBox(width: 8),
+              Expanded(child: Text("${e.message}", style: TextStyle(color: Colors.amber[900]))),
+            ],
           ),
         ),
       );
@@ -161,7 +161,12 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              backgroundColor: Theme.of(context).colorScheme.tertiary,
+                              foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                             onPressed: () => assignRoleGroup(context, entry.key, entry.value),
                             child: Text("Apply ${entry.key} Roles"),
