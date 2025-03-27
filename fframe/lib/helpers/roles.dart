@@ -35,6 +35,7 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating, // 🔥 No Hero used here
           backgroundColor: Colors.grey[900],
           content: Row(
             children: [
@@ -64,6 +65,7 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating, // 🔥 No Hero used here
           backgroundColor: Colors.grey[900],
           content: Row(
             children: [
@@ -90,6 +92,7 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       if (!context.mounted) return [];
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating, // 🔥 No Hero used here
           backgroundColor: Colors.grey[900],
           content: Row(
             children: [
