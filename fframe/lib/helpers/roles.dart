@@ -33,17 +33,28 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       });
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating, // 🔥 No Hero used here
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
           backgroundColor: Colors.grey[900],
           content: Row(
             children: [
               Icon(Icons.error, color: Colors.amber[900]),
               const SizedBox(width: 8),
-              Expanded(child: Text("${e.message}", style: TextStyle(color: Colors.amber[900]))),
+              Expanded(
+                child: Text(
+                  "${e.message}",
+                  style: TextStyle(color: Colors.amber[900]),
+                ),
+              ),
             ],
           ),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
         ),
       );
     } catch (e) {
@@ -63,17 +74,28 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       });
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating, // 🔥 No Hero used here
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
           backgroundColor: Colors.grey[900],
           content: Row(
             children: [
               Icon(Icons.error, color: Colors.amber[900]),
               const SizedBox(width: 8),
-              Expanded(child: Text("${e.message}", style: TextStyle(color: Colors.amber[900]))),
+              Expanded(
+                child: Text(
+                  "${e.message}",
+                  style: TextStyle(color: Colors.amber[900]),
+                ),
+              ),
             ],
           ),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
         ),
       );
     } catch (e) {
@@ -90,17 +112,28 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       return functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
     } on FirebaseFunctionsException catch (e) {
       if (!context.mounted) return [];
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          behavior: SnackBarBehavior.floating, // 🔥 No Hero used here
+      showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
           backgroundColor: Colors.grey[900],
           content: Row(
             children: [
               Icon(Icons.error, color: Colors.amber[900]),
               const SizedBox(width: 8),
-              Expanded(child: Text("${e.message}", style: TextStyle(color: Colors.amber[900]))),
+              Expanded(
+                child: Text(
+                  "${e.message}",
+                  style: TextStyle(color: Colors.amber[900]),
+                ),
+              ),
             ],
           ),
+          actions: [
+            TextButton(
+              child: const Text("OK"),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
         ),
       );
     } catch (e) {
