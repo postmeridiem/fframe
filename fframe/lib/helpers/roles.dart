@@ -20,6 +20,7 @@ class FframeRolesManager<T extends Enum> extends StatefulWidget {
 
 class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<T>> {
   List<String> userRoles = [];
+  bool isLoading = false;
 
   Future<List<String>> getUserRoles(BuildContext context) async {
     try {
@@ -70,35 +71,33 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
   }
 
   Future<void> assignMultipleRoles(BuildContext context, List<String> newRoles) async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
-      // 1. Get current roles
       final currentRoles = await getUserRoles(context);
 
-      // 2. Remove all current roles
       for (final role in currentRoles) {
         final callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-removeUserRole");
-        await callable({
-          'uid': widget.uid,
-          'role': role,
-        });
+        await callable({'uid': widget.uid, 'role': role});
       }
 
-      // 3. Add new roles
       for (final role in newRoles) {
         final callable = FirebaseFunctions.instanceFor(region: 'europe-west1').httpsCallable("fframeAuth-addUserRole");
-        await callable({
-          'uid': widget.uid,
-          'role': role,
-        });
+        await callable({'uid': widget.uid, 'role': role});
       }
 
-      // 4. Refresh roles state
       final updatedRoles = await getUserRoles(context);
       setState(() {
         userRoles = updatedRoles;
       });
     } catch (e) {
       _showErrorDialog(context, e.toString());
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -159,14 +158,23 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
                   ),
                 ),
                 const Divider(height: 32),
-                ...widget.appRoles.entries.map(
-                  (entry) => SwitchListTile(
-                    title: Text(entry.value),
-                    value: userRoles.contains(entry.key),
-                    onChanged: (bool newValue) => toggleUserRole(context, entry.key, newValue),
-                    activeColor: Theme.of(context).indicatorColor,
-                  ),
-                ),
+                isLoading
+                    ? const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 32),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    : Column(
+                        children: widget.appRoles.entries
+                            .map(
+                              (entry) => SwitchListTile(
+                                title: Text(entry.value),
+                                value: userRoles.contains(entry.key),
+                                onChanged: (bool newValue) => toggleUserRole(context, entry.key, newValue),
+                                activeColor: Theme.of(context).indicatorColor,
+                              ),
+                            )
+                            .toList(),
+                      ),
               ],
             );
         }
