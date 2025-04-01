@@ -325,30 +325,13 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                                     level: LogLevel.fframe,
                                                   );
                                                   DocumentTab<T> currentTab = selectedDocument.documentTabs[position];
+
                                                   currentTab.formKey = GlobalKey<FormState>();
                                                   bool preloadCurrentTab = true;
                                                   if (!document.prefetchTabs) {
                                                     preloadCurrentTab = tabController.index == position;
                                                   }
 
-// 👉 Fullscreen tab logic
-                                                  if (currentTab.fullscreenEnabled) {
-                                                    return Scaffold(
-                                                      backgroundColor: Theme.of(context).colorScheme.background,
-                                                      body: SafeArea(
-                                                        child: Form(
-                                                          key: currentTab.formKey,
-                                                          autovalidateMode: AutovalidateMode.onUserInteraction,
-                                                          child: currentTab.childBuilder(
-                                                            selectedDocument,
-                                                            selectedDocument.readOnly,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    );
-                                                  }
-
-// 👇 Fallback: normal (non-fullscreen) tab rendering
                                                   return Padding(
                                                     padding: const EdgeInsets.all(8.0),
                                                     child: Container(
