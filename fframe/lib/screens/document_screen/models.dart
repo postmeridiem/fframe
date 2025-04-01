@@ -128,6 +128,7 @@ class Document<T> {
     this.prefetchTabs = true,
     this.withEndDrawer = true,
   });
+
   final Key? key;
   final DocumentTabsBuilder<T> documentTabsBuilder;
   final DocumentHeaderBuilder<T>? documentHeaderBuilder;
@@ -149,17 +150,17 @@ class Document<T> {
 }
 
 class DocumentTab<T> {
-  /// this is a fFrame Document Tab
-  ///
-  ///
   final DocumentTabBuilder<T> tabBuilder;
   final DocumentTabChildBuilder<T> childBuilder;
   final bool lockViewportScroll;
+  final bool fullscreenEnabled;
   late GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   DocumentTab({
     required this.tabBuilder,
     required this.childBuilder,
     this.lockViewportScroll = false,
+    this.fullscreenEnabled = false,
   });
 }
 
@@ -183,6 +184,7 @@ class DocumentList<T> extends ListConfig {
     this.seperatorHeight = 1,
     super.contentPadding = const EdgeInsets.only(left: 250.0),
   });
+
   final DocumentListItemBuilder<T> builder;
   final DocumentListHeaderBuilder<T>? headerBuilder;
   final DocumentListFooterBuilder<T>? footerBuilder;
@@ -202,6 +204,7 @@ class ListGrid<T> extends ListConfig {
     this.showCreateButton = true,
     this.seperatorHeight = 1,
   });
+
   final DocumentListItemBuilder<T> builder;
   final DocumentListHeaderBuilder<T>? headerBuilder;
   final DocumentListFooterBuilder<T>? footerBuilder;
@@ -233,7 +236,14 @@ class SearchOption<T> {
   late SearchOptionSortOrder sort;
   late SearchOptionComparisonOperator comparisonOperator;
   late bool isSelected = false;
-  SearchOption({required this.caption, required this.field, required this.type, this.sort = SearchOptionSortOrder.none, this.comparisonOperator = SearchOptionComparisonOperator.equal});
+
+  SearchOption({
+    required this.caption,
+    required this.field,
+    required this.type,
+    this.sort = SearchOptionSortOrder.none,
+    this.comparisonOperator = SearchOptionComparisonOperator.equal,
+  });
 }
 
 enum SearchOptionType {
