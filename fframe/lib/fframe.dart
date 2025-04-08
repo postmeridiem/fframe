@@ -104,5 +104,5 @@ part 'package:fframe/helpers/validator.dart';
 part 'package:fframe/helpers/load_extra_data.dart';
 part 'package:fframe/helpers/notifications.dart';
 
-part 'package:fframe/models/app_notification.dart';
-part 'package:fframe/models/app_user.dart';
+part 'package:fframe/models/fframe_notification.dart';
+part 'package:fframe/models/fframe_user.dart';

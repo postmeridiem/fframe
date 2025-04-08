@@ -39,7 +39,7 @@ class FframeNotification extends ChangeNotifier {
       id: snapshot.id,
       notificationTime: json['notificationTime'] ?? Timestamp.now,
       reporter: json['reporter'] ?? "",
-      type: json['type'] ?? "",
+      type: json['type'],
       messageTitle: json['messageTitle'] ?? "",
       messageSubtitle: json['messageSubtitle'] ?? "",
       messageBody: json['messageBody'] ?? "",
