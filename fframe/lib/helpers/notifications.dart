@@ -28,6 +28,7 @@ class FframeNotifications {
 
   static void sendNotificationsToUUIDs({required List<String> uuids, required FframeNotification notification}) {
     Console.log("creating notification ${notification.messageTitle}", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+    //  FframeNotifications.sendNotificationsToEmails(emailAddresses: emailAddresses, notification: notification);
   }
 }
 
