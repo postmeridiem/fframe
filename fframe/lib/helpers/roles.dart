@@ -7,11 +7,11 @@ class FframeRolesManager<T extends Enum> extends StatefulWidget {
     super.key,
     required this.uid,
     required this.appRoles,
-    required this.roleGroups,
+    this.roleGroups,
   });
 
   final Map<String, String> appRoles;
-  final Map<String, List<T>> roleGroups;
+  final Map<String, List<T>>? roleGroups;
   final String uid;
 
   @override
@@ -134,29 +134,30 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
             }
             return Column(
               children: [
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: widget.roleGroups.entries.map((entry) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.tertiary,
-                              foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                if (widget.roleGroups != null)
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: Row(
+                        children: widget.roleGroups!.entries.map((entry) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).colorScheme.tertiary,
+                                foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              onPressed: () => assignRoleGroup(context, entry.key, entry.value),
+                              child: Text("Apply ${entry.key} Roles"),
                             ),
-                            onPressed: () => assignRoleGroup(context, entry.key, entry.value),
-                            child: Text("Apply ${entry.key} Roles"),
-                          ),
-                        );
-                      }).toList(),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
-                ),
                 const Divider(height: 32),
                 isLoading
                     ? const Padding(
