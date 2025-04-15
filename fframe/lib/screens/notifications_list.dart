@@ -150,114 +150,138 @@ class NotificationTile extends StatelessWidget {
     return const Icon(Icons.link, size: 14, color: Colors.blueAccent);
   }
 
+  Future<Widget> _buildAvatar() async {
+    try {
+      final snapshot = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: notification.reporter).limit(1).get();
+
+      if (snapshot.docs.isNotEmpty) {
+        final userData = snapshot.docs.first.data();
+        final photoUrl = userData['metadata']?['photoURL'];
+        if (photoUrl != null) {
+          return CircleAvatar(
+            radius: 18,
+            backgroundImage: NetworkImage(photoUrl),
+            backgroundColor: Colors.transparent,
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("Error loading avatar: $e");
+    }
+
+    // Fallback icon
+    return CircleAvatar(
+      radius: 18,
+      backgroundColor: Colors.blueGrey.shade800,
+      child: const Icon(Icons.notifications, size: 18, color: Colors.white),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final timestamp = notification.notificationTime?.toDate();
     final timeAgo = timestamp != null ? timeAgoFormat(timestamp) : '';
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Avatar
-          CircleAvatar(
-            radius: 18,
-            backgroundColor: Colors.blueGrey.shade800,
-            child: const Icon(Icons.notifications, size: 18, color: Colors.white),
-          ),
-          const SizedBox(width: 12),
+    return FutureBuilder<Widget>(
+      future: _buildAvatar(),
+      builder: (context, snapshot) {
+        final avatar = snapshot.data ?? const SizedBox(width: 36, height: 36);
 
-          // Text content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  notification.messageTitle,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: notification.read ? Colors.grey[400] : Colors.white,
-                  ),
-                ),
-                if (notification.messageSubtitle?.isNotEmpty ?? false)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2),
-                    child: Text(
-                      notification.messageSubtitle!,
-                      style: const TextStyle(fontSize: 13, color: Colors.white70),
-                    ),
-                  ),
-                if (notification.messageBody?.isNotEmpty ?? false)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      notification.messageBody!,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
-                  ),
-
-                // 🔗 Context links with icons
-                if (notification.contextLinks != null && notification.contextLinks!.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 6.0),
-                    child: Wrap(
-                      spacing: 8.0,
-                      runSpacing: 4.0,
-                      children: notification.contextLinks!
-                          .map((link) => TextButton.icon(
-                                style: TextButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                  minimumSize: Size.zero,
-                                ),
-                                onPressed: () => _launchUrl(link['href']),
-                                icon: _getLinkIcon(link['href']),
-                                label: Text(
-                                  link['label'],
-                                  style: const TextStyle(
-                                    fontSize: 12,
-                                    decoration: TextDecoration.underline,
-                                    color: Colors.blueAccent,
-                                  ),
-                                ),
-                              ))
-                          .toList(),
-                    ),
-                  ),
-
-                const SizedBox(height: 6),
-                Row(
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              avatar,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      timeAgo,
-                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                      notification.messageTitle,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: notification.read ? Colors.grey[400] : Colors.white,
+                      ),
                     ),
-                    const Spacer(),
-                    GestureDetector(
-                      onTap: () => _toggleRead(!notification.read),
-                      child: Tooltip(
-                        message: notification.read ? 'Mark as unread' : 'Mark as read',
-                        child: Icon(
-                          notification.read ? Icons.mark_email_read_outlined : Icons.mark_email_unread_outlined,
-                          color: Colors.blueAccent,
-                          size: 18,
+                    if (notification.messageSubtitle?.isNotEmpty ?? false)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          notification.messageSubtitle!,
+                          style: const TextStyle(fontSize: 13, color: Colors.white70),
                         ),
                       ),
-                    ),
-                    if (!notification.read)
-                      const Padding(
-                        padding: EdgeInsets.only(left: 6),
-                        child: Icon(Icons.circle, size: 8, color: Colors.blueAccent),
+                    if (notification.messageBody?.isNotEmpty ?? false)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text(
+                          notification.messageBody!,
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
                       ),
+                    if (notification.contextLinks != null && notification.contextLinks!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 6.0),
+                        child: Wrap(
+                          spacing: 8.0,
+                          runSpacing: 4.0,
+                          children: notification.contextLinks!
+                              .map((link) => TextButton.icon(
+                                    style: TextButton.styleFrom(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      minimumSize: Size.zero,
+                                    ),
+                                    onPressed: () => _launchUrl(link['href']),
+                                    icon: _getLinkIcon(link['href']),
+                                    label: Text(
+                                      link['label'],
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        decoration: TextDecoration.underline,
+                                        color: Colors.blueAccent,
+                                      ),
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Text(
+                          timeAgo,
+                          style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        ),
+                        const Spacer(),
+                        GestureDetector(
+                          onTap: () => _toggleRead(!notification.read),
+                          child: Tooltip(
+                            message: notification.read ? 'Mark as unread' : 'Mark as read',
+                            child: Icon(
+                              notification.read ? Icons.mark_email_read_outlined : Icons.mark_email_unread_outlined,
+                              color: Colors.blueAccent,
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                        if (!notification.read)
+                          const Padding(
+                            padding: EdgeInsets.only(left: 6),
+                            child: Icon(Icons.circle, size: 8, color: Colors.blueAccent),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
