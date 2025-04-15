@@ -23,7 +23,7 @@ class FframeNotification extends ChangeNotifier {
   final String messageTitle;
   final String? messageSubtitle;
   final String? messageBody;
-  final List<Map>? contextLinks;
+  final List<Map<String, dynamic>>? contextLinks;
 
   final bool seen;
   final bool read;
@@ -34,37 +34,29 @@ class FframeNotification extends ChangeNotifier {
     required DocumentSnapshot<Map<String, dynamic>> snapshot,
     SnapshotOptions? snapshotOptions,
   }) {
-    Map<String, dynamic> json = snapshot.data()!;
-    FframeNotification notification = FframeNotification(
+    final json = snapshot.data()!;
+
+    List<Map<String, dynamic>>? parsedContextLinks;
+    if (json['contextLinks'] is List) {
+      parsedContextLinks = (json['contextLinks'] as List).whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
+    }
+
+    return FframeNotification(
       id: snapshot.id,
-      notificationTime: json['notificationTime'] ?? Timestamp.now,
+      notificationTime: json['notificationTime'] ?? Timestamp.now(),
       reporter: json['reporter'] ?? "",
-      type: json['type'],
+      type: json['type'] ?? "notification",
       messageTitle: json['messageTitle'] ?? "",
       messageSubtitle: json['messageSubtitle'] ?? "",
       messageBody: json['messageBody'] ?? "",
-      contextLinks: json['contextLinks'] ?? [],
-      seen: json['seen'],
-      read: json['read'],
-      deleted: json['deleted'],
+      contextLinks: parsedContextLinks ?? [],
+      seen: json['seen'] ?? false,
+      read: json['read'] ?? false,
+      deleted: json['deleted'] ?? false,
       firestoreTTL: json['firestoreTTL'] ??
           Timestamp.fromDate(
             DateTime.now().add(const Duration(days: 30)),
           ),
-    );
-
-    return FframeNotification(
-      notificationTime: notification.notificationTime,
-      reporter: notification.reporter,
-      type: notification.type,
-      messageTitle: notification.messageTitle,
-      messageSubtitle: notification.messageSubtitle,
-      messageBody: notification.messageBody,
-      contextLinks: notification.contextLinks,
-      seen: notification.seen,
-      read: notification.read,
-      deleted: notification.deleted,
-      firestoreTTL: notification.firestoreTTL,
     );
   }
 }
