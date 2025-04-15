@@ -25,6 +25,7 @@ import 'package:fframe/constants/constants.dart';
 import 'package:fframe/controllers/query_state_controller.dart';
 import 'package:fframe/screens/document_screen/document_search.dart';
 import 'package:fframe/screens/listgrid_screen/listgrid_notifier.dart';
+import 'package:fframe/screens/notifications_list.dart';
 
 import 'package:fframe/services/navigation_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -33,21 +33,70 @@ class FframeNotifications {
 }
 
 class NotificationButton extends StatefulWidget {
-  const NotificationButton({super.key});
+  final String userId;
+
+  const NotificationButton({super.key, required this.userId});
 
   @override
   State<NotificationButton> createState() => _NotificationButtonState();
 }
 
 class _NotificationButtonState extends State<NotificationButton> {
-  late OverlayState overlayState;
-  late OverlayEntry overlayEntry;
+  OverlayEntry? _overlayEntry;
+
+  void _toggleOverlay() {
+    if (_overlayEntry == null) {
+      _overlayEntry = _buildOverlay();
+      Overlay.of(context).insert(_overlayEntry!);
+    } else {
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+    }
+  }
+
+  OverlayEntry _buildOverlay() {
+    final renderBox = context.findRenderObject() as RenderBox;
+    final offset = renderBox.localToGlobal(Offset.zero);
+
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        top: offset.dy + renderBox.size.height + 8,
+        right: 16,
+        width: 400,
+        height: 500,
+        child: Material(
+          color: Colors.transparent,
+          child: Stack(
+            children: [
+              GestureDetector(
+                onTap: _toggleOverlay,
+                behavior: HitTestBehavior.translucent,
+                child: Container(color: Colors.transparent),
+              ),
+              Align(
+                alignment: Alignment.topRight,
+                child: Material(
+                  elevation: 12,
+                  borderRadius: BorderRadius.circular(12),
+                  clipBehavior: Clip.antiAlias,
+                  child: Container(
+                    color: Theme.of(context).cardColor,
+                    child: NotificationsList(userId: widget.userId),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.notifications),
-      onPressed: () {},
+      icon: const Icon(Icons.notifications),
+      onPressed: _toggleOverlay,
     );
   }
 }
