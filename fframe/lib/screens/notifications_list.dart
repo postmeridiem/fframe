@@ -80,6 +80,21 @@ class NotificationTile extends StatelessWidget {
     await docRef.update({'read': value});
   }
 
+  Future<void> _launchUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      debugPrint("Could not launch $url");
+    }
+  }
+
+  Icon _getLinkIcon(String href) {
+    if (href.contains('atlassian')) return const Icon(Icons.bug_report, size: 14, color: Colors.blueAccent);
+    if (href.contains('github')) return const Icon(Icons.code, size: 14, color: Colors.blueAccent);
+    return const Icon(Icons.link, size: 14, color: Colors.blueAccent);
+  }
+
   @override
   Widget build(BuildContext context) {
     final timestamp = notification.notificationTime?.toDate();
@@ -127,6 +142,36 @@ class NotificationTile extends StatelessWidget {
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ),
+
+                // 🔗 Context links with icons
+                if (notification.contextLinks != null && notification.contextLinks!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6.0),
+                    child: Wrap(
+                      spacing: 8.0,
+                      runSpacing: 4.0,
+                      children: notification.contextLinks!
+                          .map((link) => TextButton.icon(
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                  minimumSize: Size.zero,
+                                ),
+                                onPressed: () => _launchUrl(link['href']),
+                                icon: _getLinkIcon(link['href']),
+                                label: Text(
+                                  link['label'],
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.blueAccent,
+                                  ),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+
                 const SizedBox(height: 6),
                 Row(
                   children: [
@@ -135,8 +180,6 @@ class NotificationTile extends StatelessWidget {
                       style: const TextStyle(fontSize: 11, color: Colors.grey),
                     ),
                     const Spacer(),
-
-                    // Read/Unread toggle
                     GestureDetector(
                       onTap: () => _toggleRead(!notification.read),
                       child: Tooltip(
@@ -148,7 +191,6 @@ class NotificationTile extends StatelessWidget {
                         ),
                       ),
                     ),
-
                     if (!notification.read)
                       const Padding(
                         padding: EdgeInsets.only(left: 6),
