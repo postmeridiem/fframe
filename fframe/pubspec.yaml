@@ -37,6 +37,7 @@ dependencies:
   shared_preferences:
   horizontal_data_table: 
   dotted_border: 
+  cached_network_image:
 
 dev_dependencies:
   flutter_test:

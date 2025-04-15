@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -119,6 +120,8 @@ class _NotificationsListState extends State<NotificationsList> {
   }
 }
 
+final Map<String, String?> _photoCache = {}; // Global cache
+
 class NotificationTile extends StatefulWidget {
   final FframeNotification notification;
   final String userId;
@@ -143,15 +146,30 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Future<void> _loadReporterPhoto() async {
+    final email = widget.notification.reporter;
+
+    // Use cache if available
+    if (_photoCache.containsKey(email)) {
+      photoUrl = _photoCache[email];
+      return;
+    }
+
     try {
-      final snapshot = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: widget.notification.reporter).limit(1).get();
+      final snapshot = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: email).limit(1).get();
 
       if (snapshot.docs.isNotEmpty) {
         final userData = snapshot.docs.first.data();
         final fetchedUrl = userData['metadata']?['photoURL'];
+
+        _photoCache[email] = fetchedUrl;
+
         if (fetchedUrl != null && mounted) {
-          setState(() {
-            photoUrl = fetchedUrl;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              setState(() {
+                photoUrl = fetchedUrl;
+              });
+            }
           });
         }
       }
@@ -176,17 +194,13 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Icon _getLinkIcon(String href) {
-    if (href.contains('atlassian')) {
-      return const Icon(Icons.bug_report, size: 14, color: Colors.blueAccent);
-    }
-    if (href.contains('github')) {
-      return const Icon(Icons.code, size: 14, color: Colors.blueAccent);
-    }
+    if (href.contains('atlassian')) return const Icon(Icons.bug_report, size: 14, color: Colors.blueAccent);
+    if (href.contains('github')) return const Icon(Icons.code, size: 14, color: Colors.blueAccent);
     return const Icon(Icons.link, size: 14, color: Colors.blueAccent);
   }
 
   String _timeAgoFormat(DateTime dateTime) {
-    final Duration diff = DateTime.now().difference(dateTime);
+    final diff = DateTime.now().difference(dateTime);
     if (diff.inSeconds < 60) return '${diff.inSeconds}s ago';
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
     if (diff.inHours < 24) return '${diff.inHours}h ago';
@@ -207,7 +221,7 @@ class _NotificationTileState extends State<NotificationTile> {
     if (photoUrl != null) {
       avatar = CircleAvatar(
         radius: 18,
-        backgroundImage: NetworkImage(photoUrl!),
+        backgroundImage: CachedNetworkImageProvider(photoUrl!),
         backgroundColor: Colors.transparent,
       );
     }
