@@ -13,6 +13,8 @@ class NotificationsList extends StatefulWidget {
 }
 
 class _NotificationsListState extends State<NotificationsList> {
+  bool onlyShowUnread = false;
+
   @override
   void initState() {
     super.initState();
@@ -20,46 +22,87 @@ class _NotificationsListState extends State<NotificationsList> {
   }
 
   Future<void> _markAllAsSeen() async {
-    final unseenNotifications = await FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications').where('seen', isEqualTo: false).get();
+    final unseen = await FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications').where('seen', isEqualTo: false).get();
 
-    for (final doc in unseenNotifications.docs) {
+    for (final doc in unseen.docs) {
       doc.reference.update({'seen': true});
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications').orderBy('notificationTime', descending: true).snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+    final query = FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications').orderBy('notificationTime', descending: true);
 
-        final docs = snapshot.data!.docs;
+    final filteredQuery = onlyShowUnread ? query.where('read', isEqualTo: false) : query;
 
-        if (docs.isEmpty) {
-          return const Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Center(child: Text("No notifications")),
-          );
-        }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title and toggle
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              const Text(
+                'Notifications',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const Spacer(),
+              const Text(
+                'Only show unread',
+                style: TextStyle(fontSize: 13, color: Colors.white70),
+              ),
+              Switch(
+                value: onlyShowUnread,
+                onChanged: (value) {
+                  setState(() {
+                    onlyShowUnread = value;
+                  });
+                },
+                activeColor: Colors.blueAccent,
+              ),
+            ],
+          ),
+        ),
 
-        return ListView.separated(
-          padding: const EdgeInsets.all(12),
-          itemCount: docs.length,
-          separatorBuilder: (_, __) => const Divider(height: 1, color: Colors.grey),
-          itemBuilder: (context, index) {
-            final doc = docs[index];
-            final notification = FframeNotification.fromFirestore(
-              snapshot: doc as DocumentSnapshot<Map<String, dynamic>>,
-            );
+        // Notification list
+        Expanded(
+          child: StreamBuilder<QuerySnapshot>(
+            stream: filteredQuery.snapshots(),
+            builder: (context, snapshot) {
+              if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
-            return NotificationTile(
-              notification: notification,
-              userId: widget.userId,
-            );
-          },
-        );
-      },
+              final docs = snapshot.data!.docs;
+              if (docs.isEmpty) {
+                return const Center(
+                  child: Text("No notifications", style: TextStyle(color: Colors.white54)),
+                );
+              }
+
+              return ListView.separated(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: docs.length,
+                separatorBuilder: (_, __) => const Divider(height: 1, color: Colors.grey),
+                itemBuilder: (context, index) {
+                  final doc = docs[index];
+                  final notification = FframeNotification.fromFirestore(
+                    snapshot: doc as DocumentSnapshot<Map<String, dynamic>>,
+                  );
+
+                  return NotificationTile(
+                    notification: notification,
+                    userId: widget.userId,
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }
