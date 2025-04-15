@@ -31,9 +31,9 @@ class _NotificationsListState extends State<NotificationsList> {
 
   @override
   Widget build(BuildContext context) {
-    final query = FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications').orderBy('notificationTime', descending: true);
+    final notificationsBase = FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications');
 
-    final filteredQuery = onlyShowUnread ? query.where('read', isEqualTo: false) : query;
+    final query = onlyShowUnread ? notificationsBase.where('read', isEqualTo: false).orderBy('notificationTime', descending: true) : notificationsBase.orderBy('notificationTime', descending: true);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,9 +72,21 @@ class _NotificationsListState extends State<NotificationsList> {
         // Notification list
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
-            stream: filteredQuery.snapshots(),
+            stream: query.snapshots(),
             builder: (context, snapshot) {
-              if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text(
+                    "Error loading notifications:\n${snapshot.error}",
+                    style: const TextStyle(color: Colors.redAccent),
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              }
+
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
 
               final docs = snapshot.data!.docs;
               if (docs.isEmpty) {
