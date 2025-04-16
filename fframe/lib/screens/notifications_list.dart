@@ -210,25 +210,20 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Widget _buildAvatar() {
+    String initials = '';
     final email = widget.notification.reporter;
-
-    // Extract initials like "CM" from "cameron.mcsorley@imaginstudio.com"
-    String getInitials(String email) {
-      final parts = email.split('@').first.split(RegExp(r'[._\s-]+'));
+    if (email.isNotEmpty && email.contains('@')) {
+      final parts = email.split('@')[0].split('.');
       if (parts.length >= 2) {
-        return (parts[0].isNotEmpty ? parts[0][0] : '') + (parts[1].isNotEmpty ? parts[1][0] : '');
-      } else if (parts.isNotEmpty && parts[0].isNotEmpty) {
-        return parts[0][0];
+        initials = (parts[0][0] + parts[1][0]).toUpperCase();
+      } else {
+        initials = parts[0].substring(0, 1).toUpperCase();
       }
-      return '';
     }
-
-    final initials = getInitials(email).toUpperCase();
-
     if (photoUrl != null) {
       if (kIsWeb) {
         final viewType = 'img-${photoUrl.hashCode}';
-
+        // Register the HTML view factory
         // ignore: undefined_prefixed_name
         ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
           final img = html.ImageElement()
@@ -236,10 +231,7 @@ class _NotificationTileState extends State<NotificationTile> {
             ..style.borderRadius = '50%'
             ..style.objectFit = 'cover'
             ..width = 36
-            ..height = 36
-            ..onError.listen((_) {
-              // fallback handled below by not setting photoUrl if unreachable
-            });
+            ..height = 36;
           return img;
         });
 
@@ -259,33 +251,25 @@ class _NotificationTileState extends State<NotificationTile> {
           placeholder: (context, url) => CircleAvatar(
             radius: 18,
             backgroundColor: Colors.grey[800],
-            child: Text(
-              initials,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-            ),
+            child: const Icon(Icons.person, size: 18, color: Colors.white),
           ),
           errorWidget: (context, url, error) => CircleAvatar(
             radius: 18,
             backgroundColor: Colors.grey[800],
-            child: Text(
-              initials.isNotEmpty ? initials : '🔔',
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-            ),
+            child: const Icon(Icons.notifications, size: 18, color: Colors.white),
           ),
         );
       }
     }
 
-    // Fallback if no image available
+    // Fallback avatar
     return CircleAvatar(
       radius: 18,
       backgroundColor: Colors.blueGrey.shade800,
-      child: initials.isNotEmpty
-          ? Text(
-              initials,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
-            )
-          : const Icon(Icons.notifications, size: 18, color: Colors.white),
+      child: Text(
+        initials,
+        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
+      ),
     );
   }
 
