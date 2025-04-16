@@ -124,15 +124,6 @@ class _NotificationsListState extends State<NotificationsList> {
   }
 }
 
-//
-// import 'dart:ui' as ui; // Needed for HtmlElementView registration
-// import 'package:flutter/foundation.dart' show kIsWeb;
-// import 'package:cached_network_image/cached_network_image.dart';
-// import 'package:fframe/fframe.dart';
-// import 'package:flutter/material.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:url_launcher/url_launcher.dart';
-
 final Map<String, String?> _photoCache = {}; // Global cache
 
 class NotificationTile extends StatefulWidget {
@@ -219,26 +210,52 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Widget _buildAvatar() {
+    final email = widget.notification.reporter;
+    String initials = "??";
+
+    if (email.isNotEmpty && email.contains('@')) {
+      final parts = email.split('@')[0].split('.');
+      if (parts.length >= 2) {
+        initials = (parts[0][0] + parts[1][0]).toUpperCase();
+      } else {
+        initials = parts[0].substring(0, 1).toUpperCase();
+      }
+    }
+
     if (photoUrl != null) {
       if (kIsWeb) {
         final viewType = 'img-${photoUrl.hashCode}';
-        // Register the HTML view factory
-        // ignore: undefined_prefixed_name
-        ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
-          final img = html.ImageElement()
-            ..src = photoUrl!
-            ..style.borderRadius = '50%'
-            ..style.objectFit = 'cover'
-            ..width = 36
-            ..height = 36;
-          return img;
+
+        final img = html.ImageElement()
+          ..src = photoUrl!
+          ..width = 36
+          ..height = 36
+          ..style.borderRadius = '50%'
+          ..style.objectFit = 'cover';
+
+        bool errored = false;
+
+        img.onError.listen((event) {
+          errored = true;
+          setState(() {});
         });
 
-        return SizedBox(
-          width: 36,
-          height: 36,
-          child: HtmlElementView(viewType: viewType),
-        );
+        img.onLoad.listen((event) {
+          errored = false;
+          setState(() {});
+        });
+
+        // Always register the view (no containsKey needed)
+        // ignore: undefined_prefixed_name
+        ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) => img);
+
+        if (!errored) {
+          return SizedBox(
+            width: 36,
+            height: 36,
+            child: HtmlElementView(viewType: viewType),
+          );
+        }
       } else {
         return CachedNetworkImage(
           imageUrl: photoUrl!,
@@ -250,22 +267,22 @@ class _NotificationTileState extends State<NotificationTile> {
           placeholder: (context, url) => CircleAvatar(
             radius: 18,
             backgroundColor: Colors.grey[800],
-            child: const Icon(Icons.person, size: 18, color: Colors.white),
+            child: Text(initials, style: const TextStyle(color: Colors.white)),
           ),
           errorWidget: (context, url, error) => CircleAvatar(
             radius: 18,
             backgroundColor: Colors.grey[800],
-            child: const Icon(Icons.notifications, size: 18, color: Colors.white),
+            child: Text(initials, style: const TextStyle(color: Colors.white)),
           ),
         );
       }
     }
 
-    // Fallback avatar
+    // Final fallback: initials
     return CircleAvatar(
       radius: 18,
       backgroundColor: Colors.blueGrey.shade800,
-      child: const Icon(Icons.notifications, size: 18, color: Colors.white),
+      child: Text(initials, style: const TextStyle(color: Colors.white)),
     );
   }
 
