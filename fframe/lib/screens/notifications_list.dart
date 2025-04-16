@@ -224,57 +224,36 @@ class _NotificationTileState extends State<NotificationTile> {
     }
 
     if (photoUrl != null) {
-      if (kIsWeb) {
-        final viewType = 'img-${photoUrl.hashCode}';
-        // ignore: undefined_prefixed_name
-        ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
-          final img = html.ImageElement()
-            ..src = photoUrl!
-            ..style.borderRadius = '50%'
-            ..style.objectFit = 'cover'
-            ..style.width = '36px'
-            ..style.height = '36px'
-            ..onError.listen((event) {
-              // do nothing — fallback shown below
-            });
-          return img;
-        });
+      final viewType = 'img-${photoUrl.hashCode}';
+      // ignore: undefined_prefixed_name
+      ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
+        final img = html.ImageElement()
+          ..src = photoUrl!
+          ..style.borderRadius = '50%'
+          ..style.objectFit = 'cover'
+          ..style.width = '36px'
+          ..style.height = '36px'
+          ..onError.listen((event) {
+            // do nothing — fallback shown below
+          });
+        return img;
+      });
 
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: Colors.blueGrey.shade800,
-              child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
-            ),
-            SizedBox(
-              width: 36,
-              height: 36,
-              child: HtmlElementView(viewType: viewType),
-            ),
-          ],
-        );
-      } else {
-        return CachedNetworkImage(
-          imageUrl: photoUrl!,
-          imageBuilder: (context, imageProvider) => CircleAvatar(
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          CircleAvatar(
             radius: 18,
-            backgroundImage: imageProvider,
-            backgroundColor: Colors.transparent,
-          ),
-          placeholder: (context, url) => CircleAvatar(
-            radius: 18,
-            backgroundColor: Colors.grey[800],
+            backgroundColor: Colors.blueGrey.shade800,
             child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
           ),
-          errorWidget: (context, url, error) => CircleAvatar(
-            radius: 18,
-            backgroundColor: Colors.grey[800],
-            child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          SizedBox(
+            width: 36,
+            height: 36,
+            child: HtmlElementView(viewType: viewType),
           ),
-        );
-      }
+        ],
+      );
     }
 
     // Final fallback if no image
