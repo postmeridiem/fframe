@@ -210,9 +210,21 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Widget _buildAvatar() {
+    String getInitials() {
+      final email = widget.notification.reporter;
+      final parts = email.split('@').first.split('.');
+      if (parts.length >= 2) {
+        return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+      }
+      return email.isNotEmpty ? email[0].toUpperCase() : '?';
+    }
+
+    final initials = getInitials();
+
     if (photoUrl != null) {
       if (kIsWeb) {
         final viewType = 'img-${photoUrl.hashCode}';
+        // Register the HTML view factory
         // ignore: undefined_prefixed_name
         ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
           final img = html.ImageElement()
@@ -220,7 +232,13 @@ class _NotificationTileState extends State<NotificationTile> {
             ..style.borderRadius = '50%'
             ..style.objectFit = 'cover'
             ..width = 36
-            ..height = 36;
+            ..height = 36
+            ..onError.listen((_) {
+              // force rebuild with null photoUrl to fallback
+              if (mounted) {
+                setState(() => photoUrl = null);
+              }
+            });
           return img;
         });
 
@@ -240,29 +258,22 @@ class _NotificationTileState extends State<NotificationTile> {
           placeholder: (context, url) => CircleAvatar(
             radius: 18,
             backgroundColor: Colors.grey[800],
-            child: const Icon(Icons.person, size: 18, color: Colors.white),
+            child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
           ),
-          errorWidget: (context, url, error) => _fallbackInitialsAvatar(),
+          errorWidget: (context, url, error) => CircleAvatar(
+            radius: 18,
+            backgroundColor: Colors.blueGrey.shade800,
+            child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          ),
         );
       }
     }
 
-    return _fallbackInitialsAvatar();
-  }
-
-  Widget _fallbackInitialsAvatar() {
-    final email = widget.notification.reporter;
-    final namePart = email.split('@').first;
-    final parts = namePart.split(RegExp(r'[._]'));
-    final initials = parts.take(2).map((p) => p.isNotEmpty ? p[0].toUpperCase() : '').join();
-
+    // Fallback avatar with initials
     return CircleAvatar(
       radius: 18,
-      backgroundColor: Colors.blueGrey.shade700,
-      child: Text(
-        initials,
-        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
-      ),
+      backgroundColor: Colors.blueGrey.shade800,
+      child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
     );
   }
 
