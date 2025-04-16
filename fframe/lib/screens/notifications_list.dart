@@ -148,7 +148,6 @@ class _NotificationTileState extends State<NotificationTile> {
   Future<void> _loadReporterPhoto() async {
     final email = widget.notification.reporter;
 
-    // Use cache if available
     if (_photoCache.containsKey(email)) {
       photoUrl = _photoCache[email];
       return;
@@ -162,7 +161,7 @@ class _NotificationTileState extends State<NotificationTile> {
         final fetchedUrl = userData['metadata']?['photoURL'];
 
         _photoCache[email] = fetchedUrl;
-
+        print("THIS IS THE PHOTO URL: ${photoUrl}");
         if (fetchedUrl != null && mounted) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
@@ -219,10 +218,23 @@ class _NotificationTileState extends State<NotificationTile> {
     );
 
     if (photoUrl != null) {
-      avatar = CircleAvatar(
-        radius: 18,
-        backgroundImage: CachedNetworkImageProvider(photoUrl!),
-        backgroundColor: Colors.transparent,
+      avatar = CachedNetworkImage(
+        imageUrl: photoUrl!,
+        imageBuilder: (context, imageProvider) => CircleAvatar(
+          radius: 18,
+          backgroundImage: imageProvider,
+          backgroundColor: Colors.transparent,
+        ),
+        placeholder: (context, url) => CircleAvatar(
+          radius: 18,
+          backgroundColor: Colors.grey[800],
+          child: const Icon(Icons.person, size: 18, color: Colors.white),
+        ),
+        errorWidget: (context, url, error) => CircleAvatar(
+          radius: 18,
+          backgroundColor: Colors.grey[800],
+          child: const Icon(Icons.notifications, size: 18, color: Colors.white),
+        ),
       );
     }
 
