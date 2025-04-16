@@ -1,8 +1,12 @@
+import 'dart:ui_web' as ui;
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fframe/fframe.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'dart:html' as html;
 
 class NotificationsList extends StatefulWidget {
   final String userId;
@@ -161,7 +165,6 @@ class _NotificationTileState extends State<NotificationTile> {
         final fetchedUrl = userData['photoURL'];
 
         _photoCache[email] = fetchedUrl;
-        print("THIS IS THE PHOTO URL: ${fetchedUrl}");
         if (fetchedUrl != null && mounted) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
@@ -206,44 +209,68 @@ class _NotificationTileState extends State<NotificationTile> {
     return '${diff.inDays}d ago';
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final timestamp = widget.notification.notificationTime?.toDate();
-    final timeAgo = timestamp != null ? _timeAgoFormat(timestamp) : '';
+  Widget _buildAvatar() {
+    if (photoUrl != null) {
+      if (kIsWeb) {
+        final viewType = 'img-${photoUrl.hashCode}';
+        // Register the HTML view factory
+        // ignore: undefined_prefixed_name
+        ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
+          final img = html.ImageElement()
+            ..src = photoUrl!
+            ..style.borderRadius = '50%'
+            ..style.objectFit = 'cover'
+            ..width = 36
+            ..height = 36;
+          return img;
+        });
 
-    Widget avatar = CircleAvatar(
+        return SizedBox(
+          width: 36,
+          height: 36,
+          child: HtmlElementView(viewType: viewType),
+        );
+      } else {
+        return CachedNetworkImage(
+          imageUrl: photoUrl!,
+          imageBuilder: (context, imageProvider) => CircleAvatar(
+            radius: 18,
+            backgroundImage: imageProvider,
+            backgroundColor: Colors.transparent,
+          ),
+          placeholder: (context, url) => CircleAvatar(
+            radius: 18,
+            backgroundColor: Colors.grey[800],
+            child: const Icon(Icons.person, size: 18, color: Colors.white),
+          ),
+          errorWidget: (context, url, error) => CircleAvatar(
+            radius: 18,
+            backgroundColor: Colors.grey[800],
+            child: const Icon(Icons.notifications, size: 18, color: Colors.white),
+          ),
+        );
+      }
+    }
+
+    // Fallback avatar
+    return CircleAvatar(
       radius: 18,
       backgroundColor: Colors.blueGrey.shade800,
       child: const Icon(Icons.notifications, size: 18, color: Colors.white),
     );
+  }
 
-    if (photoUrl != null) {
-      avatar = CachedNetworkImage(
-        imageUrl: photoUrl!,
-        imageBuilder: (context, imageProvider) => CircleAvatar(
-          radius: 18,
-          backgroundImage: imageProvider,
-          backgroundColor: Colors.transparent,
-        ),
-        placeholder: (context, url) => CircleAvatar(
-          radius: 18,
-          backgroundColor: Colors.grey[800],
-          child: const Icon(Icons.person, size: 18, color: Colors.white),
-        ),
-        errorWidget: (context, url, error) => CircleAvatar(
-          radius: 18,
-          backgroundColor: Colors.grey[800],
-          child: const Icon(Icons.notifications, size: 18, color: Colors.white),
-        ),
-      );
-    }
+  @override
+  Widget build(BuildContext context) {
+    final timestamp = widget.notification.notificationTime?.toDate();
+    final timeAgo = timestamp != null ? _timeAgoFormat(timestamp) : '';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          avatar,
+          _buildAvatar(),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
