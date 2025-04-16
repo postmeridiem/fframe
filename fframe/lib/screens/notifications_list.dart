@@ -210,16 +210,6 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Widget _buildAvatar() {
-    String initials = '';
-    final email = widget.notification.reporter;
-    if (email.isNotEmpty && email.contains('@')) {
-      final parts = email.split('@')[0].split('.');
-      if (parts.length >= 2) {
-        initials = (parts[0][0] + parts[1][0]).toUpperCase();
-      } else {
-        initials = parts[0].substring(0, 1).toUpperCase();
-      }
-    }
     if (photoUrl != null) {
       if (kIsWeb) {
         final viewType = 'img-${photoUrl.hashCode}';
@@ -266,10 +256,7 @@ class _NotificationTileState extends State<NotificationTile> {
     return CircleAvatar(
       radius: 18,
       backgroundColor: Colors.blueGrey.shade800,
-      child: Text(
-        initials,
-        style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600),
-      ),
+      child: const Icon(Icons.notifications, size: 18, color: Colors.white),
     );
   }
 
