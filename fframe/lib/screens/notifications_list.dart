@@ -124,6 +124,15 @@ class _NotificationsListState extends State<NotificationsList> {
   }
 }
 
+//
+// import 'dart:ui' as ui; // Needed for HtmlElementView registration
+// import 'package:flutter/foundation.dart' show kIsWeb;
+// import 'package:cached_network_image/cached_network_image.dart';
+// import 'package:fframe/fframe.dart';
+// import 'package:flutter/material.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:url_launcher/url_launcher.dart';
+
 final Map<String, String?> _photoCache = {}; // Global cache
 
 class NotificationTile extends StatefulWidget {
