@@ -5,6 +5,7 @@ import 'package:fframe/fframe.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:html' as html;
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -152,32 +153,38 @@ class _NotificationTileState extends State<NotificationTile> {
 
   Future<void> _loadReporterPhoto() async {
     final email = widget.notification.reporter;
-
     if (_photoCache.containsKey(email)) {
-      photoUrl = _photoCache[email];
+      setState(() => photoUrl = _photoCache[email]);
       return;
     }
 
+    final sanitizedEmail = email.replaceAll(RegExp(r'[^\w@.-]'), '_');
+    final ref = FirebaseStorage.instance.ref('userAvatars/$sanitizedEmail.jpg');
+
     try {
-      final snapshot = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: email).limit(1).get();
+      final url = await ref.getDownloadURL(); // Check if already exists
+      _photoCache[email] = url;
+      setState(() => photoUrl = url);
+    } catch (_) {
+      try {
+        final snapshot = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: email).limit(1).get();
 
-      if (snapshot.docs.isNotEmpty) {
-        final userData = snapshot.docs.first.data();
-        final fetchedUrl = userData['photoURL'];
-
-        _photoCache[email] = fetchedUrl;
-        if (fetchedUrl != null && mounted) {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              setState(() {
-                photoUrl = fetchedUrl;
-              });
+        if (snapshot.docs.isNotEmpty) {
+          final userData = snapshot.docs.first.data();
+          final originalUrl = userData['photoURL'];
+          if (originalUrl != null) {
+            final response = await http.get(Uri.parse(originalUrl));
+            if (response.statusCode == 200) {
+              await ref.putData(response.bodyBytes, SettableMetadata(contentType: 'image/jpeg'));
+              final hostedUrl = await ref.getDownloadURL();
+              _photoCache[email] = hostedUrl;
+              setState(() => photoUrl = hostedUrl);
             }
-          });
+          }
         }
+      } catch (e) {
+        debugPrint("Avatar load error: $e");
       }
-    } catch (e) {
-      debugPrint("Error loading avatar: $e");
     }
   }
 
@@ -256,7 +263,6 @@ class _NotificationTileState extends State<NotificationTile> {
       );
     }
 
-    // Final fallback if no image
     return CircleAvatar(
       radius: 18,
       backgroundColor: Colors.blueGrey.shade800,
