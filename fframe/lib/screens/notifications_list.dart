@@ -158,7 +158,7 @@ class _NotificationTileState extends State<NotificationTile> {
 
       if (snapshot.docs.isNotEmpty) {
         final userData = snapshot.docs.first.data();
-        final fetchedUrl = userData['metadata']?['photoURL'];
+        final fetchedUrl = userData['photoURL'];
 
         _photoCache[email] = fetchedUrl;
         print("THIS IS THE PHOTO URL: ${fetchedUrl}");
