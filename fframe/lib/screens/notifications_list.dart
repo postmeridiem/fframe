@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'dart:html' as html;
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class NotificationsList extends StatefulWidget {
   final String userId;
@@ -213,7 +214,8 @@ class _NotificationTileState extends State<NotificationTile> {
     if (photoUrl != null) {
       if (kIsWeb) {
         final viewType = 'img-${photoUrl.hashCode}';
-
+        // Register the HTML view factory
+        // ignore: undefined_prefixed_name
         ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
           final img = html.ImageElement()
             ..src = photoUrl!
