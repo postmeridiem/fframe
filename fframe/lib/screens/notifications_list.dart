@@ -211,25 +211,49 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Widget _buildAvatar() {
+    final email = widget.notification.reporter ?? '';
+    String initials = '?';
+
+    if (email.isNotEmpty && email.contains('@')) {
+      final parts = email.split('@')[0].split('.');
+      if (parts.length >= 2) {
+        initials = '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+      } else {
+        initials = parts[0].substring(0, 1).toUpperCase();
+      }
+    }
+
     if (photoUrl != null) {
       if (kIsWeb) {
         final viewType = 'img-${photoUrl.hashCode}';
-        // Register the HTML view factory
         // ignore: undefined_prefixed_name
         ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
           final img = html.ImageElement()
             ..src = photoUrl!
             ..style.borderRadius = '50%'
             ..style.objectFit = 'cover'
-            ..width = 36
-            ..height = 36;
+            ..style.width = '36px'
+            ..style.height = '36px'
+            ..onError.listen((event) {
+              // do nothing — fallback shown below
+            });
           return img;
         });
 
-        return SizedBox(
-          width: 36,
-          height: 36,
-          child: HtmlElementView(viewType: viewType),
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: Colors.blueGrey.shade800,
+              child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
+            ),
+            SizedBox(
+              width: 36,
+              height: 36,
+              child: HtmlElementView(viewType: viewType),
+            ),
+          ],
         );
       } else {
         return CachedNetworkImage(
@@ -242,22 +266,22 @@ class _NotificationTileState extends State<NotificationTile> {
           placeholder: (context, url) => CircleAvatar(
             radius: 18,
             backgroundColor: Colors.grey[800],
-            child: const Icon(Icons.person, size: 18, color: Colors.white),
+            child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
           ),
           errorWidget: (context, url, error) => CircleAvatar(
             radius: 18,
             backgroundColor: Colors.grey[800],
-            child: const Icon(Icons.notifications, size: 18, color: Colors.white),
+            child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
           ),
         );
       }
     }
 
-    // Fallback avatar
+    // Final fallback if no image
     return CircleAvatar(
       radius: 18,
       backgroundColor: Colors.blueGrey.shade800,
-      child: const Icon(Icons.notifications, size: 18, color: Colors.white),
+      child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
     );
   }
 
