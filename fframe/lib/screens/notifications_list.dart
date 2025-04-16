@@ -213,7 +213,6 @@ class _NotificationTileState extends State<NotificationTile> {
     if (photoUrl != null) {
       if (kIsWeb) {
         final viewType = 'img-${photoUrl.hashCode}';
-        // Register the HTML view factory
         // ignore: undefined_prefixed_name
         ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
           final img = html.ImageElement()
@@ -243,20 +242,27 @@ class _NotificationTileState extends State<NotificationTile> {
             backgroundColor: Colors.grey[800],
             child: const Icon(Icons.person, size: 18, color: Colors.white),
           ),
-          errorWidget: (context, url, error) => CircleAvatar(
-            radius: 18,
-            backgroundColor: Colors.grey[800],
-            child: const Icon(Icons.notifications, size: 18, color: Colors.white),
-          ),
+          errorWidget: (context, url, error) => _fallbackInitialsAvatar(),
         );
       }
     }
 
-    // Fallback avatar
+    return _fallbackInitialsAvatar();
+  }
+
+  Widget _fallbackInitialsAvatar() {
+    final email = widget.notification.reporter;
+    final namePart = email.split('@').first;
+    final parts = namePart.split(RegExp(r'[._]'));
+    final initials = parts.take(2).map((p) => p.isNotEmpty ? p[0].toUpperCase() : '').join();
+
     return CircleAvatar(
       radius: 18,
-      backgroundColor: Colors.blueGrey.shade800,
-      child: const Icon(Icons.notifications, size: 18, color: Colors.white),
+      backgroundColor: Colors.blueGrey.shade700,
+      child: Text(
+        initials,
+        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+      ),
     );
   }
 
