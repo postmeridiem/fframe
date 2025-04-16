@@ -161,7 +161,7 @@ class _NotificationTileState extends State<NotificationTile> {
         final fetchedUrl = userData['metadata']?['photoURL'];
 
         _photoCache[email] = fetchedUrl;
-        print("THIS IS THE PHOTO URL: ${photoUrl}");
+        print("THIS IS THE PHOTO URL: ${fetchedUrl}");
         if (fetchedUrl != null && mounted) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) {
