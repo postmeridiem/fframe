@@ -259,12 +259,22 @@ class _NotificationTileState extends State<NotificationTile> {
         );
       }
     }
+    final email = widget.notification.reporter ?? '';
+    String initials = '?';
 
+    if (email.isNotEmpty && email.contains('@')) {
+      final parts = email.split('@')[0].split('.');
+      if (parts.length >= 2) {
+        initials = '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+      } else {
+        initials = parts[0].substring(0, 1).toUpperCase();
+      }
+    }
     // Fallback avatar
     return CircleAvatar(
       radius: 18,
       backgroundColor: Colors.blueGrey.shade800,
-      child: const Icon(Icons.notifications, size: 18, color: Colors.white),
+      child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
     );
   }
 
