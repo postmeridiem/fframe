@@ -204,9 +204,16 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Icon _getLinkIcon(String href) {
-    if (href.contains('atlassian')) return const Icon(Icons.bug_report, size: 14, color: Colors.blueAccent);
-    if (href.contains('github')) return const Icon(Icons.code, size: 14, color: Colors.blueAccent);
-    return const Icon(Icons.link, size: 14, color: Colors.blueAccent);
+    switch (widget.notification.type) {
+      case 'tag':
+        return const Icon(Icons.sell, size: 14, color: Colors.lightBlue); // tag = sell icon (label/tag)
+      case 'assign':
+        return const Icon(Icons.assignment_ind, size: 14, color: Colors.orange); // assign = person assignment
+      case 'watch':
+        return const Icon(Icons.visibility, size: 14, color: Colors.green); // watch = visibility eye
+      default:
+        return const Icon(Icons.link, size: 14, color: Colors.blueAccent); // fallback link
+    }
   }
 
   String _timeAgoFormat(DateTime dateTime) {
@@ -297,7 +304,7 @@ class _NotificationTileState extends State<NotificationTile> {
     return Container(
       width: 42, // 36 + padding
       height: 42,
-      padding: const EdgeInsets.all(2), // thin ring
+      padding: const EdgeInsets.all(1), // thin ring
       decoration: BoxDecoration(
         color: ringColor,
         shape: BoxShape.circle,
