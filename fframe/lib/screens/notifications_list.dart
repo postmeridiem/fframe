@@ -253,8 +253,8 @@ class _NotificationTileState extends State<NotificationTile> {
             ..src = photoUrl!
             ..style.borderRadius = '50%'
             ..style.objectFit = 'cover'
-            ..style.width = '36px'
-            ..style.height = '36px'
+            ..style.width = '100%'
+            ..style.height = '100%'
             ..width = 36
             ..height = 36;
           return img;
