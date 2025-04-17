@@ -248,12 +248,13 @@ class _NotificationTileState extends State<NotificationTile> {
     if (photoUrl != null) {
       if (kIsWeb) {
         final viewType = 'img-${photoUrl.hashCode}';
-        // ignore: undefined_prefixed_name
         ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
           final img = html.ImageElement()
             ..src = photoUrl!
             ..style.borderRadius = '50%'
             ..style.objectFit = 'cover'
+            ..style.width = '36px'
+            ..style.height = '36px'
             ..width = 36
             ..height = 36;
           return img;
