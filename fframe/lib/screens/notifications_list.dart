@@ -218,10 +218,38 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Widget _buildAvatar() {
+    final email = widget.notification.reporter ?? '';
+    String initials = '?';
+
+    if (email.isNotEmpty && email.contains('@')) {
+      final parts = email.split('@')[0].split('.');
+      if (parts.length >= 2) {
+        initials = '${parts[0][0]}${parts[1][0]}'.toUpperCase();
+      } else {
+        initials = parts[0].substring(0, 1).toUpperCase();
+      }
+    }
+
+    Color ringColor;
+    switch (widget.notification.type) {
+      case 'tag':
+        ringColor = Colors.blueAccent;
+        break;
+      case 'assign':
+        ringColor = Colors.amberAccent;
+        break;
+      case 'watch':
+        ringColor = Colors.lightGreenAccent;
+        break;
+      default:
+        ringColor = Colors.transparent;
+    }
+
+    Widget avatarContent;
+
     if (photoUrl != null) {
       if (kIsWeb) {
         final viewType = 'img-${photoUrl.hashCode}';
-        // Register the HTML view factory
         // ignore: undefined_prefixed_name
         ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
           final img = html.ImageElement()
@@ -233,13 +261,13 @@ class _NotificationTileState extends State<NotificationTile> {
           return img;
         });
 
-        return SizedBox(
+        avatarContent = SizedBox(
           width: 36,
           height: 36,
           child: HtmlElementView(viewType: viewType),
         );
       } else {
-        return CachedNetworkImage(
+        avatarContent = CachedNetworkImage(
           imageUrl: photoUrl!,
           imageBuilder: (context, imageProvider) => CircleAvatar(
             radius: 18,
@@ -258,23 +286,25 @@ class _NotificationTileState extends State<NotificationTile> {
           ),
         );
       }
+    } else {
+      avatarContent = CircleAvatar(
+        radius: 18,
+        backgroundColor: Colors.blueGrey.shade800,
+        child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
+      );
     }
-    final email = widget.notification.reporter ?? '';
-    String initials = '?';
 
-    if (email.isNotEmpty && email.contains('@')) {
-      final parts = email.split('@')[0].split('.');
-      if (parts.length >= 2) {
-        initials = '${parts[0][0]}${parts[1][0]}'.toUpperCase();
-      } else {
-        initials = parts[0].substring(0, 1).toUpperCase();
-      }
-    }
-    // Fallback avatar
-    return CircleAvatar(
-      radius: 18,
-      backgroundColor: Colors.blueGrey.shade800,
-      child: Text(initials, style: const TextStyle(color: Colors.white, fontSize: 12)),
+    return Container(
+      width: 42, // 36 + padding
+      height: 42,
+      padding: const EdgeInsets.all(2), // thin ring
+      decoration: BoxDecoration(
+        color: ringColor,
+        shape: BoxShape.circle,
+      ),
+      child: ClipOval(
+        child: avatarContent,
+      ),
     );
   }
 
