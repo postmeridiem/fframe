@@ -204,29 +204,7 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Icon _getLinkIcon(String href) {
-    switch (widget.notification.type) {
-      case 'tag':
-        return const Icon(Icons.sell, size: 14, color: Colors.lightBlue); // tag = sell icon (label/tag)
-      case 'assign':
-        return const Icon(Icons.assignment_ind, size: 14, color: Colors.orange); // assign = person assignment
-      case 'watch':
-        return const Icon(Icons.visibility, size: 14, color: Colors.green); // watch = visibility eye
-      default:
-        return const Icon(Icons.link, size: 14, color: Colors.blueAccent); // fallback link
-    }
-  }
-
-  Color _getLinkColor() {
-    switch (widget.notification.type) {
-      case 'tag':
-        return Colors.lightBlue;
-      case 'assign':
-        return Colors.orange;
-      case 'watch':
-        return Colors.green;
-      default:
-        return Colors.blueAccent;
-    }
+    return const Icon(Icons.link, size: 14, color: Colors.blueAccent);
   }
 
   String _timeAgoFormat(DateTime dateTime) {
@@ -385,10 +363,10 @@ class _NotificationTileState extends State<NotificationTile> {
                                 icon: _getLinkIcon(link['href']),
                                 label: Text(
                                   link['label'],
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     decoration: TextDecoration.underline,
-                                    color: _getLinkColor(), // <-- MATCH the icon color!
+                                    color: Colors.blueAccent,
                                   ),
                                 ),
                               ))
