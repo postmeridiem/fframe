@@ -216,6 +216,19 @@ class _NotificationTileState extends State<NotificationTile> {
     }
   }
 
+  Color _getLinkColor() {
+    switch (widget.notification.type) {
+      case 'tag':
+        return Colors.lightBlue;
+      case 'assign':
+        return Colors.orange;
+      case 'watch':
+        return Colors.green;
+      default:
+        return Colors.blueAccent;
+    }
+  }
+
   String _timeAgoFormat(DateTime dateTime) {
     final diff = DateTime.now().difference(dateTime);
     if (diff.inSeconds < 60) return '${diff.inSeconds}s ago';
@@ -372,10 +385,10 @@ class _NotificationTileState extends State<NotificationTile> {
                                 icon: _getLinkIcon(link['href']),
                                 label: Text(
                                   link['label'],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12,
                                     decoration: TextDecoration.underline,
-                                    color: Colors.blueAccent,
+                                    color: _getLinkColor(), // <-- MATCH the icon color!
                                   ),
                                 ),
                               ))
