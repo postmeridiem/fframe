@@ -233,13 +233,13 @@ class _NotificationTileState extends State<NotificationTile> {
     Color ringColor;
     switch (widget.notification.type) {
       case 'tag':
-        ringColor = Colors.blueAccent;
+        ringColor = Colors.lightBlue;
         break;
       case 'assign':
-        ringColor = Colors.amberAccent;
+        ringColor = Colors.orange;
         break;
       case 'watch':
-        ringColor = Colors.lightGreenAccent;
+        ringColor = Colors.green;
         break;
       default:
         ringColor = Colors.transparent;
