@@ -163,28 +163,33 @@ class _NotificationTileState extends State<NotificationTile> {
   void didUpdateWidget(NotificationTile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.notification.id != oldWidget.notification.id) {
+      photoUrl = null; // 🧹 Clear previous photo!
       _loadReporterPhoto();
     }
   }
 
   Future<void> _loadReporterPhoto() async {
     final email = widget.notification.reporter;
+    if (email.isEmpty) return; // no email, nothing to do
+
     if (_photoCache.containsKey(email)) {
       setState(() => photoUrl = _photoCache[email]);
       return;
     }
 
+    // Clear while loading
+    setState(() => photoUrl = null);
+
     final sanitizedEmail = email.replaceAll(RegExp(r'[^\w@.-]'), '_');
     final ref = FirebaseStorage.instance.ref('userAvatars/$sanitizedEmail.jpg');
 
     try {
-      final url = await ref.getDownloadURL(); // Check if already exists
+      final url = await ref.getDownloadURL();
       _photoCache[email] = url;
       setState(() => photoUrl = url);
     } catch (_) {
       try {
         final snapshot = await FirebaseFirestore.instance.collection('users').where('email', isEqualTo: email).limit(1).get();
-
         if (snapshot.docs.isNotEmpty) {
           final userData = snapshot.docs.first.data();
           final originalUrl = userData['photoURL'];
@@ -200,6 +205,7 @@ class _NotificationTileState extends State<NotificationTile> {
         }
       } catch (e) {
         debugPrint("Avatar load error: $e");
+        _photoCache[email] = null; // cache that this user has no photo
       }
     }
   }
