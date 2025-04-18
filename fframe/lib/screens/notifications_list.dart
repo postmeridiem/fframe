@@ -159,6 +159,14 @@ class _NotificationTileState extends State<NotificationTile> {
     _loadReporterPhoto();
   }
 
+  @override
+  void didUpdateWidget(NotificationTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.notification.id != oldWidget.notification.id) {
+      _loadReporterPhoto();
+    }
+  }
+
   Future<void> _loadReporterPhoto() async {
     final email = widget.notification.reporter;
     if (_photoCache.containsKey(email)) {
