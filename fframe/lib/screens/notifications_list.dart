@@ -40,7 +40,11 @@ class _NotificationsListState extends State<NotificationsList> {
   Widget build(BuildContext context) {
     final notificationsBase = FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications');
 
-    final query = onlyShowUnread ? notificationsBase.where('read', isEqualTo: false).orderBy('notificationTime', descending: true) : notificationsBase.orderBy('notificationTime', descending: true);
+    Query notificationsQuery = notificationsBase.orderBy('notificationTime', descending: true);
+
+    if (onlyShowUnread) {
+      notificationsQuery = notificationsBase.where('read', isEqualTo: false).orderBy('notificationTime', descending: true);
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +83,7 @@ class _NotificationsListState extends State<NotificationsList> {
         // Notification list
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
-            stream: query.snapshots(),
+            stream: notificationsQuery.snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Center(
@@ -96,9 +100,13 @@ class _NotificationsListState extends State<NotificationsList> {
               }
 
               final docs = snapshot.data!.docs;
+
               if (docs.isEmpty) {
-                return const Center(
-                  child: Text("No notifications", style: TextStyle(color: Colors.white54)),
+                return Center(
+                  child: Text(
+                    onlyShowUnread ? "No unread notifications" : "No notifications",
+                    style: const TextStyle(color: Colors.white54),
+                  ),
                 );
               }
 
