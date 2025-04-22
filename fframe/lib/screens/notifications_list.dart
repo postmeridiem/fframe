@@ -49,7 +49,6 @@ class _NotificationsListState extends State<NotificationsList> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Title and toggle
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
@@ -79,8 +78,6 @@ class _NotificationsListState extends State<NotificationsList> {
             ],
           ),
         ),
-
-        // Notification list
         Expanded(
           child: StreamBuilder<QuerySnapshot>(
             stream: notificationsQuery.snapshots(),
@@ -170,14 +167,13 @@ class _NotificationTileState extends State<NotificationTile> {
 
   Future<void> _loadReporterPhoto() async {
     final email = widget.notification.reporter;
-    if (email.isEmpty) return; // no email, nothing to do
+    if (email.isEmpty) return;
 
     if (_photoCache.containsKey(email)) {
       setState(() => photoUrl = _photoCache[email]);
       return;
     }
 
-    // Clear while loading
     setState(() => photoUrl = null);
 
     final sanitizedEmail = email.replaceAll(RegExp(r'[^\w@.-]'), '_');
@@ -205,7 +201,7 @@ class _NotificationTileState extends State<NotificationTile> {
         }
       } catch (e) {
         debugPrint("Avatar load error: $e");
-        _photoCache[email] = null; // cache that this user has no photo
+        _photoCache[email] = null;
       }
     }
   }
@@ -399,9 +395,12 @@ class _NotificationTileState extends State<NotificationTile> {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    Text(
-                      timeAgo,
-                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    Tooltip(
+                      message: timestamp != null ? DateFormat('yyyy‑MM‑dd HH:mm:ss').format(timestamp) : '',
+                      child: Text(
+                        timeAgo,
+                        style: const TextStyle(fontSize: 11, color: Colors.grey),
+                      ),
                     ),
                     const Spacer(),
                     GestureDetector(
