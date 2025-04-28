@@ -65,7 +65,11 @@ class _MainScreenState extends State<MainScreen> {
             actions: [
               ...?Fframe.of(context)?.globalActions,
               // TODO JS: make this work directly through the notification class
-              (Fframe.of(context)?.enableNotficationSystem ?? false) ? NotificationButton() : const IgnorePointer(),
+              (Fframe.of(context)?.enableNotficationSystem ?? false)
+                  ? NotificationButton(
+                      userId: Fframe.of(context)!.user!.id!,
+                    )
+                  : const IgnorePointer(),
               const ProfileButton(),
             ],
           ),
