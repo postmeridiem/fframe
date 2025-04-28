@@ -33,10 +33,6 @@ class FframeNotifications {
 }
 
 class NotificationButton extends StatefulWidget {
-  final String userId;
-
-  const NotificationButton({super.key, required this.userId});
-
   @override
   State<NotificationButton> createState() => _NotificationButtonState();
 }
@@ -45,7 +41,7 @@ class _NotificationButtonState extends State<NotificationButton> with SingleTick
   OverlayEntry? _overlayEntry;
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
-
+  late String? userId;
   @override
   void initState() {
     super.initState();
@@ -57,6 +53,7 @@ class _NotificationButtonState extends State<NotificationButton> with SingleTick
       parent: _controller,
       curve: Curves.easeOutBack,
     );
+    userId = Fframe.of(context)!.user!.id;
   }
 
   @override
@@ -109,7 +106,7 @@ class _NotificationButtonState extends State<NotificationButton> with SingleTick
                       color: Theme.of(context).cardColor,
                       child: SizedBox(
                         height: 500,
-                        child: NotificationsList(userId: widget.userId),
+                        child: NotificationsList(userId: userId!),
                       ),
                     ),
                   ),
@@ -125,7 +122,7 @@ class _NotificationButtonState extends State<NotificationButton> with SingleTick
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications').where('seen', isEqualTo: false).snapshots(),
+      stream: FirebaseFirestore.instance.collection('users').doc(userId).collection('notifications').where('seen', isEqualTo: false).snapshots(),
       builder: (context, snapshot) {
         int unseenCount = 0;
         if (snapshot.hasData) {
