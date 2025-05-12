@@ -119,7 +119,13 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
 
     String tabIndexKey = documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
     int initialTabIndex = int.parse(SelectionState.instance.queryStringParam(tabIndexKey) ?? "0");
-    int tabIndex = initialTabIndex; // Use a separate variable to track the current tab index
+    Uri? deepLinkUri = Fframe.of(context)?.deepLinkUri;
+    int? deepLinkTabIndex;
+    if (deepLinkUri?.queryParameters.containsKey('tabIndex') == true) {
+      deepLinkTabIndex = int.tryParse(deepLinkUri!.queryParameters['tabIndex']!);
+    }
+
+    int tabIndex = deepLinkTabIndex ?? initialTabIndex; // Use a separate variable to track the current tab index
 
     // // Log the initial tab index for debugging
     // Console.log("Initial tabIndex from URL: $initialTabIndex", scope: "fframeLog.DocumentBody", level: LogLevel.prod);
