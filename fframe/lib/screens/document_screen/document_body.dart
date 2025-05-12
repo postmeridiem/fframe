@@ -119,28 +119,25 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
 
     String tabIndexKey = documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
     int initialTabIndex = int.parse(SelectionState.instance.queryStringParam(tabIndexKey) ?? "0");
+
+    /// The tab index from the deep link URI, if present.
+    ///
+    /// If the deep link URI contains a 'tabIndex' query parameter, this value
+    /// will be parsed as an integer and used as the initial tab index.
+    /// If the query parameter is missing or cannot be parsed, this value will be null.
     Uri? deepLinkUri = Fframe.of(context)?.deepLinkUri;
     int? deepLinkTabIndex;
     if (deepLinkUri?.queryParameters.containsKey('tabIndex') == true) {
       deepLinkTabIndex = int.tryParse(deepLinkUri!.queryParameters['tabIndex']!);
     }
-
+    /// The initial tab index to display.
+    ///
+    /// This value is determined by checking the following sources in order:
+    /// 1. The 'tabIndex' query parameter in the deep link URI (if present and valid).
+    /// 2. The `initialTabIndex` variable, which represents the default tab index.
+    ///
+    /// This variable is used to track the currently selected tab index within the document.
     int tabIndex = deepLinkTabIndex ?? initialTabIndex; // Use a separate variable to track the current tab index
-
-    // // Log the initial tab index for debugging
-    // Console.log("Initial tabIndex from URL: $initialTabIndex", scope: "fframeLog.DocumentBody", level: LogLevel.prod);
-    // // Add this line to log the parsed tab index
-    // Console.log("Active Tracker: ${SelectionState.instance.activeTracker}", scope: "fframeLog.DocumentBody", level: LogLevel.prod);
-    // // Add this line to log the queryParameters
-    // Console.log("Active Tracker Query Parameters: ${SelectionState.instance.activeTracker?.queryParameters}", scope: "fframeLog.DocumentBody", level: LogLevel.prod);
-    // Console.log("Parsed tabIndex: $initialTabIndex", scope: "fframeLog.DocumentBody", level: LogLevel.prod);
-
-    // Missing the tab index?
-    Console.log(
-      "DocumentBody: tabIndexKey: $tabIndexKey, initialTabIndex: $initialTabIndex, queryParameters: ${SelectionState.instance.activeTracker?.queryParameters}",
-      scope: "fframeLog.DocumentBody.beforeCheck",
-      level: LogLevel.dev,
-    );
 
     if (SelectionState.instance.activeTracker != null && SelectionState.instance.activeTracker!.queryParameters.containsKey(tabIndexKey) && int.tryParse(SelectionState.instance.activeTracker!.queryParameters[tabIndexKey]!) != null) {
       initialTabIndex = int.parse(SelectionState.instance.activeTracker!.queryParameters[tabIndexKey]!);
