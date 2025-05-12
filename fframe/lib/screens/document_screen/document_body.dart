@@ -115,8 +115,35 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
     selectedDocument.documentTabs = documentTabsBuilder(context, selectedDocument.data, selectedDocument.readOnly, selectedDocument.isNew, user);
 
     //Prepare the tabs
+    Console.log("documentConfig.embeddedDocument: ${documentConfig.embeddedDocument}", scope: "fframeLog.DocumentBody", level: LogLevel.dev);
+
     String tabIndexKey = documentConfig.embeddedDocument ? "childTabIndex" : "tabIndex";
-    int tabIndex = int.parse(SelectionState.instance.queryStringParam(tabIndexKey) ?? "0");
+    int initialTabIndex = int.parse(SelectionState.instance.queryStringParam(tabIndexKey) ?? "0");
+    int tabIndex = initialTabIndex; // Use a separate variable to track the current tab index
+
+    // // Log the initial tab index for debugging
+    // Console.log("Initial tabIndex from URL: $initialTabIndex", scope: "fframeLog.DocumentBody", level: LogLevel.prod);
+    // // Add this line to log the parsed tab index
+    // Console.log("Active Tracker: ${SelectionState.instance.activeTracker}", scope: "fframeLog.DocumentBody", level: LogLevel.prod);
+    // // Add this line to log the queryParameters
+    // Console.log("Active Tracker Query Parameters: ${SelectionState.instance.activeTracker?.queryParameters}", scope: "fframeLog.DocumentBody", level: LogLevel.prod);
+    // Console.log("Parsed tabIndex: $initialTabIndex", scope: "fframeLog.DocumentBody", level: LogLevel.prod);
+
+    // Missing the tab index?
+    Console.log(
+      "DocumentBody: tabIndexKey: $tabIndexKey, initialTabIndex: $initialTabIndex, queryParameters: ${SelectionState.instance.activeTracker?.queryParameters}",
+      scope: "fframeLog.DocumentBody.beforeCheck",
+      level: LogLevel.dev,
+    );
+
+    if (SelectionState.instance.activeTracker != null && SelectionState.instance.activeTracker!.queryParameters.containsKey(tabIndexKey) && int.tryParse(SelectionState.instance.activeTracker!.queryParameters[tabIndexKey]!) != null) {
+      initialTabIndex = int.parse(SelectionState.instance.activeTracker!.queryParameters[tabIndexKey]!);
+      Console.log(
+        "DocumentBody: Using tabIndex from activeTracker: $initialTabIndex",
+        scope: "fframeLog.DocumentBody.afterCheck",
+        level: LogLevel.dev,
+      );
+    }
 
     //Prepare the context card toggler
     if (contextCards != null && contextCards.isNotEmpty) {
