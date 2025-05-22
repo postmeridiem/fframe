@@ -39,4 +39,20 @@ class Validator {
     // unsure how this is needed yet, since icon field should be an icon picket
     return true;
   }
+
+  bool validateUrl(String? rawvalue) {
+    // Check if input is a valid URL (might not cover all edge cases).
+    // Starting with "http://" or "https://" is mandatory.
+    if (rawvalue != null && rawvalue.isNotEmpty) {
+      final urlRegex = RegExp(
+        r"^(?:http:\/\/|https:\/\/)(?:[\w-]+\.)*[\w-]+(?:\/[\w\-\._~:/?#[\]@!\$&'()*+,;=.]*)?$",
+        caseSensitive: false,
+      );
+      if (urlRegex.hasMatch(rawvalue)) {
+        Uri? parsedValue = Uri.tryParse(rawvalue);
+        return parsedValue != null;
+      }
+    }
+    return false;
+  }
 }
