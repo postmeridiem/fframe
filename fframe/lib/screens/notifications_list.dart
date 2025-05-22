@@ -118,6 +118,7 @@ class _NotificationsListState extends State<NotificationsList> {
                   );
 
                   return NotificationTile(
+                    key: ValueKey(notification.id),
                     notification: notification,
                     userId: widget.userId,
                   );
@@ -159,8 +160,8 @@ class _NotificationTileState extends State<NotificationTile> {
   @override
   void didUpdateWidget(NotificationTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.notification.id != oldWidget.notification.id) {
-      photoUrl = null; // 🧹 Clear previous photo!
+    if (widget.notification.id != oldWidget.notification.id || widget.notification.reporter != oldWidget.notification.reporter) {
+      photoUrl = null;
       _loadReporterPhoto();
     }
   }
