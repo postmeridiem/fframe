@@ -371,6 +371,51 @@ class SwimlanesFilterBar<T> extends StatelessWidget {
                         ),
                       )
                     : const IgnorePointer(),
+                swimlanesConfig.customFilter != null
+                    ? swimlanesConfig.customFilter!.customFilterWidget != null
+                        ? swimlanesConfig.customFilter!.customFilterWidget!(swimlanesController)
+                        : Padding(
+                            padding: const EdgeInsets.only(right: 16.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                OutlinedButton(
+                                  onPressed: () {
+                                    toggleFilter(SwimlanesFilterType.customFilter);
+                                  },
+                                  style: OutlinedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                    ),
+                                    side: BorderSide(
+                                      width: 2,
+                                      color: (currentFilter == SwimlanesFilterType.customFilter) ? active : Theme.of(context).disabledColor,
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 4, bottom: 4),
+                                    child: Icon(
+                                      Icons.filter_list,
+                                      size: 16,
+                                      color: (currentFilter == SwimlanesFilterType.customFilter) ? active : inactive,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4.0),
+                                  child: Text(
+                                    swimlanesConfig.customFilter!.filterName,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: swimlanesController.taskCardTextColor,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                    : const IgnorePointer(),
               ],
             ),
           ),
@@ -661,12 +706,14 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                     case SwimlanesFilterType.prioHigh:
                       selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) < 4);
                       break;
-                    case SwimlanesFilterType.prioLow:
+                    case SwimlanesFilterType.prioNormal:
                       selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) >= 4 && swimlanesConfig.getPriority!(selectedDocument.data) < 7);
                       break;
-                    case SwimlanesFilterType.prioNormal:
+                    case SwimlanesFilterType.prioLow:
                       selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) >= 7);
                       break;
+                    case SwimlanesFilterType.customFilter:
+                      selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.customFilter!.matchesCustomFilter(selectedDocument.data));
                     default:
                       break;
                   }

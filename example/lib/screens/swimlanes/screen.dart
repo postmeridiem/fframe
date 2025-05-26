@@ -19,6 +19,37 @@ class SwimlanesScreen extends StatefulWidget {
 }
 
 class _SwimlanesScreenState extends State<SwimlanesScreen> {
+  // Filter toggle showcasing a custom option
+  Widget customFilterWidget(SwimlanesController swimlanesController) {
+    SwimlanesFilterType currentFilter = swimlanesController.notifier.filter;
+    SwimlanesFilterType targetFilter = SwimlanesFilterType.customFilter;
+    return ElevatedButton.icon(
+      onPressed: () {
+        if (swimlanesController.filter != targetFilter) {
+          swimlanesController.notifier.setFilter(targetFilter);
+        } else {
+          swimlanesController.notifier.setFilter(SwimlanesFilterType.unfiltered);
+        }
+      },
+      icon: const Icon(
+        Icons.auto_fix_normal_outlined,
+        color: Colors.white,
+      ),
+      label: const Text(
+        'Dolly filter',
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(28),
+        ),
+        backgroundColor: (currentFilter == targetFilter) ? Theme.of(context).indicatorColor : Theme.of(context).disabledColor,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return DocumentScreen<Suggestion>(
@@ -106,6 +137,15 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
           isAssignee: (suggestion, user) {
             return suggestion.assignee == user.uid;
           },
+        ),
+        customFilter: SwimlanesCustomFilter<Suggestion>(
+          filterName: 'Card name',
+          matchesCustomFilter: (suggestion) {
+            // In this example the custom filter is to be named "dolly the sheep"
+            String dummyFilterSelection = 'dolly the sheep';
+            return suggestion.name == dummyFilterSelection;
+          },
+          customFilterWidget: customFilterWidget,
         ),
         // getDueDate: (suggestion) => suggestion.dueDate,
         taskWidgetHeader: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionHeader(

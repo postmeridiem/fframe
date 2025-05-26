@@ -13,6 +13,7 @@ class SwimlanesConfig<T> extends ListConfig {
     this.assignee,
     this.myId,
     this.following,
+    this.customFilter,
     this.swimlaneBackgroundColor,
     this.swimlaneHeaderColor,
     this.swimlaneHeaderTextColor,
@@ -44,6 +45,7 @@ class SwimlanesConfig<T> extends ListConfig {
   final String Function(T) getTitle;
   final String Function(FFrameUser)? myId;
   final SwimlanesFollowing<T>? following;
+  final SwimlanesCustomFilter<T>? customFilter;
   final SwimlanesAssignee<T>? assignee;
   final String Function(T) getDescription;
   final double Function(T)? getPriority;
@@ -73,6 +75,28 @@ class SwimlanesAssignee<T> {
   final bool Function(T, FFrameUser) isAssignee;
   final T Function(T, FFrameUser) setAssignee;
   final T Function(T) unsetAssignee;
+}
+
+class SwimlanesCustomFilter<T> {
+  SwimlanesCustomFilter({
+    required this.filterName,
+    required this.matchesCustomFilter,
+    this.customFilterWidget,
+  });
+  // Custom filter name shown amongst the client-side filters (only if there's no customFilterWidget defined)
+  final String filterName;
+
+  // Tells if the document (T) is matching with a custom filter
+  // e.g. use case for selected label matching
+  // matchesCustomFilter: (cardDoc) {
+  //   bool? hasLabel = cardDoc.labels?.include(selectedLabelId);
+  //   return hasLabel == true ? hasLabel : false;
+  // }
+  final bool Function(T) matchesCustomFilter;
+
+  // How the filter option should be shown amongst the other client-side filters.
+  // If not defined, it'll be shown as the others.
+  final Widget Function(SwimlanesController)? customFilterWidget;
 }
 
 class SwimlanesActionMenu<T> {
@@ -171,6 +195,7 @@ enum SwimlanesFilterType {
   prio7,
   prio8,
   prio9,
+  customFilter,
 }
 
 typedef SwimlanesActionHandler<T> = void Function(
