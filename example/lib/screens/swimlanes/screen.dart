@@ -21,31 +21,67 @@ class SwimlanesScreen extends StatefulWidget {
 class _SwimlanesScreenState extends State<SwimlanesScreen> {
   // Filter toggle showcasing a custom option
   Widget customFilterWidget(SwimlanesController swimlanesController) {
-    SwimlanesFilterType currentFilter = swimlanesController.notifier.filter;
     SwimlanesFilterType targetFilter = SwimlanesFilterType.customFilter;
-    return ElevatedButton.icon(
-      onPressed: () {
-        if (swimlanesController.filter != targetFilter) {
-          swimlanesController.notifier.setFilter(targetFilter);
-        } else {
-          swimlanesController.notifier.setFilter(SwimlanesFilterType.unfiltered);
-        }
+    SwimlanesFilterType currentFilter = swimlanesController.notifier.filter;
+    // Dummy labels with the same functionality - to toggle the filter type on
+    List<String> dummyLabels = ['label1', 'label2', 'label3'];
+    return PopupMenuButton<String>(
+      tooltip: "Filter by labels",
+      itemBuilder: (BuildContext context) {
+        return [
+          PopupMenuItem<String>(
+            enabled: false, // Allow interaction with children without closing
+            child: SizedBox(
+              width: 100,
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setStateInsidePopup) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: dummyLabels.map((labelName) {
+                      return CheckboxListTile(
+                        title: Text(labelName),
+                        value: swimlanesController.filter == targetFilter,
+                        onChanged: (value) {
+                          if (swimlanesController.filter != targetFilter) {
+                            swimlanesController.notifier.setFilter(targetFilter);
+                          } else {
+                            swimlanesController.notifier.setFilter(SwimlanesFilterType.unfiltered);
+                          }
+                          setStateInsidePopup(() {});
+                        },
+                        dense: true,
+                        controlAffinity: ListTileControlAffinity.leading,
+                      );
+                    }).toList(),
+                  );
+                },
+              ),
+            ),
+          ),
+        ];
       },
-      icon: const Icon(
-        Icons.auto_fix_normal_outlined,
-        color: Colors.white,
-      ),
-      label: const Text(
-        'Dolly filter',
-        style: TextStyle(
-          color: Colors.white,
+      child: Card(
+        child: Container(
+          height: swimlanesController.headerHeight,
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          decoration: BoxDecoration(
+            color: currentFilter == SwimlanesFilterType.customFilter ? Theme.of(context).indicatorColor : null,
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          child: const Row(
+            children: [
+              Icon(
+                Icons.filter_list_alt,
+                color: Colors.white,
+              ),
+              Text(
+                'Labels',
+                style: TextStyle(color: Colors.white),
+              ),
+            ],
+          ),
         ),
-      ),
-      style: ElevatedButton.styleFrom(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-        ),
-        backgroundColor: (currentFilter == targetFilter) ? Theme.of(context).indicatorColor : Theme.of(context).disabledColor,
       ),
     );
   }
@@ -145,6 +181,7 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
             String dummyFilterSelection = 'dolly the sheep';
             return suggestion.name == dummyFilterSelection;
           },
+          // Only shown if myId is undefined, so if the default client-side filters are not shown.
           customFilterWidget: customFilterWidget,
         ),
         // getDueDate: (suggestion) => suggestion.dueDate,

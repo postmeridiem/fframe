@@ -100,6 +100,7 @@ class _SwimlaneHeadersState<T> extends State<SwimlaneHeaders<T>> {
                     ),
                   ),
                 ),
+          if (widget.swimlanesConfig.myId == null && widget.swimlanesConfig.customFilter?.customFilterWidget != null) widget.swimlanesConfig.customFilter!.customFilterWidget!(swimlanesController),
         ],
       ),
     );
@@ -371,50 +372,48 @@ class SwimlanesFilterBar<T> extends StatelessWidget {
                         ),
                       )
                     : const IgnorePointer(),
-                swimlanesConfig.customFilter != null
-                    ? swimlanesConfig.customFilter!.customFilterWidget != null
-                        ? swimlanesConfig.customFilter!.customFilterWidget!(swimlanesController)
-                        : Padding(
-                            padding: const EdgeInsets.only(right: 16.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                OutlinedButton(
-                                  onPressed: () {
-                                    toggleFilter(SwimlanesFilterType.customFilter);
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(28),
-                                    ),
-                                    side: BorderSide(
-                                      width: 2,
-                                      color: (currentFilter == SwimlanesFilterType.customFilter) ? active : Theme.of(context).disabledColor,
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 4, bottom: 4),
-                                    child: Icon(
-                                      Icons.filter_list,
-                                      size: 16,
-                                      color: (currentFilter == SwimlanesFilterType.customFilter) ? active : inactive,
-                                    ),
-                                  ),
+                swimlanesConfig.customFilter != null && swimlanesConfig.customFilter!.customFilterWidget == null
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () {
+                                toggleFilter(SwimlanesFilterType.customFilter);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(28),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 4.0),
-                                  child: Text(
-                                    swimlanesConfig.customFilter!.filterName,
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: swimlanesController.taskCardTextColor,
-                                    ),
-                                  ),
+                                side: BorderSide(
+                                  width: 2,
+                                  color: (currentFilter == SwimlanesFilterType.customFilter) ? active : Theme.of(context).disabledColor,
                                 ),
-                              ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 4, bottom: 4),
+                                child: Icon(
+                                  Icons.filter_list,
+                                  size: 16,
+                                  color: (currentFilter == SwimlanesFilterType.customFilter) ? active : inactive,
+                                ),
+                              ),
                             ),
-                          )
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                swimlanesConfig.customFilter!.filterName,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: swimlanesController.taskCardTextColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
                     : const IgnorePointer(),
               ],
             ),
