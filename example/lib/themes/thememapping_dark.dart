@@ -59,10 +59,10 @@ final ThemeData appDarkTheme = ThemeData(
       color: darkModeConfig.signalColors.constErrorColor,
     ),
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     color: darkModeConfig.constSecondaryColor,
   ),
-  tabBarTheme: TabBarTheme(
+  tabBarTheme: TabBarThemeData(
     indicatorSize: TabBarIndicatorSize.tab,
     labelColor: darkModeConfig.constPrimaryAccentColor,
     unselectedLabelColor: darkModeConfig.constUnselectedColor,

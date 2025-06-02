@@ -58,7 +58,7 @@ final ThemeData appLightTheme = ThemeData(
       color: lightModeConfig.signalColors.constErrorColor,
     ),
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     color: lightModeConfig.constSecondaryColor,
   ),
   navigationRailTheme: NavigationRailThemeData(
@@ -67,7 +67,7 @@ final ThemeData appLightTheme = ThemeData(
   navigationBarTheme: NavigationBarThemeData(
     backgroundColor: lightModeConfig.constSurfaceColor,
   ),
-  tabBarTheme: TabBarTheme(
+  tabBarTheme: TabBarThemeData(
     indicatorSize: TabBarIndicatorSize.tab,
     // labelColor: lightModeConfig.constPrimaryAccentColor,
     unselectedLabelColor: lightModeConfig.constUnselectedColor,
