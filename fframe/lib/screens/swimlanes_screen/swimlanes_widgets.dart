@@ -734,6 +734,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                             width: swimlanesConfig.swimlaneWidth,
                             swimlaneSetting: widget.swimlaneSetting,
                             priority: 1.0,
+                            lanePosition: lanePositionIncrement,
                           )
                         : ListView.builder(
                             shrinkWrap: true,
@@ -782,8 +783,32 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                   buildContext: context,
                                 );
 
+                                double? topDropZoneLanePosition;
+                                if (index == 0) {
+                                  if (swimlanesConfig.getLanePosition != null) {
+                                    // Calculate lane position for the 1st drop zone
+                                    double firstDocPos = swimlanesConfig.getLanePosition!(selectedDocument.data);
+                                    topDropZoneLanePosition = firstDocPos / 2.0;
+                                  } else {
+                                    // Fallback to a default starting value if getLanePosition is null
+                                    topDropZoneLanePosition = lanePositionIncrement / 2.0;
+                                  }
+                                }
+
                                 return Column(
                                   children: [
+                                    if (index == 0)
+                                      // Insert drop zone for the top of the lane
+                                      SwimlaneDropZone(
+                                        swimlanesController: widget.swimlanesController,
+                                        swimlanesConfig: swimlanesConfig,
+                                        fFrameUser: widget.fFrameUser,
+                                        height: dropTargetHeight,
+                                        width: swimlanesConfig.swimlaneWidth,
+                                        swimlaneSetting: widget.swimlaneSetting,
+                                        priority: 1.0,
+                                        lanePosition: topDropZoneLanePosition,
+                                      ),
                                     // if (nextPriority != null)
                                     //   Padding(
                                     //     padding: const EdgeInsets.all(8.0),
