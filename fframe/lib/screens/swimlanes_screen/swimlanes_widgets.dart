@@ -837,13 +837,32 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                   ],
                                 );
                               } else {
+                                T docAbove = selectedDocuments[docIndex].data; // Doc before the drop zone
+
+                                // Calculate lane position for drop zone (the primary ordering within lanes)
+                                double? dropZoneLanePosition;
+                                if (swimlanesConfig.getLanePosition != null) {
+                                  if (docIndex < selectedDocuments.length - 1) {
+                                    // Drop zone is between 2 docs
+                                    T docBelow = selectedDocuments[docIndex + 1].data;
+                                    double posAbove = swimlanesConfig.getLanePosition!(docAbove);
+                                    double posBelow = swimlanesConfig.getLanePosition!(docBelow);
+                                    dropZoneLanePosition = (posAbove + posBelow) / 2.0;
+                                  } else {
+                                    // Drop zone is after the last doc in the list
+                                    double posLast = swimlanesConfig.getLanePosition!(docAbove);
+                                    dropZoneLanePosition = posLast + lanePositionIncrement; // Lane position for the last item
+                                  }
+                                }
                                 // Calculate priority for drop zone
                                 double? dropZonePriority;
                                 if (swimlanesConfig.getPriority != null) {
                                   if (docIndex < selectedDocuments.length - 1) {
+                                    // Drop zone is between 2 docs
                                     dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
                                   } else {
-                                    double lastPriority = swimlanesConfig.getPriority!(selectedDocuments[docIndex].data);
+                                    // Drop zone is after the last doc in the list
+                                    double lastPriority = swimlanesConfig.getPriority!(docAbove);
                                     dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
                                   }
                                 }
@@ -869,6 +888,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                       width: swimlanesConfig.swimlaneWidth,
                                       swimlaneSetting: widget.swimlaneSetting,
                                       priority: dropZonePriority,
+                                      lanePosition: dropZoneLanePosition,
                                     ),
                                   ],
                                 );
@@ -943,11 +963,13 @@ class SwimlaneDropZone<T> extends StatefulWidget {
     this.height = 48.0,
     required this.swimlaneSetting,
     this.priority,
+    this.lanePosition,
   });
   final SwimlaneSetting<T> swimlaneSetting;
   final SwimlanesController swimlanesController;
   final SwimlanesConfig<T> swimlanesConfig;
   final double? priority;
+  final double? lanePosition;
   final FFrameUser fFrameUser;
   final double width;
   final double height;
@@ -1003,10 +1025,24 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = null;
         });
         T data = dragContext.data.selectedDocument.data;
-        if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlaneSetting.onPriorityChange != null) {
+
+        if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlaneSetting.onLanePositionChange != null) {
+          // Card dropped in the SAME lane (reorder) and lane position is the primary ordering strategy
+          data = widget.swimlaneSetting.onLanePositionChange!(data, widget.lanePosition);
+        } else if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlaneSetting.onPriorityChange != null) {
+          // Card dropped in the SAME lane (reorder) and priority is the primary ordering strategy
           data = widget.swimlaneSetting.onPriorityChange!(data, widget.priority);
         } else if (widget.swimlaneSetting.onLaneDrop != null) {
-          data = widget.swimlaneSetting.onLaneDrop!(data, widget.priority);
+          // Card dropped in a DIFFERENT lane
+          if (widget.swimlanesConfig.getLanePosition != null) {
+            // Lane position is passed if that's the primary ordering strategy
+            data = widget.swimlaneSetting.onLaneDrop!(data, widget.lanePosition);
+          } else {
+            // Priority is passed if that's the primary ordering strategy
+            data = widget.swimlaneSetting.onLaneDrop!(data, widget.priority);
+          }
+        } else {
+          Console.log("onLaneDrop is not implemented for this lane", level: LogLevel.dev);
         }
         dragContext.data.selectedDocument.update(data: data);
       }),
@@ -1021,7 +1057,15 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = dragContext!.data;
         });
 
-        if (widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id && widget.swimlanesConfig.getPriority != null && widget.swimlaneSetting.canChangePriority != null) {
+        if (widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id && widget.swimlanesConfig.getLanePosition != null && widget.swimlaneSetting.canChangePriority != null) {
+          return widget.swimlaneSetting.canChangePriority!(
+            dragContext.data.selectedDocument,
+            widget.fFrameUser.roles,
+            dragContext.data.sourceColumn.id,
+            widget.swimlanesConfig.getLanePosition!(dragContext.data.selectedDocument.data).floor(),
+            widget.lanePosition!.floor(),
+          );
+        } else if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlanesConfig.getPriority != null && widget.swimlaneSetting.canChangePriority != null) {
           return widget.swimlaneSetting.canChangePriority!(
             dragContext.data.selectedDocument,
             widget.fFrameUser.roles,

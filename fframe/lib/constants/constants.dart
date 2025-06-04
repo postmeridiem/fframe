@@ -17,3 +17,7 @@ Map<String, String> allClaims = {
 };
 
 enum ScreenSize { phone, tablet, large, unknown }
+
+// Defining the re-indexing increment for swimlanes lane position calculation:
+// Reasoning behind the value: providing "space" for reordering, to better avoid complex fractions.
+const double lanePositionIncrement = 1000.0;

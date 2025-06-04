@@ -86,6 +86,11 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
       suggestion.priority = priority ?? 5.0;
       return suggestion;
     },
+    // onLanePositionChange: (Suggestion suggestion, double? lanePosition) {
+    //   // Dummy implementation, as Suggestion doesn't have a field for lanePosition
+    //   Console.log('onLanePositionChange called with target lanePosition of $lanePosition');
+    //   return suggestion;
+    // },
     canChangePriority: (SelectedDocument<Suggestion> selectedDocument, roles, sourceSwimmingLane, sourcePriority, targetPriority) {
       return true;
     },
