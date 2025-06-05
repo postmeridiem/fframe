@@ -145,6 +145,7 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
         getTitle: (suggestion) => suggestion.name ?? "?",
         getDescription: (suggestion) => suggestion.description ?? "",
         getPriority: (suggestion) => suggestion.priority,
+        // getLanePosition: (suggestion) => suggestion.priority.toDouble(), // Dummy implementation as a suggestion doesn't have lanePosition
         myId: (user) => user.uid!,
         following: SwimlanesFollowing<Suggestion>(
           isFollowing: (suggestion, user) => suggestion.followers != null && suggestion.followers!.contains(user.uid),
