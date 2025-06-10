@@ -59,4 +59,27 @@ class FframeNotification extends ChangeNotifier {
           ),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'notificationTime': notificationTime ?? Timestamp.now(),
+      'reporter': reporter,
+      'type': type,
+      'messageTitle': messageTitle,
+      'messageSubtitle': messageSubtitle,
+      'messageBody': messageBody,
+      'contextLinks': contextLinks,
+      'seen': seen,
+      'read': read,
+      'deleted': deleted,
+      'firestoreTTL': firestoreTTL ??
+          Timestamp.fromDate(
+            DateTime.now().add(const Duration(days: 30)),
+          ),
+    };
+  }
+
+  Map<String, dynamic> toFirestore() {
+    return toJson();
+  }
 }
