@@ -4,11 +4,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:html' as html;
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class NotificationsList extends StatefulWidget {
   final String userId;
@@ -40,10 +38,10 @@ class _NotificationsListState extends State<NotificationsList> {
   Widget build(BuildContext context) {
     final notificationsBase = FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications');
 
-    Query notificationsQuery = notificationsBase.orderBy('notificationTime', descending: true);
+    Query notificationsQuery = notificationsBase.where('deleted', isEqualTo: false).orderBy('notificationTime', descending: true);
 
     if (onlyShowUnread) {
-      notificationsQuery = notificationsBase.where('read', isEqualTo: false).orderBy('notificationTime', descending: true);
+      notificationsQuery = notificationsBase.where('deleted', isEqualTo: false).where('read', isEqualTo: false).orderBy('notificationTime', descending: true);
     }
 
     return Column(
@@ -83,6 +81,7 @@ class _NotificationsListState extends State<NotificationsList> {
             stream: notificationsQuery.snapshots(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
+                Console.log("Error loading notifications: ${snapshot.error}", scope: "fframeLog.NotificationsList", level: LogLevel.prod);
                 return Center(
                   child: Text(
                     "Error loading notifications:\n${snapshot.error}",
@@ -211,6 +210,15 @@ class _NotificationTileState extends State<NotificationTile> {
     final docRef = FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications').doc(widget.notification.id);
 
     await docRef.update({'read': value});
+  }
+
+  Future<void> _dismissNotification() async {
+    final docRef = FirebaseFirestore.instance.collection('users').doc(widget.userId).collection('notifications').doc(widget.notification.id);
+
+    await docRef.update({
+      'deleted': true,
+      'firestoreTTL': Timestamp.now(),
+    });
   }
 
   Future<void> _launchUrl(String url) async {
@@ -404,9 +412,23 @@ class _NotificationTileState extends State<NotificationTile> {
                       ),
                     ),
                     const Spacer(),
-                    GestureDetector(
-                      onTap: () => _toggleRead(!widget.notification.read),
-                      child: Tooltip(
+                    IconButton(
+                      onPressed: _dismissNotification,
+                      icon: const Tooltip(
+                        message: 'Dismiss notification',
+                        child: Icon(
+                          Icons.delete_outline_rounded,
+                          color: Colors.blueAccent,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 4.0,
+                    ),
+                    IconButton(
+                      onPressed: () => _toggleRead(!widget.notification.read),
+                      icon: Tooltip(
                         message: widget.notification.read ? 'Mark as unread' : 'Mark as read',
                         child: Icon(
                           widget.notification.read ? Icons.mark_email_read_outlined : Icons.mark_email_unread_outlined,
