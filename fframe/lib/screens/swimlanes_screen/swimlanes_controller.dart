@@ -75,6 +75,11 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
   late double _viewportWidth;
 
   // late Map<String, bool> listGridSelection = {};
+  double? draggedItemHeight;
+
+  void setDraggedItemHeight(double? height) {
+    draggedItemHeight = height;
+  }
 
   Color get swimlaneBackgroundColor {
     return swimlanesConfig.swimlaneBackgroundColor ?? theme.colorScheme.surfaceContainerHighest;

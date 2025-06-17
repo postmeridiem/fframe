@@ -618,17 +618,6 @@ class Swimlane<T> extends StatefulWidget {
 }
 
 class _SwimlaneState<T> extends State<Swimlane<T>> {
-  double dropTargetHeight = 200.0;
-
-  double _getTaskCardHeight(GlobalKey dragKey) {
-    if (dragKey.currentContext != null) {
-      final RenderBox renderBox = dragKey.currentContext!.findRenderObject() as RenderBox;
-      dropTargetHeight = renderBox.size.height;
-    }
-
-    return 10.0;
-  }
-
   final int _documentsPerPage = 20;
 
   @override
@@ -803,7 +792,6 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                         swimlanesController: widget.swimlanesController,
                                         swimlanesConfig: swimlanesConfig,
                                         fFrameUser: widget.fFrameUser,
-                                        height: dropTargetHeight,
                                         width: swimlanesConfig.swimlaneWidth,
                                         swimlaneSetting: widget.swimlaneSetting,
                                         priority: 1.0,
@@ -820,40 +808,46 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                     //       ],
                                     //     ),
                                     //   ),
-                                    GestureDetector(
-                                      onTapDown: (_) => _getTaskCardHeight(dragContext.dragKey),
-                                      child: Draggable<DragContext<T>>(
-                                        data: dragContext,
-                                        feedback: SwimlanesTaskCard<T>(
-                                          selectedDocument: selectedDocument,
-                                          swimlanesController: widget.swimlanesController,
-                                          swimlanesConfig: swimlanesConfig,
-                                          fFrameUser: widget.fFrameUser,
-                                          color: widget.swimlanesController.taskCardColor,
-                                          width: swimlanesConfig.swimlaneWidth,
-                                          feedback: true,
-                                        ),
-                                        childWhenDragging: SwimlanesTaskCard<T>(
-                                          selectedDocument: selectedDocument,
-                                          swimlanesController: widget.swimlanesController,
-                                          swimlanesConfig: swimlanesConfig,
-                                          fFrameUser: widget.fFrameUser,
-                                          color: widget.swimlanesController.taskCardColor,
-                                          width: swimlanesConfig.swimlaneWidth,
-                                          childWhenDragging: true,
-                                        ),
-                                        child: Builder(builder: (context) {
-                                          return SwimlanesTaskCard<T>(
-                                            key: dragContext.dragKey,
-                                            selectedDocument: selectedDocument,
-                                            swimlanesController: widget.swimlanesController,
-                                            swimlanesConfig: swimlanesConfig,
-                                            color: widget.swimlanesController.taskCardColor,
-                                            fFrameUser: widget.fFrameUser,
-                                            width: swimlanesConfig.swimlaneWidth,
-                                          );
-                                        }),
+                                    Draggable<DragContext<T>>(
+                                      data: dragContext,
+                                      onDragStarted: () {
+                                        // The context is guaranteed to be valid at this moment
+                                        final RenderBox renderBox = dragKey.currentContext!.findRenderObject() as RenderBox;
+                                        widget.swimlanesController.setDraggedItemHeight(renderBox.size.height);
+                                      },
+                                      onDragEnd: (details) {
+                                        // Clean up the height in the controller when the drag is over
+                                        widget.swimlanesController.setDraggedItemHeight(null);
+                                      },
+                                      feedback: SwimlanesTaskCard<T>(
+                                        selectedDocument: selectedDocument,
+                                        swimlanesController: widget.swimlanesController,
+                                        swimlanesConfig: swimlanesConfig,
+                                        fFrameUser: widget.fFrameUser,
+                                        color: widget.swimlanesController.taskCardColor,
+                                        width: swimlanesConfig.swimlaneWidth,
+                                        feedback: true,
                                       ),
+                                      childWhenDragging: SwimlanesTaskCard<T>(
+                                        selectedDocument: selectedDocument,
+                                        swimlanesController: widget.swimlanesController,
+                                        swimlanesConfig: swimlanesConfig,
+                                        fFrameUser: widget.fFrameUser,
+                                        color: widget.swimlanesController.taskCardColor,
+                                        width: swimlanesConfig.swimlaneWidth,
+                                        childWhenDragging: true,
+                                      ),
+                                      child: Builder(builder: (context) {
+                                        return SwimlanesTaskCard<T>(
+                                          key: dragContext.dragKey,
+                                          selectedDocument: selectedDocument,
+                                          swimlanesController: widget.swimlanesController,
+                                          swimlanesConfig: swimlanesConfig,
+                                          color: widget.swimlanesController.taskCardColor,
+                                          fFrameUser: widget.fFrameUser,
+                                          width: swimlanesConfig.swimlaneWidth,
+                                        );
+                                      }),
                                     ),
                                     if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
                                       const Center(
@@ -909,7 +903,6 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                       swimlanesController: widget.swimlanesController,
                                       swimlanesConfig: swimlanesConfig,
                                       fFrameUser: widget.fFrameUser,
-                                      height: dropTargetHeight,
                                       width: swimlanesConfig.swimlaneWidth,
                                       swimlaneSetting: widget.swimlaneSetting,
                                       priority: dropZonePriority,
@@ -985,7 +978,6 @@ class SwimlaneDropZone<T> extends StatefulWidget {
     required this.swimlanesConfig,
     required this.fFrameUser,
     required this.width,
-    this.height = 48.0,
     required this.swimlaneSetting,
     this.priority,
     this.lanePosition,
@@ -997,7 +989,6 @@ class SwimlaneDropZone<T> extends StatefulWidget {
   final double? lanePosition;
   final FFrameUser fFrameUser;
   final double width;
-  final double height;
   @override
   State<SwimlaneDropZone<T>> createState() => _SwimlaneDropZoneState<T>();
 }
@@ -1012,16 +1003,19 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
         List<dynamic> accepted,
         List<dynamic> rejected,
       ) {
+        double currentHeight = 48.0;
+
         if (accepted.isNotEmpty) {
           _dragContext = accepted.first;
         }
+        if (accepted.isNotEmpty || rejected.isNotEmpty) {
+          // A draggable is hovering over THIS drop zone.
+          final double? heightFromController = widget.swimlanesController.draggedItemHeight;
+          currentHeight = heightFromController ?? currentHeight;
+        }
 
         return Container(
-          height: (accepted.isNotEmpty)
-              ? widget.height
-              : (rejected.isNotEmpty)
-                  ? widget.height
-                  : 8.0,
+          height: (accepted.isNotEmpty || rejected.isNotEmpty) ? currentHeight : 8.0,
           width: widget.width,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5.0),
@@ -1158,79 +1152,82 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
           width: widget.width,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-            child: GestureDetector(
-              onTap: () {
-                if (swimlanesConfig.openDocumentOnClick) {
-                  selectedDocument.open();
-                }
-              },
-              child: Card(
-                color: widget.color,
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        // crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: swimlanesConfig.taskWidgetHeader(
-                              selectedDocument,
-                              swimlanesConfig,
-                              widget.fFrameUser,
-                            ),
-                          ),
-                          if (swimlanesConfig.assignee != null)
-                            IconButton(
-                              icon: Tooltip(
-                                message: "Assign",
-                                child: Icon(
-                                  Icons.person,
-                                  color: (swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser) == true) ? Colors.greenAccent : null,
-                                ),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  if (swimlanesConfig.openDocumentOnClick) {
+                    selectedDocument.open();
+                  }
+                },
+                child: Card(
+                  color: widget.color,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          // crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: swimlanesConfig.taskWidgetHeader(
+                                selectedDocument,
+                                swimlanesConfig,
+                                widget.fFrameUser,
                               ),
-                              onPressed: () {
-                                if ((swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser) == true)) {
-                                  swimlanesConfig.assignee!.unsetAssignee(selectedDocument.data);
-                                } else {
-                                  swimlanesConfig.assignee!.setAssignee(selectedDocument.data, widget.fFrameUser);
-                                }
-
-                                selectedDocument.update();
-                              },
                             ),
-                          if (swimlanesConfig.following != null)
-                            Tooltip(
-                              message: "Watch",
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.remove_red_eye,
-                                  color: (swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser) == true) ? Colors.greenAccent : null,
+                            if (swimlanesConfig.assignee != null)
+                              IconButton(
+                                icon: Tooltip(
+                                  message: "Assign",
+                                  child: Icon(
+                                    Icons.person,
+                                    color: (swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser) == true) ? Colors.greenAccent : null,
+                                  ),
                                 ),
                                 onPressed: () {
-                                  if (swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser) == true) {
-                                    swimlanesConfig.following!.stopFollowing(selectedDocument.data, widget.fFrameUser);
+                                  if ((swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser) == true)) {
+                                    swimlanesConfig.assignee!.unsetAssignee(selectedDocument.data);
                                   } else {
-                                    swimlanesConfig.following!.startFollowing(selectedDocument.data, widget.fFrameUser);
+                                    swimlanesConfig.assignee!.setAssignee(selectedDocument.data, widget.fFrameUser);
                                   }
+
                                   selectedDocument.update();
                                 },
                               ),
-                            ),
-                        ],
-                      ),
-                      swimlanesConfig.taskWidgetBody(
-                        selectedDocument,
-                        swimlanesConfig,
-                        widget.fFrameUser,
-                      ),
-                    ],
+                            if (swimlanesConfig.following != null)
+                              Tooltip(
+                                message: "Watch",
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.remove_red_eye,
+                                    color: (swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser) == true) ? Colors.greenAccent : null,
+                                  ),
+                                  onPressed: () {
+                                    if (swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser) == true) {
+                                      swimlanesConfig.following!.stopFollowing(selectedDocument.data, widget.fFrameUser);
+                                    } else {
+                                      swimlanesConfig.following!.startFollowing(selectedDocument.data, widget.fFrameUser);
+                                    }
+                                    selectedDocument.update();
+                                  },
+                                ),
+                              ),
+                          ],
+                        ),
+                        swimlanesConfig.taskWidgetBody(
+                          selectedDocument,
+                          swimlanesConfig,
+                          widget.fFrameUser,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
