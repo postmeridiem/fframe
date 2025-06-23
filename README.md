@@ -1,63 +1,126 @@
 # fframe
 ## FlutFrame
 
+[![fframe](https://github.com/postmeridiem/fframe/actions/workflows/fframe.yaml/badge.svg?branch=main)](https://github.com/postmeridiem/fframe/actions/workflows/fframe.yaml)
+
+**`fframe` is an opinionated Flutter framework designed to accelerate the development of data-driven applications on top of Firebase.**
+
+It provides a complete, configurable application shell, handling routing, navigation, theming, authentication, and pre-built screens out of the box. This allows you to focus on your core application logic and data models instead of boilerplate infrastructure.
+
+## Key Features
+
+- **Configuration-Driven UI:** Define your entire app layout—navigation destinations, tabs, and pages—with a simple `NavigationConfig` object.
+- **Firebase-centric:** Seamless integration with Firebase Authentication and Cloud Firestore. The framework handles initialization and listens for auth state changes automatically.
+- **Ready-to-use Screens:** A rich set of pre-built, configurable screens for common use cases:
+    - `DocumentScreen`: For CRUD operations on single Firestore documents.
+    - `ListGridScreen`: Display Firestore collections in a paginated, filterable data grid.
+    - `SwimlanesScreen`: A Kanban-style board for visualizing data stages.
+- **Authentication Handled:** Manages the sign-in/sign-out lifecycle, automatically presenting a sign-in UI when needed.
+- **Theming & Localization:** Easily configure light/dark themes and provide multi-language support through a simple configuration.
+- **Developer-Friendly:** Includes a built-in console logger and a clear structure that promotes clean code separation.
+
+## Getting Started
+
+### Prerequisites
+
+- An existing Flutter project.
+- A Firebase project with Authentication and Firestore configured.
+
 ### Installation
-- install flutter per normal instructions
-- create a new flutter project
-- copy the example dir into the root of your project
-- continue following the instructions [here](https://github.com/postmeridiem/fframe/blob/main/example/installation.md)
 
+1.  **Add the `fframe` package:**
+    _Note: `fframe` is not yet on pub.dev. You will need to add it as a git dependency in your `pubspec.yaml`._
 
-### l10n support added
-For a new clone, no action is needed.
-To update for l10n support you need to do the following
-- copy l10n.yaml from the example dir to your project root
-- add generate: true to the flutter section of your pubspec.yaml
-- copy the l10n folder from example/lib into your lib dir
-- import 'package:your_package/l10n/l10n.dart'; into main.dart in your lib dir
-- add l10nConfig: l10nConfig, to the Fframe instantiation in main.dart in your lib dir
+    ```yaml
+    dependencies:
+      flutter:
+        sdk: flutter
+      fframe:
+        git:
+          url: https://github.com/postmeridiem/fframe.git
+          ref: main # or a specific tag/commit
+    ```
 
-for examples check the example codebase. 
-
-NOTE: when everything is added at once the flutter_gen package may not yet be available. In that case, comment out the missing imports in lib/l10n/l10n.dart and the additional error in that same file. Run *flutter gen-l10n* and then reload your IDE project and uncomment the temporary changes in l10n.dart
-
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
-
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+2.  **Initialize `fframe`:**
+    Wrap your root `MaterialApp` with the `Fframe` widget in your `lib/main.dart` and provide it with the necessary configurations.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+Here is a minimal example of how to set up an `fframe` application.
 
 ```dart
-const like = 'sample';
+// lib/main.dart
+import 'package:flutter/material.dart';
+import 'package:fframe/fframe.dart';
+import 'package:firebase_core/firebase_core.dart';
+// Import your screen builders and configurations
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Make sure to add your own firebase_options.dart
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  runApp(const MainApp());
+}
+
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Fframe(
+      title: "My Awesome App",
+      firebaseOptions: DefaultFirebaseOptions.currentPlatform,
+      lightMode: ThemeData.light(),
+      darkMode: ThemeData.dark(),
+      l10nConfig: L10nConfig(
+        // Your localization settings
+      ),
+      consoleLogger: Console(
+        // Your logger settings
+      ),
+      // Define the navigation structure of your application
+      navigationConfig: NavigationConfig(
+        destinations: [
+          // Example: A screen to view a list of customers
+          FframeDestination(
+            icon: Icons.people,
+            label: "Customers",
+            path: "customers",
+            screenBuilder: (context) => ListGridScreen(
+              collection: "customers",
+              // ... other listgrid configurations
+            ),
+          ),
+          // Example: A document screen to edit a single customer
+          FframeDestination(
+            icon: Icons.person,
+            label: "Customer",
+            path: "customers",
+            documentIdKey: "id", // The parameter name in the route
+            screenBuilder: (context, documentId) => DocumentScreen(
+              collection: "customers",
+              documentId: documentId,
+              // ... other document screen configurations
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 ```
 
-## Additional information
+For a complete, runnable example, please see the `/example` directory in this repository.
 
-TODO: Tell users more about the package: where to find more information, how to 
-contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+## Contributing
+
+Contributions are welcome! If you'd like to contribute, please fork the repository and open a pull request. For major changes, please open an issue first to discuss what you would like to change.
+
+## Filing Issues
+
+If you encounter a bug or have a feature request, please file an issue on the [GitHub issue tracker](TBD_issues_link).
+
+## License
+
+This package is licensed under the [MIT License](LICENSE.md).
 
