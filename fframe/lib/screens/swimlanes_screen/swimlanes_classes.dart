@@ -10,6 +10,7 @@ class SwimlanesConfig<T> extends ListConfig {
     required this.taskWidgetHeader,
     required this.taskWidgetBody,
     this.getPriority,
+    this.getLanePosition,
     this.assignee,
     this.myId,
     this.following,
@@ -49,6 +50,7 @@ class SwimlanesConfig<T> extends ListConfig {
   final SwimlanesAssignee<T>? assignee;
   final String Function(T) getDescription;
   final double Function(T)? getPriority;
+  final double Function(T)? getLanePosition;
   final Widget Function(SelectedDocument<T>, SwimlanesConfig<T>, FFrameUser) taskWidgetHeader;
   final Widget Function(SelectedDocument<T>, SwimlanesConfig<T>, FFrameUser) taskWidgetBody;
   final bool openDocumentOnClick;
@@ -129,6 +131,7 @@ class SwimlaneSetting<T> {
     required this.header,
     this.onLaneDrop,
     this.onPriorityChange,
+    this.onLanePositionChange,
     this.canChangePriority,
     this.canChangeSwimLane,
     this.query,
@@ -146,6 +149,7 @@ class SwimlaneSetting<T> {
   final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int? sourcePriority, int? targetPriority)? canChangeSwimLane;
   final T Function(T data, double? priority)? onLaneDrop;
   final T Function(T data, double? priority)? onPriorityChange;
+  final T Function(T data, double? lanePosition)? onLanePositionChange; // If defined, it is prioritised over onPriorityChange as the primary ordering method within lanes
   late int? swimlaneIndex;
   late bool hasAccess = false;
 }

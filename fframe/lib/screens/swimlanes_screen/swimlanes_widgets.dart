@@ -618,17 +618,6 @@ class Swimlane<T> extends StatefulWidget {
 }
 
 class _SwimlaneState<T> extends State<Swimlane<T>> {
-  double dropTargetHeight = 200.0;
-
-  double _getTaskCardHeight(GlobalKey dragKey) {
-    if (dragKey.currentContext != null) {
-      final RenderBox renderBox = dragKey.currentContext!.findRenderObject() as RenderBox;
-      dropTargetHeight = renderBox.size.height;
-    }
-
-    return 10.0;
-  }
-
   final int _documentsPerPage = 20;
 
   @override
@@ -734,6 +723,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                             width: swimlanesConfig.swimlaneWidth,
                             swimlaneSetting: widget.swimlaneSetting,
                             priority: 1.0,
+                            lanePosition: lanePositionIncrement,
                           )
                         : ListView.builder(
                             shrinkWrap: true,
@@ -782,8 +772,31 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                   buildContext: context,
                                 );
 
+                                double? topDropZoneLanePosition;
+                                if (index == 0) {
+                                  if (swimlanesConfig.getLanePosition != null) {
+                                    // Calculate lane position for the 1st drop zone
+                                    double firstDocPos = swimlanesConfig.getLanePosition!(selectedDocument.data);
+                                    topDropZoneLanePosition = firstDocPos / 2.0;
+                                  } else {
+                                    // Fallback to a default starting value if getLanePosition is null
+                                    topDropZoneLanePosition = lanePositionIncrement / 2.0;
+                                  }
+                                }
+
                                 return Column(
                                   children: [
+                                    if (index == 0)
+                                      // Insert drop zone for the top of the lane
+                                      SwimlaneDropZone(
+                                        swimlanesController: widget.swimlanesController,
+                                        swimlanesConfig: swimlanesConfig,
+                                        fFrameUser: widget.fFrameUser,
+                                        width: swimlanesConfig.swimlaneWidth,
+                                        swimlaneSetting: widget.swimlaneSetting,
+                                        priority: 1.0,
+                                        lanePosition: topDropZoneLanePosition,
+                                      ),
                                     // if (nextPriority != null)
                                     //   Padding(
                                     //     padding: const EdgeInsets.all(8.0),
@@ -795,40 +808,46 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                     //       ],
                                     //     ),
                                     //   ),
-                                    GestureDetector(
-                                      onTapDown: (_) => _getTaskCardHeight(dragContext.dragKey),
-                                      child: Draggable<DragContext<T>>(
-                                        data: dragContext,
-                                        feedback: SwimlanesTaskCard<T>(
-                                          selectedDocument: selectedDocument,
-                                          swimlanesController: widget.swimlanesController,
-                                          swimlanesConfig: swimlanesConfig,
-                                          fFrameUser: widget.fFrameUser,
-                                          color: widget.swimlanesController.taskCardColor,
-                                          width: swimlanesConfig.swimlaneWidth,
-                                          feedback: true,
-                                        ),
-                                        childWhenDragging: SwimlanesTaskCard<T>(
-                                          selectedDocument: selectedDocument,
-                                          swimlanesController: widget.swimlanesController,
-                                          swimlanesConfig: swimlanesConfig,
-                                          fFrameUser: widget.fFrameUser,
-                                          color: widget.swimlanesController.taskCardColor,
-                                          width: swimlanesConfig.swimlaneWidth,
-                                          childWhenDragging: true,
-                                        ),
-                                        child: Builder(builder: (context) {
-                                          return SwimlanesTaskCard<T>(
-                                            key: dragContext.dragKey,
-                                            selectedDocument: selectedDocument,
-                                            swimlanesController: widget.swimlanesController,
-                                            swimlanesConfig: swimlanesConfig,
-                                            color: widget.swimlanesController.taskCardColor,
-                                            fFrameUser: widget.fFrameUser,
-                                            width: swimlanesConfig.swimlaneWidth,
-                                          );
-                                        }),
+                                    Draggable<DragContext<T>>(
+                                      data: dragContext,
+                                      onDragStarted: () {
+                                        // The context is guaranteed to be valid at this moment
+                                        final RenderBox renderBox = dragKey.currentContext!.findRenderObject() as RenderBox;
+                                        widget.swimlanesController.setDraggedItemHeight(renderBox.size.height);
+                                      },
+                                      onDragEnd: (details) {
+                                        // Clean up the height in the controller when the drag is over
+                                        widget.swimlanesController.setDraggedItemHeight(null);
+                                      },
+                                      feedback: SwimlanesTaskCard<T>(
+                                        selectedDocument: selectedDocument,
+                                        swimlanesController: widget.swimlanesController,
+                                        swimlanesConfig: swimlanesConfig,
+                                        fFrameUser: widget.fFrameUser,
+                                        color: widget.swimlanesController.taskCardColor,
+                                        width: swimlanesConfig.swimlaneWidth,
+                                        feedback: true,
                                       ),
+                                      childWhenDragging: SwimlanesTaskCard<T>(
+                                        selectedDocument: selectedDocument,
+                                        swimlanesController: widget.swimlanesController,
+                                        swimlanesConfig: swimlanesConfig,
+                                        fFrameUser: widget.fFrameUser,
+                                        color: widget.swimlanesController.taskCardColor,
+                                        width: swimlanesConfig.swimlaneWidth,
+                                        childWhenDragging: true,
+                                      ),
+                                      child: Builder(builder: (context) {
+                                        return SwimlanesTaskCard<T>(
+                                          key: dragContext.dragKey,
+                                          selectedDocument: selectedDocument,
+                                          swimlanesController: widget.swimlanesController,
+                                          swimlanesConfig: swimlanesConfig,
+                                          color: widget.swimlanesController.taskCardColor,
+                                          fFrameUser: widget.fFrameUser,
+                                          width: swimlanesConfig.swimlaneWidth,
+                                        );
+                                      }),
                                     ),
                                     if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
                                       const Center(
@@ -837,13 +856,32 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                   ],
                                 );
                               } else {
+                                T docAbove = selectedDocuments[docIndex].data; // Doc before the drop zone
+
+                                // Calculate lane position for drop zone (the primary ordering within lanes)
+                                double? dropZoneLanePosition;
+                                if (swimlanesConfig.getLanePosition != null) {
+                                  if (docIndex < selectedDocuments.length - 1) {
+                                    // Drop zone is between 2 docs
+                                    T docBelow = selectedDocuments[docIndex + 1].data;
+                                    double posAbove = swimlanesConfig.getLanePosition!(docAbove);
+                                    double posBelow = swimlanesConfig.getLanePosition!(docBelow);
+                                    dropZoneLanePosition = (posAbove + posBelow) / 2.0;
+                                  } else {
+                                    // Drop zone is after the last doc in the list
+                                    double posLast = swimlanesConfig.getLanePosition!(docAbove);
+                                    dropZoneLanePosition = posLast + lanePositionIncrement; // Lane position for the last item
+                                  }
+                                }
                                 // Calculate priority for drop zone
                                 double? dropZonePriority;
                                 if (swimlanesConfig.getPriority != null) {
                                   if (docIndex < selectedDocuments.length - 1) {
+                                    // Drop zone is between 2 docs
                                     dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
                                   } else {
-                                    double lastPriority = swimlanesConfig.getPriority!(selectedDocuments[docIndex].data);
+                                    // Drop zone is after the last doc in the list
+                                    double lastPriority = swimlanesConfig.getPriority!(docAbove);
                                     dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
                                   }
                                 }
@@ -865,10 +903,10 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                       swimlanesController: widget.swimlanesController,
                                       swimlanesConfig: swimlanesConfig,
                                       fFrameUser: widget.fFrameUser,
-                                      height: dropTargetHeight,
                                       width: swimlanesConfig.swimlaneWidth,
                                       swimlaneSetting: widget.swimlaneSetting,
                                       priority: dropZonePriority,
+                                      lanePosition: dropZoneLanePosition,
                                     ),
                                   ],
                                 );
@@ -940,17 +978,17 @@ class SwimlaneDropZone<T> extends StatefulWidget {
     required this.swimlanesConfig,
     required this.fFrameUser,
     required this.width,
-    this.height = 48.0,
     required this.swimlaneSetting,
     this.priority,
+    this.lanePosition,
   });
   final SwimlaneSetting<T> swimlaneSetting;
   final SwimlanesController swimlanesController;
   final SwimlanesConfig<T> swimlanesConfig;
   final double? priority;
+  final double? lanePosition;
   final FFrameUser fFrameUser;
   final double width;
-  final double height;
   @override
   State<SwimlaneDropZone<T>> createState() => _SwimlaneDropZoneState<T>();
 }
@@ -965,16 +1003,19 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
         List<dynamic> accepted,
         List<dynamic> rejected,
       ) {
+        double currentHeight = 48.0;
+
         if (accepted.isNotEmpty) {
           _dragContext = accepted.first;
         }
+        if (accepted.isNotEmpty || rejected.isNotEmpty) {
+          // A draggable is hovering over THIS drop zone.
+          final double? heightFromController = widget.swimlanesController.draggedItemHeight;
+          currentHeight = heightFromController ?? currentHeight;
+        }
 
         return Container(
-          height: (accepted.isNotEmpty)
-              ? widget.height
-              : (rejected.isNotEmpty)
-                  ? widget.height
-                  : 8.0,
+          height: (accepted.isNotEmpty || rejected.isNotEmpty) ? currentHeight : 8.0,
           width: widget.width,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5.0),
@@ -1003,10 +1044,24 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = null;
         });
         T data = dragContext.data.selectedDocument.data;
-        if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlaneSetting.onPriorityChange != null) {
+
+        if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlaneSetting.onLanePositionChange != null) {
+          // Card dropped in the SAME lane (reorder) and lane position is the primary ordering strategy
+          data = widget.swimlaneSetting.onLanePositionChange!(data, widget.lanePosition);
+        } else if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlaneSetting.onPriorityChange != null) {
+          // Card dropped in the SAME lane (reorder) and priority is the primary ordering strategy
           data = widget.swimlaneSetting.onPriorityChange!(data, widget.priority);
         } else if (widget.swimlaneSetting.onLaneDrop != null) {
-          data = widget.swimlaneSetting.onLaneDrop!(data, widget.priority);
+          // Card dropped in a DIFFERENT lane
+          if (widget.swimlanesConfig.getLanePosition != null) {
+            // Lane position is passed if that's the primary ordering strategy
+            data = widget.swimlaneSetting.onLaneDrop!(data, widget.lanePosition);
+          } else {
+            // Priority is passed if that's the primary ordering strategy
+            data = widget.swimlaneSetting.onLaneDrop!(data, widget.priority);
+          }
+        } else {
+          Console.log("onLaneDrop is not implemented for this lane", level: LogLevel.dev);
         }
         dragContext.data.selectedDocument.update(data: data);
       }),
@@ -1021,7 +1076,15 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = dragContext!.data;
         });
 
-        if (widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id && widget.swimlanesConfig.getPriority != null && widget.swimlaneSetting.canChangePriority != null) {
+        if (widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id && widget.swimlanesConfig.getLanePosition != null && widget.swimlaneSetting.canChangePriority != null) {
+          return widget.swimlaneSetting.canChangePriority!(
+            dragContext.data.selectedDocument,
+            widget.fFrameUser.roles,
+            dragContext.data.sourceColumn.id,
+            widget.swimlanesConfig.getLanePosition!(dragContext.data.selectedDocument.data).floor(),
+            widget.lanePosition!.floor(),
+          );
+        } else if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlanesConfig.getPriority != null && widget.swimlaneSetting.canChangePriority != null) {
           return widget.swimlaneSetting.canChangePriority!(
             dragContext.data.selectedDocument,
             widget.fFrameUser.roles,
@@ -1089,79 +1152,82 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
           width: widget.width,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
-            child: GestureDetector(
-              onTap: () {
-                if (swimlanesConfig.openDocumentOnClick) {
-                  selectedDocument.open();
-                }
-              },
-              child: Card(
-                color: widget.color,
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        // mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        // crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: swimlanesConfig.taskWidgetHeader(
-                              selectedDocument,
-                              swimlanesConfig,
-                              widget.fFrameUser,
-                            ),
-                          ),
-                          if (swimlanesConfig.assignee != null)
-                            IconButton(
-                              icon: Tooltip(
-                                message: "Assign",
-                                child: Icon(
-                                  Icons.person,
-                                  color: (swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser) == true) ? Colors.greenAccent : null,
-                                ),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () {
+                  if (swimlanesConfig.openDocumentOnClick) {
+                    selectedDocument.open();
+                  }
+                },
+                child: Card(
+                  color: widget.color,
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(4, 4, 4, 4),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          // mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          // crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: swimlanesConfig.taskWidgetHeader(
+                                selectedDocument,
+                                swimlanesConfig,
+                                widget.fFrameUser,
                               ),
-                              onPressed: () {
-                                if ((swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser) == true)) {
-                                  swimlanesConfig.assignee!.unsetAssignee(selectedDocument.data);
-                                } else {
-                                  swimlanesConfig.assignee!.setAssignee(selectedDocument.data, widget.fFrameUser);
-                                }
-
-                                selectedDocument.update();
-                              },
                             ),
-                          if (swimlanesConfig.following != null)
-                            Tooltip(
-                              message: "Watch",
-                              child: IconButton(
-                                icon: Icon(
-                                  Icons.remove_red_eye,
-                                  color: (swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser) == true) ? Colors.greenAccent : null,
+                            if (swimlanesConfig.assignee != null)
+                              IconButton(
+                                icon: Tooltip(
+                                  message: "Assign",
+                                  child: Icon(
+                                    Icons.person,
+                                    color: (swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser) == true) ? Colors.greenAccent : null,
+                                  ),
                                 ),
                                 onPressed: () {
-                                  if (swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser) == true) {
-                                    swimlanesConfig.following!.stopFollowing(selectedDocument.data, widget.fFrameUser);
+                                  if ((swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser) == true)) {
+                                    swimlanesConfig.assignee!.unsetAssignee(selectedDocument.data);
                                   } else {
-                                    swimlanesConfig.following!.startFollowing(selectedDocument.data, widget.fFrameUser);
+                                    swimlanesConfig.assignee!.setAssignee(selectedDocument.data, widget.fFrameUser);
                                   }
+
                                   selectedDocument.update();
                                 },
                               ),
-                            ),
-                        ],
-                      ),
-                      swimlanesConfig.taskWidgetBody(
-                        selectedDocument,
-                        swimlanesConfig,
-                        widget.fFrameUser,
-                      ),
-                    ],
+                            if (swimlanesConfig.following != null)
+                              Tooltip(
+                                message: "Watch",
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.remove_red_eye,
+                                    color: (swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser) == true) ? Colors.greenAccent : null,
+                                  ),
+                                  onPressed: () {
+                                    if (swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser) == true) {
+                                      swimlanesConfig.following!.stopFollowing(selectedDocument.data, widget.fFrameUser);
+                                    } else {
+                                      swimlanesConfig.following!.startFollowing(selectedDocument.data, widget.fFrameUser);
+                                    }
+                                    selectedDocument.update();
+                                  },
+                                ),
+                              ),
+                          ],
+                        ),
+                        swimlanesConfig.taskWidgetBody(
+                          selectedDocument,
+                          swimlanesConfig,
+                          widget.fFrameUser,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

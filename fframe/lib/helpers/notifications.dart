@@ -22,13 +22,141 @@ class FframeNotifications {
     FframeNotifications.instance.enabled = false;
   }
 
-  static void sendNotificationsToEmails({required List<String> emailAddresses, required FframeNotification notification}) {
-    Console.log("creating notification ${notification.messageTitle}", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+  static Future<void> sendNotificationsToEmails({required List<String> emailAddresses, required FframeNotification notification}) async {
+    Console.log("Sending notification ${notification.messageTitle} to $emailAddresses", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+
+    if (emailAddresses.isEmpty) {
+      Console.log("No email addresses provided.", scope: "fframeLog.FframeNotifications", level: LogLevel.prod);
+      return;
+    }
+
+    final firestore = FirebaseFirestore.instance;
+    WriteBatch batch = firestore.batch();
+    int batchCount = 0;
+
+    for (String email in emailAddresses) {
+      try {
+        // Find user by email
+        final userQuerySnapshot = await firestore.collection('users').where('email', isEqualTo: email).limit(1).get();
+
+        if (userQuerySnapshot.docs.isNotEmpty) {
+          final userId = userQuerySnapshot.docs.first.id;
+          final notificationRef = firestore.collection('users').doc(userId).collection('notifications').doc();
+
+          // Use a copy of the notification to ensure 'seen' and 'read' are false for new notifications
+          // and to set a fresh notificationTime and firestoreTTL
+          final FframeNotification newNotification = FframeNotification(
+            reporter: notification.reporter,
+            messageTitle: notification.messageTitle,
+            type: notification.type,
+            messageSubtitle: notification.messageSubtitle,
+            messageBody: notification.messageBody,
+            contextLinks: notification.contextLinks,
+            seen: false, // Ensure new notifications are unseen
+            read: false, // Ensure new notifications are unread
+            notificationTime: notification.notificationTime ?? Timestamp.now(), // Set current time for the notification
+            firestoreTTL: notification.firestoreTTL ?? Timestamp.fromDate(DateTime.now().add(const Duration(days: 30))), // Set TTL based on creation time
+          );
+
+          batch.set(notificationRef, newNotification.toFirestore());
+          batchCount++;
+
+          Console.log("Notification queued for $email (User ID: $userId)", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+
+          // Firestore batch limit is 500 operations
+          if (batchCount >= 499) {
+            // Commit a bit before the limit to be safe
+            await batch.commit();
+            batch = firestore.batch(); // Start a new batch
+            batchCount = 0;
+            Console.log("Committed a batch of notifications.", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+          }
+        } else {
+          Console.log("User not found for email: $email", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+        }
+      } catch (e) {
+        Console.log("Error sending notification to $email: $e", scope: "fframeLog.FframeNotifications", level: LogLevel.prod);
+      }
+    }
+
+    // Commit any remaining operations in the batch
+    if (batchCount > 0) {
+      try {
+        await batch.commit();
+        Console.log("Committed final batch of notifications.", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+      } catch (e) {
+        Console.log("Error committing final batch: $e", scope: "fframeLog.FframeNotifications", level: LogLevel.prod);
+      }
+    }
+    Console.log("Finished sending notifications for: ${notification.messageTitle}", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
   }
 
-  static void sendNotificationsToUUIDs({required List<String> uuids, required FframeNotification notification}) {
-    Console.log("creating notification ${notification.messageTitle}", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
-    //  FframeNotifications.sendNotificationsToEmails(emailAddresses: emailAddresses, notification: notification);
+  static Future<void> sendNotificationsToUUIDs({required List<String> uuids, required FframeNotification notification}) async {
+    Console.log("Sending notification ${notification.messageTitle} to UUIDs: $uuids", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+
+    if (uuids.isEmpty) {
+      Console.log("No UUIDs provided.", scope: "fframeLog.FframeNotifications", level: LogLevel.prod);
+      return;
+    }
+
+    final firestore = FirebaseFirestore.instance;
+    WriteBatch batch = firestore.batch();
+    int batchCount = 0;
+
+    for (String userId in uuids) {
+      try {
+        // Check if the user document exists to avoid creating orphaned notification documents
+        final userDoc = await firestore.collection('users').doc(userId).get();
+
+        if (userDoc.exists) {
+          final notificationRef = firestore.collection('users').doc(userId).collection('notifications').doc();
+
+          // Use a copy of the notification to ensure 'seen' and 'read' are false for new notifications
+          // and to set a fresh notificationTime and firestoreTTL
+          final FframeNotification newNotification = FframeNotification(
+            reporter: notification.reporter,
+            messageTitle: notification.messageTitle,
+            type: notification.type,
+            messageSubtitle: notification.messageSubtitle,
+            messageBody: notification.messageBody,
+            contextLinks: notification.contextLinks,
+            seen: false, // Ensure new notifications are unseen
+            read: false, // Ensure new notifications are unread
+            notificationTime: notification.notificationTime ?? Timestamp.now(), // Set current time for the notification
+            firestoreTTL: notification.firestoreTTL ?? Timestamp.fromDate(DateTime.now().add(const Duration(days: 30))), // Set TTL based on creation time
+          );
+
+          batch.set(notificationRef, newNotification.toFirestore());
+          batchCount++;
+
+          Console.log("Notification queued for User ID: $userId", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+
+          // Firestore batch limit is 500 operations
+          if (batchCount >= 499) {
+            // Commit a bit before the limit to be safe
+            await batch.commit();
+            batch = firestore.batch(); // Start a new batch
+            batchCount = 0;
+            Console.log("Committed a batch of notifications.", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+          }
+        } else {
+          Console.log("User not found for UUID: $userId. Skipping notification.", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+        }
+      } catch (e) {
+        Console.log("Error processing notification for User ID $userId: $e", scope: "fframeLog.FframeNotifications", level: LogLevel.prod);
+      }
+    }
+
+    // Commit any remaining operations in the batch
+    if (batchCount > 0) {
+      try {
+        await batch.commit();
+        Console.log("Committed final batch of notifications.", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
+      } catch (e) {
+        Console.log("Error committing final batch: $e", scope: "fframeLog.FframeNotifications", level: LogLevel.prod);
+      }
+    }
+    Console.log("Finished sending notifications for: ${notification.messageTitle} to UUIDs", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
   }
 }
 
