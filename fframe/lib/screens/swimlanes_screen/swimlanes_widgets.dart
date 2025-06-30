@@ -1055,10 +1055,10 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           // Card dropped in a DIFFERENT lane
           if (widget.swimlanesConfig.getLanePosition != null) {
             // Lane position is passed if that's the primary ordering strategy
-            data = widget.swimlaneSetting.onLaneDrop!(data, widget.lanePosition);
+            data = widget.swimlaneSetting.onLaneDrop!(data, widget.lanePosition, dragContext.data.selectedDocument);
           } else {
             // Priority is passed if that's the primary ordering strategy
-            data = widget.swimlaneSetting.onLaneDrop!(data, widget.priority);
+            data = widget.swimlaneSetting.onLaneDrop!(data, widget.priority, dragContext.data.selectedDocument);
           }
         } else {
           Console.log("onLaneDrop is not implemented for this lane", level: LogLevel.dev);

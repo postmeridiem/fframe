@@ -147,7 +147,11 @@ class SwimlaneSetting<T> {
   final Query<T>? Function(Query<T> query)? query;
   final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int sourcePriority, int targetPriority)? canChangePriority;
   final bool Function(SelectedDocument<T> selectedDocument, List<String> userRoles, String sourceLaneId, int? sourcePriority, int? targetPriority)? canChangeSwimLane;
-  final T Function(T data, double? priority)? onLaneDrop;
+  final T Function(
+    T data,
+    double? priority,
+    SelectedDocument<T> selectedDocument,
+  )? onLaneDrop;
   final T Function(T data, double? priority)? onPriorityChange;
   final T Function(T data, double? lanePosition)? onLanePositionChange; // If defined, it is prioritised over onPriorityChange as the primary ordering method within lanes
   late int? swimlaneIndex;

@@ -9,7 +9,7 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
     query: (Query<Suggestion> query) {
       return query.where("status", isEqualTo: "new");
     },
-    onLaneDrop: (Suggestion suggestion, double? priority) {
+    onLaneDrop: (Suggestion suggestion, double? priority, _) {
       suggestion.status = "new";
       return suggestion;
     },
@@ -30,7 +30,7 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
     query: (Query<Suggestion> query) {
       return query.where("status", isEqualTo: "triage");
     },
-    onLaneDrop: (Suggestion suggestion, double? priority) {
+    onLaneDrop: (Suggestion suggestion, double? priority, _) {
       suggestion.status = "triage";
       suggestion.priority = priority ?? 5.0;
       return suggestion;
@@ -52,7 +52,7 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
     query: (Query<Suggestion> query) {
       return query.where("status", isEqualTo: "inProgress");
     },
-    onLaneDrop: (Suggestion suggestion, double? priority) {
+    onLaneDrop: (Suggestion suggestion, double? priority, _) {
       suggestion.status = "inProgress";
       return suggestion;
     },
@@ -78,7 +78,7 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
     query: (Query<Suggestion> query) {
       return query.where("status", isEqualTo: "quality");
     },
-    onLaneDrop: (Suggestion suggestion, double? priority) {
+    onLaneDrop: (Suggestion suggestion, double? priority, _) {
       suggestion.status = "quality";
       return suggestion;
     },
@@ -104,7 +104,7 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
     query: (Query<Suggestion> query) {
       return query.where("status", isEqualTo: "done");
     },
-    onLaneDrop: (Suggestion suggestion, double? priority) {
+    onLaneDrop: (Suggestion suggestion, double? priorit, _) {
       suggestion.status = "done";
       return suggestion;
     },
