@@ -907,6 +907,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                       swimlaneSetting: widget.swimlaneSetting,
                                       priority: dropZonePriority,
                                       lanePosition: dropZoneLanePosition,
+                                      customHeight: docIndex == selectedDocuments.length - 1 ? 48.0 : null, // More space below the last item
                                     ),
                                   ],
                                 );
@@ -981,12 +982,14 @@ class SwimlaneDropZone<T> extends StatefulWidget {
     required this.swimlaneSetting,
     this.priority,
     this.lanePosition,
+    this.customHeight,
   });
   final SwimlaneSetting<T> swimlaneSetting;
   final SwimlanesController swimlanesController;
   final SwimlanesConfig<T> swimlanesConfig;
   final double? priority;
   final double? lanePosition;
+  final double? customHeight;
   final FFrameUser fFrameUser;
   final double width;
   @override
@@ -1015,7 +1018,7 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
         }
 
         return Container(
-          height: (accepted.isNotEmpty || rejected.isNotEmpty) ? currentHeight : 8.0,
+          height: (accepted.isNotEmpty || rejected.isNotEmpty) ? currentHeight : (widget.customHeight ?? 8.0),
           width: widget.width,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5.0),
