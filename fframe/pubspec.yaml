@@ -44,9 +44,13 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints:
-  # http:
   test:
   build_runner:
+  integration_test:
+    sdk: flutter
+  firebase_auth_mocks:
+  fake_cloud_firestore:
+  http:
 # The following section is specific to Flutter.
 # === this is configured at the application level when using FlutFrame ===
 
