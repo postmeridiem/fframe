@@ -272,7 +272,7 @@ class _ProfileButtonState extends State<ProfileButton> {
     );
   }
 
-  showUserOverlay() {
+  void showUserOverlay() {
     overlayEntry = OverlayEntry(builder: (context) {
       return Stack(
         children: <Widget>[

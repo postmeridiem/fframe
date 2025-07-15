@@ -30,7 +30,7 @@ class FRouter extends InheritedWidget {
   ///FRouter.of(context).navigateTo(navigationTarget: widget.navigationTarget, queryParameters: {"id": "cow"});
   ///Path and replace QS
   ///FRouter.of(context).navigateTo(navigationTarget: widget.navigationTarget, queryParameters: {"id": "cow"}, resetQueryString: true);
-  navigateTo<T>({required NavigationTarget navigationTarget, Map<String, String>? queryParameters, bool? resetQueryString = true, T? context}) {
+  void navigateTo<T>({required NavigationTarget navigationTarget, Map<String, String>? queryParameters, bool? resetQueryString = true, T? context}) {
     //  queryState = ref.read(queryStateProvider);
 
     //  newQueryState = (resetQueryString == true) ? QueryState(queryParameters: queryParameters) : QueryState.mergeComponents(queryState, queryParameters);
@@ -52,7 +52,7 @@ class FRouter extends InheritedWidget {
   ///FRouter.of(context).navigateToRoute(route: String);
   ///Text based route and id
   ///FRouter.of(context).navigateToRoute(route: String, id: String);
-  navigateToRoute<T>(BuildContext context, {required String route, String id = ''}) {
+  void navigateToRoute<T>(BuildContext context, {required String route, String id = ''}) {
     bool idMode = id == '' ? false : true;
     Console.log("Update route to $route ${idMode ? "into id: $id" : ""}", scope: "fframeLog.navigateToRoute", level: LogLevel.prod);
     // Map<String, String> queryParameters = idMode ? {"id": id} : {};
@@ -98,7 +98,7 @@ class FRouter extends InheritedWidget {
   ///FRouter.of(context).updateQueryString(queryString: {"id": "cow"});
   ///Only QS (replace path and existing QS values)
   ///FRouter.of(context).updateQueryString(queryString: {"id": "cow"}, resetQueryString: true);
-  updateQueryString<T>({required Map<String, String> queryParameters, bool? resetQueryString = false}) {
+  void updateQueryString<T>({required Map<String, String> queryParameters, bool? resetQueryString = false}) {
     Console.log(
       "Updated QueryString to ${queryParameters.toString()}}",
       scope: "fframeLog.FRouter.updateQueryString",
@@ -143,7 +143,7 @@ class FRouter extends InheritedWidget {
   // }
 
   ///Request a logout
-  signOut() {
+  void signOut() {
     // NavigationNotifier.instance.signOut();
   }
 
@@ -273,7 +273,7 @@ class FRouter extends InheritedWidget {
     return index == -1 ? 0 : index;
   }
 
-  tabSwitch({required TabController tabController, required}) {
+  void tabSwitch({required TabController tabController, required}) {
     Console.log(
       "Change from one tab to another tab",
       scope: "fframeLog.FRouter.tabSwitch",

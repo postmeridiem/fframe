@@ -30,19 +30,19 @@ class FireStoreQueryState<T> with ChangeNotifier {
     }
   }
 
-  reset() {
+  void reset() {
     _queryComponents.clear();
     notifyListeners();
   }
 
-  removeQueryComponent({required String id}) {
+  void removeQueryComponent({required String id}) {
     if (_queryComponents.containsKey(id)) {
       _queryComponents.remove(id);
       notifyListeners();
     }
   }
 
-  addQueryComponent({
+  void addQueryComponent({
     required String id,
     required Query<T> Function(Query<T>) queryComponent,
     bool notify = true,

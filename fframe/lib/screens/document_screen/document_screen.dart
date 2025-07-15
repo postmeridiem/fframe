@@ -190,7 +190,7 @@ class DocumentScreenConfig extends InheritedModel<DocumentScreenConfig> {
     SelectedDocument<T>.createNew(documentConfig: documentConfig as DocumentConfig<T>);
   }
 
-  save({required BuildContext context, bool closeAfterSave = false}) {
+  void save({required BuildContext context, bool closeAfterSave = false}) {
     SelectedDocument? selectedDocument = SelectionState.instance.activeDocument;
     if (selectedDocument != null) {
       if (closeAfterSave) {

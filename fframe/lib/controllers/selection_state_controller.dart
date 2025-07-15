@@ -32,11 +32,10 @@ class SelectionStateTracker<T> {
   }
 
   Widget titleIcon() {
-    //TODO
     return const Icon(Icons.no_crash_outlined);
   }
 
-  clearQueryParameters() {
+  void clearQueryParameters() {
     queryParameters.clear();
   }
 
@@ -46,11 +45,11 @@ class SelectionStateTracker<T> {
     }
   }
 
-  setQueryParameter({required String key, required String value}) {
+  void setQueryParameter({required String key, required String value}) {
     queryParameters[key] = value;
   }
 
-  clearQueryParameter({required String key}) {
+  void clearQueryParameter({required String key}) {
     if (queryParameters.containsKey(key)) {
       queryParameters.remove(key);
     }
@@ -110,14 +109,14 @@ class SelectionState with ChangeNotifier {
     return activeDocument.collection;
   }
 
-  clear() {
+  void clear() {
     _selectionState.clear();
     NavigationNotifier.instance.processRouteInformation();
     // NavigationNotifier.instance.processRouteInformation(queryState: QueryState(queryParameters: null));
     // notifyListeners();
   }
 
-  selectDocument<T>(SelectedDocument<T> selectedDocument) {
+  void selectDocument<T>(SelectedDocument<T> selectedDocument) {
     //Cannot keep a pendingUri on top of any other load
     pendingUri = null;
     // NavigationNotifier.instance local = NavigationNotifier.instance.instance;
@@ -163,7 +162,7 @@ class SelectionState with ChangeNotifier {
     }
   }
 
-  _minimize({required SelectionStateViewType viewType}) {
+  void _minimize({required SelectionStateViewType viewType}) {
     _selectionState.forEach((String key, SelectionStateTracker selectionStateTracker) {
       if (selectionStateTracker.viewType == viewType) {
         selectionStateTracker.viewType = SelectionStateViewType.minimized;
@@ -172,7 +171,7 @@ class SelectionState with ChangeNotifier {
     NavigationNotifier.instance.processRouteInformation();
   }
 
-  maximizeDocument<T>(SelectedDocument<T> selectedDocument) {
+  void maximizeDocument<T>(SelectedDocument<T> selectedDocument) {
     //Check if hte document is not already the active one
     String? activeDocumentId = this.activeDocumentId;
     String trackerId = selectedDocument.trackerId;
@@ -189,7 +188,7 @@ class SelectionState with ChangeNotifier {
     NavigationNotifier.instance.processRouteInformation();
   }
 
-  minimizeDocument<T>(SelectedDocument<T> selectedDocument) {
+  void minimizeDocument<T>(SelectedDocument<T> selectedDocument) {
     //Minimize the selected document
     if (_changeViewType(selectedDocument: selectedDocument, viewType: SelectionStateViewType.minimized)) {
       // QueryState.instance.queryParameters = null;
@@ -210,7 +209,7 @@ class SelectionState with ChangeNotifier {
     return false;
   }
 
-  closeDocument<T>(SelectedDocument<T> selectedDocument) {
+  void closeDocument<T>(SelectedDocument<T> selectedDocument) {
     if (selectedDocument.trackerId == activeDocument?.trackerId) {
       // TODO: Perform a dirty document check
     }
@@ -221,18 +220,18 @@ class SelectionState with ChangeNotifier {
     NavigationNotifier.instance.processRouteInformation();
   }
 
-  closeActiveDocument() {
+  void closeActiveDocument() {
     SelectedDocument? selectedDocument = activeDocument;
     if (selectedDocument != null) {
       closeDocument(selectedDocument);
     }
   }
 
-  closeAllDocuments() {
+  void closeAllDocuments() {
     _selectionState.clear();
   }
 
-  closeSelectedDocument<T>(SelectedDocument<T> selectedDocument) {
+  void closeSelectedDocument<T>(SelectedDocument<T> selectedDocument) {
     closeDocument(selectedDocument);
   }
 
@@ -299,6 +298,7 @@ class SelectedDocument<T> {
   bool? _isNew;
 
   SelectedDocument({
+    // ignore: strict_top_level_inference
     required id,
     required this.documentConfig,
     this.documentSnapshot,
@@ -347,7 +347,8 @@ class SelectedDocument<T> {
   String get queryParameter => "${documentConfig.queryStringIdParam}?$documentId";
 
   @override
-  toString() {
+  @override
+  String toString() {
     return "firestore:/${this.collection}/$documentId";
   }
 
@@ -398,14 +399,14 @@ class SelectedDocument<T> {
     return false;
   }
 
-  snackbar({required BuildContext context, required SnackBar snackbar}) {
+  void snackbar({required BuildContext context, required SnackBar snackbar}) {
     Fframe.of(context)!.showSnackBar(
       context: context,
       snackBar: snackbar,
     );
   }
 
-  delete({required BuildContext context}) async {
+  Future<void> delete({required BuildContext context}) async {
     if (isNew) return;
     bool dialogResult = await (confirmationDialog(
         context: context,
@@ -485,7 +486,7 @@ class SelectedDocument<T> {
     }
   }
 
-  close({BuildContext? context, bool skipWarning = false}) async {
+  Future<void> close({BuildContext? context, bool skipWarning = false}) async {
     if (isDirty == false || this.readOnly == true || skipWarning == true) {
       SelectionState.instance.closeSelectedDocument(this);
       return;
@@ -543,13 +544,13 @@ class SelectedDocument<T> {
     }
   }
 
-  copy({required BuildContext context}) {
+  void copy({required BuildContext context}) {
     SelectedDocument<T> clone = SelectedDocument<T>.clone(documentConfig: documentConfig, data: data);
     //Todo: Check if new doc flag is proper
     SelectionState.instance.selectDocument(clone);
   }
 
-  update({T? data}) async {
+  Future<void> update({T? data}) async {
     String? docId = documentId;
     if (isNew == true) {
       docId = _createNewDocumentId(data: data as T);
@@ -576,7 +577,7 @@ class SelectedDocument<T> {
     _fingerPrint = _createFingerPrint();
   }
 
-  save({required BuildContext context, bool closeAfterSave = true, T? data}) async {
+  Future<void> save({required BuildContext context, bool closeAfterSave = true, T? data}) async {
     if (validate(context: context, moveToTab: true) == -1) {
       String? docId = documentId;
 
@@ -884,7 +885,11 @@ class SelectedDocument<T> {
         return selectedDocument.open();
       }
       throw ("Document $id could not be loaded from ${documentConfig.collection}");
-    }).onError((error, stackTrace) => SelectionState.instance.clear());
+    }).onError((error, stackTrace) {
+      SelectionState.instance.clear();
+      Console.log(error.toString());
+      throw (error.toString());
+    });
     // } else {
     //   debugPrint("Document must be read from the database");
 

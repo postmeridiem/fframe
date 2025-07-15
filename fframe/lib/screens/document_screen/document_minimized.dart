@@ -16,7 +16,7 @@ class _MinimizedDocumentsWatcherState extends State<MinimizedDocumentsWatcher> {
     SelectionState.instance.addListener(updatePadding);
   }
 
-  updatePadding() {
+  void updatePadding() {
     if (SelectionState.instance.padding != padding) {
       setState(() {
         padding = SelectionState.instance.padding;

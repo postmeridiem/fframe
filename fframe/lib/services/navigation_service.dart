@@ -64,7 +64,7 @@ class NavigationNotifier extends ChangeNotifier {
   int? selectedNavRailIndex;
   bool get isSignedIn => FRouterConfig.instance.user == null ? false : true;
 
-  selectionStateListener() {
+  void selectionStateListener() {
     Console.log(
       "selectionStateListener",
       scope: "fframeLog.NavigationNotifier.currentTarget",
@@ -129,7 +129,7 @@ class NavigationNotifier extends ChangeNotifier {
     return navigationConfig;
   }
 
-  parseRouteInformation({required Uri uri}) {
+  void parseRouteInformation({required Uri uri}) {
     Console.log(
       "parseRouteInformation",
       scope: "fframeLog.NavigationNotifier.parseRouteInformation uri: ${uri.toString()}}",
@@ -165,7 +165,7 @@ class NavigationNotifier extends ChangeNotifier {
     }
   }
 
-  processRouteInformation({TargetState? targetState, SelectionState? selectionState}) {
+  void processRouteInformation({TargetState? targetState, SelectionState? selectionState}) {
     Console.log(
       "processRouteInformation",
       scope: "fframeLog.NavigationNotifier.processRouteInformation",
@@ -201,7 +201,7 @@ class NavigationNotifier extends ChangeNotifier {
     return uri;
   }
 
-  markBuildDone<T>(DocumentConfig<T> documentConfig) async {
+  Future<void> markBuildDone<T>(DocumentConfig<T> documentConfig) async {
     _isbuilding = false;
     Console.log(
       "Mark build done",

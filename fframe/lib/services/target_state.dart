@@ -20,7 +20,7 @@ class TargetState extends ChangeNotifier {
 
   NavigationTarget get navigationTarget => _navigationTarget!;
 
-  processRouteRequest({required NavigationTarget navigationTarget}) {
+  void processRouteRequest({required NavigationTarget navigationTarget}) {
     if (navigationTarget.navigationTabs != null && navigationTarget is! NavigationTab) {
       Console.log("Cannot route to a path which has tabs. Mandatory apply the first tab", scope: "fframeLog.TargetState.processRouteRequest", level: LogLevel.fframe);
       this.navigationTarget = navigationTarget.navigationTabs!.first;

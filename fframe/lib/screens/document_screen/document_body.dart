@@ -19,7 +19,7 @@ class _DocumentBodyWatcherState extends State<DocumentBodyWatcher> {
     // TargetState.instance.addListener(targetStateListener);
   }
 
-  updatePadding() {
+  void updatePadding() {
     if (SelectionState.instance.padding != padding) {
       setState(() {
         padding = SelectionState.instance.padding;
@@ -513,7 +513,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
   }
 }
 
-calculateTabBar({
+TabBar? calculateTabBar({
   required BuildContext context,
   required List<DocumentTab> activeTabs,
   required TabController controller,

@@ -226,10 +226,10 @@ class FirestoreDataGridState<T> extends State<FirestoreDataGrid<T>> {
 
 class FframeDataRow<T> extends DataRow {
   const FframeDataRow({
-    key,
-    selected = false,
-    onSelectChanged,
-    onLongPress,
+    dynamic key,
+    bool selected = false,
+    dynamic onSelectChanged,
+    dynamic onLongPress,
     this.onTap,
     color,
     required super.cells,

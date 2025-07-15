@@ -39,7 +39,7 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
     NavigationNotifier.instance.addListener(_navigationNotifierListener);
   }
 
-  _navigationNotifierListener() {
+  void _navigationNotifierListener() {
     Console.log(
       "_navigationNotifierListener",
       scope: "fframeLog.FNavigationRouterDelegate._navigationNotifier",

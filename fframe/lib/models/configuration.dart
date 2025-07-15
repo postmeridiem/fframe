@@ -10,7 +10,7 @@ class Configuration extends ChangeNotifier {
     this.order,
   });
 
-  fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+  Configuration fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
     Map<String, dynamic> json = snapshot.data()!;
     return Configuration(
       id: snapshot.id,
