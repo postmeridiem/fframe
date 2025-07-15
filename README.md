@@ -1,4 +1,5 @@
 # fframe
+
 ## FlutFrame
 
 [![fframe](https://github.com/postmeridiem/fframe/actions/workflows/fframe.yaml/badge.svg?branch=main)](https://github.com/postmeridiem/fframe/actions/workflows/fframe.yaml)
@@ -12,7 +13,7 @@ It provides a complete, configurable application shell, handling routing, naviga
 - **Configuration-Driven UI:** Define your entire app layout—navigation destinations, tabs, and pages—with a simple `NavigationConfig` object.
 - **Firebase-centric:** Seamless integration with Firebase Authentication and Cloud Firestore. The framework handles initialization and listens for auth state changes automatically.
 - **Ready-to-use Screens:** A rich set of pre-built, configurable screens for common use cases:
-    - `DocumentScreen`: For CRUD operations on single Firestore documents.
+  - `DocumentScreen`: For CRUD operations on single Firestore documents.
     - `ListGridScreen`: Display Firestore collections in a paginated, filterable data grid.
     - `SwimlanesScreen`: A Kanban-style board for visualizing data stages.
 - **Authentication Handled:** Manages the sign-in/sign-out lifecycle, automatically presenting a sign-in UI when needed.
@@ -30,7 +31,7 @@ It provides a complete, configurable application shell, handling routing, naviga
 
 For detailed installation instructions, please refer to the [installation.md](installation.md) file.
 
-1.  **Add the `fframe` package:**
+1. **Add the `fframe` package:**
     _Note: `fframe` is not yet on pub.dev. You will need to add it as a git dependency in your `pubspec.yaml`._
 
     ```yaml
@@ -43,7 +44,7 @@ For detailed installation instructions, please refer to the [installation.md](in
           ref: main # or a specific tag/commit
     ```
 
-2.  **Initialize `fframe`:**
+2. **Initialize `fframe`:**
     Wrap your root `MaterialApp` with the `Fframe` widget in your `lib/main.dart` and provide it with the necessary configurations.
 
 ## Usage
@@ -125,4 +126,3 @@ If you encounter a bug or have a feature request, please file an issue on the [G
 ## License
 
 This package is licensed under the [MIT License](LICENSE.md).
-
