@@ -58,6 +58,7 @@ class Fframe extends InheritedWidget {
     this.postLoad,
     this.postSignIn,
     this.postSignOut,
+    this.testSettings,
   }) : super(child: FFramePreload()) {
     Console.log("+-=-=-=-=-=-=-=-=-=-=-= ${DateTime.now().toIso8601String()} -=-=-=-=-=-=-=-=-=-=-=-=-=-+", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.green);
     deepLinkUri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
@@ -84,6 +85,7 @@ class Fframe extends InheritedWidget {
   final PostFunction? postLoad;
   final PostFunction? postSignIn;
   final PostFunction? postSignOut;
+  final TestSettings? testSettings;
 
   Uri? deepLinkUri;
 
@@ -166,6 +168,14 @@ class _FframeLoaderState extends State<FframeFirebaseLoader> {
 
   @override
   Widget build(BuildContext context) {
+    final TestSettings? testSettings = Fframe.of(context)!.testSettings;
+
+    if (testSettings != null) {
+      // If testSettings are provided, we don't initialize Firebase.
+      // We assume that mock instances are provided in the testSettings.
+      return const FframeL10nLoader();
+    }
+
     FirebaseOptions firebaseOptions = Fframe.of(context)!.firebaseOptions;
     return FutureBuilder<FirebaseApp>(
       future: Firebase.initializeApp(options: firebaseOptions),
@@ -226,8 +236,10 @@ class _FRouterLoaderState extends State<FRouterLoader> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Fframe.of(context)!.testSettings?.firebaseAuth ?? FirebaseAuth.instance;
+
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.userChanges(),
+      stream: auth.userChanges(),
       initialData: null,
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (!snapshot.hasData) {
@@ -359,16 +371,17 @@ class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObser
 
   @override
   Widget build(BuildContext context) {
+    final auth = Fframe.of(context)!.testSettings?.firebaseAuth ?? FirebaseAuth.instance;
     Uri uri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
-    Console.log("dynamic link research: ${uri.toString()} => ${FirebaseAuth.instance.isSignInWithEmailLink(uri.toString())}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
+    Console.log("dynamic link research: ${uri.toString()} => ${auth.isSignInWithEmailLink(uri.toString())}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
 
-    if (FirebaseAuth.instance.isSignInWithEmailLink(uri.toString())) {
+    if (auth.isSignInWithEmailLink(uri.toString())) {
       if (uri.queryParameters.containsKey("hash")) {
         String hash = uri.queryParameters["hash"]!;
         String emailAddress = utf8.decode(base64.decode(hash));
 
         return FutureBuilder<UserCredential>(
-            future: FirebaseAuth.instance.signInWithEmailLink(email: emailAddress, emailLink: uri.toString()),
+            future: auth.signInWithEmailLink(email: emailAddress, emailLink: uri.toString()),
             builder: (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
               if (!snapshot.hasData) {
                 return FFWaitPage(

@@ -75,6 +75,7 @@ part 'package:fframe/models/navigation_target.dart';
 part 'package:fframe/models/sign_in_config.dart';
 part 'package:fframe/models/router_config.dart';
 part 'package:fframe/models/navigation_config.dart';
+part 'package:fframe/models/test_settings.dart';
 
 part 'package:fframe/services/target_state.dart';
 // part 'package:fframe/services/query_state.dart';
