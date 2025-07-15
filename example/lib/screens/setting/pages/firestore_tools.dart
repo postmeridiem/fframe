@@ -77,7 +77,6 @@ class StampUpdate {
                     break;
                   case OperationType.delete:
                     break;
-                  default:
                 }
               },
             ),

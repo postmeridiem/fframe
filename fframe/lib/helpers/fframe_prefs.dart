@@ -41,20 +41,17 @@ class FframePrefs {
         mode = 'light';
         break;
       case ThemeMode.system:
-      default:
         mode = 'system';
     }
     setString(key: "themeMode", value: mode);
   }
 
-  static Future<String> getString(
-      {required String key, required String fallback}) async {
+  static Future<String> getString({required String key, required String fallback}) async {
     final preferences = await SharedPreferences.getInstance();
     return preferences.getString(key) ?? fallback;
   }
 
-  static Future<void> setString(
-      {required String key, required String value}) async {
+  static Future<void> setString({required String key, required String value}) async {
     final preferences = await SharedPreferences.getInstance();
     preferences.setString(key, value);
   }

@@ -101,8 +101,6 @@ class _SettingsGeneralFormState extends State<SettingsGeneralForm> {
                         // ignore: use_build_context_synchronously
                         promptOK(context: context, title: "system", message: "system");
                         break;
-                      default:
-                        promptOK(context: context, title: "dunno", message: "dunno");
                     }
                   });
                 }

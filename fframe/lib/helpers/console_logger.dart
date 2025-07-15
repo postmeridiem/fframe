@@ -39,7 +39,6 @@ class Console {
           debugPrint("${color.colorCode}$message)${ConsoleColor.standard.colorCode}");
         }
         break;
-      default:
     }
   }
 }
