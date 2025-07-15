@@ -9,6 +9,7 @@ test_driver/test_utils.dart
 test_driver/user_e2e.dart
 ios/GoogleService-Info.plist
 firebase_config.dart
+.env
 
 # Files and directories created by flutter and pub
 .dart_tool/

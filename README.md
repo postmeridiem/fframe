@@ -28,6 +28,8 @@ It provides a complete, configurable application shell, handling routing, naviga
 
 ### Installation
 
+For detailed installation instructions, please refer to the [installation.md](installation.md) file.
+
 1.  **Add the `fframe` package:**
     _Note: `fframe` is not yet on pub.dev. You will need to add it as a git dependency in your `pubspec.yaml`._
 
