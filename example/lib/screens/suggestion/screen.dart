@@ -249,7 +249,7 @@ Document<Suggestion> suggestionDocument() {
             label: Text(
               "Mark as Done",
               style: TextStyle(
-                color: Theme.of(context).indicatorColor,
+                color: Theme.of(context).colorScheme.onSecondary,
               ),
             ),
           ),
@@ -267,7 +267,7 @@ Document<Suggestion> suggestionDocument() {
             },
             icon: Icon(
               Icons.table_chart_outlined,
-              color: Theme.of(context).indicatorColor,
+              color: Theme.of(context).colorScheme.onSecondary,
             ),
           ),
       ];

@@ -66,7 +66,7 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
           height: swimlanesController.headerHeight,
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           decoration: BoxDecoration(
-            color: currentFilter == SwimlanesFilterType.customFilter ? Theme.of(context).indicatorColor : null,
+            color: currentFilter == SwimlanesFilterType.customFilter ? Theme.of(context).colorScheme.onSecondary : null,
             borderRadius: BorderRadius.circular(8.0),
           ),
           child: const Row(
