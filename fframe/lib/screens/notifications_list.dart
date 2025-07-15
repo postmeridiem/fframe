@@ -1,10 +1,10 @@
+import 'dart:js_interop';
 import 'dart:ui_web' as ui;
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:fframe/fframe.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:web/web.dart' as web;
 
@@ -190,9 +190,11 @@ class _NotificationTileState extends State<NotificationTile> {
           final userData = snapshot.docs.first.data();
           final originalUrl = userData['photoURL'];
           if (originalUrl != null) {
-            final response = await http.get(Uri.parse(originalUrl));
-            if (response.statusCode == 200) {
-              await ref.putData(response.bodyBytes, SettableMetadata(contentType: 'image/jpeg'));
+            final responsePromise = web.window.fetch(originalUrl.toJS);
+            final response = await responsePromise.toDart;
+            final body = await response.arrayBuffer().toDart;
+            if (response.status == 200) {
+              await ref.putData(body.toDart.asUint8List(), SettableMetadata(contentType: 'image/jpeg'));
               final hostedUrl = await ref.getDownloadURL();
               _photoCache[email] = hostedUrl;
               setState(() => photoUrl = hostedUrl);
