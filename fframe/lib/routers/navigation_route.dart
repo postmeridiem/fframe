@@ -76,12 +76,6 @@ class FNavigationRouterDelegate extends RouterDelegate<NavigationNotifier> with 
           builder: (context) => FFErrorPage(),
         );
       },
-      onPopPage: (route, result) {
-        if (!route.didPop(result)) {
-          return false;
-        }
-        return true;
-      },
     );
   }
 

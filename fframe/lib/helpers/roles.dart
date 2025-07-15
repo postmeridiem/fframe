@@ -171,7 +171,7 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
                                 title: Text(entry.value),
                                 value: userRoles.contains(entry.key),
                                 onChanged: (bool newValue) => toggleUserRole(context, entry.key, newValue),
-                                activeColor: Theme.of(context).indicatorColor,
+                                activeColor: Theme.of(context).colorScheme.primary,
                               ),
                             )
                             .toList(),

@@ -367,11 +367,11 @@ class DataGridToggle<T> extends StatelessWidget {
           child: (documentConfig.currentViewType == ViewType.list)
               ? Icon(
                   Icons.keyboard_double_arrow_right_rounded,
-                  color: Theme.of(context).indicatorColor,
+                  color: Theme.of(context).colorScheme.primary,
                 )
               : Icon(
                   Icons.keyboard_double_arrow_left_rounded,
-                  color: Theme.of(context).indicatorColor,
+                  color: Theme.of(context).colorScheme.primary,
                 ),
         ),
       ),

@@ -130,6 +130,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
     if (deepLinkUri?.queryParameters.containsKey('tabIndex') == true) {
       deepLinkTabIndex = int.tryParse(deepLinkUri!.queryParameters['tabIndex']!);
     }
+
     /// The initial tab index to display.
     ///
     /// This value is determined by checking the following sources in order:
@@ -288,7 +289,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                           ),
                                           icon: Icon(
                                             Icons.minimize,
-                                            color: Theme.of(context).indicatorColor,
+                                            color: Theme.of(context).colorScheme.onSecondary,
                                           ),
                                           onPressed: () {
                                             SelectionState.instance.minimizeDocument(selectedDocument);
@@ -303,7 +304,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                                           ),
                                           icon: Icon(
                                             Icons.close,
-                                            color: Theme.of(context).indicatorColor,
+                                            color: Theme.of(context).colorScheme.onSecondary,
                                           ),
                                           onPressed: () {
                                             selectedDocument.close(context: context);
@@ -478,7 +479,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                       ),
                       icon: Icon(
                         Icons.chevron_left,
-                        color: Theme.of(context).indicatorColor,
+                        color: Theme.of(context).colorScheme.primary,
                       ),
                       onPressed: () {
                         setState(() {
@@ -495,7 +496,7 @@ class _DocumentBodyState<T> extends State<DocumentBody<T>> {
                           ),
                           icon: Icon(
                             Icons.chevron_right,
-                            color: Theme.of(context).indicatorColor,
+                            color: Theme.of(context).colorScheme.primary,
                           ),
                           onPressed: () {
                             setState(() {

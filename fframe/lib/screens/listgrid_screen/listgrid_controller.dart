@@ -110,7 +110,7 @@ class ListGridController extends InheritedModel<ListGridController> {
   }
 
   Color get widgetAccentColor {
-    return listGridConfig.widgetAccentColor ?? theme.indicatorColor;
+    return listGridConfig.widgetAccentColor ?? theme.colorScheme.primary;
   }
 
   Color get widgetBackgroundColor {

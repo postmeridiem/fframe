@@ -131,7 +131,7 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                                           ),
                                         ),
                                         child: Container(
-                                          color: (Fframe.of(context)!.getSystemThemeMode == ThemeMode.dark) ? Colors.black.withOpacity(0.2) : Colors.white.withOpacity(0.2),
+                                          color: (Fframe.of(context)!.getSystemThemeMode == ThemeMode.dark) ? Colors.black.withAlpha((255 * 0.2).round()) : Colors.white.withAlpha((255 * 0.2).round()),
                                           child: FirestoreQueryBuilder<T>(
                                             pageSize: listGridController.dataMode.limit,
                                             query: listGridNotifier.currentQuery,

@@ -122,7 +122,7 @@ class SwimlaneHeaderFilterButton extends StatelessWidget {
       child: Center(
         child: IconButton(
           icon: const Icon(Icons.filter_alt_outlined),
-          color: swimlanesController.notifier.filter == SwimlanesFilterType.unfiltered ? swimlanesController.taskCardTextColor : Theme.of(context).indicatorColor,
+          color: swimlanesController.notifier.filter == SwimlanesFilterType.unfiltered ? swimlanesController.taskCardTextColor : Theme.of(context).colorScheme.primary,
           onPressed: () {},
         ),
       ),
@@ -143,7 +143,7 @@ class SwimlanesFilterBar<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Color inactive = swimlanesController.taskCardTextColor;
-    final Color active = Theme.of(context).indicatorColor;
+    final Color active = Theme.of(context).colorScheme.primary;
 
     return ListenableBuilder(
       listenable: swimlanesController.notifier,

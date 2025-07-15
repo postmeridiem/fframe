@@ -721,7 +721,7 @@ class SelectedDocument<T> {
     //       ),
     //       icon: Icon(
     //         Icons.close,
-    //         color: Theme.of(context).indicatorColor,
+    //         color: Theme.of(context).colorScheme.onSecondary,
     //       ),
     //       onPressed: () {
     //         close(context: context);
@@ -741,7 +741,7 @@ class SelectedDocument<T> {
             ),
             icon: Icon(
               Icons.delete_forever,
-              color: Theme.of(context).indicatorColor,
+              color: Theme.of(context).colorScheme.onSecondary,
             ),
             onPressed: () {
               delete(context: context);
@@ -760,7 +760,7 @@ class SelectedDocument<T> {
             ),
             icon: Icon(
               Icons.copy_outlined,
-              color: Theme.of(context).indicatorColor,
+              color: Theme.of(context).colorScheme.onSecondary,
             ),
             onPressed: () {
               copy(context: context);
@@ -779,7 +779,7 @@ class SelectedDocument<T> {
             ),
             icon: Icon(
               Icons.edit,
-              color: Theme.of(context).indicatorColor,
+              color: Theme.of(context).colorScheme.onSecondary,
             ),
             onPressed: () {
               readOnly = !readOnly;
@@ -800,7 +800,7 @@ class SelectedDocument<T> {
             ),
             icon: Icon(
               Icons.check,
-              color: Theme.of(context).indicatorColor,
+              color: Theme.of(context).colorScheme.onSecondary,
             ),
             onPressed: () {
               validate(context: context, showPopup: true);
@@ -818,7 +818,7 @@ class SelectedDocument<T> {
             ),
             icon: Icon(
               Icons.save,
-              color: Theme.of(context).indicatorColor,
+              color: Theme.of(context).colorScheme.onSecondary,
             ),
             onPressed: () {
               save(context: context);

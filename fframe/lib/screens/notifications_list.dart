@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'dart:html' as html;
+import 'package:web/web.dart' as web;
 
 class NotificationsList extends StatefulWidget {
   final String userId;
@@ -243,7 +243,7 @@ class _NotificationTileState extends State<NotificationTile> {
   }
 
   Widget _buildAvatar() {
-    final email = widget.notification.reporter ?? '';
+    final email = widget.notification.reporter;
     String initials = '?';
 
     if (email.isNotEmpty && email.contains('@')) {
@@ -276,7 +276,7 @@ class _NotificationTileState extends State<NotificationTile> {
       if (kIsWeb) {
         final viewType = 'img-${photoUrl.hashCode}';
         ui.platformViewRegistry.registerViewFactory(viewType, (int viewId) {
-          final img = html.ImageElement()
+          final img = web.HTMLImageElement()
             ..src = photoUrl!
             ..style.borderRadius = '50%'
             ..style.objectFit = 'cover'

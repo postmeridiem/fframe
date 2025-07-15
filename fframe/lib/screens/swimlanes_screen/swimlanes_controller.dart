@@ -98,7 +98,7 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
   }
 
   Color get swimlaneSeparatorColor {
-    return swimlanesConfig.swimlaneHeaderSeparatorColor ?? theme.indicatorColor;
+    return swimlanesConfig.swimlaneHeaderSeparatorColor ?? theme.colorScheme.primary;
   }
 
   Color get taskCardColor {
