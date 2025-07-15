@@ -30,7 +30,9 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
       });
       return functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
     } catch (e) {
-      _showErrorDialog(context, e.toString());
+      if (context.mounted) {
+        _showErrorDialog(context, e.toString());
+      }
     }
     return [];
   }
@@ -51,7 +53,9 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
     if (confirm != true) return;
 
     final newRoles = roles.map((r) => r.name).toList();
-    await assignMultipleRoles(context, newRoles);
+    if (context.mounted) {
+      await assignMultipleRoles(context, newRoles);
+    }
   }
 
   Future<void> toggleUserRole(BuildContext context, String role, bool add) async {
@@ -66,7 +70,9 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
         userRoles = functionResults.data.map((roleDynamic) => roleDynamic.toString()).toList();
       });
     } catch (e) {
-      _showErrorDialog(context, e.toString());
+      if (context.mounted) {
+        _showErrorDialog(context, e.toString());
+      }
     }
   }
 
@@ -88,12 +94,18 @@ class _FframeRolesManagerState<T extends Enum> extends State<FframeRolesManager<
         await callable({'uid': widget.uid, 'role': role});
       }
 
-      final updatedRoles = await getUserRoles(context);
-      setState(() {
-        userRoles = updatedRoles;
-      });
+      if (context.mounted) {
+        final updatedRoles = await getUserRoles(context);
+        if (context.mounted) {
+          setState(() {
+            userRoles = updatedRoles;
+          });
+        }
+      }
     } catch (e) {
-      _showErrorDialog(context, e.toString());
+      if (context.mounted) {
+        _showErrorDialog(context, e.toString());
+      }
     } finally {
       setState(() {
         isLoading = false;
