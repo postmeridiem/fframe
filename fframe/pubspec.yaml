@@ -50,7 +50,7 @@ dev_dependencies:
     sdk: flutter
   firebase_auth_mocks:
   fake_cloud_firestore:
-  http:
+
 # The following section is specific to Flutter.
 # === this is configured at the application level when using FlutFrame ===
 
