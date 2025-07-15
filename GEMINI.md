@@ -90,3 +90,19 @@ clients to reflect this change.
 ```
 fix(ui): correct typo on the settings page
 ```
+
+## Testing
+
+When running tests that produce a large amount of output, it is recommended to redirect the output to a file within the `llm-scratchspace` directory. This directory is located at the root of the project and is ignored by Git. This practice helps to prevent token size issues and allows for easier analysis of test results.
+
+To do this, you can use the `>` operator to redirect the standard output of the test command to a file. For example:
+
+```bash
+flutter test --platform chrome test/my_test.dart > llm-scratchspace/my_test_output.txt
+```
+
+After running the test, you can then read the output file to analyze the results.
+
+## Agent File Handling
+
+To maintain a clean project directory, **always** place any temporary files, test outputs, or other generated artifacts into the `llm-scratchspace/` directory. This directory is ignored by Git (except for the `.gitkeep` file) and can be safely cleared if context is lost or a task is complete.
