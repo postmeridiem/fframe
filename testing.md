@@ -4,10 +4,12 @@ This document outlines a comprehensive testing strategy for the `fframe` package
 
 ## 1. Core Principles
 
-*   **Hybrid Testing:** Employ a hybrid strategy using both mock objects and the Firebase Emulator Suite.
-    *   **Mocks:** For fast, isolated unit and widget tests.
-    *   **Emulators:** For high-fidelity integration and end-to-end tests that include Firebase backend behavior (Security Rules, Cloud Functions).
-*   **Composability:** Create reusable test harnesses and mock components to simplify test creation.
+*   **Use High-Fidelity Fakes:** For unit and widget tests involving Firebase, always prefer high-fidelity fakes over manual mocks.
+    *   **`fake_cloud_firestore`:** Use for any tests that interact with Firestore. This provides a reliable, in-memory database that behaves like the real thing.
+    *   **`firebase_auth_mocks`:** Use for tests involving Authentication.
+*   **Isolate Tests:** Unit and widget tests should be fast and isolated from external services. The use of fakes and mocks is crucial for this.
+*   **Use Emulators for Integration:** The full Firebase Emulator Suite should be reserved for integration and end-to-end tests that require testing backend behavior like Security Rules and Cloud Functions.
+*   **Composability:** Create reusable test harnesses to simplify test creation.
 *   **Automation:** All tests should be automated and run as part of a CI/CD pipeline.
 
 ## 2. Testing Layers
@@ -25,7 +27,7 @@ We will adopt a multi-layered testing approach, executed in order from fastest t
 
 *   **Focus:** Test individual classes and functions in isolation.
 *   **Location:** `fframe/test/unit/`
-*   **Tools:** `test`, `mockito`
+*   **Tools:** `test`, `fake_cloud_firestore`, `firebase_auth_mocks`
 *   **Execution Environment:** Due to web-specific dependencies within the `fframe` package (e.g., `dart:html`, `dart:js_interop`), unit tests **must** be run in a browser environment. Use the `--platform chrome` flag when running tests.
 *   **Examples:**
     *   Test business logic in controllers and services.
@@ -36,7 +38,7 @@ We will adopt a multi-layered testing approach, executed in order from fastest t
 
 *   **Focus:** Test individual widgets in isolation from the full widget tree.
 *   **Location:** `fframe/test/widget/`
-*   **Tools:** `flutter_test`, `mockito`
+*   **Tools:** `flutter_test`, `fake_cloud_firestore`, `firebase_auth_mocks`
 *   **Execution Environment:** Like unit tests, widget tests must also be run in a browser environment using the `--platform chrome` flag to ensure access to necessary web libraries.
 *   **Challenges:**
     *   Deeply nested widget structure.
@@ -95,12 +97,13 @@ dev_dependencies:
 
 ### 3.2. Firebase Testing Approaches
 
-#### 3.2.1. Mocking (for Unit/Widget Tests)
+#### 3.2.1. Mocking vs. Faking (for Unit/Widget Tests)
 
-For fast, isolated tests of individual widgets or business logic, we will use mocking libraries:
+For fast, isolated tests of individual widgets or business logic, we will use high-fidelity fakes instead of manual mocks whenever possible.
 
-*   `firebase_auth_mocks`: For mocking `FirebaseAuth`.
-*   `fake_cloud_firestore`: For mocking `FirebaseFirestore`.
+*   **`fake_cloud_firestore`:** **This is the preferred method for all unit and widget tests that interact with Firestore.** It provides an in-memory database that accurately mimics the behavior of the real Firestore, making tests more reliable and easier to write.
+*   **`firebase_auth_mocks`:** Use for mocking `FirebaseAuth`.
+*   **`mockito`:** Use for mocking other dependencies that do not have high-fidelity fakes available.
 
 #### 3.2.2. Firebase Emulator Suite (for Integration Tests)
 
@@ -132,7 +135,65 @@ Future<void> connectToFirebaseEmulators() async {
 }
 ```
 
-### 3.3. Boilerplate Widget Runners
+### 3.3. Unit Test Harness
+
+For unit tests that have dependencies on `Fframe` singletons (like `L10n` or `Console`), a test harness is provided to simplify setup. This avoids having to manually initialize each singleton in every test file.
+
+**`fframe/test/unit/test_harness.dart`:**
+
+```dart
+import 'package:flutter/material.dart';
+import 'package:fframe/fframe.dart';
+
+/// Initializes the necessary Fframe singletons for unit testing.
+///
+/// Call this function in the `setUp` block of your test files.
+void setupUnitTests() {
+  // L10n calls Console.log, so the Console must be initialized first.
+  Console(logThreshold: LogLevel.prod);
+
+  // Initialize L10n with mock data
+  L10n(
+    l10nConfig: L10nConfig(
+      locale: const Locale('en', 'US'),
+      supportedLocales: [const Locale('en', 'US')],
+      localizationsDelegates: [],
+      source: L10nSource.assets,
+    ),
+    localeData: {
+      'global': {
+        'greeting': {'translation': 'Hello, World!'},
+      },
+    },
+  );
+}
+```
+
+**Usage in a Unit Test:**
+
+```dart
+// fframe/test/unit/my_class_test.dart
+import 'package:flutter_test/flutter_test.dart';
+import 'package:fframe/fframe.dart';
+import 'test_harness.dart'; // Import the harness
+
+void main() {
+  group('MyClass Tests', () {
+    // Set up the test environment before each test
+    setUp(() {
+      setupUnitTests();
+    });
+
+    test('some test that uses L10n', () {
+      // Now you can safely call methods that depend on L10n or Console
+      final result = L10n.string('greeting', placeholder: 'Default');
+      expect(result, 'Hello, World!');
+    });
+  });
+}
+```
+
+### 3.4. Boilerplate Widget Runners
 
 Create a `TestHarness` widget that wraps a given widget with all the necessary providers and context for it to render correctly.
 

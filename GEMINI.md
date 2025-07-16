@@ -103,6 +103,13 @@ flutter test --platform chrome test/my_test.dart > llm-scratchspace/my_test_outp
 
 After running the test, you can then read the output file to analyze the results.
 
+## Code Quality Workflow
+
+To ensure consistency and catch potential issues early, the following steps should be followed after making any changes to the application code:
+
+1.  **Run the Linter:** Execute `flutter analyze` to check for any static analysis issues.
+2.  **Run Tests:** Execute the relevant tests to ensure the changes have not introduced any regressions.
+
 ## Agent File Handling
 
 To maintain a clean project directory, **always** place any temporary files, test outputs, or other generated artifacts into the `llm-scratchspace/` directory. This directory is ignored by Git (except for the `.gitkeep` file) and can be safely cleared if context is lost or a task is complete.
