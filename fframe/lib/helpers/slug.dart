@@ -3,8 +3,9 @@ String getSlug(String input) {
   String trim(String charlist) {
     return input
         .replaceAll('.', '-')
+        .replaceAll('\'', '-')
         // Replace occurrences of '[', ']', and ''' with '-'
-        .replaceAll(RegExp(r'[\\[\\]\' ']+'), '-')
+        .replaceAll(RegExp(r'[\[\]]+'), '-')
         // Replace occurrences of '{{}}' with '-'
         .replaceAll(RegExp(r'\{\{\}\}+'), '-')
         // Replace tilde with hyphens
@@ -67,7 +68,7 @@ String getSlug(String input) {
     'r': 'ŕ|ŗ|ř|Ŕ|Ŗ|Ř',
     's': 'ś|ŝ|ş|š|ſ|Ś|Ŝ|Ş|Š',
     't': 'ţ|ť|ŧ|Ţ|Ť|Ŧ',
-    'u': 'ù|ú|û|ũ|ū|ŭ|ů|ű|ų|ư|ǔ|ǖ|ǘ|ǚ|ǜ|Ù|Ú|Û|Ũ|Ū|Ŭ|Ů|Ű|Ų|Ư|Ǔ|Ǖ|Ǘ|Ǚ|Ǜ',
+    'u': 'ù|ú|û|ũ|ū|ŭ|ů|ű|ų|ư|ǔ|ǖ|ǘ|ǚ|ǜ|Ù|Ú|Û|Ũ|Ū|Ŭ|Ů|Ű|Ų|Ư|Ǔ|Ǖ|Ǘ|Ǚ|ǜ',
     'y': 'ý|ÿ|ŷ|Ý|Ÿ|Ŷ',
     'w': 'ŵ|Ŵ',
     'z': 'ź|ż|ž|Ź|Ż|Ž',
