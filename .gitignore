@@ -71,3 +71,4 @@ fframe/devtools_options.yaml
 # Gemini scratchspace
 llm-scratchspace/*
 !llm-scratchspace/.gitkeep
+fframe/firestore-debug.log
