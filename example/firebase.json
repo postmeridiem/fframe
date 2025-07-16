@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "appAssociation": "AUTO", 
+    "appAssociation": "AUTO",
     "public": "build/web",
     "ignore": [
       "firebase.json",
@@ -17,5 +17,17 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "emulators": {
+    "auth": {
+      "port": 9099
+    },
+    "firestore": {
+      "port": 8080
+    },
+    "ui": {
+      "enabled": false
+    },
+    "singleProjectMode": true
   }
 }
