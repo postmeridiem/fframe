@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/helpers/prompts.dart';
+import 'test_harness.dart';
 
 void main() {
   group('Prompts', () {
     testWidgets('promptOK should build and display correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
+        TestHarness(
+          child: Builder(
             builder: (BuildContext context) {
               return ElevatedButton(
                 onPressed: () {
@@ -34,8 +35,8 @@ void main() {
 
     testWidgets('promptOKCancel should build and display correctly', (WidgetTester tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: Builder(
+        TestHarness(
+          child: Builder(
             builder: (BuildContext context) {
               return ElevatedButton(
                 onPressed: () {
