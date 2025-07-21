@@ -47,6 +47,8 @@ dev_dependencies:
   firebase_auth_mocks:
   fake_cloud_firestore:
   http:
+  shared_preferences: ^2.5.3
+  cloud_firestore: ^5.6.12
 
 # The following section is specific to Flutter.
 flutter:
