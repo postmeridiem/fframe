@@ -37,9 +37,9 @@ class L10n {
       } else {}
     } else {
       Console.log(
-        "ERROR: Unknown namespace: $namespace while looking for <$key>",
+        "Unknown namespace: $namespace while looking for <$key>",
         scope: "fframeLog.L10N.string",
-        level: LogLevel.prod,
+        level: LogLevel.dev,
       );
     }
     return output;
