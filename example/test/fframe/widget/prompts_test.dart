@@ -1,66 +1,48 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:fframe/helpers/prompts.dart';
+import 'package:example/helpers/prompts.dart';
+
 import '../widget_test_harness.dart';
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
-  group('Prompts', () {
-    testWidgets('promptOK should build and display correctly', (WidgetTester tester) async {
+  group('promptOK Widget Tests', () {
+    testWidgets('should display a dialog with the correct title and message', (WidgetTester tester) async {
+      const String testTitle = 'Test Title';
+      const String testMessage = 'This is a test message.';
+
       await tester.pumpWidget(
         TestHarness(
           child: Builder(
             builder: (BuildContext context) {
               return ElevatedButton(
-                onPressed: () {
-                  promptOK(
-                    context: context,
-                    title: 'Test Title',
-                    message: 'Test Message',
-                  );
-                },
-                child: const Text('Show OK Prompt'),
+                onPressed: () => promptOK(context, testTitle, testMessage),
+                child: const Text('Show Dialog'),
               );
             },
           ),
         ),
       );
 
-      await tester.tap(find.text('Show OK Prompt'));
+      // Tap the button to show the dialog.
+      await tester.tap(find.byType(ElevatedButton));
       await tester.pumpAndSettle();
 
-      expect(find.text('Test Title'), findsOneWidget);
-      expect(find.text('Test Message'), findsOneWidget);
-      expect(find.text('OK'), findsOneWidget);
-    });
+      // Verify that the dialog is displayed.
+      expect(find.byType(AlertDialog), findsOneWidget);
 
-    testWidgets('promptOKCancel should build and display correctly', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        TestHarness(
-          child: Builder(
-            builder: (BuildContext context) {
-              return ElevatedButton(
-                onPressed: () {
-                  promptOKCancel(
-                    context: context,
-                    title: 'Test Title',
-                    message: 'Test Message',
-                  );
-                },
-                child: const Text('Show OK/Cancel Prompt'),
-              );
-            },
-          ),
-        ),
-      );
+      // Verify the title and message.
+      expect(find.text(testTitle), findsOneWidget);
+      expect(find.text(testMessage), findsOneWidget);
 
-      await tester.tap(find.text('Show OK/Cancel Prompt'));
+      // Verify the button text.
+      expect(find.text('I do!'), findsOneWidget);
+
+      // Tap the button to close the dialog.
+      await tester.tap(find.text('I do!'));
       await tester.pumpAndSettle();
 
-      expect(find.text('Test Title'), findsOneWidget);
-      expect(find.text('Test Message'), findsOneWidget);
-      expect(find.text('OK'), findsOneWidget);
-      expect(find.text('Cancel'), findsOneWidget);
+      // Verify that the dialog is closed.
+      expect(find.byType(AlertDialog), findsNothing);
     });
   });
 }

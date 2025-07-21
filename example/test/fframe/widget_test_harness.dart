@@ -1,6 +1,8 @@
 import 'package:fframe/helpers/l10n.dart';
 import 'package:flutter/material.dart';
 
+import 'unit_test_harness.dart';
+
 class TestHarness extends StatelessWidget {
   const TestHarness({
     super.key,
@@ -19,17 +21,8 @@ class TestHarness extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Initialize L10n with a default config for testing
-    L10n(
-      l10nConfig: l10nConfig ??
-          L10nConfig(
-            locale: const Locale('en', 'US'),
-            supportedLocales: [const Locale('en', 'US')],
-            localizationsDelegates: [],
-            source: L10nSource.assets,
-          ),
-      localeData: const {},
-    );
+    // Initialize singletons using the centralized unit test setup.
+    setupUnitTests();
 
     return MaterialApp(
       theme: theme ?? ThemeData.light(),
