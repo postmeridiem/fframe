@@ -96,12 +96,13 @@ fix(ui): correct typo on the settings page
 
 ## Testing
 
-When running tests that produce a large amount of output, it is recommended to redirect the output to a file within the `llm-scratchspace` directory. This directory is located at the root of the project and is ignored by Git. This practice helps to prevent token size issues and allows for easier analysis of test results.
+When running tests that produce a large amount of output, it is recommended to redirect the output to a file within the `llm-scratchspace` directory.
 
-To do this, you can use the `>` operator to redirect the standard output of the test command to a file. For example:
+**IMPORTANT:** Always use an absolute path for the output file to avoid errors when running commands from different subdirectories.
 
+Example using a placeholder for the project root:
 ```bash
-flutter test --platform chrome test/my_test.dart > llm-scratchspace/my_test_output.txt
+flutter test --platform chrome test/my_test.dart > /path/to/project/llm-scratchspace/my_test_output.txt
 ```
 
 After running the test, you can then read the output file to analyze the results.
@@ -113,6 +114,8 @@ To ensure consistency and catch potential issues early, the following steps shou
 1. **Run the Linter:** Execute `flutter analyze` to check for any static analysis issues.
 2. **Run Tests:** Execute the relevant tests to ensure the changes have not introduced any regressions.
 
-## Agent File Handling
+## Agent File Handling & Path Management
 
-To maintain a clean project directory, **always** place any temporary files, test outputs, or other generated artifacts into the `llm-scratchspace/` directory. This directory is ignored by Git (except for the `.gitkeep` file) and can be safely cleared if context is lost or a task is complete.
+To maintain a clean project directory, **always** place any temporary files, test outputs, or other generated artifacts into the `llm-scratchspace/` directory.
+
+**CRITICAL:** When referencing `llm-scratchspace` (e.g., for redirecting command output), **always use an absolute path from the project root**. I will resolve this path dynamically when executing commands and will not hardcode it.
