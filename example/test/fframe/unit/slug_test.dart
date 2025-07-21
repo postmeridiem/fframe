@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/helpers/slug.dart';
-import 'test_harness.dart';
+import '../unit_test_harness.dart';
 
 void main() {
   group('getSlug characterization tests', () {

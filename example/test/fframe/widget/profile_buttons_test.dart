@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/helpers/profile_buttons.dart';
-import 'test_harness.dart';
+import '../widget_test_harness.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('ProfileButtons', () {
     testWidgets('ThemeDropdown should build and change value', (WidgetTester tester) async {
       await tester.pumpWidget(

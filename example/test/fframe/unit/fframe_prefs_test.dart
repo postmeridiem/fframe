@@ -4,6 +4,7 @@ import 'package:fframe/helpers/fframe_prefs.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('FframePrefs', () {
     setUp(() {
       SharedPreferences.setMockInitialValues({});

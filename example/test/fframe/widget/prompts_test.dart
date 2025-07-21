@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/helpers/prompts.dart';
-import 'test_harness.dart';
+import '../widget_test_harness.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   group('Prompts', () {
     testWidgets('promptOK should build and display correctly', (WidgetTester tester) async {
       await tester.pumpWidget(

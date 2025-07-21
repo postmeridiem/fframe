@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'test_harness.dart';
+import '../unit_test_harness.dart';
 import 'package:fframe/helpers/l10n.dart';
 
 void main() {

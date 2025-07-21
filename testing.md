@@ -51,16 +51,16 @@ All test-related dependencies are declared in the `dev_dependencies` section of 
 
 ### 3.3. Running Tests
 
-All tests should be run from the root of the `fframe` project, targeting the `example` directory.
+All tests should be run from the `example` directory.
 
 **Run all tests:**
 ```bash
-flutter test example/test/fframe/ --platform chrome
+flutter test test/fframe/ --platform chrome
 ```
 
 **Run a specific test file:**
 ```bash
-flutter test example/test/fframe/unit/validator_test.dart --platform chrome
+flutter test test/fframe/unit/validator_test.dart --platform chrome
 ```
 
 ### 3.4. Test Output Handling
@@ -68,5 +68,5 @@ flutter test example/test/fframe/unit/validator_test.dart --platform chrome
 To manage potentially large outputs, redirect test command output to a file within the `llm-scratchspace` directory.
 
 ```bash
-flutter test example/test/fframe/ --platform chrome > llm-scratchspace/test_output.txt
+flutter test test/fframe/ --platform chrome > ../llm-scratchspace/test_output.txt
 ```

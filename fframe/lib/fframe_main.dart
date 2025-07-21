@@ -61,8 +61,16 @@ class Fframe extends InheritedWidget {
     this.testSettings,
   }) : super(child: FFramePreload()) {
     Console.log("+-=-=-=-=-=-=-=-=-=-=-= ${DateTime.now().toIso8601String()} -=-=-=-=-=-=-=-=-=-=-=-=-=-+", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.green);
-    deepLinkUri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
-    Console.log("deepLinkUri: ${deepLinkUri!.path} ${deepLinkUri?.queryParameters}", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.white);
+    deepLinkUri = Uri.parse("/");
+    try {
+      Uri potentialUri = Uri.parse(Uri.base.toString().replaceAll("/#/", "/"));
+      if (potentialUri.scheme == 'http' || potentialUri.scheme == 'https') {
+        deepLinkUri = potentialUri;
+      }
+    } catch (e) {
+      //Ignore this. This happens during testing
+    }
+    Console.log("deepLinkUri: ${deepLinkUri?.path} ${deepLinkUri?.queryParameters}", scope: "Fframe", level: LogLevel.dev, color: ConsoleColor.white);
   }
 
   // static final Fframe instance = Fframe._internal();

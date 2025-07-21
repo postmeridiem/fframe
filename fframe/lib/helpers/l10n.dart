@@ -115,36 +115,40 @@ class L10nConfig {
 
 // apply a url parameter (e.g. ?locale=en_US) to the default language
   static Locale urlReader(Locale defaultLoc, {String urlparam = "locale"}) {
-    Locale output;
-    String baseUrl = Uri.base.toString();
-    if (!baseUrl.contains('#')) {
-      // url is not a deeplink, no locale specified
+    try {
+      Locale output;
+      String baseUrl = Uri.base.toString();
+      if (!baseUrl.contains('#')) {
+        // url is not a deeplink, no locale specified
+        return defaultLoc;
+      }
+      List<String> rawuri = Uri.base.toString().split("#");
+      Uri actual = Uri.parse(rawuri[1]);
+
+      if (actual.queryParameters[urlparam] != null) {
+        String locationquery = actual.queryParameters[urlparam] as String;
+        String language;
+        String country;
+
+        // check for full or partial (language only) configurations
+        // and then fill the outputs
+        if (locationquery.contains('_')) {
+          List<String> localesplit = locationquery.split("_");
+          language = localesplit[0];
+          country = localesplit[1];
+        } else {
+          language = locationquery;
+          country = '';
+        }
+        output = Locale(language, country);
+      } else {
+        // there was no query parameter
+        output = defaultLoc;
+      }
+      return output;
+    } catch (e) {
       return defaultLoc;
     }
-    List<String> rawuri = Uri.base.toString().split("#");
-    Uri actual = Uri.parse(rawuri[1]);
-
-    if (actual.queryParameters[urlparam] != null) {
-      String locationquery = actual.queryParameters[urlparam] as String;
-      String language;
-      String country;
-
-      // check for full or partial (language only) configurations
-      // and then fill the outputs
-      if (locationquery.contains('_')) {
-        List<String> localesplit = locationquery.split("_");
-        language = localesplit[0];
-        country = localesplit[1];
-      } else {
-        language = locationquery;
-        country = '';
-      }
-      output = Locale(language, country);
-    } else {
-      // there was no query parameter
-      output = defaultLoc;
-    }
-    return output;
   }
 }
 
