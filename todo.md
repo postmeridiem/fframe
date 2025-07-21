@@ -1,27 +1,28 @@
-# Project TODOs
+# FFrame Project Tasks
 
-This file lists the outstanding tasks and improvements for the `fframe` project, extracted from the original documentation.
+## Subject: Model Refactoring
+- [ ] (P1) Refactor all models in `example/lib/models` to decouple them from Firestore. #task-1
+  - [ ] Sub-task: Go through all models in `example/lib/models`.
+  - [ ] Sub-task: Remove all `import 'package:cloud_firestore/cloud_firestore.dart';`.
+  - [ ] Sub-task: Replace Firestore types like `Timestamp` with standard Dart types (e.g., `DateTime`).
+  - [ ] Sub-task: Update `fromJson` and `toJson` methods to handle the conversion.
 
-### Documentation & Setup Scripts
+## Subject: Testing
+- [ ] (P1) Create a reusable test harness in `example/test` (e.g., `test_harness.dart`). #task-2
+  - [ ] Sub-task: Harness should initialize a `FakeCloudFirestore` instance.
+  - [ ] Sub-task: Harness should set up `Fframe.config` with the fake Firestore instance.
+  - [ ] Sub-task: Harness should mock user authentication using `firebase_auth_mocks`.
+  - [ ] Sub-task: Harness should provide helper methods to pre-seed the database with test data.
+- [ ] (P2) Write integration tests for CRUD operations and queries. #task-3
+  - [ ] Sub-task: Create a new test file, such as `example/test/firestore_integration_test.dart`.
+  - [ ] Sub-task: Test fetching a list of documents.
+  - [ ] Sub-task: Test creating a new document.
+  - [ ] Sub-task: Test updating an existing document.
+  - [ ] Sub-task: Test deleting a document.
+  - [ ] Sub-task: Test querying and filtering data.
 
--   **Create Fixture Script for `fframe` Collection:**
-    -   The installation process requires creating an `fframe/` collection in Firestore. A script should be created to automate this setup.
-    -   *Original Note: `create fframe/ collection with (TODO: fixture script)`*
-
--   **Automate Domain Configuration:**
-    -   The `config.ts` file in the Firebase Functions requires manual entry of authorized domains. This should be scripted or centralized.
-    -   *Original Note: `adjust firebase/functions/src/fframe-auth/config.ts to your domains (TODO: either script this, or make it use some shared config from somewhere)`*
-
--   **Clarify Cloud Function Permissions:**
-    -   The installation guide needs a clearer explanation of how to set permissions for the Cloud Functions to allow all users to call them.
-    -   *Original Note: `make sure the cloud functions permissions are set to allUsers can call Cloud Function (TODO: explain better)`*
-
-### Optional Features & Examples
-
--   **Fixture Script for Suggestions:**
-    -   Provide a fixture script to automatically add the `suggestions` collection and data for the example route.
-    -   *Original Note: `remove the suggestions route (main.js, uncomment [suggestionNavigationTarget]) or run the (TODO: fixture script) to add suggestions to your app`*
-
--   **Fixture Script for Settings:**
-    -   Provide a fixture script to add pre-configured settings documents for the example route.
-    -   *Original Note: `remove or adjust the settings route (main.js, uncomment [settingNavigationTarget]) or run the (TODO: fixture script) to add preconfigured routes for settings to your app`* 
+## Subject: Documentation
+- [ ] (P3) Update `testing.md` to document the new testing strategy. #task-4
+  - [ ] Sub-task: Remove outdated recommendations.
+  - [ ] Sub-task: Add a new section explaining testing within the `example` app.
+  - [ ] Sub-task: Include a code example of the new test harness.
