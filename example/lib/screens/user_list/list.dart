@@ -23,9 +23,9 @@ class UserListItem extends StatelessWidget {
               radius: 18.0,
               backgroundImage: (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
               backgroundColor: (user.photoURL == null) ? Colors.amber : Colors.transparent,
-              child: (user.photoURL == null && avatarText != null)
+              child: (user.photoURL == null && avatarText != null && avatarText.isNotEmpty)
                   ? Text(
-                      "${avatarText.first}${avatarText.last}",
+                      "${avatarText.first}${avatarText.length > 1 ? avatarText.last : ''}",
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     )
                   : null,
