@@ -4,7 +4,7 @@ This document outlines the testing strategy for the `fframe` package. Since `ffr
 
 ## 1. Core Principles
 
-- **Test Through the `example` App:** All unit, widget, and integration tests for the `fframe` package are located in and run from the `example/test/` directory. **You must run all test commands from inside the `example/test` directory, where the `pubspec.yaml` is present.**
+- **Test Through the `example` App:** All unit, widget, and integration tests for the `fframe` package are located in and run from the `example/test/` directory. **You must run all test commands from the `example` directory (the root of the example app, where `pubspec.yaml` is present).**
 - **Use High-Fidelity Fakes:** For unit and widget tests, always prefer high-fidelity fakes over manual mocks.
   - **`fake_cloud_firestore`:** For tests that interact with Firestore.
   - **`firebase_auth_mocks`:** For tests involving Authentication.
@@ -51,7 +51,7 @@ All test-related dependencies are declared in the `dev_dependencies` section of 
 
 ### 3.3. Running Tests
 
-All tests should be run from the `example` directory.
+All tests should be run from the `example` directory (the root of the example app, where `pubspec.yaml` is present).
 
 **Run all tests:**
 ```bash
