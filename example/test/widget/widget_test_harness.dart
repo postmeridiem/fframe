@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-import 'unit_test_harness.dart';
+import '../unit/unit_test_harness.dart';
 
 final FirebaseOptions mockFirebaseOptions = FirebaseOptions(
   apiKey: 'test-api-key',

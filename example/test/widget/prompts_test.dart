@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:example/helpers/prompts.dart';
-
-import '../widget_test_harness.dart';
+import 'widget_test_harness.dart';
 
 void main() {
   group('promptOK Widget Tests', () {
@@ -11,16 +10,14 @@ void main() {
       const String testMessage = 'This is a test message.';
 
       await tester.pumpWidget(
-        TestHarness(
-          child: Builder(
-            builder: (BuildContext context) {
-              return ElevatedButton(
-                onPressed: () => promptOK(context, testTitle, testMessage),
-                child: const Text('Show Dialog'),
-              );
-            },
-          ),
-        ),
+        MinimalFframe(child: Builder(
+          builder: (BuildContext context) {
+            return ElevatedButton(
+              onPressed: () => promptOK(context, testTitle, testMessage),
+              child: const Text('Show Dialog'),
+            );
+          },
+        )),
       );
 
       // Tap the button to show the dialog.
@@ -45,4 +42,4 @@ void main() {
       expect(find.byType(AlertDialog), findsNothing);
     });
   });
-}
+} 
