@@ -107,6 +107,8 @@ flutter test --platform chrome test/my_test.dart > /path/to/project/llm-scratchs
 
 After running the test, you can then read the output file to analyze the results.
 
+**See [`docs/testing.md`](docs/testing.md) for the full testing strategy, including harness usage and widget test best practices.**
+
 ## Code Quality Workflow
 
 To ensure consistency and catch potential issues early, the following steps should be followed after making any changes to the application code:

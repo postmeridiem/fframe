@@ -115,6 +115,10 @@ class MainApp extends StatelessWidget {
 
 For a complete, runnable example, please see the `/example` directory in this repository.
 
+## Testing
+
+For the full testing strategy, including how to use the test harness and run widget/integration tests, see [`docs/testing.md`](docs/testing.md).
+
 ## Contributing
 
 Contributions are welcome! If you'd like to contribute, please fork the repository and open a pull request. For major changes, please open an issue first to discuss what you would like to change.

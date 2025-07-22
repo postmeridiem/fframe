@@ -53,4 +53,5 @@ This document explains the file structure of the `fframe` package and the exampl
 
 ## Additional Notes
 - All temporary files and test outputs should go in `llm-scratchspace/` (see `GEMINI.md`).
+- See [`docs/testing.md`](docs/testing.md) for the full testing strategy and harness usage.
 - See other docs files for details on routing, theming, localization, and logging.

@@ -1,7 +1,74 @@
 import 'package:fframe/helpers/l10n.dart';
 import 'package:flutter/material.dart';
+import 'package:fframe/fframe.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'unit_test_harness.dart';
+
+final FirebaseOptions mockFirebaseOptions = FirebaseOptions(
+  apiKey: 'test-api-key',
+  appId: '1:1234567890:web:abcdef123456',
+  messagingSenderId: '1234567890',
+  projectId: 'test-project-id',
+);
+
+class MinimalFframe extends StatelessWidget {
+  final Widget child;
+  const MinimalFframe({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Fframe(
+      title: "Test",
+      firebaseOptions: mockFirebaseOptions,
+      navigationConfig: NavigationConfig(
+        navigationTargets: [],
+        signInConfig: SignInConfig(signInTarget: NavigationTarget(
+          path: "/sign-in",
+          title: "Sign In",
+          contentPane: Container(),
+          public: true,
+        )),
+        errorPage: NavigationTarget(
+          path: "/error",
+          title: "Error",
+          contentPane: Container(),
+          public: true,
+        ),
+        emptyPage: NavigationTarget(
+          path: "/empty",
+          title: "Empty",
+          contentPane: Container(),
+          public: true,
+        ),
+        waitPage: NavigationTarget(
+          path: "/wait",
+          title: "Wait",
+          contentPane: child,
+          public: true,
+        ),
+      ),
+      lightMode: ThemeData.light(),
+      darkMode: ThemeData.dark(),
+      themeMode: ThemeMode.system,
+      l10nConfig: L10nConfig(
+        locale: const Locale('en', 'US'),
+        supportedLocales: [const Locale('en', 'US')],
+        localizationsDelegates: const [],
+        source: L10nSource.assets,
+        namespaces: ['fframe', 'global'],
+      ),
+      consoleLogger: Console(logThreshold: LogLevel.dev),
+      providerConfigs: const [],
+      enableNotficationSystem: false,
+      debugShowCheckedModeBanner: false,
+      globalActions: const [],
+      postLoad: (_) async {},
+      postSignIn: (_) async {},
+      postSignOut: (_) async {},
+    );
+  }
+}
 
 class TestHarness extends StatelessWidget {
   const TestHarness({
