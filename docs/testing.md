@@ -4,12 +4,12 @@ This document outlines the testing strategy for the `fframe` package. Since `ffr
 
 ## 1. Core Principles
 
-- **Test Through the `example` App:** All unit, widget, and integration tests for the `fframe` package are located in and run from the `example/` directory.
+- **Test Through the `example` App:** All unit, widget, and integration tests for the `fframe` package are located in and run from the `example/test/` directory. **You must run all test commands from inside the `example/test` directory, where the `pubspec.yaml` is present.**
 - **Use High-Fidelity Fakes:** For unit and widget tests, always prefer high-fidelity fakes over manual mocks.
   - **`fake_cloud_firestore`:** For tests that interact with Firestore.
   - **`firebase_auth_mocks`:** For tests involving Authentication.
 - **Use Emulators for Integration:** The full Firebase Emulator Suite is reserved for integration and end-to-end tests that require testing backend behavior like Security Rules and Cloud Functions.
-- **Composability:** Reusable test harnesses are located in `example/test/fframe/` to simplify test creation.
+- **Composability:** Reusable test harnesses are located in `widget/` and `unit/` to simplify test creation.
 - **Automation:** All tests are automated and run as part of the CI/CD pipeline.
 
 ## 2. Testing Layers
@@ -42,7 +42,7 @@ This document outlines the testing strategy for the `fframe` package. Since `ffr
 
 ### 3.1. Test Dependencies
 
-All test-related dependencies are declared in the `dev_dependencies` section of `example/pubspec.yaml`.
+All test-related dependencies are declared in the `dev_dependencies` section of `pubspec.yaml` in the `example/` directory.
 
 ### 3.2. Test Harnesses
 
@@ -55,18 +55,28 @@ All tests should be run from the `example` directory.
 
 **Run all tests:**
 ```bash
-flutter test test/fframe/ --platform chrome
+flutter test test --platform chrome
+```
+
+**Run all widget tests:**
+```bash
+flutter test test/widget --platform chrome
+```
+
+**Run all unit tests:**
+```bash
+flutter test test/unit --platform chrome
 ```
 
 **Run a specific test file:**
 ```bash
-flutter test test/fframe/unit/validator_test.dart --platform chrome
+flutter test test/unit/validator_test.dart --platform chrome
 ```
 
 ### 3.4. Test Output Handling
 
-To manage potentially large outputs, redirect test command output to a file within the `llm-scratchspace` directory.
+To manage potentially large outputs, redirect test command output to a file within the `llm-scratchspace` directory (which should be at the same level as `example/`). Always use an absolute path from the project root.
 
 ```bash
-flutter test test/fframe/ --platform chrome > ../llm-scratchspace/test_output.txt
+flutter test --platform chrome > /absolute/path/to/llm-scratchspace/test_output.txt
 ``` 
