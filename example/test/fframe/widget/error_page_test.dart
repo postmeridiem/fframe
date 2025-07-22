@@ -5,7 +5,7 @@ import '../widget_test_harness.dart';
 
 void main() {
   testWidgets('ErrorPage renders animated error icon and error text', (WidgetTester tester) async {
-    await tester.pumpWidget(const TestHarness(child: ErrorPage()));
+    await tester.pumpWidget(MinimalFframe(child: const ErrorPage()));
     expect(find.byType(AnimatedCrossFade), findsOneWidget);
     expect(find.byType(Text), findsWidgets);
     // Simulate timer tick
