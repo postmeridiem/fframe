@@ -12,6 +12,7 @@ final FirebaseOptions mockFirebaseOptions = FirebaseOptions(
   projectId: 'test-project-id',
 );
 
+/// DEPRECATED: [MinimalFframe] is deprecated for widget testing. Use [TestHarness] instead.
 class MinimalFframe extends StatelessWidget {
   final Widget child;
   const MinimalFframe({super.key, required this.child});
@@ -70,6 +71,15 @@ class MinimalFframe extends StatelessWidget {
   }
 }
 
+/// [TestHarness] is the preferred test harness for widget tests in this project.
+///
+/// It sets up a [MaterialApp] with L10n and Console logger singletons initialized via [setupUnitTests].
+/// This avoids async and Firestore dependencies, and ensures localization and logging are available.
+///
+/// Usage:
+///   await tester.pumpWidget(TestHarness(child: MyWidget()));
+///
+/// [MinimalFframe] is deprecated for widget testing and should not be used in new or migrated tests.
 class TestHarness extends StatelessWidget {
   const TestHarness({
     super.key,
