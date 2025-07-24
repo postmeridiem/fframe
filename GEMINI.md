@@ -100,6 +100,10 @@ When running tests that produce a large amount of output, it is recommended to r
 
 **IMPORTANT:** Always use an absolute path for the output file to avoid errors when running commands from different subdirectories.
 
+**All test commands should be run from the `example` directory (the root of the example app, where `pubspec.yaml` is present).**
+
+For test file organization, see [docs/testing.md](docs/testing.md#test-file-organization).
+
 Example using a placeholder for the project root:
 ```bash
 flutter test --platform chrome test/my_test.dart > /path/to/project/llm-scratchspace/my_test_output.txt

@@ -12,6 +12,24 @@ This document outlines the testing strategy for the `fframe` package. Since `ffr
 - **Composability:** Reusable test harnesses are located in `widget/` and `unit/` to simplify test creation.
 - **Automation:** All tests are automated and run as part of the CI/CD pipeline.
 
+## Test File Organization
+
+All test files for the example app must be placed under `example/test/` relative to the project root.
+
+- **Unit tests:** `example/test/unit/`
+- **Widget tests:** `example/test/widget/`
+- **Integration tests:** `example/test/integration/`
+
+When creating, editing, or referencing test files, always use the full path from the project root (e.g., `example/test/widget/my_widget_test.dart`).
+
+**Do not place any test files directly under the project root or outside the `example/test/` directory tree.**
+
+| Test Type      | Correct Path Example                        | Incorrect Path Example         |
+|---------------|---------------------------------------------|-------------------------------|
+| Unit          | example/test/unit/my_unit_test.dart          | test/unit/my_unit_test.dart   |
+| Widget        | example/test/widget/my_widget_test.dart      | test/widget/my_widget_test.dart |
+| Integration   | example/test/integration/my_integration_test.dart | test/integration/my_integration_test.dart |
+
 ## 2. Testing Layers
 
 ### 2.1. Static Analysis (Linting)
