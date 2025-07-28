@@ -5,4 +5,8 @@
 			300
 		],
 	},
+	// Disables VS Code's built-in markdown validation
+	"markdown.validate.enabled": false,
+	// Disables the popular 'markdownlint' extension for this workspace
+	"markdownlint.enabled": false
 }
