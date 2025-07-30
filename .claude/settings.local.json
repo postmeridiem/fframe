@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(flutter analyze:*)",
-      "Bash(firebase:*)"
+      "Bash(firebase:*)",
+      "Bash(flutter test:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

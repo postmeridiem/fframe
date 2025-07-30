@@ -123,6 +123,23 @@ To ensure consistency and catch potential issues early, the following steps shou
 1. **Run the Linter:** Execute `flutter analyze` to check for any static analysis issues.
 2. **Run Tests:** Execute the relevant tests to ensure the changes have not introduced any regressions.
 
+### **MANDATORY: Linter Check After File Changes**
+
+**CRITICAL INSTRUCTION:** After modifying, creating, or editing any Dart file in this project, you MUST immediately run `flutter analyze` to check for linting issues. This applies to:
+
+- Creating new files
+- Editing existing files  
+- Refactoring code
+- Adding features or fixing bugs
+
+**Process:**
+1. Make your code changes
+2. Immediately run `flutter analyze`
+3. Fix any linting issues found before proceeding
+4. Only consider the task complete when the linter shows no issues
+
+This ensures consistent code quality and catches style/syntax issues immediately rather than accumulating technical debt.
+
 ## Agent File Handling & Path Management
 
 To maintain a clean project directory, **always** place any temporary files, test outputs, or other generated artifacts into the `llm-scratchspace/` directory.
