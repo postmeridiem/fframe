@@ -6,7 +6,7 @@ import 'widget_test_harness.dart';
 void main() {
   testWidgets('EmptyPage renders animated icon and text', (WidgetTester tester) async {
     // Use TestHarness as the preferred widget test harness
-    await tester.pumpWidget(TestHarness(child: Scaffold(body: EmptyPage())));
+    await tester.pumpWidget(const TestHarness(child: Scaffold(body: EmptyPage())));
     expect(find.byType(AnimatedCrossFade), findsOneWidget);
     expect(find.text('Much empty'), findsOneWidget);
     await tester.pump(const Duration(seconds: 11));

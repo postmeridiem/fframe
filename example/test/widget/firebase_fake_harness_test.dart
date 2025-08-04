@@ -1,22 +1,19 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'firebase_fake_harness.dart';
 
 void main() {
   group('FirebaseFakeHarness', () {
     testWidgets('should initialize with fake Firebase services', (tester) async {
-      final testWidget = Container(
-        child: const Text('Test Widget'),
-      );
+      const testWidget = Text('Test Widget');
 
       await tester.pumpWidget(
         FirebaseFakeHarness(
-          child: testWidget,
-          initialFirestoreData: {
+          initialFirestoreData: const {
             'users/test1': {'name': 'Test User', 'email': 'test@example.com'}
           },
           mockUser: createTestUser(),
+          child: testWidget,
         ),
       );
 
@@ -39,8 +36,8 @@ void main() {
 
       await tester.pumpWidget(
         FirebaseFakeHarness(
-          child: const Text('Test'),
           initialFirestoreData: testData,
+          child: const Text('Test'),
         ),
       );
 
@@ -69,8 +66,8 @@ void main() {
 
       await tester.pumpWidget(
         FirebaseFakeHarness(
-          child: const Text('Test'),
           mockUser: mockUser,
+          child: const Text('Test'),
         ),
       );
 
@@ -87,9 +84,9 @@ void main() {
     testWidgets('should work without Firebase services when disabled', (tester) async {
       await tester.pumpWidget(
         const FirebaseFakeHarness(
-          child: Text('Test Without Firebase'),
           enableAuth: false,
           enableFirestore: false,
+          child: Text('Test Without Firebase'),
         ),
       );
 
@@ -102,8 +99,8 @@ void main() {
     testWidgets('should clean up services on dispose', (tester) async {
       await tester.pumpWidget(
         FirebaseFakeHarness(
-          child: const Text('Test'),
           mockUser: createTestUser(),
+          child: const Text('Test'),
         ),
       );
 
@@ -150,11 +147,11 @@ void main() {
 
     testWidgets('clearFakeFirestore should reset Firestore data', (tester) async {
       await tester.pumpWidget(
-        FirebaseFakeHarness(
-          child: const Text('Test'),
+        const FirebaseFakeHarness(
           initialFirestoreData: {
             'test/doc1': {'data': 'should be cleared'}
           },
+          child: Text('Test'),
         ),
       );
       await tester.pumpAndSettle();

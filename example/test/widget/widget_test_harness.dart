@@ -1,8 +1,6 @@
 import 'package:fframe/helpers/l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:fframe/fframe.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../unit/unit_test_harness.dart';
 
 const FirebaseOptions mockFirebaseOptions = FirebaseOptions(

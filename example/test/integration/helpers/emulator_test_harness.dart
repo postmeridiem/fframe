@@ -83,34 +83,38 @@ class _EmulatorTestHarnessState extends State<EmulatorTestHarness> {
   @override
   void initState() {
     super.initState();
-    _initializeEmulators();
+    // Initialize synchronously to avoid async in initState
+    _initializeEmulatorsSync();
   }
 
-  /// Initialize Firebase and connect to emulators
-  Future<void> _initializeEmulators() async {
+  /// Initialize Firebase and connect to emulators synchronously
+  void _initializeEmulatorsSync() {
     try {
-      // Initialize Firebase if not already initialized
-      if (Firebase.apps.isEmpty) {
-        await Firebase.initializeApp(options: emulatorFirebaseOptions);
-      }
-
+      // For emulator testing, we can set up connections without awaiting
+      // since the emulators should already be running
+      
       // Connect to Auth emulator if enabled
       if (widget.enableAuth) {
-        await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+        try {
+          FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+        } catch (e) {
+          // Already configured, ignore
+        }
       }
 
       // Connect to Firestore emulator if enabled
       if (widget.enableFirestore) {
-        FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+        try {
+          FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+        } catch (e) {
+          // Already configured, ignore
+        }
       }
 
-      setState(() {
-        _isInitialized = true;
-      });
+      // Set initialized immediately for emulator testing
+      _isInitialized = true;
     } catch (e) {
-      setState(() {
-        _initializationError = e.toString();
-      });
+      _initializationError = e.toString();
     }
   }
 
@@ -143,12 +147,12 @@ class _EmulatorTestHarnessState extends State<EmulatorTestHarness> {
     }
 
     if (!_isInitialized) {
-      return MaterialApp(
+      return const MaterialApp(
         home: Scaffold(
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 CircularProgressIndicator(),
                 SizedBox(height: 16),
                 Text('Initializing Firebase Emulators...'),

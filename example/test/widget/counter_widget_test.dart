@@ -12,10 +12,10 @@ void main() {
           builder: (context, setState) => Scaffold(
             body: Column(
               children: [
-                Text('Count: $counter', key: Key('counterText')),
+                Text('Count: $counter', key: const Key('counterText')),
                 ElevatedButton(
                   onPressed: () => setState(() => counter++),
-                  child: Text('Increment'),
+                  child: const Text('Increment'),
                 ),
               ],
             ),
