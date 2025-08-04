@@ -312,8 +312,7 @@ import '../../widget/firebase_fake_harness.dart' as fake_harness;
 **Platform Issues:** All tests must run with `--platform chrome` due to web dependencies.
 
 **Dependency Issues:** Use the appropriate fframe import for your test type:
-- Use `fframe_core.dart` for minimal Firebase testing without web dependencies
-- Use `fframe_test.dart` for unit tests with Firebase mocks
+- Use `fframe_test.dart` for Firebase testing with mocks and fakes
 - Use `fframe.dart` (full) only when you need complete widget functionality
 
 **Linting Errors:** Always run `flutter analyze` and fix issues before committing:
@@ -335,19 +334,6 @@ The fframe package provides specialized entry points designed for different test
 
 ### 8.1. Core Libraries
 
-#### `package:fframe/fframe_core.dart`
-
-- **Purpose:** Minimal fframe services without web-specific dependencies
-- **Use Cases:**
-  - Unit tests running on VM platform
-  - Server-side code
-  - Non-web Flutter platforms
-  - Firebase emulator testing without widget complexity
-- **Exports:**
-  - Core Firebase: `firebase_core`, `firebase_auth`, `cloud_firestore`, `firebase_storage`
-  - Core Services: `DatabaseService`, `DocumentConfigCore`
-- **Benefits:** Avoids Chrome platform timing issues and web dependency conflicts
-
 #### `package:fframe/fframe_test.dart`
 
 - **Purpose:** Test-specific utilities with fake Firebase services
@@ -356,7 +342,8 @@ The fframe package provides specialized entry points designed for different test
   - Integration tests with controlled data
   - Service-level Firebase testing
 - **Exports:**
-  - Everything from `fframe_core.dart`
+  - Core Firebase: `firebase_core`, `firebase_auth`, `cloud_firestore`, `firebase_storage`
+  - Core Services: `DatabaseService`, `DocumentConfigCore` 
   - Test utilities: `FakeFirebaseFirestore`, `MockFirebaseAuth`
   - Helper functions: `createFakeFirestore()`, `createMockAuth()`, `createTestUser()`
 - **Benefits:** Provides reliable, fast Firebase testing without emulator setup
@@ -372,27 +359,13 @@ The fframe package provides specialized entry points designed for different test
 
 | Test Type | Recommended Import | Reason |
 |-----------|-------------------|---------|
-| Unit Tests (VM) | `fframe_core.dart` | Minimal dependencies, fast execution |
 | Unit Tests (with mocks) | `fframe_test.dart` | Includes Firebase fakes and utilities |
 | Widget Tests (simple) | `fframe.dart` via TestHarness | Full UI components needed |
 | Widget Tests (Firebase) | `fframe_test.dart` | Controlled fake services |
-| Integration Tests | `fframe_core.dart` + direct Firebase | Avoids widget complexity, real Firebase |
-| Emulator Tests | `fframe_core.dart` | Minimal setup, direct emulator connection |
+| Integration Tests | `fframe_test.dart` | Service-level testing with controlled data |
+| Service Tests | `fframe_test.dart` | Direct Firebase operations with mocks |
 
 ### 8.3. Usage Examples
-
-#### Minimal Firebase Testing with fframe_core.dart
-
-```dart
-import 'package:fframe/fframe_core.dart';
-
-test('should test Firebase operations directly', () async {
-  await Firebase.initializeApp(options: testFirebaseOptions);
-  FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-  
-  // Test Firebase operations without widget overhead
-});
-```
 
 #### Mock Firebase Testing with fframe_test.dart
 

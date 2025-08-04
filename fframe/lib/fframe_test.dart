@@ -10,8 +10,15 @@
 /// without web-only dependencies that cause issues on VM platform.
 library fframe_test;
 
-// Re-export everything from fframe_core
-export 'fframe_core.dart';
+// Core Firebase exports (platform-independent)
+export 'package:firebase_core/firebase_core.dart';
+export 'package:firebase_auth/firebase_auth.dart';  
+export 'package:cloud_firestore/cloud_firestore.dart';
+export 'package:firebase_storage/firebase_storage.dart';
+
+// Export the core services and models
+export 'services/database_service.dart';
+export 'models/document_config_core.dart';
 
 // Test-specific exports
 export 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
