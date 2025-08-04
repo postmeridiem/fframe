@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:fframe/fframe.dart';
+import 'package:fframe/fframe_test.dart';
 import 'package:fframe/helpers/l10n.dart';
 
 /// Firebase options specifically configured for emulator testing
