@@ -7,7 +7,19 @@ import '../fframe.dart';
 import 'package:fframe/helpers/l10n.dart';
 
 class DatabaseService<T> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
+
+  /// Creates a DatabaseService with optional dependency injection.
+  /// 
+  /// If [auth] or [firestore] are not provided, defaults to the singleton instances.
+  /// This allows for testing with fake implementations while maintaining 
+  /// backward compatibility for production use.
+  DatabaseService({
+    FirebaseAuth? auth,
+    FirebaseFirestore? firestore,
+  }) : _auth = auth ?? FirebaseAuth.instance,
+        _firestore = firestore ?? FirebaseFirestore.instance;
 
   Query<T> query({
     required String collection,
@@ -15,7 +27,7 @@ class DatabaseService<T> {
     Query<T> Function(Query<T> query)? queryBuilder,
     int? limit,
   }) {
-    Query<T> query = FirebaseFirestore.instance.collection(collection).withConverter<T>(
+    Query<T> query = _firestore.collection(collection).withConverter<T>(
           fromFirestore: fromFirestore,
           toFirestore: (_, __) => {},
         );
@@ -35,7 +47,7 @@ class DatabaseService<T> {
     required T Function(DocumentSnapshot<Map<String, dynamic>>, SnapshotOptions?) fromFirestore,
     Query<T> Function(Query<T> query)? queryBuilder,
   }) async {
-    Query<T> query = FirebaseFirestore.instance.collection(collection).withConverter(
+    Query<T> query = _firestore.collection(collection).withConverter(
           fromFirestore: fromFirestore,
           toFirestore: (_, __) => {},
         );
@@ -53,7 +65,7 @@ class DatabaseService<T> {
     required DocumentConfig<T> documentConfig,
     Query<T>? query,
   }) async {
-    AggregateQuerySnapshot aggregateQuerySnapshot = (query == null) ? (await FirebaseFirestore.instance.collection(documentConfig.collection).count().get()) : (await query.count().get());
+    AggregateQuerySnapshot aggregateQuerySnapshot = (query == null) ? (await _firestore.collection(documentConfig.collection).count().get()) : (await query.count().get());
     return aggregateQuerySnapshot.count!;
   }
 
@@ -65,7 +77,7 @@ class DatabaseService<T> {
   }) {
     if (_auth.currentUser == null) return const Stream.empty();
 
-    CollectionReference collectionReference = FirebaseFirestore.instance.collection(collection);
+    CollectionReference collectionReference = _firestore.collection(collection);
 
     DocumentReference<T> documentReference = collectionReference.doc(documentId).withConverter<T>(
           fromFirestore: fromFirestore,
@@ -81,7 +93,7 @@ class DatabaseService<T> {
     required Map<String, Object?> Function(T, SetOptions?) toFirestore,
   }) async {
     if (_auth.currentUser == null) return null;
-    DocumentReference<T> documentReference = FirebaseFirestore.instance.collection(collection).doc(documentId).withConverter<T>(
+    DocumentReference<T> documentReference = _firestore.collection(collection).doc(documentId).withConverter<T>(
           fromFirestore: fromFirestore,
           toFirestore: toFirestore,
         );
@@ -89,7 +101,7 @@ class DatabaseService<T> {
   }
 
   String generateDocId({required String collection}) {
-    CollectionReference collectionReference = FirebaseFirestore.instance.collection(collection);
+    CollectionReference collectionReference = _firestore.collection(collection);
     return collectionReference.doc().id;
   }
 
@@ -109,7 +121,7 @@ class DatabaseService<T> {
     Query<T>? query,
   }) {
     if (query == null) {
-      return FirebaseFirestore.instance.collection(documentConfig.collection).withConverter(fromFirestore: documentConfig.fromFirestore, toFirestore: documentConfig.toFirestore).snapshots().map((querySnapshot) => querySnapshot.docs.map((documentSnapshot) {
+      return _firestore.collection(documentConfig.collection).withConverter(fromFirestore: documentConfig.fromFirestore, toFirestore: documentConfig.toFirestore).snapshots().map((querySnapshot) => querySnapshot.docs.map((documentSnapshot) {
             return SelectedDocument<T>(
               id: documentSnapshot.id,
               documentConfig: documentConfig,
