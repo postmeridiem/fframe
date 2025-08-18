@@ -1,18 +1,8 @@
 // ignore_for_file: depend_on_referenced_packages, unused_import
 
-/// Test-specific fframe library entry point.
-/// Use this entry point for:
-/// - Unit tests 
-/// - Integration tests
-/// - Test utilities and factories
-/// 
-/// This provides the core fframe functionality plus specific test utilities
-/// without web-only dependencies that cause issues on VM platform.
-library fframe_test;
-
 // Core Firebase exports (platform-independent)
 export 'package:firebase_core/firebase_core.dart';
-export 'package:firebase_auth/firebase_auth.dart';  
+export 'package:firebase_auth/firebase_auth.dart';
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:firebase_storage/firebase_storage.dart';
 
@@ -33,13 +23,13 @@ FakeFirebaseFirestore createFakeFirestore({
   Map<String, dynamic> initialData = const {},
 }) {
   final firestore = FakeFirebaseFirestore();
-  
+
   // Populate with initial data if provided
   if (initialData.isNotEmpty) {
     // This would need to be implemented based on the data structure
     // For now, return the empty firestore
   }
-  
+
   return firestore;
 }
 

@@ -113,9 +113,25 @@ Instead of fighting Firebase's architecture, work WITH it:
 - **Multiple AI assistants unable to resolve over several days**
 
 ### ❌ Mixed Fake/Real Firebase Testing
-- ServiceFactory trying to support both fake and real backends
-- Interface mismatches between fake and real services
+- ServiceFactory trying to support both fake and real services
+- Interface mismatches between fake and real services  
 - Global state contamination between different service types
+
+### ❌ Firebase Widget Testing (load_extra_data.dart Case Study)
+**Context**: Created comprehensive unit tests for Firebase-dependent widgets in `load_extra_data.dart` including:
+- `ReadFromFireStoreByDocumentId<T>` - Single document stream widget
+- `QueryFromFireStore<T>` - Query-based Firestore widget  
+- `QueryStreamFromFireStore<T>` - Streaming query widget
+
+**Specific Failures Encountered**:
+- ❌ **Firebase initialization error**: `[core/no-app] No Firebase App '[DEFAULT]' has been created - call Firebase.initializeApp()`
+- ❌ **Widget constructor dependency**: Widgets directly instantiate `DatabaseService()` without dependency injection
+- ❌ **Global Firebase state**: Widget tests fail because Firebase isn't initialized in test environment
+- ❌ **Mock service isolation**: `FakeFirebaseFirestore` can't be injected into existing widget constructors
+
+**Test Results**: 16 tests created, 6 passed (non-Firebase components), 10 failed (Firebase-dependent functionality)
+
+**Key Learning**: Firebase widgets that rely on global Firebase instances (`FirebaseAuth.instance`, `FirebaseFirestore.instance`) cannot be effectively unit tested without major architectural changes to support dependency injection.
 
 ## Historical Note
 
