@@ -145,3 +145,35 @@ This ensures consistent code quality and catches style/syntax issues immediately
 To maintain a clean project directory, **always** place any temporary files, test outputs, or other generated artifacts into the `llm-scratchspace/` directory.
 
 **CRITICAL:** When referencing `llm-scratchspace` (e.g., for redirecting command output), **always use an absolute path from the project root**. I will resolve this path dynamically when executing commands and will not hardcode it.
+
+## Cross-Session Todo Management
+
+**CRITICAL INSTRUCTION:** For cross-session persistence, always use the `todo.md` file in the project root instead of the TodoWrite tool for session todos.
+
+### Todo Management Process
+
+1. **At session start:** Read `todo.md` to see existing todos from previous sessions
+2. **During session:** Add new todos directly to `todo.md` using the Edit tool
+3. **Task completion:** Mark todos as completed in `todo.md` with [x] checkboxes
+4. **Session end:** Ensure `todo.md` reflects current state for next session
+
+### Todo Format in todo.md
+
+```markdown
+## Session Todos
+
+- [ ] (P1) High priority task #session-task-1
+- [x] (P2) Completed medium priority task #session-task-2  
+- [ ] (P3) Low priority task #session-task-3
+
+## Subject: [Other Categories]
+[Existing project-specific todos remain unchanged]
+```
+
+**Priority Levels:**
+
+* P1: High priority (blocking/critical)
+* P2: Medium priority (important but not blocking)
+* P3: Low priority (nice to have)
+
+This ensures todos persist across all Claude sessions and maintain project continuity.
