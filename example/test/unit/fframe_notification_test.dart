@@ -3,15 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/fframe.dart';
 
 import 'unit_test_harness.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('FframeNotification', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('FframeNotification', () {
     setUp(() {
       setupUnitTests();
     });
 
-    group('Constructor', () {
-      test('should create notification with required parameters only', () {
+    timedGroup('Constructor', () {
+      timedTest('should create notification with required parameters only', () {
         final notification = FframeNotification(
           reporter: 'test-reporter',
           messageTitle: 'Test Title',
@@ -32,7 +35,7 @@ void main() {
         expect(notification, isA<ChangeNotifier>());
       });
 
-      test('should create notification with all parameters', () {
+      timedTest('should create notification with all parameters', () {
         final notificationTime = Timestamp.now();
         final ttl = Timestamp.fromDate(DateTime.now().add(const Duration(days: 7)));
         final contextLinks = <Map<String, dynamic>>[
@@ -69,7 +72,7 @@ void main() {
         expect(notification.firestoreTTL, equals(ttl));
       });
 
-      test('should have immutable properties', () {
+      timedTest('should have immutable properties', () {
         final notification = FframeNotification(
           reporter: 'test-reporter',
           messageTitle: 'Test Title',
@@ -82,7 +85,7 @@ void main() {
         expect(notification.type, equals('warning'));
       });
 
-      test('should be a ChangeNotifier', () {
+      timedTest('should be a ChangeNotifier', () {
         final notification = FframeNotification(
           reporter: 'test-reporter',
           messageTitle: 'Test Title',
@@ -92,8 +95,8 @@ void main() {
       });
     });
 
-    group('toJson Method', () {
-      test('should convert notification to JSON with all fields', () {
+    timedGroup('toJson Method', () {
+      timedTest('should convert notification to JSON with all fields', () {
         final notificationTime = Timestamp.fromDate(DateTime(2024, 1, 15, 10, 30));
         final ttl = Timestamp.fromDate(DateTime(2024, 2, 15, 10, 30));
         final contextLinks = <Map<String, dynamic>>[
@@ -129,7 +132,7 @@ void main() {
         expect(json['firestoreTTL'], equals(ttl));
       });
 
-      test('should handle null notificationTime by setting current timestamp', () {
+      timedTest('should handle null notificationTime by setting current timestamp', () {
         final beforeCall = Timestamp.now();
         
         final notification = FframeNotification(
@@ -147,7 +150,7 @@ void main() {
         expect(timestamp.seconds, lessThanOrEqualTo(afterCall.seconds));
       });
 
-      test('should handle null firestoreTTL by setting 30-day expiry', () {
+      timedTest('should handle null firestoreTTL by setting 30-day expiry', () {
         final beforeCall = DateTime.now();
         
         final notification = FframeNotification(
@@ -171,7 +174,7 @@ void main() {
         expect(ttlDate.isBefore(maxExpectedTTL.add(const Duration(seconds: 1))), isTrue);
       });
 
-      test('should include null values in JSON', () {
+      timedTest('should include null values in JSON', () {
         final notification = FframeNotification(
           reporter: 'test-reporter',
           messageTitle: 'Test Title',
@@ -191,8 +194,8 @@ void main() {
       });
     });
 
-    group('toFirestore Method', () {
-      test('should delegate to toJson', () {
+    timedGroup('toFirestore Method', () {
+      timedTest('should delegate to toJson', () {
         final notification = FframeNotification(
           reporter: 'test-reporter',
           messageTitle: 'Test Title',
@@ -204,7 +207,7 @@ void main() {
         expect(firestoreData, equals(jsonData));
       });
 
-      test('should return proper Firestore-compatible data', () {
+      timedTest('should return proper Firestore-compatible data', () {
         final notification = FframeNotification(
           reporter: 'test-reporter',
           messageTitle: 'Test Title',
@@ -220,8 +223,8 @@ void main() {
       });
     });
 
-    group('Default Values', () {
-      test('should use correct default values', () {
+    timedGroup('Default Values', () {
+      timedTest('should use correct default values', () {
         final notification = FframeNotification(
           reporter: 'test-reporter',
           messageTitle: 'Test Title',
@@ -233,7 +236,7 @@ void main() {
         expect(notification.deleted, isFalse);
       });
 
-      test('should allow overriding default values', () {
+      timedTest('should allow overriding default values', () {
         final notification = FframeNotification(
           reporter: 'test-reporter',
           messageTitle: 'Test Title',
@@ -250,8 +253,8 @@ void main() {
       });
     });
 
-    group('Context Links', () {
-      test('should handle empty context links', () {
+    timedGroup('Context Links', () {
+      timedTest('should handle empty context links', () {
         final notification = FframeNotification(
           reporter: 'test-reporter',
           messageTitle: 'Test Title',
@@ -262,7 +265,7 @@ void main() {
         expect(notification.contextLinks, isA<List<Map<String, dynamic>>>());
       });
 
-      test('should handle complex context links structure', () {
+      timedTest('should handle complex context links structure', () {
         final contextLinks = <Map<String, dynamic>>[
           {
             'url': 'https://example.com/page1',
@@ -291,8 +294,8 @@ void main() {
       });
     });
 
-    group('Edge Cases', () {
-      test('should handle empty strings for required fields', () {
+    timedGroup('Edge Cases', () {
+      timedTest('should handle empty strings for required fields', () {
         final notification = FframeNotification(
           reporter: '',
           messageTitle: '',
@@ -302,7 +305,7 @@ void main() {
         expect(notification.messageTitle, equals(''));
       });
 
-      test('should handle very long strings', () {
+      timedTest('should handle very long strings', () {
         final longString = 'A' * 10000; // 10,000 character string
         
         final notification = FframeNotification(
@@ -316,7 +319,7 @@ void main() {
         expect(notification.messageBody!.length, equals(10000));
       });
 
-      test('should handle special characters in strings', () {
+      timedTest('should handle special characters in strings', () {
         const specialChars = 'Test with émojis 🚀 and spéciál châractérs & symbols!@#\$%^&*()';
         
         final notification = FframeNotification(
@@ -332,7 +335,7 @@ void main() {
         expect(notification.messageBody, equals(specialChars));
       });
 
-      test('should handle extreme timestamps', () {
+      timedTest('should handle extreme timestamps', () {
         final veryOldTime = Timestamp.fromDate(DateTime(1970, 1, 1));
         final veryFutureTime = Timestamp.fromDate(DateTime(2100, 12, 31));
 

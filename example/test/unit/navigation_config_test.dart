@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/fframe.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('NavigationConfig', () {
-    test('clone factory creates a deep copy', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('NavigationConfig', () {
+    timedTest('clone factory creates a deep copy', () {
       // 1. Create original NavigationConfig
       final original = NavigationConfig(
         signInConfig: SignInConfig(

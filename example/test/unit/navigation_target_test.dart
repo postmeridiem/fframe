@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/fframe.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('NavigationTarget', () {
-    test('should construct successfully with only a contentPane', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('NavigationTarget', () {
+    timedTest('should construct successfully with only a contentPane', () {
       expect(
         () => NavigationTarget(
           title: 'Test',
@@ -15,7 +18,7 @@ void main() {
       );
     });
 
-    test('should construct successfully with only navigationTabs', () {
+    timedTest('should construct successfully with only navigationTabs', () {
       expect(
         () => NavigationTarget(
           title: 'Test',
@@ -36,7 +39,7 @@ void main() {
       );
     });
 
-    test('should throw AssertionError if both contentPane and navigationTabs are provided', () {
+    timedTest('should throw AssertionError if both contentPane and navigationTabs are provided', () {
       expect(
         () => NavigationTarget(
           title: 'Test',
@@ -48,7 +51,7 @@ void main() {
       );
     });
 
-    test('should construct successfully with neither contentPane nor navigationTabs', () {
+    timedTest('should construct successfully with neither contentPane nor navigationTabs', () {
       expect(
         () => NavigationTarget(
           title: 'Test',

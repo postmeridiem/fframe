@@ -2,14 +2,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/fframe.dart';
 
 import 'unit_test_harness.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('SignInConfig', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('SignInConfig', () {
     setUp(() {
       setupUnitTests();
     });
 
-    test('should create sign-in config with required signInTarget', () {
+    timedTest('should create sign-in config with required signInTarget', () {
       final signInTarget = NavigationTarget(title: 'Sign In', path: '/signin');
       
       final config = SignInConfig(signInTarget: signInTarget);
@@ -18,7 +21,7 @@ void main() {
       expect(config.invitionTarget, isNull);
     });
 
-    test('should create sign-in config with both targets', () {
+    timedTest('should create sign-in config with both targets', () {
       final signInTarget = NavigationTarget(title: 'Sign In', path: '/signin');
       final invitationTarget = NavigationTarget(title: 'Invitation', path: '/invitation');
       
@@ -31,7 +34,7 @@ void main() {
       expect(config.invitionTarget, equals(invitationTarget));
     });
 
-    test('should handle null invitionTarget', () {
+    timedTest('should handle null invitionTarget', () {
       final signInTarget = NavigationTarget(title: 'Sign In', path: '/signin');
       
       final config = SignInConfig(

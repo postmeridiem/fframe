@@ -3,15 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/fframe.dart';
 
 import 'unit_test_harness.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('FFrameUser', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('FFrameUser', () {
     setUp(() {
       setupUnitTests();
     });
 
-    group('Constructor', () {
-      test('should create user with all parameters', () {
+    timedGroup('Constructor', () {
+      timedTest('should create user with all parameters', () {
         final user = FFrameUser(
           id: 'test-id',
           uid: 'test-uid',
@@ -31,7 +34,7 @@ void main() {
         expect(user, isA<ChangeNotifier>());
       });
 
-      test('should create user with minimal parameters', () {
+      timedTest('should create user with minimal parameters', () {
         final user = FFrameUser();
 
         expect(user.id, isNull);
@@ -43,7 +46,7 @@ void main() {
         expect(user.timeStamp, isNotNull);
       });
 
-      test('should set timestamp on creation', () {
+      timedTest('should set timestamp on creation', () {
         final beforeCreation = DateTime.now();
         final user = FFrameUser();
         final afterCreation = DateTime.now();
@@ -53,51 +56,51 @@ void main() {
         expect(user.timeStamp!.isBefore(afterCreation.add(const Duration(seconds: 1))), isTrue);
       });
 
-      test('should be a ChangeNotifier', () {
+      timedTest('should be a ChangeNotifier', () {
         final user = FFrameUser();
         
         expect(user, isA<ChangeNotifier>());
       });
     });
 
-    group('Roles Management', () {
-      test('should return empty list when roles is null', () {
+    timedGroup('Roles Management', () {
+      timedTest('should return empty list when roles is null', () {
         final user = FFrameUser();
         
         expect(user.roles, isEmpty);
         expect(user.roles, isA<List<String>>());
       });
 
-      test('should return roles when provided', () {
+      timedTest('should return roles when provided', () {
         final user = FFrameUser(roles: <String>['admin', 'editor', 'viewer']);
         
         expect(user.roles, equals(['admin', 'editor', 'viewer']));
         expect(user.roles.length, equals(3));
       });
 
-      test('should preserve role order', () {
+      timedTest('should preserve role order', () {
         final roles = <String>['viewer', 'admin', 'editor'];
         final user = FFrameUser(roles: roles);
         
         expect(user.roles, equals(roles));
       });
 
-      test('should handle empty roles list', () {
+      timedTest('should handle empty roles list', () {
         final user = FFrameUser(roles: <String>[]);
         
         expect(user.roles, isEmpty);
       });
     });
 
-    group('hasRole Method', () {
-      test('should return true for existing role', () {
+    timedGroup('hasRole Method', () {
+      timedTest('should return true for existing role', () {
         final user = FFrameUser(roles: <String>['admin', 'editor']);
         
         expect(user.hasRole('admin'), isTrue);
         expect(user.hasRole('editor'), isTrue);
       });
 
-      test('should return false for non-existing role', () {
+      timedTest('should return false for non-existing role', () {
         final user = FFrameUser(roles: <String>['admin']);
         
         expect(user.hasRole('editor'), isFalse);
@@ -105,7 +108,7 @@ void main() {
         expect(user.hasRole('nonexistent'), isFalse);
       });
 
-      test('should handle case insensitivity correctly', () {
+      timedTest('should handle case insensitivity correctly', () {
         // hasRole converts input to lowercase and checks against stored roles
         // So for case insensitivity to work, stored roles should be lowercase
         final user = FFrameUser(roles: <String>['admin', 'editor', 'viewer']);
@@ -126,7 +129,7 @@ void main() {
         expect(user.hasRole('Viewer'), isTrue);
       });
 
-      test('should handle special characters in roles', () {
+      timedTest('should handle special characters in roles', () {
         final user = FFrameUser(roles: <String>['admin-user', 'api_reader', 'role.with.dots']);
         
         expect(user.hasRole('admin-user'), isTrue);
@@ -135,15 +138,15 @@ void main() {
         expect(user.hasRole('ADMIN-USER'), isTrue); // hasRole converts to lowercase
       });
 
-      test('should throw when roles is null and hasRole is called', () {
+      timedTest('should throw when roles is null and hasRole is called', () {
         final user = FFrameUser(); // No roles provided, _roles is null
         
         expect(() => user.hasRole('any-role'), throwsA(isA<TypeError>()));
       });
     });
 
-    group('Edge Cases', () {
-      test('should handle null and empty string roles', () {
+    timedGroup('Edge Cases', () {
+      timedTest('should handle null and empty string roles', () {
         final user = FFrameUser(roles: <String>['', 'valid-role']);
         
         expect(user.roles, contains(''));
@@ -152,7 +155,7 @@ void main() {
         expect(user.hasRole('valid-role'), isTrue);
       });
 
-      test('should handle duplicate roles', () {
+      timedTest('should handle duplicate roles', () {
         final user = FFrameUser(roles: <String>['admin', 'admin', 'user', 'admin']);
         
         expect(user.roles, equals(['admin', 'admin', 'user', 'admin'])); // Preserves duplicates
@@ -160,7 +163,7 @@ void main() {
         expect(user.hasRole('user'), isTrue);
       });
 
-      test('should handle unicode characters in roles', () {
+      timedTest('should handle unicode characters in roles', () {
         final user = FFrameUser(roles: <String>['管理员', 'ユーザー', 'administrador']);
         
         expect(user.hasRole('管理员'), isTrue);
@@ -168,7 +171,7 @@ void main() {
         expect(user.hasRole('administrador'), isTrue);
       });
 
-      test('should handle very long role names', () {
+      timedTest('should handle very long role names', () {
         final longRole = 'a' * 1000; // 1000 character role name
         final user = FFrameUser(roles: <String>[longRole]);
         
@@ -177,8 +180,8 @@ void main() {
       });
     });
 
-    group('Properties Immutability', () {
-      test('should have immutable properties', () {
+    timedGroup('Properties Immutability', () {
+      timedTest('should have immutable properties', () {
         final user = FFrameUser(
           id: 'test-id',
           uid: 'test-uid',
@@ -195,7 +198,7 @@ void main() {
         expect(user.photoURL, equals('https://example.com/photo.jpg'));
       });
 
-      test('should allow roles to be accessed but not modified externally', () {
+      timedTest('should allow roles to be accessed but not modified externally', () {
         final originalRoles = <String>['admin', 'user'];
         final user = FFrameUser(roles: originalRoles);
         

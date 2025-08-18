@@ -3,14 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/fframe.dart';
 
 import 'unit_test_harness.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('Destination', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('Destination', () {
     setUp(() {
       setupUnitTests();
     });
 
-    test('should create destination with required parameters', () {
+    timedTest('should create destination with required parameters', () {
       const icon = Icon(Icons.home);
       Widget navigationLabel() => const Text('Home');
       
@@ -26,7 +29,7 @@ void main() {
       expect(destination.padding, isNull);
     });
 
-    test('should create destination with all parameters', () {
+    timedTest('should create destination with all parameters', () {
       const icon = Icon(Icons.home);
       const selectedIcon = Icon(Icons.home_filled);
       Widget navigationLabel() => const Text('Home');
@@ -48,7 +51,7 @@ void main() {
       expect(destination.padding, equals(padding));
     });
 
-    test('should use icon as selectedIcon when selectedIcon is null', () {
+    timedTest('should use icon as selectedIcon when selectedIcon is null', () {
       const icon = Icon(Icons.settings);
       Widget navigationLabel() => const Text('Settings');
       
@@ -61,7 +64,7 @@ void main() {
       expect(destination.selectedIcon, equals(icon));
     });
 
-    test('should create functional navigation and tab labels', () {
+    timedTest('should create functional navigation and tab labels', () {
       Widget navigationLabel() => const Text('Profile');
       String tabLabel() => 'Profile Tab';
       

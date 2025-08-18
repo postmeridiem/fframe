@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import '../helpers/test_timing.dart';
 
 // This file is intentionally left empty of substantial tests.
 //
@@ -15,8 +16,10 @@ import 'package:flutter_test/flutter_test.dart';
 // widget and integration tests that exercise the full navigation flow.
 
 void main() {
-  group('NavigationNotifier - Unit Test Skipped', () {
-    test('See comments in file for details on why this class is not unit tested', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('NavigationNotifier - Unit Test Skipped', () {
+    timedTest('See comments in file for details on why this class is not unit tested', () {
       // This test is a placeholder to ensure the file is not flagged by test runners.
       expect(true, isTrue);
     });

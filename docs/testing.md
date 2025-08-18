@@ -383,11 +383,133 @@ test('should test with fake Firebase services', () async {
 });
 ```
 
-## 9. Current Test Coverage
+## 9. Performance Benchmarking and Timing
+
+The fframe testing system includes comprehensive timing benchmarks to monitor test performance and detect regressions.
+
+### 9.1. Timing Infrastructure
+
+**Shared Timing Library:** `example/test/helpers/test_timing.dart`
+- Non-intrusive wrapper functions for existing test patterns
+- Automatic timing collection and performance categorization
+- File-based output for persistent analysis
+
+**File Output Location:** `llm-scratchspace/timing/` (project root)
+```
+llm-scratchspace/timing/
+├── unit_tests_timing.json       # Unit test performance data
+├── widget_tests_timing.json     # Widget test performance data  
+├── integration_tests_timing.json # Integration test performance data
+├── timing_summary.json          # Cross-test-type performance summary
+└── performance_trends.json      # Historical timing trends
+```
+
+### 9.2. Timing Functions
+
+Replace standard test functions with timing-enabled versions:
+
+```dart
+// Unit Tests
+timedTest('should calculate correctly', () async {
+  // Test implementation - timing happens automatically
+});
+
+timedGroup('Calculator', () {
+  // Group of timed tests
+});
+
+// Widget Tests  
+timedTestWidgets('should render widget', (tester) async {
+  // Widget test implementation - timing happens automatically
+});
+```
+
+### 9.3. Performance Categories
+
+Tests are automatically categorized based on execution time:
+
+| Test Type | Fast | Moderate | Slow |
+|-----------|------|----------|------|
+| **Unit Tests** | < 10ms | < 50ms | ≥ 50ms |
+| **Widget Tests** | < 100ms | < 500ms | ≥ 500ms |
+| **Integration Tests** | < 500ms | < 2000ms | ≥ 2000ms |
+
+### 9.4. Timing Output Format
+
+**JSON Structure:**
+```json
+{
+  "test_run_timestamp": "2025-08-04T10:30:00Z",
+  "test_type": "unit|widget|integration",
+  "tests": [
+    {
+      "name": "should calculate sum correctly",
+      "file": "calculator_test.dart",
+      "duration_ms": 12,
+      "category": "fast|moderate|slow",
+      "threshold_exceeded": false
+    }
+  ],
+  "summary": {
+    "total_tests": 101,
+    "fast_tests": 85,
+    "moderate_tests": 14,
+    "slow_tests": 2,
+    "average_duration_ms": 8.5
+  }
+}
+```
+
+### 9.5. Running Tests with Timing
+
+**Normal Test Execution** (timing enabled by default):
+```bash
+flutter test test/unit --platform chrome
+# Output: Normal test results + timing files written to llm-scratchspace/timing/
+```
+
+**Benchmark Mode** (detailed timing output):
+```bash
+BENCHMARK_MODE=true flutter test test/unit --platform chrome
+# Output: Enhanced console timing + detailed JSON reports
+```
+
+### 9.6. Performance Analysis
+
+**View Timing Reports:**
+```bash
+# View latest unit test timings
+cat llm-scratchspace/timing/unit_tests_timing.json | jq '.summary'
+
+# Find slowest tests
+cat llm-scratchspace/timing/unit_tests_timing.json | jq '.tests[] | select(.category == "slow")'
+```
+
+**Performance Regression Detection:**
+- Historical timing data tracks performance over time
+- Threshold alerts for tests that become significantly slower
+- Trend analysis for gradual performance degradation
+
+### 9.7. CI/CD Integration
+
+**Automated Performance Monitoring:**
+- Timing files can be archived as build artifacts
+- Performance trend graphs from historical JSON data
+- Automated alerts for performance regressions
+
+**Performance Gates:**
+```bash
+# Fail build if too many slow tests
+SLOW_TEST_THRESHOLD=5 flutter test --platform chrome
+```
+
+## 10. Current Test Coverage
 
 - **Unit Tests:** 101+ tests - utilities, extensions, services, models
 - **Widget Tests:** 20 tests - pages, dialogs, buttons, components  
 - **Integration Tests:** Infrastructure ready for complex async flows
 - **Total:** 121+ tests with comprehensive coverage across all layers
 
-The testing system is production-ready with excellent separation of concerns, specialized import libraries for different testing scenarios, and appropriate harnesses for all testing scenarios.
+**Performance Benchmarking:** Timing data collection across all test types with automated categorization and trend analysis.
+
+The testing system is production-ready with excellent separation of concerns, specialized import libraries for different testing scenarios, appropriate harnesses for all testing scenarios, and comprehensive performance monitoring.

@@ -3,14 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/models/configuration.dart';
 
 import 'unit_test_harness.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('Configuration', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('Configuration', () {
     setUp(() {
       setupUnitTests();
     });
 
-    test('should create configuration with default values', () {
+    timedTest('should create configuration with default values', () {
       final config = Configuration();
 
       expect(config.id, isNull);
@@ -21,7 +24,7 @@ void main() {
       expect(config, isA<ChangeNotifier>());
     });
 
-    test('should create configuration with all parameters', () {
+    timedTest('should create configuration with all parameters', () {
       final config = Configuration(
         id: 'test-id',
         name: 'Test Config',
@@ -37,7 +40,7 @@ void main() {
       expect(config.order, equals(1));
     });
 
-    test('should convert to Firestore map correctly', () {
+    timedTest('should convert to Firestore map correctly', () {
       final config = Configuration(
         id: 'test-id',
         name: 'Test Config',
@@ -57,7 +60,7 @@ void main() {
       expect(firestoreMap.containsKey('id'), isFalse); // ID not included in Firestore
     });
 
-    test('should handle null values in toFirestore', () {
+    timedTest('should handle null values in toFirestore', () {
       final config = Configuration();
 
       final firestoreMap = config.toFirestore();
@@ -70,7 +73,7 @@ void main() {
       }));
     });
 
-    test('should allow mutable properties to be changed', () {
+    timedTest('should allow mutable properties to be changed', () {
       final config = Configuration(
         name: 'Original',
         active: true,
@@ -86,7 +89,7 @@ void main() {
       expect(config.order, equals(10));
     });
 
-    test('should not allow id to be changed after creation', () {
+    timedTest('should not allow id to be changed after creation', () {
       final config = Configuration(id: 'immutable-id');
       
       expect(config.id, equals('immutable-id'));

@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/fframe.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('Console Logger Tests', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('Console Logger Tests', () {
     // This list will capture the output of debugPrint.
     final List<String> capturedLogs = [];
 
@@ -25,7 +28,7 @@ void main() {
       capturedLogs.clear();
     });
 
-    test('should log messages at or above the "dev" threshold', () {
+    timedTest('should log messages at or above the "dev" threshold', () {
       // 1. Arrange
       Console(logThreshold: LogLevel.dev);
 
@@ -41,7 +44,7 @@ void main() {
       expect(capturedLogs.any((log) => log.contains('fframe message')), isFalse);
     });
 
-    test('should only log messages at the "prod" threshold', () {
+    timedTest('should only log messages at the "prod" threshold', () {
       // 1. Arrange
       Console(logThreshold: LogLevel.prod);
 
@@ -55,7 +58,7 @@ void main() {
       expect(capturedLogs.first, contains('prod message'));
     });
 
-    test('should log all levels when threshold is "fframe"', () {
+    timedTest('should log all levels when threshold is "fframe"', () {
       // 1. Arrange
       Console(logThreshold: LogLevel.fframe);
 

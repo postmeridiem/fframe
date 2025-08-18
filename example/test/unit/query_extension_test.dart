@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'unit_test_harness.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('Query StartsWith Extension Logic', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('Query StartsWith Extension Logic', () {
     setUp(() {
       setupUnitTests();
     });
 
-    test('should handle empty search term correctly', () {
+    timedTest('should handle empty search term correctly', () {
       // Test the logic that would be used in the extension
       const searchTerm = '';
       expect(searchTerm.isEmpty, isTrue);
@@ -18,7 +21,7 @@ void main() {
       // This is the core logic we can test
     });
 
-    test('should calculate correct end limit for single character', () {
+    timedTest('should calculate correct end limit for single character', () {
       const searchTerm = 'a';
       expect(searchTerm.isNotEmpty, isTrue);
       
@@ -32,7 +35,7 @@ void main() {
       expect(limit, equals('b')); // 'a' + 1 = 'b'
     });
 
-    test('should calculate correct end limit for multi-character search', () {
+    timedTest('should calculate correct end limit for multi-character search', () {
       const searchTerm = 'hello';
       
       final strFrontCode = searchTerm.substring(0, searchTerm.length - 1);
@@ -44,7 +47,7 @@ void main() {
       expect(limit, equals('hellp')); // 'hell' + ('o' + 1) = 'hellp'
     });
 
-    test('should handle case-sensitive searches correctly', () {
+    timedTest('should handle case-sensitive searches correctly', () {
       const searchTerm = 'Test';
       
       final strFrontCode = searchTerm.substring(0, searchTerm.length - 1);
@@ -56,7 +59,7 @@ void main() {
       expect(limit, equals('Tesu')); // 'Tes' + ('t' + 1) = 'Tesu'
     });
 
-    test('should handle special characters', () {
+    timedTest('should handle special characters', () {
       const searchTerm = 'test@';
       
       final strFrontCode = searchTerm.substring(0, searchTerm.length - 1);
@@ -68,7 +71,7 @@ void main() {
       expect(limit, equals('testA')); // @ (ASCII 64) + 1 = A (ASCII 65)
     });
 
-    test('should handle numeric characters', () {
+    timedTest('should handle numeric characters', () {
       const searchTerm = 'test123';
       
       final strFrontCode = searchTerm.substring(0, searchTerm.length - 1);
@@ -80,7 +83,7 @@ void main() {
       expect(limit, equals('test124')); // '3' + 1 = '4'
     });
 
-    test('should handle edge case with single character z', () {
+    timedTest('should handle edge case with single character z', () {
       const searchTerm = 'z';
       
       final strFrontCode = searchTerm.substring(0, searchTerm.length - 1);
@@ -92,7 +95,7 @@ void main() {
       expect(limit, equals('{')); // 'z' (ASCII 122) + 1 = '{' (ASCII 123)
     });
 
-    test('should work with unicode characters', () {
+    timedTest('should work with unicode characters', () {
       const searchTerm = 'café';
       
       final strFrontCode = searchTerm.substring(0, searchTerm.length - 1);

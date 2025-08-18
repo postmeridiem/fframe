@@ -3,14 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/fframe.dart';
 
 import 'unit_test_harness.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('NavigationTab', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('NavigationTab', () {
     setUp(() {
       setupUnitTests();
     });
 
-    test('should create navigation tab with required parameters', () {
+    timedTest('should create navigation tab with required parameters', () {
       Widget navigationLabel() => const Text('Tab');
       final destination = Destination(
         icon: const Icon(Icons.tab),
@@ -36,7 +39,7 @@ void main() {
       expect(tab.parentTarget, isNull);
     });
 
-    test('should create navigation tab with all parameters', () {
+    timedTest('should create navigation tab with all parameters', () {
       Widget navigationLabel() => const Text('Advanced Tab');
       final destination = Destination(
         icon: const Icon(Icons.settings_applications),
@@ -65,7 +68,7 @@ void main() {
       expect(tab.parentTarget, isNull);
     });
 
-    test('should allow setting parentTarget', () {
+    timedTest('should allow setting parentTarget', () {
       Widget navigationLabel() => const Text('Child Tab');
       final destination = Destination(
         icon: const Icon(Icons.child_care),
@@ -91,7 +94,7 @@ void main() {
       expect(tab.parentTarget, equals(parentTarget));
     });
 
-    test('should inherit from NavigationTarget', () {
+    timedTest('should inherit from NavigationTarget', () {
       Widget navigationLabel() => const Text('Inherited Tab');
       final destination = Destination(
         icon: const Icon(Icons.nature),

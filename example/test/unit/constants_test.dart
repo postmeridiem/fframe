@@ -2,22 +2,25 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fframe/constants/constants.dart';
 
 import 'unit_test_harness.dart';
+import '../helpers/test_timing.dart';
 
 void main() {
-  group('Constants', () {
+  setupTiming(TestType.unit);
+  
+  timedGroup('Constants', () {
     setUp(() {
       setupUnitTests();
     });
 
-    group('allClaims', () {
-      test('should contain user-related claims', () {
+    timedGroup('allClaims', () {
+      timedTest('should contain user-related claims', () {
         expect(allClaims.containsKey('userViewer'), isTrue);
         expect(allClaims.containsKey('userEditor'), isTrue);
         expect(allClaims['userViewer'], equals('Allow viewing of all registered users'));
         expect(allClaims['userEditor'], equals('Allow editing of all registered users'));
       });
 
-      test('should contain client-related claims', () {
+      timedTest('should contain client-related claims', () {
         expect(allClaims.containsKey('clientViewer'), isTrue);
         expect(allClaims.containsKey('clientEditor'), isTrue);
         expect(allClaims.containsKey('clientCreator'), isTrue);
@@ -26,7 +29,7 @@ void main() {
         expect(allClaims['clientCreator'], equals('Allow creating of a registered client'));
       });
 
-      test('should contain runConfig-related claims', () {
+      timedTest('should contain runConfig-related claims', () {
         expect(allClaims.containsKey('runConfigViewer'), isTrue);
         expect(allClaims.containsKey('runConfigEditor'), isTrue);
         expect(allClaims.containsKey('runConfigCreator'), isTrue);
@@ -35,7 +38,7 @@ void main() {
         expect(allClaims['runConfigCreator'], equals('Allow creating of a registered runConfig'));
       });
 
-      test('should contain run-related claims', () {
+      timedTest('should contain run-related claims', () {
         expect(allClaims.containsKey('runViewer'), isTrue);
         expect(allClaims.containsKey('runEditor'), isTrue);
         expect(allClaims.containsKey('runCreator'), isTrue);
@@ -44,48 +47,48 @@ void main() {
         expect(allClaims['runCreator'], equals('Allow creating of a registered run'));
       });
 
-      test('should not contain commented out userCreator claim', () {
+      timedTest('should not contain commented out userCreator claim', () {
         expect(allClaims.containsKey('userCreator'), isFalse);
       });
 
-      test('should have correct total number of claims', () {
+      timedTest('should have correct total number of claims', () {
         expect(allClaims.length, equals(11)); // Total claims excluding commented one
       });
     });
 
-    group('ScreenSize enum', () {
-      test('should contain all expected values', () {
+    timedGroup('ScreenSize enum', () {
+      timedTest('should contain all expected values', () {
         expect(ScreenSize.values, contains(ScreenSize.phone));
         expect(ScreenSize.values, contains(ScreenSize.tablet));
         expect(ScreenSize.values, contains(ScreenSize.large));
         expect(ScreenSize.values, contains(ScreenSize.unknown));
       });
 
-      test('should have correct number of values', () {
+      timedTest('should have correct number of values', () {
         expect(ScreenSize.values.length, equals(4));
       });
 
-      test('should allow comparison and equality', () {
+      timedTest('should allow comparison and equality', () {
         expect(ScreenSize.phone == ScreenSize.phone, isTrue);
         expect(ScreenSize.phone == ScreenSize.tablet, isFalse);
         expect(ScreenSize.tablet != ScreenSize.large, isTrue);
       });
     });
 
-    group('lanePositionIncrement', () {
-      test('should have correct value', () {
+    timedGroup('lanePositionIncrement', () {
+      timedTest('should have correct value', () {
         expect(lanePositionIncrement, equals(1000.0));
       });
 
-      test('should be a double', () {
+      timedTest('should be a double', () {
         expect(lanePositionIncrement, isA<double>());
       });
 
-      test('should be positive', () {
+      timedTest('should be positive', () {
         expect(lanePositionIncrement, greaterThan(0));
       });
 
-      test('should provide reasonable spacing for reordering', () {
+      timedTest('should provide reasonable spacing for reordering', () {
         // Test the concept behind the value - providing space for reordering
         expect(lanePositionIncrement, greaterThan(100)); // Should be large enough
         expect(lanePositionIncrement % 100, equals(0)); // Should be a round number
