@@ -227,7 +227,7 @@ class _FRouterLoaderState extends State<FRouterLoader> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.userChanges(),
+      stream: FirebaseAuth.instance.authStateChanges(),
       initialData: null,
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (!snapshot.hasData) {
