@@ -103,14 +103,29 @@ class ListGridColumn<T> {
     this.onTableCellClick,
     // this.dynamicTextStyle,
     // this.dynamicBackgroundColor,
-  });
+  }) : assert(
+          (searchable == false && sortable == false) || fieldName != null,
+          'fieldName must be provided if a column is searchable or sortable.',
+        );
 
   String label;
   bool visible;
-  String? fieldName;
-  bool searchable;
+
+  /// The name of the field in the Firestore document.
+  ///
+  /// This is required if [searchable] or [sortable] is set to `true`.
+  final String? fieldName;
+
+  /// Whether this column can be searched.
+  ///
+  /// If `true`, [fieldName] must be provided.
+  final bool searchable;
   ListGridSearchMask? searchMask;
-  bool sortable;
+
+  /// Whether this column can be sorted.
+  ///
+  /// If `true`, [fieldName] must be provided.
+  final bool sortable;
   bool descending;
   ListGridColumnSizingMode columnSizing;
   double columnWidth;
