@@ -45,7 +45,7 @@ class Validator {
     // Starting with "http://" or "https://" is mandatory.
     if (rawvalue != null && rawvalue.isNotEmpty) {
       final urlRegex = RegExp(
-        r"^(?:http:\/\/|https:\/\/)(?:[\w-]+\.)*[\w-]+(?:\/[\w\-\._~:/?#[\]@!\$&'()*+,;=.]*)?$",
+        r"^(?:http:\/\/|https:\/\/)(?:[\w-]+\.)*[\w-]+(?:\/[\w\-\._~:/?#[\]@!\$&'()*+,;=.%]*)?$",
         caseSensitive: false,
       );
       if (urlRegex.hasMatch(rawvalue)) {
