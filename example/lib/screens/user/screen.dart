@@ -51,6 +51,9 @@ class _UsersScreenState extends State<UsersScreen> {
       // Optional ListGrid widget
       viewType: ViewType.listgrid,
       listGrid: ListGridConfig<AppUser>(
+        // Use client-side filtering to perform a "contains" search.
+        // The default behavior is a "startsWith" search.
+        searchAsContains: true,
         searchHint: "Search user name",
         columnSettings: listGridColumns,
       ),
