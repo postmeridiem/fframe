@@ -257,12 +257,40 @@ class ListGridEndless<T> extends StatefulWidget {
 class _ListGridEndlessState<T> extends State<ListGridEndless<T>> {
   @override
   Widget build(BuildContext context) {
+    List<DocumentSnapshot<T>> docs = widget.queryBuilderSnapshot.docs;
+
+    // Client-side filtering for 'searchAsContains' functionality.
+    // When `searchAsContains` is true, the Firestore query fetches all documents
+    // (or a broad subset), and this logic performs the "contains" check on the
+    // client. It iterates through each document's searchable columns, gets the
+    // value using the `valueBuilder`, and checks if the string representation
+    // of that value contains the search term.
+    if (widget.listGridController.listGridConfig.searchAsContains && widget.listGridController.notifier.searchString != null && widget.listGridController.notifier.searchString!.isNotEmpty) {
+      final String searchTerm = widget.listGridController.notifier.searchString!.toLowerCase();
+      docs = docs.where((doc) {
+        final T? data = doc.data();
+        if (data == null) return false;
+
+        // Iterate over searchable columns to check for a match
+        final List<ListGridColumn<T>> searchableColumns = widget.listGridController.columnSettings.where((c) => c.searchable).cast<ListGridColumn<T>>().toList();
+        for (final column in searchableColumns) {
+          if (column.valueBuilder != null) {
+            final dynamic value = column.valueBuilder!(context, data);
+            if (value != null && value.toString().toLowerCase().contains(searchTerm)) {
+              return true;
+            }
+          }
+        }
+        return false; // No match found in any searchable column
+      }).toList();
+    }
+
     final ScrollController verticalScroll = ScrollController();
     return Scrollbar(
       controller: verticalScroll,
       thumbVisibility: true,
       child: ListView.separated(
-        itemCount: widget.queryBuilderSnapshot.docs.length,
+        itemCount: docs.length,
         scrollDirection: Axis.vertical,
         reverse: false,
         controller: verticalScroll,
@@ -285,12 +313,12 @@ class _ListGridEndlessState<T> extends State<ListGridEndless<T>> {
           return const IgnorePointer();
         },
         itemBuilder: (context, index) {
-          final isLastItem = index + 1 == widget.queryBuilderSnapshot.docs.length;
+          final isLastItem = index + 1 == docs.length;
           if (isLastItem && widget.queryBuilderSnapshot.hasMore) {
             widget.queryBuilderSnapshot.fetchMore();
           }
 
-          final DocumentSnapshot<T> documentSnapshot = widget.queryBuilderSnapshot.docs[index];
+          final DocumentSnapshot<T> documentSnapshot = docs[index];
 
           final SelectedDocument<T> selectedDocument = SelectedDocument(
             id: documentSnapshot.id,

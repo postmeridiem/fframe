@@ -21,6 +21,7 @@ class ListGridConfig<T> extends ListConfig {
     this.hideListOnDocumentOpen = false,
     this.openDocumentOnClick = true,
     this.searchHint,
+    this.searchAsContains = false,
     this.actionBar = const [],
   });
 
@@ -46,6 +47,12 @@ class ListGridConfig<T> extends ListConfig {
   final bool hideListOnDocumentOpen;
   final bool openDocumentOnClick;
   final String? searchHint;
+
+  /// Determines the search behavior for the list grid.
+  ///
+  /// If `true`, the search will filter items that contain the search string.
+  /// If `false` (default), it will filter for items that start with the search string.
+  final bool searchAsContains;
   final List<ListGridActionMenu<T>> actionBar;
 }
 

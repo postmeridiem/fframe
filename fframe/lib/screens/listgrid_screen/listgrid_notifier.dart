@@ -1,6 +1,6 @@
 import 'package:fframe/extensions/extensions.dart';
 import 'package:flutter/foundation.dart';
-import 'package:fframe/fframe.dart'; 
+import 'package:fframe/fframe.dart';
 
 class ListGridNotifier<T> extends ChangeNotifier {
   ListGridNotifier({
@@ -129,7 +129,13 @@ class ListGridNotifier<T> extends ChangeNotifier {
               String fieldName = curColumn.fieldName!;
               outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
               if (curColumn.searchMask == null) {
-                outputQuery = outputQuery.startsWith(fieldName, curSearch);
+                // For a "startsWith" search, apply the filter directly to the query.
+                // When 'searchAsContains' is true, this is skipped, and the
+                // filtering is handled on the client-side in `ListGridEndless`
+                // to allow for a "contains" check.
+                if (_listGridConfig != null && !_listGridConfig!.searchAsContains) {
+                  outputQuery = outputQuery.startsWith(fieldName, curSearch);
+                }
               } else {
                 if (curColumn.searchMask!.toLowerCase) {
                   curSearch = curSearch.toLowerCase();
