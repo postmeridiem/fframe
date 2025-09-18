@@ -38,6 +38,13 @@ class ListGridNotifier<T> extends ChangeNotifier {
       'Multiple searchable columns are only supported when `searchAsContains` is true. Please enable `searchAsContains` in ListGridConfig or mark only one column as searchable.',
     );
 
+    if (_listGridConfig!.searchAsContains) {
+      // When 'searchAsContains' is enabled, all documents are fetched upfront
+      // to support client-side "contains" filtering. This is necessary because
+      // Firestore does not support native "contains" queries.
+      _prefetchDocuments(_initialQuery as Query<T>);
+    }
+
     // initialize the current query, based on sorting and settings
     _queryBuilder();
 
@@ -63,6 +70,16 @@ class ListGridNotifier<T> extends ChangeNotifier {
   late List<ListGridColumn<T>> _columnSettings;
   late int? sortedColumnIndex;
   final List<SelectedDocument<T>> _selectedDocuments = [];
+
+  /// A cache of all documents for the initial query.
+  ///
+  /// This is populated when `searchAsContains` is true, allowing for
+  /// client-side filtering across the entire dataset without repeated
+  /// database queries. It is null if `searchAsContains` is false.
+  List<QueryDocumentSnapshot<T>>? _prefetchedDocs;
+
+  /// Getter for the cached documents.
+  List<QueryDocumentSnapshot<T>>? get prefetchedDocs => _prefetchedDocs;
   Timer? _debounce;
 
   String? get searchString {
@@ -237,6 +254,23 @@ class ListGridNotifier<T> extends ChangeNotifier {
     AggregateQuerySnapshot snapshot = await query.count().get();
     int collectionCount = snapshot.count!;
     _collectionCount = collectionCount;
+  }
+
+  /// Fetches all documents from the given [query] and stores them in
+  /// [_prefetchedDocs].
+  ///
+  /// This method is called when `searchAsContains` is true to load the entire
+  /// dataset into memory for client-side searching. It notifies listeners
+  /// upon completion or if an error occurs.
+  Future<void> _prefetchDocuments(Query<T> query) async {
+    try {
+      final snapshot = await query.get();
+      _prefetchedDocs = snapshot.docs;
+      Console.log("Pre-fetched ${_prefetchedDocs?.length ?? 0} documents for client-side search.", scope: "fframeLog.ListGridNotifier", level: LogLevel.fframe);
+    } catch (e) {
+      Console.log("Error pre-fetching documents: $e");
+    }
+    notifyListeners(); // Notify that prefetched data is available or an error occurred.
   }
 
   void update() {

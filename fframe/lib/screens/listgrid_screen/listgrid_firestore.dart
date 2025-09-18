@@ -132,38 +132,53 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                                         ),
                                         child: Container(
                                           color: (Fframe.of(context)!.getSystemThemeMode == ThemeMode.dark) ? Colors.black.withOpacity(0.2) : Colors.white.withOpacity(0.2),
-                                          child: FirestoreQueryBuilder<T>(
-                                            pageSize: listGridController.dataMode.limit,
-                                            query: listGridNotifier.currentQuery,
-                                            builder: (
-                                              BuildContext context,
-                                              FirestoreQueryBuilderSnapshot<T> queryBuilderSnapshot,
-                                              Widget? child,
-                                            ) {
-                                              return SizedBox(
-                                                width: listGridController.calculatedWidth,
-                                                child: queryBuilderSnapshot.hasError
-                                                    ? Card(
-                                                        child: Center(
-                                                          child: SizedBox(
-                                                            width: 500,
-                                                            height: double.infinity,
-                                                            child: Padding(
-                                                              padding: const EdgeInsets.all(40.0),
-                                                              child: SelectableText(
-                                                                "error ${queryBuilderSnapshot.error}",
+                                          // Conditionally render the list based on the search mode.
+                                          // If `searchAsContains` is true, we use the pre-fetched documents.
+                                          // Otherwise, we use the standard paginated `FirestoreQueryBuilder`.
+                                          child: SizedBox(
+                                              width: listGridController.calculatedWidth,
+                                              child: listGridController.listGridConfig.searchAsContains
+                                                  // For client-side search, wait for pre-fetched docs to be loaded.
+                                                  ? (listGridNotifier.prefetchedDocs == null
+                                                      ? const Center(child: CircularProgressIndicator())
+                                                      : ListGridEndless<T>(
+                                                          prefetchedDocs: listGridNotifier.prefetchedDocs,
+                                                          listGridController: listGridController,
+                                                        ))
+                                                  // For server-side search (the default), use FirestoreQueryBuilder for pagination.
+                                                  : FirestoreQueryBuilder<T>(
+                                                      pageSize: listGridController.dataMode.limit,
+                                                      query: listGridNotifier.currentQuery,
+                                                      builder: (
+                                                        BuildContext context,
+                                                        FirestoreQueryBuilderSnapshot<T> queryBuilderSnapshot,
+                                                        Widget? child,
+                                                      ) {
+                                                        if (queryBuilderSnapshot.hasError) {
+                                                          return Card(
+                                                            child: Center(
+                                                              child: SizedBox(
+                                                                width: 500,
+                                                                height: double.infinity,
+                                                                child: Padding(
+                                                                  padding: const EdgeInsets.all(40.0),
+                                                                  child: SelectableText(
+                                                                    "error ${queryBuilderSnapshot.error}",
+                                                                  ),
+                                                                ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ),
-                                                      )
-                                                    : ListGridEndless<T>(
-                                                        queryBuilderSnapshot: queryBuilderSnapshot,
-                                                        listGridController: listGridController,
-                                                      ),
-                                              );
-                                            },
-                                          ),
+                                                          );
+                                                        }
+                                                        if (queryBuilderSnapshot.isFetching) {
+                                                          return const Center(child: CircularProgressIndicator());
+                                                        }
+                                                        return ListGridEndless<T>(
+                                                          queryBuilderSnapshot: queryBuilderSnapshot,
+                                                          listGridController: listGridController,
+                                                        );
+                                                      },
+                                                    )),
                                         ),
                                       ),
                                     ),
@@ -242,12 +257,23 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
 class ListGridEndless<T> extends StatefulWidget {
   const ListGridEndless({
     super.key,
-    required this.queryBuilderSnapshot,
+    this.queryBuilderSnapshot,
+    this.prefetchedDocs,
     required this.listGridController,
-  });
+  }) : assert(queryBuilderSnapshot != null || prefetchedDocs != null);
 
-  // the configuration that was provided
-  final FirestoreQueryBuilderSnapshot<T> queryBuilderSnapshot;
+  /// The snapshot from `FirestoreQueryBuilder` for paginated data.
+  ///
+  /// This is used when `searchAsContains` is `false`.
+  final FirestoreQueryBuilderSnapshot<T>? queryBuilderSnapshot;
+
+  /// A list of all documents fetched upfront.
+  ///
+  /// This is used when `searchAsContains` is `true` to enable client-side
+  /// "contains" filtering on the entire collection.
+  final List<QueryDocumentSnapshot<T>>? prefetchedDocs;
+
+  /// The controller that holds the configuration and state for the grid.
   final ListGridController listGridController;
 
   @override
@@ -257,7 +283,15 @@ class ListGridEndless<T> extends StatefulWidget {
 class _ListGridEndlessState<T> extends State<ListGridEndless<T>> {
   @override
   Widget build(BuildContext context) {
-    List<DocumentSnapshot<T>> docs = widget.queryBuilderSnapshot.docs;
+    List<DocumentSnapshot<T>> docs;
+    // Determine the source of documents based on the search configuration.
+    // If `searchAsContains` is true, use the pre-fetched list. Otherwise, use
+    // the paginated list from the query snapshot.
+    if (widget.listGridController.listGridConfig.searchAsContains) {
+      docs = widget.prefetchedDocs!;
+    } else {
+      docs = widget.queryBuilderSnapshot!.docs;
+    }
 
     // Client-side filtering for 'searchAsContains' functionality.
     // When `searchAsContains` is true, the Firestore query fetches all documents
@@ -265,7 +299,8 @@ class _ListGridEndlessState<T> extends State<ListGridEndless<T>> {
     // client. It iterates through each document's searchable columns, gets the
     // value using the `valueBuilder`, and checks if the string representation of
     // that value contains the search term. This supports searching across
-    // multiple fields simultaneously.
+    // multiple fields simultaneously. This filtering is now done on the complete
+    // prefetched list of documents.
     if (widget.listGridController.listGridConfig.searchAsContains && widget.listGridController.notifier.searchString != null && widget.listGridController.notifier.searchString!.isNotEmpty) {
       final String searchTerm = widget.listGridController.notifier.searchString!.toLowerCase();
       // Get searchable columns once, outside the loop for efficiency.
@@ -314,8 +349,10 @@ class _ListGridEndlessState<T> extends State<ListGridEndless<T>> {
         },
         itemBuilder: (context, index) {
           final isLastItem = index + 1 == docs.length;
-          if (isLastItem && widget.queryBuilderSnapshot.hasMore) {
-            widget.queryBuilderSnapshot.fetchMore();
+          // When not using pre-fetched data, check if more documents can be
+          // fetched for infinite scrolling.
+          if (widget.queryBuilderSnapshot != null && isLastItem && widget.queryBuilderSnapshot!.hasMore) {
+            widget.queryBuilderSnapshot!.fetchMore();
           }
 
           final DocumentSnapshot<T> documentSnapshot = docs[index];
