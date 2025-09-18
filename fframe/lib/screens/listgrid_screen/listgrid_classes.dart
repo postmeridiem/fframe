@@ -50,14 +50,16 @@ class ListGridConfig<T> extends ListConfig {
 
   /// Determines the search behavior for the list grid.
   ///
-  /// If `true`, the search will filter items that contain the search string.
-  /// This is performed client-side, which may impact performance on large
-  /// datasets as it requires fetching documents before filtering. This approach
-  /// is necessary because Firestore does not natively support "contains"
-  /// queries on text fields.
+  /// If `true`, the search will filter items that contain the search string
+  /// across all columns marked as `searchable`. This is performed client-side,
+  /// which may impact performance on large datasets as it requires fetching
+  /// documents before filtering. This approach is necessary because Firestore
+  /// does not natively support "contains" queries on text fields.
   ///
   /// If `false` (default), it will filter for items that start with the search
-  /// string, which is a more performant, server-side query.
+  /// string. This is a more performant, server-side query, but it only works
+  /// on a single column (the first one encountered in `columnSettings` that is
+  /// marked as `searchable`).
   final bool searchAsContains;
   final List<ListGridActionMenu<T>> actionBar;
 }

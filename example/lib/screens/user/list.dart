@@ -33,6 +33,8 @@ List<ListGridColumn<AppUser>> listGridColumns = [
   ),
   ListGridColumn(
     label: "Email",
+    fieldName: "email",
+    searchable: true,
     columnSizing: ListGridColumnSizingMode.fixed,
     columnWidth: 400,
     generateTooltip: true,
@@ -80,20 +82,19 @@ class UserListItem extends StatelessWidget {
   final FFrameUser? fFrameUser;
   @override
   Widget build(BuildContext context) {
-    List<String>? avatarText = user.displayName
-        ?.split(' ')
-        .map((part) => part.trim().substring(0, 1))
-        .toList();
+    List<String>? avatarText = user.displayName?.split(' ').map((part) => part.trim().substring(0, 1)).toList();
     return ListTile(
       mouseCursor: SystemMouseCursors.click,
       selected: selected,
       leading: (avatarText != null || user.photoURL != null)
           ? CircleAvatar(
               radius: 18.0,
-              backgroundImage:
-                  (user.photoURL == null) ? null : NetworkImage(user.photoURL!),
-              backgroundColor:
-                  (user.photoURL == null) ? Colors.amber : Colors.transparent,
+              backgroundImage: (user.photoURL == null)
+                  ? null
+                  : NetworkImage(
+                      user.photoURL!,
+                    ),
+              backgroundColor: (user.photoURL == null) ? Colors.amber : Colors.transparent,
               child: (user.photoURL == null && avatarText != null)
                   ? Text(
                       "${avatarText.first}${avatarText.last}",

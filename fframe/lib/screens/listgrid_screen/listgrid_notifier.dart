@@ -32,6 +32,11 @@ class ListGridNotifier<T> extends ChangeNotifier {
       }
     }
 
+    assert(
+      _listGridConfig!.searchAsContains || searchableColumns.length <= 1,
+      'Multiple searchable columns are only supported when `searchAsContains` is true. Please enable `searchAsContains` in ListGridConfig or mark only one column as searchable.',
+    );
+
     // initialize the current query, based on sorting and settings
     _queryBuilder();
 
@@ -92,62 +97,40 @@ class ListGridNotifier<T> extends ChangeNotifier {
     } else {
       if (searchableColumns.isNotEmpty) {
         if (searchString != null && searchString!.isNotEmpty) {
+          // A search string is present.
           Console.log("fframeLog.ListGridNotifier: searching for: $searchString");
-          if (searchableColumns.length > 1) {
-            //TODO JPM: make multiple columns supported
-            Console.log("fframeLog.ListGridNotifier: ERROR: Multiple searchable columns not supported at this time. Please adjust configuration");
-            // List<Filter> currentFilters = [];
-            // for (int searchableColumnIndex in searchableColumns) {
-            //   String curSearch = searchString!;
-            //   ListGridColumn curColumn = _columnSettings[searchableColumnIndex];
-            //   if (curColumn.fieldName != null) {
-            //     String fieldName = curColumn.fieldName!;
-            //     outputQuery = outputQuery.orderBy(fieldName,
-            //         descending: curColumn.descending);
-            //     if (curColumn.searchMask != null) {
-            //       if (curColumn.searchMask!.toLowerCase) {
-            //         curSearch = curSearch.toLowerCase();
-            //       }
-            //       curSearch = curSearch.replaceAll(
-            //         curColumn.searchMask!.from,
-            //         curColumn.searchMask!.to,
-            //       );
-            //     }
-            //     currentFilters.add(Filter(fieldName, isEqualTo: curSearch));
-            //     outputQuery = outputQuery.startsWith(
-            //       fieldName,
-            //       curSearch,
-            //     );
-            //   }
-            //   outputQuery = outputQuery
-            //       .where(Filter.or(currentFilters[0], currentFilters[1]));
-            // }
-          } else {
-            if (_columnSettings[searchableColumns.first].fieldName != null) {
-              String curSearch = searchString!;
-              ListGridColumn curColumn = _columnSettings[searchableColumns.first];
-              String fieldName = curColumn.fieldName!;
-              outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
-              if (curColumn.searchMask == null) {
-                // For a "startsWith" search, apply the filter directly to the query.
-                // When 'searchAsContains' is true, this is skipped, and the
-                // filtering is handled on the client-side in `ListGridEndless`
-                // to allow for a "contains" check.
-                if (_listGridConfig != null && !_listGridConfig!.searchAsContains) {
-                  outputQuery = outputQuery.startsWith(fieldName, curSearch);
-                }
-              } else {
-                if (curColumn.searchMask!.toLowerCase) {
-                  curSearch = curSearch.toLowerCase();
-                }
-                outputQuery = outputQuery.startsWith(
-                  fieldName,
-                  curSearch.replaceAll(
-                    curColumn.searchMask!.from,
-                    curColumn.searchMask!.to,
-                  ),
-                );
+
+          // For server-side searches (`startsWith`), Firestore requires the query to be
+          // ordered by the same field used in the range filter. We use the first
+          // available searchable column as the primary one for this purpose.
+          // The assertion in the constructor ensures that for server-side searches,
+          // there is only one searchable column configured.
+          final ListGridColumn primarySearchColumn = _columnSettings[searchableColumns.first];
+
+          if (primarySearchColumn.fieldName != null) {
+            String curSearch = searchString!;
+            String fieldName = primarySearchColumn.fieldName!;
+            outputQuery = outputQuery.orderBy(fieldName, descending: primarySearchColumn.descending);
+
+            if (primarySearchColumn.searchMask == null) {
+              // For a "startsWith" search, apply the filter directly to the query.
+              // When 'searchAsContains' is true, this is skipped. The filtering is handled on the client-side
+              // in `ListGridEndless`, which allows for checking multiple columns.
+              if (_listGridConfig != null && !_listGridConfig!.searchAsContains) {
+                outputQuery = outputQuery.startsWith(fieldName, curSearch);
               }
+            } else {
+              // Apply search mask if one is configured.
+              if (primarySearchColumn.searchMask!.toLowerCase) {
+                curSearch = curSearch.toLowerCase();
+              }
+              outputQuery = outputQuery.startsWith(
+                fieldName,
+                curSearch.replaceAll(
+                  primarySearchColumn.searchMask!.from,
+                  primarySearchColumn.searchMask!.to,
+                ),
+              );
             }
           }
         } else {
