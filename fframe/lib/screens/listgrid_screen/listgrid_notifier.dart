@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:fframe/extensions/extensions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:fframe/fframe.dart';
@@ -62,19 +63,29 @@ class ListGridNotifier<T> extends ChangeNotifier {
   late List<ListGridColumn<T>> _columnSettings;
   late int? sortedColumnIndex;
   final List<SelectedDocument<T>> _selectedDocuments = [];
+  Timer? _debounce;
 
   String? get searchString {
     return _searchString;
   }
 
+  /// Sets the search string for filtering the list.
+  ///
+  /// To prevent performance issues with rapid typing, this setter uses a
+  /// debouncing mechanism. It waits for a 300ms pause in user input
+  /// before triggering the `_queryBuilder` to re-filter the data. This ensures
+  /// that the filtering logic doesn't run on every keystroke, providing a
+  /// smoother user experience, especially with large datasets.
   set searchString(String? searchString) {
-    //TODO JPM: add some kind of rate limiting
-    if (searchString != null && searchString.isNotEmpty) {
-      _searchString = searchString;
-    } else {
-      _searchString = null;
-    }
-    _queryBuilder();
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      if (searchString != null && searchString.isNotEmpty) {
+        _searchString = searchString;
+      } else {
+        _searchString = null;
+      }
+      _queryBuilder();
+    });
   }
 
   void _queryBuilder() {
