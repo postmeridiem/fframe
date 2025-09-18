@@ -263,16 +263,16 @@ class _ListGridEndlessState<T> extends State<ListGridEndless<T>> {
     // When `searchAsContains` is true, the Firestore query fetches all documents
     // (or a broad subset), and this logic performs the "contains" check on the
     // client. It iterates through each document's searchable columns, gets the
-    // value using the `valueBuilder`, and checks if the string representation
-    // of that value contains the search term.
+    // value using the `valueBuilder`, and checks if the string representation of
+    // that value contains the search term. This supports searching across
+    // multiple fields simultaneously.
     if (widget.listGridController.listGridConfig.searchAsContains && widget.listGridController.notifier.searchString != null && widget.listGridController.notifier.searchString!.isNotEmpty) {
       final String searchTerm = widget.listGridController.notifier.searchString!.toLowerCase();
+      // Get searchable columns once, outside the loop for efficiency.
+      final List<ListGridColumn<T>> searchableColumns = widget.listGridController.columnSettings.where((c) => c.searchable).cast<ListGridColumn<T>>().toList();
       docs = docs.where((doc) {
         final T? data = doc.data();
         if (data == null) return false;
-
-        // Iterate over searchable columns to check for a match
-        final List<ListGridColumn<T>> searchableColumns = widget.listGridController.columnSettings.where((c) => c.searchable).cast<ListGridColumn<T>>().toList();
         for (final column in searchableColumns) {
           if (column.valueBuilder != null) {
             final dynamic value = column.valueBuilder!(context, data);
