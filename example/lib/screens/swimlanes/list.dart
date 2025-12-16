@@ -48,14 +48,16 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
   ),
   // Example of creating a new card
   SwimlaneSetting(
+    openNewCard: true,
     allowCardCreation: true,
     onNewCard: (laneId, _, priority) {
-      return Suggestion(
-        name: "New card",
-        status: laneId,
-        priority: priority ?? 5.0,
-        active: true,
-      );
+      return Suggestion(name: "New card", status: laneId, priority: priority ?? 5.0, active: true);
+    },
+    onCardCreated: (documentId, data) {
+      // Optional: Add custom logic after a card is created.
+      // For example, you could navigate to a specific URL
+      // or show a confirmation dialog.
+      Console.log("New card created with ID: $documentId");
     },
     id: "inProgress",
     header: "In Progress",

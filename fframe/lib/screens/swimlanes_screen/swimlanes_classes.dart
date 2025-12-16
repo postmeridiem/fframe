@@ -140,7 +140,9 @@ class SwimlaneSetting<T> {
     this.cardControlsBuilder,
     this.allowCardCreation = false,
     this.onNewCard,
+    this.onCardCreated,
     this.addCardButtonStyle,
+    this.openNewCard = false,
   }) : assert(
           allowCardCreation == false || onNewCard != null,
           "Configuration error in SwimlaneSetting: 'onNewCard' must be provided when 'allowCardCreation' is true.",
@@ -179,10 +181,33 @@ class SwimlaneSetting<T> {
   /// This is required if [allowCardCreation] is `true`.
   final T Function(String laneId, double? lanePosition, double? priority)? onNewCard;
 
+  /// Callback executed after a new card is successfully created.
+  ///
+  /// It receives the `documentId` and the `data` of the new card.
+  /// This can be used for custom logic, like opening a new URL that
+  /// directly navigates to the newly created card.
+  ///
+  /// Example:
+  /// ```dart
+  /// onCardCreated: (documentId, data) {
+  ///   Fframe.of(context).navigateTo('/suggestions/$documentId');
+  /// }
+  /// ```
+  final void Function(String documentId, T data)? onCardCreated;
+
   /// Custom [ButtonStyle] for the "Add a card" button.
   ///
   /// If not provided, a default style will be used.
   final ButtonStyle? addCardButtonStyle;
+
+  /// Whether to automatically open the newly created card within the app.
+  ///
+  /// When set to `true`, after a new card is created, it will be
+  /// automatically opened in the document view. This provides a quick way for
+  /// users to start editing the new card right away.
+  ///
+  /// Defaults to `false`.
+  final bool openNewCard;
   late int? swimlaneIndex;
   late bool hasAccess = false;
 }

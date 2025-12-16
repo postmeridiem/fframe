@@ -637,7 +637,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
               minimumSize: const Size(double.infinity, 40),
               foregroundColor: widget.swimlanesController.taskCardTextColor,
             ),
-        onPressed: () {
+        onPressed: () async {
           double? newLanePosition;
           double? newPriority;
 
@@ -665,13 +665,25 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
             newPriority,
           );
 
-          DatabaseService<T>().createDocument(
+          final newDocId = DatabaseService<T>().generateDocId(collection: widget.documentConfig.collection);
+          final SaveState saveResult = await DatabaseService<T>().createDocument(
             collection: widget.documentConfig.collection,
-            documentId: FirebaseFirestore.instance.collection(widget.documentConfig.collection).doc().id,
+            documentId: newDocId,
             data: newCardData,
             fromFirestore: widget.documentConfig.fromFirestore,
             toFirestore: widget.documentConfig.toFirestore,
           );
+
+          if (saveResult.result) {
+            widget.swimlaneSetting.onCardCreated?.call(newDocId, newCardData);
+
+            if (widget.swimlaneSetting.openNewCard) {
+              SelectedDocument.load<T>(
+                documentConfig: widget.documentConfig,
+                id: newDocId,
+              );
+            }
+          }
         },
       ),
     );
