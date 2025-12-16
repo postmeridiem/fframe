@@ -628,7 +628,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
   Widget _buildAddCardButton(List<SelectedDocument<T>> selectedDocuments) {
     final swimlanesConfig = widget.swimlanesConfig;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      padding: const EdgeInsets.all(8.0),
       child: OutlinedButton.icon(
         icon: const Icon(Icons.add),
         label: const Text("Add a card"),
@@ -777,11 +777,11 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                         ),
                       ),
                     ),
-                    child: (selectedDocuments.isEmpty && !swimlanesConfig.isReadOnly)
-                        ? Column(
-                            children: [
-                              Expanded(
-                                child: SwimlaneDropZone(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: (selectedDocuments.isEmpty && !swimlanesConfig.isReadOnly)
+                              ? SwimlaneDropZone(
                                   swimlanesController: widget.swimlanesController,
                                   swimlanesConfig: swimlanesConfig,
                                   fFrameUser: widget.fFrameUser,
@@ -789,206 +789,199 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                   swimlaneSetting: widget.swimlaneSetting,
                                   priority: 1.0,
                                   lanePosition: lanePositionIncrement,
-                                ),
-                              ),
-                              if (showAddButton) _buildAddCardButton(selectedDocuments),
-                            ],
-                          )
-                        : ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: (swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2) + (showAddButton ? 1 : 0),
-                            itemBuilder: (context, index) {
-                              if (snapshot.hasMore && index + 1 == snapshot.docs.length) {
-                                // Tell FirestoreQueryBuilder to try to obtain more items.
-                                // It is safe to call this function from within the build method.
-                                snapshot.fetchMore();
-                              }
+                                )
+                              : ListView.builder(
+                                  itemCount: (swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2),
+                                  itemBuilder: (context, index) {
+                                    if (snapshot.hasMore && index + 1 == snapshot.docs.length) {
+                                      // Tell FirestoreQueryBuilder to try to obtain more items.
+                                      // It is safe to call this function from within the build method.
+                                      snapshot.fetchMore();
+                                    }
 
-                              final int listEndIndex = swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2;
-                              if (index == listEndIndex) {
-                                // This index is for the button at the end of the list.
-                                return _buildAddCardButton(selectedDocuments);
-                              }
-
-                              // Return only task cards if the swimlanes are read-only
-                              if (swimlanesConfig.isReadOnly) {
-                                return Column(
-                                  children: [
-                                    Builder(builder: (context) {
-                                      return SwimlanesTaskCard<T>(
-                                        selectedDocument: selectedDocuments[index],
-                                        swimlanesController: widget.swimlanesController,
-                                        swimlanesConfig: swimlanesConfig,
-                                        color: widget.swimlanesController.taskCardColor,
-                                        fFrameUser: widget.fFrameUser,
-                                        width: swimlanesConfig.swimlaneWidth,
+                                    // Return only task cards if the swimlanes are read-only
+                                    if (swimlanesConfig.isReadOnly) {
+                                      return Column(
+                                        children: [
+                                          Builder(builder: (context) {
+                                            return SwimlanesTaskCard<T>(
+                                              selectedDocument: selectedDocuments[index],
+                                              swimlanesController: widget.swimlanesController,
+                                              swimlanesConfig: swimlanesConfig,
+                                              color: widget.swimlanesController.taskCardColor,
+                                              fFrameUser: widget.fFrameUser,
+                                              width: swimlanesConfig.swimlaneWidth,
+                                            );
+                                          }),
+                                          if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
+                                            const Center(
+                                              child: CircularProgressIndicator(),
+                                            )
+                                        ],
                                       );
-                                    }),
-                                    if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
-                                      const Center(
-                                        child: CircularProgressIndicator(),
-                                      )
-                                  ],
-                                );
-                              }
+                                    }
 
-                              // Calculate index in the original documents list
-                              int docIndex = index ~/ 2;
-                              final selectedDocument = selectedDocuments[docIndex];
+                                    // Calculate index in the original documents list
+                                    int docIndex = index ~/ 2;
+                                    final selectedDocument = selectedDocuments[docIndex];
 
-                              // int? nextPriority = isNextPriority(selectedDocuments, docIndex);
+                                    // int? nextPriority = isNextPriority(selectedDocuments, docIndex);
 
-                              GlobalKey dragKey = GlobalKey();
-                              if (index.isEven) {
-                                final DragContext<T> dragContext = DragContext<T>(
-                                  sourceColumn: widget.swimlaneSetting,
-                                  selectedDocument: selectedDocument,
-                                  dragKey: dragKey,
-                                  buildContext: context,
-                                );
-
-                                double? topDropZoneLanePosition;
-                                if (index == 0) {
-                                  if (swimlanesConfig.getLanePosition != null) {
-                                    // Calculate lane position for the 1st drop zone
-                                    double firstDocPos = swimlanesConfig.getLanePosition!(selectedDocument.data);
-                                    topDropZoneLanePosition = firstDocPos / 2.0;
-                                  } else {
-                                    // Fallback to a default starting value if getLanePosition is null
-                                    topDropZoneLanePosition = lanePositionIncrement / 2.0;
-                                  }
-                                }
-
-                                return Column(
-                                  children: [
-                                    if (index == 0)
-                                      // Insert drop zone for the top of the lane
-                                      SwimlaneDropZone(
-                                        swimlanesController: widget.swimlanesController,
-                                        swimlanesConfig: swimlanesConfig,
-                                        fFrameUser: widget.fFrameUser,
-                                        width: swimlanesConfig.swimlaneWidth,
-                                        swimlaneSetting: widget.swimlaneSetting,
-                                        priority: 1.0,
-                                        lanePosition: topDropZoneLanePosition,
-                                      ),
-                                    // if (nextPriority != null)
-                                    //   Padding(
-                                    //     padding: const EdgeInsets.all(8.0),
-                                    //     child: Stack(
-                                    //       alignment: AlignmentDirectional.centerStart,
-                                    //       children: [
-                                    //         const Divider(),
-                                    //         CircleAvatar(child: Text(nextPriority.toString())),
-                                    //       ],
-                                    //     ),
-                                    //   ),
-                                    Draggable<DragContext<T>>(
-                                      data: dragContext,
-                                      onDragStarted: () {
-                                        // The context is guaranteed to be valid at this moment
-                                        final RenderBox renderBox = dragKey.currentContext!.findRenderObject() as RenderBox;
-                                        widget.swimlanesController.setDraggedItemHeight(renderBox.size.height);
-                                      },
-                                      onDragEnd: (details) {
-                                        // Clean up the height in the controller when the drag is over
-                                        widget.swimlanesController.setDraggedItemHeight(null);
-                                      },
-                                      feedback: SwimlanesTaskCard<T>(
+                                    GlobalKey dragKey = GlobalKey();
+                                    if (index.isEven) {
+                                      final DragContext<T> dragContext = DragContext<T>(
+                                        sourceColumn: widget.swimlaneSetting,
                                         selectedDocument: selectedDocument,
-                                        swimlanesController: widget.swimlanesController,
-                                        swimlanesConfig: swimlanesConfig,
-                                        fFrameUser: widget.fFrameUser,
-                                        color: widget.swimlanesController.taskCardColor,
-                                        width: swimlanesConfig.swimlaneWidth,
-                                        feedback: true,
-                                      ),
-                                      childWhenDragging: SwimlanesTaskCard<T>(
-                                        selectedDocument: selectedDocument,
-                                        swimlanesController: widget.swimlanesController,
-                                        swimlanesConfig: swimlanesConfig,
-                                        fFrameUser: widget.fFrameUser,
-                                        color: widget.swimlanesController.taskCardColor,
-                                        width: swimlanesConfig.swimlaneWidth,
-                                        childWhenDragging: true,
-                                      ),
-                                      child: Builder(builder: (context) {
-                                        return SwimlanesTaskCard<T>(
-                                          key: dragContext.dragKey,
-                                          selectedDocument: selectedDocument,
-                                          swimlanesController: widget.swimlanesController,
-                                          swimlanesConfig: swimlanesConfig,
-                                          color: widget.swimlanesController.taskCardColor,
-                                          fFrameUser: widget.fFrameUser,
-                                          width: swimlanesConfig.swimlaneWidth,
-                                        );
-                                      }),
-                                    ),
-                                    if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
-                                      const Center(
-                                        child: CircularProgressIndicator(),
-                                      )
-                                  ],
-                                );
-                              } else {
-                                T docAbove = selectedDocuments[docIndex].data; // Doc before the drop zone
+                                        dragKey: dragKey,
+                                        buildContext: context,
+                                      );
 
-                                // Calculate lane position for drop zone (the primary ordering within lanes)
-                                double? dropZoneLanePosition;
-                                if (swimlanesConfig.getLanePosition != null) {
-                                  if (docIndex < selectedDocuments.length - 1) {
-                                    // Drop zone is between 2 docs
-                                    T docBelow = selectedDocuments[docIndex + 1].data;
-                                    double posAbove = swimlanesConfig.getLanePosition!(docAbove);
-                                    double posBelow = swimlanesConfig.getLanePosition!(docBelow);
-                                    dropZoneLanePosition = (posAbove + posBelow) / 2.0;
-                                  } else {
-                                    // Drop zone is after the last doc in the list
-                                    double posLast = swimlanesConfig.getLanePosition!(docAbove);
-                                    dropZoneLanePosition = posLast + lanePositionIncrement; // Lane position for the last item
-                                  }
-                                }
-                                // Calculate priority for drop zone
-                                double? dropZonePriority;
-                                if (swimlanesConfig.getPriority != null) {
-                                  if (docIndex < selectedDocuments.length - 1) {
-                                    // Drop zone is between 2 docs
-                                    dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
-                                  } else {
-                                    // Drop zone is after the last doc in the list
-                                    double lastPriority = swimlanesConfig.getPriority!(docAbove);
-                                    dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
-                                  }
-                                }
-                                // Add a drop zone between items
-                                return Column(
-                                  children: [
-                                    // if (nextPriority != null)
-                                    //   Padding(
-                                    //     padding: const EdgeInsets.all(8.0),
-                                    //     child: Stack(
-                                    //       alignment: AlignmentDirectional.centerStart,
-                                    //       children: [
-                                    //         const Divider(),
-                                    //         CircleAvatar(child: Text(nextPriority.toString())),
-                                    //       ],
-                                    //     ),
-                                    //   ),
-                                    SwimlaneDropZone(
-                                      swimlanesController: widget.swimlanesController,
-                                      swimlanesConfig: swimlanesConfig,
-                                      fFrameUser: widget.fFrameUser,
-                                      width: swimlanesConfig.swimlaneWidth,
-                                      swimlaneSetting: widget.swimlaneSetting,
-                                      priority: dropZonePriority,
-                                      lanePosition: dropZoneLanePosition,
-                                      customHeight: docIndex == selectedDocuments.length - 1 ? 48.0 : null, // More space below the last item
-                                    ),
-                                  ],
-                                );
-                              }
-                            },
-                          ),
+                                      double? topDropZoneLanePosition;
+                                      if (index == 0) {
+                                        if (swimlanesConfig.getLanePosition != null) {
+                                          // Calculate lane position for the 1st drop zone
+                                          double firstDocPos = swimlanesConfig.getLanePosition!(selectedDocument.data);
+                                          topDropZoneLanePosition = firstDocPos / 2.0;
+                                        } else {
+                                          // Fallback to a default starting value if getLanePosition is null
+                                          topDropZoneLanePosition = lanePositionIncrement / 2.0;
+                                        }
+                                      }
+
+                                      return Column(
+                                        children: [
+                                          if (index == 0)
+                                            // Insert drop zone for the top of the lane
+                                            SwimlaneDropZone(
+                                              swimlanesController: widget.swimlanesController,
+                                              swimlanesConfig: swimlanesConfig,
+                                              fFrameUser: widget.fFrameUser,
+                                              width: swimlanesConfig.swimlaneWidth,
+                                              swimlaneSetting: widget.swimlaneSetting,
+                                              priority: 1.0,
+                                              lanePosition: topDropZoneLanePosition,
+                                            ),
+                                          // if (nextPriority != null)
+                                          //   Padding(
+                                          //     padding: const EdgeInsets.all(8.0),
+                                          //     child: Stack(
+                                          //       alignment: AlignmentDirectional.centerStart,
+                                          //       children: [
+                                          //         const Divider(),
+                                          //         CircleAvatar(child: Text(nextPriority.toString())),
+                                          //       ],
+                                          //     ),
+                                          //   ),
+                                          Draggable<DragContext<T>>(
+                                            data: dragContext,
+                                            onDragStarted: () {
+                                              // The context is guaranteed to be valid at this moment
+                                              final RenderBox renderBox = dragKey.currentContext!.findRenderObject() as RenderBox;
+                                              widget.swimlanesController.setDraggedItemHeight(renderBox.size.height);
+                                            },
+                                            onDragEnd: (details) {
+                                              // Clean up the height in the controller when the drag is over
+                                              widget.swimlanesController.setDraggedItemHeight(null);
+                                            },
+                                            feedback: SwimlanesTaskCard<T>(
+                                              selectedDocument: selectedDocument,
+                                              swimlanesController: widget.swimlanesController,
+                                              swimlanesConfig: swimlanesConfig,
+                                              fFrameUser: widget.fFrameUser,
+                                              color: widget.swimlanesController.taskCardColor,
+                                              width: swimlanesConfig.swimlaneWidth,
+                                              feedback: true,
+                                            ),
+                                            childWhenDragging: SwimlanesTaskCard<T>(
+                                              selectedDocument: selectedDocument,
+                                              swimlanesController: widget.swimlanesController,
+                                              swimlanesConfig: swimlanesConfig,
+                                              fFrameUser: widget.fFrameUser,
+                                              color: widget.swimlanesController.taskCardColor,
+                                              width: swimlanesConfig.swimlaneWidth,
+                                              childWhenDragging: true,
+                                            ),
+                                            child: Builder(builder: (context) {
+                                              return SwimlanesTaskCard<T>(
+                                                key: dragContext.dragKey,
+                                                selectedDocument: selectedDocument,
+                                                swimlanesController: widget.swimlanesController,
+                                                swimlanesConfig: swimlanesConfig,
+                                                color: widget.swimlanesController.taskCardColor,
+                                                fFrameUser: widget.fFrameUser,
+                                                width: swimlanesConfig.swimlaneWidth,
+                                              );
+                                            }),
+                                          ),
+                                          if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
+                                            const Center(
+                                              child: CircularProgressIndicator(),
+                                            )
+                                        ],
+                                      );
+                                    } else {
+                                      T docAbove = selectedDocuments[docIndex].data; // Doc before the drop zone
+
+                                      // Calculate lane position for drop zone (the primary ordering within lanes)
+                                      double? dropZoneLanePosition;
+                                      if (swimlanesConfig.getLanePosition != null) {
+                                        if (docIndex < selectedDocuments.length - 1) {
+                                          // Drop zone is between 2 docs
+                                          T docBelow = selectedDocuments[docIndex + 1].data;
+                                          double posAbove = swimlanesConfig.getLanePosition!(docAbove);
+                                          double posBelow = swimlanesConfig.getLanePosition!(docBelow);
+                                          dropZoneLanePosition = (posAbove + posBelow) / 2.0;
+                                        } else {
+                                          // Drop zone is after the last doc in the list
+                                          double posLast = swimlanesConfig.getLanePosition!(docAbove);
+                                          dropZoneLanePosition = posLast + lanePositionIncrement; // Lane position for the last item
+                                        }
+                                      }
+                                      // Calculate priority for drop zone
+                                      double? dropZonePriority;
+                                      if (swimlanesConfig.getPriority != null) {
+                                        if (docIndex < selectedDocuments.length - 1) {
+                                          // Drop zone is between 2 docs
+                                          dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
+                                        } else {
+                                          // Drop zone is after the last doc in the list
+                                          double lastPriority = swimlanesConfig.getPriority!(docAbove);
+                                          dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
+                                        }
+                                      }
+                                      // Add a drop zone between items
+                                      return Column(
+                                        children: [
+                                          // if (nextPriority != null)
+                                          //   Padding(
+                                          //     padding: const EdgeInsets.all(8.0),
+                                          //     child: Stack(
+                                          //       alignment: AlignmentDirectional.centerStart,
+                                          //       children: [
+                                          //         const Divider(),
+                                          //         CircleAvatar(child: Text(nextPriority.toString())),
+                                          //       ],
+                                          //     ),
+                                          //   ),
+                                          SwimlaneDropZone(
+                                            swimlanesController: widget.swimlanesController,
+                                            swimlanesConfig: swimlanesConfig,
+                                            fFrameUser: widget.fFrameUser,
+                                            width: swimlanesConfig.swimlaneWidth,
+                                            swimlaneSetting: widget.swimlaneSetting,
+                                            priority: dropZonePriority,
+                                            lanePosition: dropZoneLanePosition,
+                                            customHeight: docIndex == selectedDocuments.length - 1 ? 48.0 : null, // More space below the last item
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                  },
+                                ),
+                        ),
+                        if (showAddButton) _buildAddCardButton(selectedDocuments),
+                      ],
+                    ),
                   );
                 },
               );
