@@ -620,6 +620,63 @@ class Swimlane<T> extends StatefulWidget {
 class _SwimlaneState<T> extends State<Swimlane<T>> {
   final int _documentsPerPage = 20;
 
+  /// Builds the "Add a card" button that appears at the bottom of a swimlane.
+  ///
+  /// This button, when pressed, triggers the [SwimlaneSetting.onNewCard] callback
+  /// to create a new card. It calculates the appropriate `lanePosition` and
+  /// `priority` for the new card based on the existing cards in the lane.
+  Widget _buildAddCardButton(List<SelectedDocument<T>> selectedDocuments) {
+    final swimlanesConfig = widget.swimlanesConfig;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      child: OutlinedButton.icon(
+        icon: const Icon(Icons.add),
+        label: const Text("Add a card"),
+        style: widget.swimlaneSetting.addCardButtonStyle ??
+            OutlinedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 40),
+              foregroundColor: widget.swimlanesController.taskCardTextColor,
+            ),
+        onPressed: () {
+          double? newLanePosition;
+          double? newPriority;
+
+          if (selectedDocuments.isNotEmpty) {
+            final lastDocData = selectedDocuments.last.data;
+            if (swimlanesConfig.getLanePosition != null) {
+              newLanePosition = swimlanesConfig.getLanePosition!(lastDocData) + lanePositionIncrement;
+            }
+            if (swimlanesConfig.getPriority != null) {
+              double lastPriority = swimlanesConfig.getPriority!(lastDocData);
+              newPriority = lastPriority + (1 - (lastPriority % 1)) / 2;
+            }
+          } else {
+            if (swimlanesConfig.getLanePosition != null) {
+              newLanePosition = lanePositionIncrement;
+            }
+            if (swimlanesConfig.getPriority != null) {
+              newPriority = 1.0;
+            }
+          }
+
+          final newCardData = widget.swimlaneSetting.onNewCard!(
+            widget.swimlaneSetting.id,
+            newLanePosition,
+            newPriority,
+          );
+
+          DatabaseService<T>().createDocument(
+            collection: widget.documentConfig.collection,
+            documentId: FirebaseFirestore.instance.collection(widget.documentConfig.collection).doc().id,
+            data: newCardData,
+            fromFirestore: widget.documentConfig.fromFirestore,
+            toFirestore: widget.documentConfig.toFirestore,
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final SwimlanesConfig<T> swimlanesConfig = widget.swimlanesController.swimlanesConfig as SwimlanesConfig<T>;
@@ -706,6 +763,11 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                       break;
                   }
 
+                  // Determine if the "Add a card" button should be displayed based on configuration.
+                  // Role-based security is handled by the developer, who should conditionally
+                  // set `allowCardCreation` in the `SwimlaneSetting`.
+                  final bool showAddButton = !swimlanesConfig.isReadOnly && widget.swimlaneSetting.allowCardCreation && widget.swimlaneSetting.onNewCard != null;
+
                   return Container(
                     decoration: BoxDecoration(
                       border: Border(
@@ -716,23 +778,36 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                       ),
                     ),
                     child: (selectedDocuments.isEmpty && !swimlanesConfig.isReadOnly)
-                        ? SwimlaneDropZone(
-                            swimlanesController: widget.swimlanesController,
-                            swimlanesConfig: swimlanesConfig,
-                            fFrameUser: widget.fFrameUser,
-                            width: swimlanesConfig.swimlaneWidth,
-                            swimlaneSetting: widget.swimlaneSetting,
-                            priority: 1.0,
-                            lanePosition: lanePositionIncrement,
+                        ? Column(
+                            children: [
+                              Expanded(
+                                child: SwimlaneDropZone(
+                                  swimlanesController: widget.swimlanesController,
+                                  swimlanesConfig: swimlanesConfig,
+                                  fFrameUser: widget.fFrameUser,
+                                  width: swimlanesConfig.swimlaneWidth,
+                                  swimlaneSetting: widget.swimlaneSetting,
+                                  priority: 1.0,
+                                  lanePosition: lanePositionIncrement,
+                                ),
+                              ),
+                              if (showAddButton) _buildAddCardButton(selectedDocuments),
+                            ],
                           )
                         : ListView.builder(
                             shrinkWrap: true,
-                            itemCount: swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2, // Double the count for drop zones and add 1 for the final drop zone
+                            itemCount: (swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2) + (showAddButton ? 1 : 0),
                             itemBuilder: (context, index) {
                               if (snapshot.hasMore && index + 1 == snapshot.docs.length) {
                                 // Tell FirestoreQueryBuilder to try to obtain more items.
                                 // It is safe to call this function from within the build method.
                                 snapshot.fetchMore();
+                              }
+
+                              final int listEndIndex = swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2;
+                              if (index == listEndIndex) {
+                                // This index is for the button at the end of the list.
+                                return _buildAddCardButton(selectedDocuments);
                               }
 
                               // Return only task cards if the swimlanes are read-only

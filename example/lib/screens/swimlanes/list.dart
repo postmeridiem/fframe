@@ -46,7 +46,17 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
       return true;
     },
   ),
+  // Example of creating a new card
   SwimlaneSetting(
+    allowCardCreation: true,
+    onNewCard: (laneId, _, priority) {
+      return Suggestion(
+        name: "New card",
+        status: laneId,
+        priority: priority ?? 5.0,
+        active: true,
+      );
+    },
     id: "inProgress",
     header: "In Progress",
     query: (Query<Suggestion> query) {

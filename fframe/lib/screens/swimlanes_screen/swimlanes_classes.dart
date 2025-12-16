@@ -138,7 +138,13 @@ class SwimlaneSetting<T> {
     this.roles,
     this.swimlaneWidth = 200,
     this.cardControlsBuilder,
-  });
+    this.allowCardCreation = false,
+    this.onNewCard,
+    this.addCardButtonStyle,
+  }) : assert(
+          allowCardCreation == false || onNewCard != null,
+          "Configuration error in SwimlaneSetting: 'onNewCard' must be provided when 'allowCardCreation' is true.",
+        );
   final String id;
   final String header;
   final List<String>? roles;
@@ -154,6 +160,29 @@ class SwimlaneSetting<T> {
   )? onLaneDrop;
   final T Function(T data, double? priority)? onPriorityChange;
   final T Function(T data, double? lanePosition)? onLanePositionChange; // If defined, it is prioritised over onPriorityChange as the primary ordering method within lanes
+
+  /// Whether to show a button to create a new card at the bottom of the swimlane.
+  ///
+  /// Defaults to `false`.
+  /// If `true`, [onNewCard] must be provided.
+  /// The developer is responsible for implementing any role-based security
+  /// by conditionally setting this property based on user roles.
+  final bool allowCardCreation;
+
+  /// A callback that returns a new instance of the data model `T` when the
+  /// "add card" button is pressed.
+  ///
+  /// The callback receives the `laneId`, the calculated `lanePosition`, and the
+  /// `priority` for the new card. This data should be used to initialize the new object.
+  /// The returned object will be saved as a new document in Firestore.
+  ///
+  /// This is required if [allowCardCreation] is `true`.
+  final T Function(String laneId, double? lanePosition, double? priority)? onNewCard;
+
+  /// Custom [ButtonStyle] for the "Add a card" button.
+  ///
+  /// If not provided, a default style will be used.
+  final ButtonStyle? addCardButtonStyle;
   late int? swimlaneIndex;
   late bool hasAccess = false;
 }
