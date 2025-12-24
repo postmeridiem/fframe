@@ -143,6 +143,7 @@ class SwimlaneSetting<T> {
     this.onCardCreated,
     this.addCardButtonStyle,
     this.openNewCard = false,
+    this.isMovementLocked = false,
   }) : assert(
           allowCardCreation == false || onNewCard != null,
           "Configuration error in SwimlaneSetting: 'onNewCard' must be provided when 'allowCardCreation' is true.",
@@ -208,6 +209,12 @@ class SwimlaneSetting<T> {
   ///
   /// Defaults to `false`.
   final bool openNewCard;
+
+  /// Whether card movement into and out of this swimlane is locked.
+  ///
+  /// If `true`, cards cannot be dragged out of this lane, and no cards can be
+  /// dropped into it from other lanes. Reordering within the lane is still allowed.
+  final bool isMovementLocked;
   late int? swimlaneIndex;
   late bool hasAccess = false;
 }

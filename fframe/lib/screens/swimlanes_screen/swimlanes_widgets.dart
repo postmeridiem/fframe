@@ -1159,7 +1159,12 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = dragContext!.data;
         });
 
-        if (widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id && widget.swimlanesConfig.getLanePosition != null && widget.swimlaneSetting.canChangePriority != null) {
+        // Prevent dropping if the source or target lane is locked for movement.
+        if (dragContext!.data.sourceColumn.isMovementLocked || widget.swimlaneSetting.isMovementLocked) {
+          return false;
+        }
+
+        if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlanesConfig.getLanePosition != null && widget.swimlaneSetting.canChangePriority != null) {
           return widget.swimlaneSetting.canChangePriority!(
             dragContext.data.selectedDocument,
             widget.fFrameUser.roles,
