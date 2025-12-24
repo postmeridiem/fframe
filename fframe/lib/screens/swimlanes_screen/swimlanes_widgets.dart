@@ -484,12 +484,26 @@ class SwimlaneHeader<T> extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                swimlaneSetting.header,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: swimlanesController.swimlaneHeaderTextColor,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (swimlaneSetting.isMovementLocked)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: Icon(
+                        Icons.lock_outline,
+                        color: swimlanesController.swimlaneHeaderTextColor.withOpacity(0.6),
+                        size: 20,
+                      ),
+                    ),
+                  Text(
+                    swimlaneSetting.header,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: swimlanesController.swimlaneHeaderTextColor,
+                    ),
+                  ),
+                ],
               ),
               // Text(
               //   "countMessage",
@@ -1087,10 +1101,15 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
         List<dynamic> rejected,
       ) {
         double currentHeight = 48.0;
+        bool isLocked = false;
 
         if (accepted.isNotEmpty) {
           _dragContext = accepted.first;
+        } else if (rejected.isNotEmpty) {
+          _dragContext = rejected.first;
+          isLocked = _dragContext!.sourceColumn.isMovementLocked || widget.swimlaneSetting.isMovementLocked;
         }
+
         if (accepted.isNotEmpty || rejected.isNotEmpty) {
           // A draggable is hovering over THIS drop zone.
           final double? heightFromController = widget.swimlanesController.draggedItemHeight;
@@ -1114,6 +1133,7 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
                         : (rejected.isNotEmpty)
                             ? Colors.red.shade800
                             : widget.swimlanesController.taskCardColor,
+                    isLocked: isLocked,
                     fFrameUser: widget.fFrameUser,
                     width: widget.width,
                     // feedback: true,
@@ -1206,6 +1226,7 @@ class SwimlanesTaskCard<T> extends StatefulWidget {
     required this.width,
     required this.color,
     this.feedback = false,
+    this.isLocked = false,
     this.childWhenDragging = false,
   });
 
@@ -1215,6 +1236,7 @@ class SwimlanesTaskCard<T> extends StatefulWidget {
   final FFrameUser fFrameUser;
   final bool feedback;
   final bool childWhenDragging;
+  final bool isLocked;
   final double width;
   final Color color;
 
@@ -1270,7 +1292,7 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
                                 widget.fFrameUser,
                               ),
                             ),
-                            if (swimlanesConfig.assignee != null)
+                            if (swimlanesConfig.assignee != null && !widget.isLocked)
                               IconButton(
                                 icon: Tooltip(
                                   message: "Assign",
@@ -1289,7 +1311,15 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
                                   selectedDocument.update();
                                 },
                               ),
-                            if (swimlanesConfig.following != null)
+                            if (widget.isLocked)
+                              const Tooltip(
+                                message: "Movement is locked",
+                                child: Icon(
+                                  Icons.lock,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            if (swimlanesConfig.following != null && !widget.isLocked)
                               Tooltip(
                                 message: "Watch",
                                 child: IconButton(
