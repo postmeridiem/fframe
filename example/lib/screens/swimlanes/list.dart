@@ -59,6 +59,11 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
       // or show a confirmation dialog.
       Console.log("New card created with ID: $documentId");
     },
+    // Prevents cards from being moved out of or into this lane.
+    // This is useful for lanes that represent a final state, such as "Done" or "Archived",
+    // or for lanes where movement is controlled programmatically rather than by user drag-and-drop.
+    // A lock icon will be displayed in the swimlane header.
+    isMovementLocked: true,
     id: "inProgress",
     header: "In Progress",
     query: (Query<Suggestion> query) {
