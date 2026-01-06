@@ -8,10 +8,7 @@ import 'swimlanes.dart';
 enum SwimlanesQueryStates { active, inactive }
 
 class SwimlanesScreen extends StatefulWidget {
-  const SwimlanesScreen({
-    super.key,
-    required this.swimlanesQueryState,
-  });
+  const SwimlanesScreen({super.key, required this.swimlanesQueryState});
   final SwimlanesQueryStates swimlanesQueryState;
 
   @override
@@ -65,20 +62,11 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
         child: Container(
           height: swimlanesController.headerHeight,
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          decoration: BoxDecoration(
-            color: currentFilter == SwimlanesFilterType.customFilter ? Theme.of(context).indicatorColor : null,
-            borderRadius: BorderRadius.circular(8.0),
-          ),
+          decoration: BoxDecoration(color: currentFilter == SwimlanesFilterType.customFilter ? Theme.of(context).indicatorColor : null, borderRadius: BorderRadius.circular(8.0)),
           child: const Row(
             children: [
-              Icon(
-                Icons.filter_list_alt,
-                color: Colors.white,
-              ),
-              Text(
-                'Labels',
-                style: TextStyle(color: Colors.white),
-              ),
+              Icon(Icons.filter_list_alt, color: Colors.white),
+              Text('Labels', style: TextStyle(color: Colors.white)),
             ],
           ),
         ),
@@ -88,130 +76,127 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DocumentScreen<Suggestion>(
-      //Indicate where the documents are located and how to convert them to and fromt their models.
-      // formKey: GlobalKey<FormState>(),
-      collection: "suggestions",
-      fromFirestore: Suggestion.fromFirestore,
-      toFirestore: (suggestion, options) {
-        return suggestion.toFirestore();
-      },
-      createDocumentId: (suggestion) {
-        return "${suggestion.name}";
-      },
+    return StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
+      stream: FirebaseFirestore.instance.collection("users").snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Center(child: Text("An error has occured: ${snapshot.error}"));
+        }
 
-      preSave: (Suggestion suggestion) {
-        //Here you can do presave stuff to the context document.
-        suggestion.saveCount++;
-        return suggestion;
-      },
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-      createNew: () => Suggestion(
-        active: true,
-        createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}",
-      ),
+        List<FFrameUser> userList = snapshot.data!.docs.map((doc) {
+          return FFrameUser.fromFirestore(snapshot: doc);
+        }).toList();
 
-      documentTitle: (BuildContext context, Suggestion data) {
-        return data.name ?? "New Suggestion";
-      },
+        return DocumentScreen<Suggestion>(
+          //Indicate where the documents are located and how to convert them to and fromt their models.
+          // formKey: GlobalKey<FormState>(),
+          collection: "suggestions",
+          fromFirestore: Suggestion.fromFirestore,
+          toFirestore: (suggestion, options) {
+            return suggestion.toFirestore();
+          },
+          createDocumentId: (suggestion) {
+            return "${suggestion.name}";
+          },
 
-      //Optional title widget
-      headerBuilder: (BuildContext context, String documentTitle, Suggestion data) {
-        return Text(
-          documentTitle,
-          style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface,
+          preSave: (Suggestion suggestion) {
+            //Here you can do presave stuff to the context document.
+            suggestion.saveCount++;
+            return suggestion;
+          },
+
+          createNew: () => Suggestion(active: true, createdBy: FirebaseAuth.instance.currentUser?.displayName ?? "unknown at ${DateTime.now().toLocal()}"),
+
+          documentTitle: (BuildContext context, Suggestion data) {
+            return data.name ?? "New Suggestion";
+          },
+
+          //Optional title widget
+          headerBuilder: (BuildContext context, String documentTitle, Suggestion data) {
+            return Text(documentTitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface));
+          },
+
+          // query: (query) {
+          //   // return query.where("active", isNull: true);
+          //   // switch (widget.swimlanesQueryState) {
+          //   //   case SwimlanesQueryStates.active:
+          //   //     return query.where("active", isEqualTo: true);
+
+          //   //   case SwimlanesQueryStates.inactive:
+          //   //     return query.where("active", isEqualTo: false);
+          //   // }
+          // },
+
+          // Optional Swimlanes widget
+          viewType: ViewType.swimlanes,
+          swimlanes: SwimlanesConfig<Suggestion>(
+            userList: userList,
+            trackerId: "trackerId",
+            swimlaneSettings: swimlanesSettings,
+            getStatus: (suggestion) => suggestion.status ?? "",
+            getTitle: (suggestion) => suggestion.name ?? "?",
+            getDescription: (suggestion) => suggestion.description ?? "",
+            getPriority: (suggestion) => suggestion.priority,
+            // getLanePosition: (suggestion) => suggestion.priority.toDouble(), // Dummy implementation as a suggestion doesn't have lanePosition
+            myId: (user) => user.uid!,
+            following: SwimlanesFollowing<Suggestion>(
+              isFollowing: (suggestion, user) => suggestion.followers != null && suggestion.followers!.contains(user.uid),
+              startFollowing: (suggestion, user) {
+                suggestion.followers ??= [];
+                suggestion.followers!.add(user.uid!);
+                return suggestion;
+              },
+              stopFollowing: (suggestion, user) {
+                suggestion.followers ??= [];
+                suggestion.followers!.remove(user.uid!);
+                return suggestion;
+              },
+            ),
+            assignee: SwimlanesAssignee<Suggestion>(
+              unsetAssignee: (suggestion) {
+                //TODO: User picker dialog
+                suggestion.assignee = null;
+                return suggestion;
+              },
+              setAssignee: (suggestion, user) {
+                //TODO: User picker dialog
+                suggestion.assignee = user.uid;
+                return suggestion;
+              },
+              isAssignee: (suggestion, user) {
+                return suggestion.assignee == user.uid;
+              },
+            ),
+            customFilter: SwimlanesCustomFilter<Suggestion>(
+              filterName: 'Card name',
+              matchesCustomFilter: (suggestion) {
+                // In this example the custom filter is to be named "dolly the sheep"
+                String dummyFilterSelection = 'dolly the sheep';
+                return suggestion.name == dummyFilterSelection;
+              },
+              // Only shown if myId is undefined, so if the default client-side filters are not shown.
+              customFilterWidget: customFilterWidget,
+            ),
+            // getDueDate: (suggestion) => suggestion.dueDate,
+            taskWidgetHeader: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionHeader(selectedDocument: selectedDocument, swimlanesConfig: swimlanesConfig, fFrameUser: fFrameUser),
+            taskWidgetBody: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionCard(selectedDocument: selectedDocument, swimlanesConfig: swimlanesConfig, fFrameUser: fFrameUser),
+            // getAssignee: (Suggestion ) {  },
           ),
+
+          // Center part, shows a firestore doc. Tabs possible
+          document: suggestionDocument(),
         );
       },
-
-      // query: (query) {
-      //   // return query.where("active", isNull: true);
-      //   // switch (widget.swimlanesQueryState) {
-      //   //   case SwimlanesQueryStates.active:
-      //   //     return query.where("active", isEqualTo: true);
-
-      //   //   case SwimlanesQueryStates.inactive:
-      //   //     return query.where("active", isEqualTo: false);
-      //   // }
-      // },
-
-      // Optional Swimlanes widget
-      viewType: ViewType.swimlanes,
-      swimlanes: SwimlanesConfig<Suggestion>(
-        trackerId: "trackerId",
-        swimlaneSettings: swimlanesSettings,
-        getStatus: (suggestion) => suggestion.status ?? "",
-        getTitle: (suggestion) => suggestion.name ?? "?",
-        getDescription: (suggestion) => suggestion.description ?? "",
-        getPriority: (suggestion) => suggestion.priority,
-        // getLanePosition: (suggestion) => suggestion.priority.toDouble(), // Dummy implementation as a suggestion doesn't have lanePosition
-        myId: (user) => user.uid!,
-        following: SwimlanesFollowing<Suggestion>(
-          isFollowing: (suggestion, user) => suggestion.followers != null && suggestion.followers!.contains(user.uid),
-          startFollowing: (suggestion, user) {
-            suggestion.followers ??= [];
-            suggestion.followers!.add(user.uid!);
-            return suggestion;
-          },
-          stopFollowing: (suggestion, user) {
-            suggestion.followers ??= [];
-            suggestion.followers!.remove(user.uid!);
-            return suggestion;
-          },
-        ),
-        assignee: SwimlanesAssignee<Suggestion>(
-          unsetAssignee: (suggestion) {
-            //TODO: User picker dialog
-            suggestion.assignee = null;
-            return suggestion;
-          },
-          setAssignee: (suggestion, user) {
-            //TODO: User picker dialog
-            suggestion.assignee = user.uid;
-            return suggestion;
-          },
-          isAssignee: (suggestion, user) {
-            return suggestion.assignee == user.uid;
-          },
-        ),
-        customFilter: SwimlanesCustomFilter<Suggestion>(
-          filterName: 'Card name',
-          matchesCustomFilter: (suggestion) {
-            // In this example the custom filter is to be named "dolly the sheep"
-            String dummyFilterSelection = 'dolly the sheep';
-            return suggestion.name == dummyFilterSelection;
-          },
-          // Only shown if myId is undefined, so if the default client-side filters are not shown.
-          customFilterWidget: customFilterWidget,
-        ),
-        // getDueDate: (suggestion) => suggestion.dueDate,
-        taskWidgetHeader: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionHeader(
-          selectedDocument: selectedDocument,
-          swimlanesConfig: swimlanesConfig,
-          fFrameUser: fFrameUser,
-        ),
-        taskWidgetBody: (selectedDocument, swimlanesConfig, fFrameUser) => SuggestionCard(
-          selectedDocument: selectedDocument,
-          swimlanesConfig: swimlanesConfig,
-          fFrameUser: fFrameUser,
-        ),
-        // getAssignee: (Suggestion ) {  },
-      ),
-
-      // Center part, shows a firestore doc. Tabs possible
-      document: suggestionDocument(),
     );
   }
 }
 
 class SuggestionHeader extends StatelessWidget {
-  SuggestionHeader({
-    super.key,
-    required this.selectedDocument,
-    required this.swimlanesConfig,
-    required this.fFrameUser,
-  }) : suggestion = selectedDocument.data;
+  SuggestionHeader({super.key, required this.selectedDocument, required this.swimlanesConfig, required this.fFrameUser}) : suggestion = selectedDocument.data;
   final SelectedDocument<Suggestion> selectedDocument;
   final SwimlanesConfig<Suggestion> swimlanesConfig;
   final FFrameUser fFrameUser;
@@ -224,12 +209,7 @@ class SuggestionHeader extends StatelessWidget {
 }
 
 class SuggestionCard extends StatelessWidget {
-  SuggestionCard({
-    super.key,
-    required this.selectedDocument,
-    required this.swimlanesConfig,
-    required this.fFrameUser,
-  }) : suggestion = selectedDocument.data;
+  SuggestionCard({super.key, required this.selectedDocument, required this.swimlanesConfig, required this.fFrameUser}) : suggestion = selectedDocument.data;
   final SelectedDocument<Suggestion> selectedDocument;
   final SwimlanesConfig<Suggestion> swimlanesConfig;
   final FFrameUser fFrameUser;
