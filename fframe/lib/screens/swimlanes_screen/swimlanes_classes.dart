@@ -15,6 +15,7 @@ class SwimlanesConfig<T> extends ListConfig {
     this.myId,
     this.following,
     this.customFilter,
+    this.userList,
     this.swimlaneBackgroundColor,
     this.swimlaneHeaderColor,
     this.swimlaneHeaderTextColor,
@@ -46,6 +47,7 @@ class SwimlanesConfig<T> extends ListConfig {
   final String Function(T) getTitle;
   final String Function(FFrameUser)? myId;
   final SwimlanesFollowing<T>? following;
+  final List<FFrameUser>? userList;
   final SwimlanesCustomFilter<T>? customFilter;
   final SwimlanesAssignee<T>? assignee;
   final String Function(T) getDescription;

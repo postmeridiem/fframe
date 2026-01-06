@@ -233,6 +233,7 @@ class SwimlanesNotifier<T> extends ChangeNotifier {
   late Query _currentQuery;
   late bool _taskDragging;
   late SwimlanesFilterType _filter;
+  FFrameUser? _assignedToUser;
 
   String? get searchString {
     return _searchString;
@@ -278,8 +279,23 @@ class SwimlanesNotifier<T> extends ChangeNotifier {
     return _filter;
   }
 
+  FFrameUser? get assignedToUser => _assignedToUser;
+
   void setFilter(SwimlanesFilterType filter) {
     _filter = filter;
+    if (filter != SwimlanesFilterType.assignedTo) {
+      _assignedToUser = null;
+    }
+    notifyListeners();
+  }
+
+  void setAssignedToFilter(FFrameUser? user) {
+    _assignedToUser = user;
+    if (user != null) {
+      _filter = SwimlanesFilterType.assignedTo;
+    } else {
+      _filter = SwimlanesFilterType.unfiltered;
+    }
     notifyListeners();
   }
 

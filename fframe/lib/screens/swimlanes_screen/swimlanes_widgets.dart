@@ -1,5 +1,11 @@
+/// This file contains the various widgets that make up the swimlanes UI,
+/// such as headers, filter bars, lanes, and task cards.
 part of 'package:fframe/fframe.dart';
 
+/// A widget that displays the headers for all the swimlanes.
+///
+/// It includes the main header bar and a positioned filter widget that
+/// appears on hover or when a filter is active.
 class SwimlaneHeaders<T> extends StatefulWidget {
   const SwimlaneHeaders({
     super.key,
@@ -107,6 +113,9 @@ class _SwimlaneHeadersState<T> extends State<SwimlaneHeaders<T>> {
   }
 }
 
+/// The icon button that acts as the entry point for the filter menu.
+///
+/// Its color changes to indicate whether a filter is currently active.
 class SwimlaneHeaderFilterButton extends StatelessWidget {
   const SwimlaneHeaderFilterButton({
     super.key,
@@ -130,6 +139,11 @@ class SwimlaneHeaderFilterButton extends StatelessWidget {
   }
 }
 
+/// A horizontal bar containing various filter options for the swimlanes.
+///
+/// This widget is displayed when the user hovers over the filter area.
+/// It provides options to filter by "assigned to me", "following", priority,
+/// a custom filter, and the new "assigned to" user dropdown.
 class SwimlanesFilterBar<T> extends StatelessWidget {
   const SwimlanesFilterBar({
     super.key,
@@ -200,6 +214,13 @@ class SwimlanesFilterBar<T> extends StatelessWidget {
                         ),
                       )
                     : const IgnorePointer(),
+                if (swimlanesConfig.assignee != null && swimlanesConfig.userList != null && swimlanesConfig.userList!.isNotEmpty)
+                  _AssigneeFilter(
+                    swimlanesController: swimlanesController,
+                    swimlanesConfig: swimlanesConfig,
+                    activeColor: active,
+                    inactiveColor: inactive,
+                  ),
                 swimlanesConfig.following != null
                     ? Padding(
                         padding: const EdgeInsets.only(right: 16.0),
@@ -423,6 +444,7 @@ class SwimlanesFilterBar<T> extends StatelessWidget {
     );
   }
 
+  /// Toggles a given filter. If the filter is already active, it deactivates it.
   void toggleFilter(SwimlanesFilterType filter) {
     if (swimlanesController.filter != filter) {
       swimlanesController.notifier.setFilter(filter);
@@ -432,6 +454,223 @@ class SwimlanesFilterBar<T> extends StatelessWidget {
   }
 }
 
+/// Returns the initials from a given name string.
+String _getInitials(String? name) {
+  if (name == null || name.isEmpty) return "?";
+  List<String> names = name.split(" ");
+  String initials = "";
+  if (names.isNotEmpty && names[0].isNotEmpty) {
+    initials += names[0][0];
+  }
+  if (names.length > 1 && names.last.isNotEmpty) {
+    initials += names.last[0];
+  }
+  return initials.toUpperCase();
+}
+
+class _AssigneeFilter<T> extends StatelessWidget {
+  const _AssigneeFilter({
+    super.key,
+    required this.swimlanesController,
+    required this.swimlanesConfig,
+    required this.activeColor,
+    required this.inactiveColor,
+  });
+
+  final SwimlanesController swimlanesController;
+  final SwimlanesConfig<T> swimlanesConfig;
+  final Color activeColor;
+  final Color inactiveColor;
+
+  @override
+  Widget build(BuildContext context) {
+    final FFrameUser? selectedUser = swimlanesController.notifier.assignedToUser;
+    final bool isFilterActive = selectedUser != null;
+
+    return Padding(
+      padding: const EdgeInsets.only(right: 16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          OutlinedButton(
+            onPressed: () => _showUserSelectionDialog(context),
+            style: OutlinedButton.styleFrom(
+              shape: const CircleBorder(),
+              side: BorderSide(
+                width: 2,
+                color: isFilterActive ? activeColor : Theme.of(context).disabledColor,
+              ),
+              padding: const EdgeInsets.all(8),
+            ),
+            child: _buildAvatar(selectedUser),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 4.0),
+            child: Text(
+              "assigned to",
+              style: TextStyle(
+                fontSize: 11,
+                color: swimlanesController.taskCardTextColor,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAvatar(FFrameUser? user) {
+    if (user != null) {
+      return Tooltip(
+        message: user.displayName ?? "Unknown",
+        child: CircleAvatar(
+          radius: 10,
+          child: Text(
+            _getInitials(user.displayName),
+            style: const TextStyle(fontSize: 10),
+          ),
+        ),
+      );
+    }
+    return Icon(
+      Icons.group_outlined,
+      size: 16,
+      color: inactiveColor,
+    );
+  }
+
+  Future<void> _showUserSelectionDialog(BuildContext context) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return _UserSelectionDialog(
+          swimlanesController: swimlanesController,
+          swimlanesConfig: swimlanesConfig,
+        );
+      },
+    );
+  }
+}
+
+class _UserSelectionDialog<T> extends StatefulWidget {
+  const _UserSelectionDialog({
+    super.key,
+    required this.swimlanesController,
+    required this.swimlanesConfig,
+  });
+
+  final SwimlanesController swimlanesController;
+  final SwimlanesConfig<T> swimlanesConfig;
+
+  @override
+  State<_UserSelectionDialog<T>> createState() => _UserSelectionDialogState<T>();
+}
+
+class _UserSelectionDialogState<T> extends State<_UserSelectionDialog<T>> {
+  late final TextEditingController _searchController;
+  late List<FFrameUser> _filteredUsers;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+    _filteredUsers = widget.swimlanesConfig.userList ?? [];
+    _searchController.addListener(_filterUsers);
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_filterUsers);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterUsers() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredUsers = (widget.swimlanesConfig.userList ?? []).where((user) {
+        final displayName = user.displayName?.toLowerCase() ?? '';
+        final email = user.email?.toLowerCase() ?? '';
+        return displayName.contains(query) || email.contains(query);
+      }).toList();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return AlertDialog(
+      title: const Text('Filter by Assignee'),
+      contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+      content: SizedBox(
+        width: 350,
+        height: 500,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  labelText: 'Search users',
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                  contentPadding: EdgeInsets.symmetric(horizontal: 8),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: Container(
+                color: theme.colorScheme.surfaceContainerHighest.withValues(
+                  alpha: 0.3,
+                ),
+                child: ListView.separated(
+                  itemCount: _filteredUsers.length + 1,
+                  separatorBuilder: (context, index) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return ListTile(
+                        leading: const CircleAvatar(child: Icon(Icons.clear)),
+                        title: const Text('All Users'),
+                        onTap: () {
+                          widget.swimlanesController.notifier.setAssignedToFilter(null);
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    }
+                    final user = _filteredUsers[index - 1];
+                    return ListTile(
+                      leading: CircleAvatar(child: Text(_getInitials(user.displayName))),
+                      title: Text(user.displayName ?? 'Unknown User'),
+                      onTap: () {
+                        widget.swimlanesController.notifier.setAssignedToFilter(user);
+                        Navigator.of(context).pop();
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: const Text('Close'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+  }
+}
+
+/// The header widget for a single swimlane.
+///
+/// Displays the lane's title and a lock icon if movement is restricted.
 class SwimlaneHeader<T> extends StatelessWidget {
   const SwimlaneHeader({
     super.key,
@@ -520,6 +759,8 @@ class SwimlaneHeader<T> extends StatelessWidget {
   }
 }
 
+/// A wrapper for a table cell in the swimlanes view, making it clickable
+/// to open the corresponding document.
 class SwimlanesBuilderCell<T> extends StatefulWidget {
   const SwimlanesBuilderCell({
     super.key,
@@ -574,6 +815,7 @@ class _SwimlanesBuilderCellState<T> extends State<SwimlanesBuilderCell<T>> {
   }
 }
 
+/// The main container widget that builds and displays all the swimlanes in a row.
 class Swimlanes<T> extends StatelessWidget {
   Swimlanes({
     super.key,
@@ -611,6 +853,11 @@ class Swimlanes<T> extends StatelessWidget {
   }
 }
 
+/// A widget representing a single vertical lane in the swimlanes board.
+///
+/// It uses a [FirestoreQueryBuilder] to fetch and display the documents (cards)
+/// that belong to it. It also handles the filtering logic on the client side
+/// and provides the main list view for the cards.
 class Swimlane<T> extends StatefulWidget {
   const Swimlane({
     super.key,
@@ -770,6 +1017,11 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                       break;
                     case SwimlanesFilterType.assignedToMe:
                       selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser));
+                      break;
+                    case SwimlanesFilterType.assignedTo:
+                      if (widget.swimlanesController.notifier.assignedToUser != null) {
+                        selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.swimlanesController.notifier.assignedToUser!));
+                      }
                       break;
                     case SwimlanesFilterType.followedTasks:
                       selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser));
@@ -1020,6 +1272,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
     });
   }
 
+  /// Calculates the priority for a drop target located between two items.
   double? calculateDropTargetPriority(List<SelectedDocument<T>> items, int index) {
     if (widget.swimlanesConfig.getPriority == null) return null;
 
@@ -1041,6 +1294,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
     return double.parse(((currentPriority + nextPriority) / 2).toStringAsFixed(decimals));
   }
 
+  /// Determines if the next item in the list has a different integer priority.
   int? isNextPriority(List<SelectedDocument<T>> items, int index) {
     if (widget.swimlanesConfig.getPriority == null) return null;
 
@@ -1066,6 +1320,11 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
   }
 }
 
+/// A drop zone widget that allows task cards to be dropped into it.
+///
+/// This widget is used both between cards for reordering and in empty lanes.
+/// It handles the logic for accepting or rejecting a drop based on various
+/// conditions like lane locks and custom `canChange` callbacks.
 class SwimlaneDropZone<T> extends StatefulWidget {
   const SwimlaneDropZone({
     super.key,
@@ -1216,6 +1475,11 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
   }
 }
 
+/// The widget that represents a single task card within a swimlane.
+///
+/// It is draggable and displays information about the task as defined by
+/// the `taskWidgetHeader` and `taskWidgetBody` in the [SwimlanesConfig].
+/// It also includes buttons for assigning and following tasks.
 class SwimlanesTaskCard<T> extends StatefulWidget {
   const SwimlanesTaskCard({
     super.key,
