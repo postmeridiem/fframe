@@ -496,12 +496,13 @@ class _AssigneeFilter<T> extends StatelessWidget {
           OutlinedButton(
             onPressed: () => _showUserSelectionDialog(context),
             style: OutlinedButton.styleFrom(
-              shape: const CircleBorder(),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+              ),
               side: BorderSide(
                 width: 2,
                 color: isFilterActive ? activeColor : Theme.of(context).disabledColor,
               ),
-              padding: const EdgeInsets.all(8),
             ),
             child: _buildAvatar(selectedUser),
           ),
@@ -1556,20 +1557,22 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
                                 widget.fFrameUser,
                               ),
                             ),
-                            if (swimlanesConfig.assignee != null && !widget.isLocked)
+                            // The "Assign" button is only shown if both setAssignee and unsetAssignee callbacks are provided.
+                            // This allows for a filter-only implementation if desired.
+                            if (swimlanesConfig.assignee?.setAssignee != null && swimlanesConfig.assignee?.unsetAssignee != null && !widget.isLocked)
                               IconButton(
                                 icon: Tooltip(
                                   message: "Assign",
                                   child: Icon(
                                     Icons.person,
-                                    color: (swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser) == true) ? Colors.greenAccent : null,
+                                    color: (swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser)) ? Colors.greenAccent : null,
                                   ),
                                 ),
                                 onPressed: () {
-                                  if ((swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser) == true)) {
-                                    swimlanesConfig.assignee!.unsetAssignee(selectedDocument.data);
+                                  if (swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser)) {
+                                    swimlanesConfig.assignee!.unsetAssignee!(selectedDocument.data);
                                   } else {
-                                    swimlanesConfig.assignee!.setAssignee(selectedDocument.data, widget.fFrameUser);
+                                    swimlanesConfig.assignee!.setAssignee!(selectedDocument.data, widget.fFrameUser);
                                   }
 
                                   selectedDocument.update();
