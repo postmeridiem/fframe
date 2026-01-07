@@ -127,8 +127,8 @@ class SwimlanesCustomFilter<T> {
   // }
   final bool Function(T) matchesCustomFilter;
 
-  // How the filter option should be shown amongst the other client-side filters.
-  // If not defined, it'll be shown as the others.
+  /// A custom widget to display in the filter bar.
+  /// If not provided, a default button with [filterName] is shown.
   final Widget Function(SwimlanesController)? customFilterWidget;
 }
 

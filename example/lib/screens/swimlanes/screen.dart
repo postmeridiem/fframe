@@ -178,7 +178,7 @@ class _SwimlanesScreenState extends State<SwimlanesScreen> {
                 String dummyFilterSelection = 'dolly the sheep';
                 return suggestion.name == dummyFilterSelection;
               },
-              // Only shown if myId is undefined, so if the default client-side filters are not shown.
+              // This widget is displayed in the filter bar alongside other filters.
               customFilterWidget: customFilterWidget,
             ),
             // getDueDate: (suggestion) => suggestion.dueDate,

@@ -65,7 +65,7 @@ class _SwimlaneHeadersState<T> extends State<SwimlaneHeaders<T>> {
               ),
             ),
           ),
-          widget.swimlanesConfig.myId == null
+          (widget.swimlanesConfig.myId == null && widget.swimlanesConfig.customFilter == null)
               ? const IgnorePointer()
               : Positioned(
                   child: Opacity(
@@ -106,7 +106,6 @@ class _SwimlaneHeadersState<T> extends State<SwimlaneHeaders<T>> {
                     ),
                   ),
                 ),
-          if (widget.swimlanesConfig.myId == null && widget.swimlanesConfig.customFilter?.customFilterWidget != null) widget.swimlanesConfig.customFilter!.customFilterWidget!(swimlanesController),
         ],
       ),
     );
@@ -436,6 +435,11 @@ class SwimlanesFilterBar<T> extends StatelessWidget {
                         ),
                       )
                     : const IgnorePointer(),
+                if (swimlanesConfig.customFilter?.customFilterWidget != null)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
+                    child: swimlanesConfig.customFilter!.customFilterWidget!(swimlanesController),
+                  ),
               ],
             ),
           ),
