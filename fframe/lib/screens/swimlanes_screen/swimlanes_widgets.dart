@@ -487,13 +487,25 @@ class SwimlaneHeader<T> extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  if (swimlaneSetting.isMovementLocked)
+                  if (swimlaneSetting.movementLock.isPartiallyLocked)
                     Padding(
                       padding: const EdgeInsets.only(right: 8.0),
-                      child: Icon(
-                        Icons.lock_outline,
-                        color: swimlanesController.swimlaneHeaderTextColor.withOpacity(0.6),
-                        size: 20,
+                      child: Tooltip(
+                        message: swimlaneSetting.movementLockTooltip ??
+                            (swimlaneSetting.movementLock.isFullyLocked
+                                ? 'Movement fully locked'
+                                : swimlaneSetting.movementLock.incoming
+                                    ? 'Incoming movement locked'
+                                    : 'Outgoing movement locked'),
+                        child: Icon(
+                          swimlaneSetting.movementLock.isFullyLocked
+                              ? Icons.lock_outline
+                              : swimlaneSetting.movementLock.incoming
+                                  ? Icons.login
+                                  : Icons.logout,
+                          color: swimlanesController.swimlaneHeaderTextColor.withValues(alpha: 0.6),
+                          size: 20,
+                        ),
                       ),
                     ),
                   Text(
@@ -1107,7 +1119,8 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = accepted.first;
         } else if (rejected.isNotEmpty) {
           _dragContext = rejected.first;
-          isLocked = _dragContext!.sourceColumn.isMovementLocked || widget.swimlaneSetting.isMovementLocked;
+          // Check if movement is locked: outgoing from source OR incoming to target
+          isLocked = _dragContext!.sourceColumn.movementLock.outgoing || widget.swimlaneSetting.movementLock.incoming;
         }
 
         if (accepted.isNotEmpty || rejected.isNotEmpty) {
@@ -1179,10 +1192,16 @@ class _SwimlaneDropZoneState<T> extends State<SwimlaneDropZone<T>> {
           _dragContext = dragContext!.data;
         });
 
-        // Prevent dropping if the source or target lane is locked for movement.
-        if (dragContext!.data.sourceColumn.isMovementLocked || widget.swimlaneSetting.isMovementLocked) {
-          return false;
+        // Determine if this is a cross-lane move or reordering within the same lane
+        bool isSameLane = widget.swimlaneSetting.id == dragContext!.data.sourceColumn.id;
+
+        // For cross-lane moves: check outgoing lock on source AND incoming lock on target
+        if (!isSameLane) {
+          if (dragContext.data.sourceColumn.movementLock.outgoing || widget.swimlaneSetting.movementLock.incoming) {
+            return false;
+          }
         }
+        // For same-lane reordering: always allow (no locks apply to reordering)
 
         if (widget.swimlaneSetting.id == dragContext.data.sourceColumn.id && widget.swimlanesConfig.getLanePosition != null && widget.swimlaneSetting.canChangePriority != null) {
           return widget.swimlaneSetting.canChangePriority!(

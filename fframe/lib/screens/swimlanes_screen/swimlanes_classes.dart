@@ -101,6 +101,30 @@ class SwimlanesCustomFilter<T> {
   final Widget Function(SwimlanesController)? customFilterWidget;
 }
 
+class SwimlanesMovementLock {
+  const SwimlanesMovementLock({
+    this.incoming = false,
+    this.outgoing = false,
+  });
+
+  /// Whether cards can be dropped into this lane from other lanes.
+  /// If `true`, cards cannot be dropped into this lane.
+  final bool incoming;
+
+  /// Whether cards can be dragged out of this lane to other lanes.
+  /// If `true`, cards cannot be dragged out of this lane.
+  final bool outgoing;
+
+  /// Returns true if both incoming and outgoing are locked.
+  bool get isFullyLocked => incoming && outgoing;
+
+  /// Returns true if either incoming or outgoing is locked.
+  bool get isPartiallyLocked => incoming || outgoing;
+
+  /// Returns true if no locks are applied.
+  bool get isUnlocked => !incoming && !outgoing;
+}
+
 class SwimlanesActionMenu<T> {
   const SwimlanesActionMenu({
     required this.menuItems,
@@ -143,7 +167,8 @@ class SwimlaneSetting<T> {
     this.onCardCreated,
     this.addCardButtonStyle,
     this.openNewCard = false,
-    this.isMovementLocked = false,
+    this.movementLock = const SwimlanesMovementLock(),
+    this.movementLockTooltip,
   }) : assert(
           allowCardCreation == false || onNewCard != null,
           "Configuration error in SwimlaneSetting: 'onNewCard' must be provided when 'allowCardCreation' is true.",
@@ -210,11 +235,30 @@ class SwimlaneSetting<T> {
   /// Defaults to `false`.
   final bool openNewCard;
 
-  /// Whether card movement into and out of this swimlane is locked.
+  /// Configures movement restrictions for cards in this swimlane.
   ///
-  /// If `true`, cards cannot be dragged out of this lane, and no cards can be
-  /// dropped into it from other lanes. Reordering within the lane is still allowed.
-  final bool isMovementLocked;
+  /// Allows granular control over card movement:
+  /// - `incoming`: If `true`, prevents cards from being dropped into this lane from other lanes
+  /// - `outgoing`: If `true`, prevents cards from being dragged out of this lane to other lanes
+  ///
+  /// Example:
+  /// ```dart
+  /// movementLock: SwimlanesMovementLock(incoming: true, outgoing: false)
+  /// ```
+  /// This allows cards to move out but not into the lane.
+  final SwimlanesMovementLock movementLock;
+
+  /// Custom tooltip message to display when hovering over the movement lock icon.
+  ///
+  /// If provided, this will override the default tooltip messages.
+  /// Use this to provide specific information about which lanes cards can be moved to/from.
+  ///
+  /// Example:
+  /// ```dart
+  /// movementLockTooltip: 'Can only move to "Completed Card" lane'
+  /// ```
+  final String? movementLockTooltip;
+
   late int? swimlaneIndex;
   late bool hasAccess = false;
 }
