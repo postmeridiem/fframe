@@ -15,6 +15,7 @@ class SwimlanesConfig<T> extends ListConfig {
     this.myId,
     this.following,
     this.customFilter,
+    this.userList,
     this.swimlaneBackgroundColor,
     this.swimlaneHeaderColor,
     this.swimlaneHeaderTextColor,
@@ -46,6 +47,7 @@ class SwimlanesConfig<T> extends ListConfig {
   final String Function(T) getTitle;
   final String Function(FFrameUser)? myId;
   final SwimlanesFollowing<T>? following;
+  final List<FFrameUser>? userList;
   final SwimlanesCustomFilter<T>? customFilter;
   final SwimlanesAssignee<T>? assignee;
   final String Function(T) getDescription;
@@ -68,15 +70,44 @@ class SwimlanesFollowing<T> {
   final T Function(T, FFrameUser) stopFollowing;
 }
 
+/// Configures the assignee functionality for swimlane cards.
+///
+/// This class provides the logic for checking if a user is an assignee,
+/// and optionally, for setting and unsetting an assignee on a card.
 class SwimlanesAssignee<T> {
+  /// Creates a configuration for swimlane assignee functionality.
+  ///
+  /// The [isAssignee] callback is required and determines if a given user is
+  /// assigned to a card. This is used for filtering, such as "Assigned to Me".
+  ///
+  /// The [setAssignee] and [unsetAssignee] callbacks are optional. If they are
+  /// provided, an "assign" button will be displayed on the task card, allowing
+  /// users to assign or unassign themselves. If they are omitted, the swimlanes
+  /// will only support filtering by assignee, without providing the UI to
+  /// change the assignment.
   SwimlanesAssignee({
     required this.isAssignee,
-    required this.setAssignee,
-    required this.unsetAssignee,
+    this.setAssignee,
+    this.unsetAssignee,
   });
+
+  /// A callback that returns `true` if the given [FFrameUser] is assigned to
+  /// the document [T].
+  ///
+  /// This is used for filtering cards.
   final bool Function(T, FFrameUser) isAssignee;
-  final T Function(T, FFrameUser) setAssignee;
-  final T Function(T) unsetAssignee;
+
+  /// An optional callback to assign a user to the document.
+  ///
+  /// If provided (along with [unsetAssignee]), an assignment UI will be enabled
+  /// on the task card.
+  final T Function(T, FFrameUser)? setAssignee;
+
+  /// An optional callback to unassign a user from the document.
+  ///
+  /// If provided (along with [setAssignee]), an assignment UI will be enabled
+  /// on the task card.
+  final T Function(T)? unsetAssignee;
 }
 
 class SwimlanesCustomFilter<T> {
@@ -96,8 +127,8 @@ class SwimlanesCustomFilter<T> {
   // }
   final bool Function(T) matchesCustomFilter;
 
-  // How the filter option should be shown amongst the other client-side filters.
-  // If not defined, it'll be shown as the others.
+  /// A custom widget to display in the filter bar.
+  /// If not provided, a default button with [filterName] is shown.
   final Widget Function(SwimlanesController)? customFilterWidget;
 }
 
