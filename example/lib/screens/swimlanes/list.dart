@@ -59,11 +59,13 @@ List<SwimlaneSetting<Suggestion>> swimlanesSettings = [
       // or show a confirmation dialog.
       Console.log("New card created with ID: $documentId");
     },
-    // Prevents cards from being moved out of or into this lane.
-    // This is useful for lanes that represent a final state, such as "Done" or "Archived",
-    // or for lanes where movement is controlled programmatically rather than by user drag-and-drop.
-    // A lock icon will be displayed in the swimlane header.
-    isMovementLocked: true,
+    // Controls granular movement restrictions for this lane using incoming/outgoing locks.
+    // - incoming: true prevents cards from being dragged INTO this lane
+    // - outgoing: true prevents cards from being dragged OUT OF this lane
+    // A lock icon will be displayed in the swimlane header when movement is restricted.
+    movementLock: const SwimlanesMovementLock(incoming: true, outgoing: false),
+    // Tooltip displayed when hovering over the lock icon to explain the movement restrictions.
+    movementLockTooltip: "Only allowed to drag tickets out of this lane",
     id: "inProgress",
     header: "In Progress",
     query: (Query<Suggestion> query) {
