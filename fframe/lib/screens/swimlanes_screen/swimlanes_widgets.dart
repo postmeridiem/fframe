@@ -55,6 +55,7 @@ class _SwimlaneHeadersState<T> extends State<SwimlaneHeaders<T>> {
             child: Container(
               color: swimlanesController.swimlaneHeaderColor,
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: swimlaneSettings
                     .map((SwimlaneSetting<T> swimlaneSetting) => SwimlaneHeader<T>(
                           swimlanesController: swimlanesController,
@@ -724,51 +725,46 @@ class SwimlaneHeader<T> extends StatelessWidget {
       ),
       child: SizedBox(
         width: swimlanesController.swimlanesConfig.swimlaneWidth,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Text.rich(
+              TextSpan(
                 children: [
                   if (swimlaneSetting.movementLock.isPartiallyLocked)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: Tooltip(
-                        message: swimlaneSetting.movementLockTooltip ??
-                            (swimlaneSetting.movementLock.isFullyLocked
-                                ? 'Movement fully locked'
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Tooltip(
+                          message: swimlaneSetting.movementLockTooltip ??
+                              (swimlaneSetting.movementLock.isFullyLocked
+                                  ? 'Movement fully locked'
+                                  : swimlaneSetting.movementLock.incoming
+                                      ? 'Incoming movement locked'
+                                      : 'Outgoing movement locked'),
+                          child: Icon(
+                            swimlaneSetting.movementLock.isFullyLocked
+                                ? Icons.lock_outline
                                 : swimlaneSetting.movementLock.incoming
-                                    ? 'Incoming movement locked'
-                                    : 'Outgoing movement locked'),
-                        child: Icon(
-                          swimlaneSetting.movementLock.isFullyLocked
-                              ? Icons.lock_outline
-                              : swimlaneSetting.movementLock.incoming
-                                  ? Icons.login
-                                  : Icons.logout,
-                          color: swimlanesController.swimlaneHeaderTextColor.withValues(alpha: 0.6),
-                          size: 20,
+                                    ? Icons.login
+                                    : Icons.logout,
+                            color: swimlanesController.swimlaneHeaderTextColor.withValues(alpha: 0.6),
+                            size: 20,
+                          ),
                         ),
                       ),
                     ),
-                  Text(
-                    swimlaneSetting.header,
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: swimlanesController.swimlaneHeaderTextColor,
-                    ),
-                  ),
+                  TextSpan(text: swimlaneSetting.header),
                 ],
               ),
-              // Text(
-              //   "countMessage",
-              //   style: TextStyle(
-              //     fontSize: 10,
-              //     color: swimlanesController.swimlaneHeaderTextColor,
-              //   ),
-              // ),
-            ],
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                color: swimlanesController.swimlaneHeaderTextColor,
+              ),
+            ),
           ),
         ),
       ),
