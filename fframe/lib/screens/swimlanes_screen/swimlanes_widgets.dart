@@ -1173,10 +1173,15 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                               // The context is guaranteed to be valid at this moment
                                               final RenderBox renderBox = dragKey.currentContext!.findRenderObject() as RenderBox;
                                               widget.swimlanesController.setDraggedItemHeight(renderBox.size.height);
+                                              // Enable auto-scroll detection
+                                              widget.swimlanesController.taskDragging = true;
                                             },
                                             onDragEnd: (details) {
                                               // Clean up the height in the controller when the drag is over
                                               widget.swimlanesController.setDraggedItemHeight(null);
+                                              // Disable auto-scroll and stop any active scrolling
+                                              widget.swimlanesController.taskDragging = false;
+                                              widget.swimlanesController.dragAutoScrollService.onDragEnd();
                                             },
                                             feedback: SwimlanesTaskCard<T>(
                                               selectedDocument: selectedDocument,

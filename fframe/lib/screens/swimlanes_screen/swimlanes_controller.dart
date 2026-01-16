@@ -12,6 +12,8 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
     required this.swimlanesConfig,
     required this.viewportSize,
   }) : super(child: child) {
+    // Initialize the drag auto-scroll service
+    dragAutoScrollService = DragAutoScrollService();
     // initialize the total width tracker
     double calculatedMinWidth = 0;
 
@@ -63,6 +65,7 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
     );
   }
   late SwimlanesNotifier notifier;
+  late DragAutoScrollService dragAutoScrollService;
 
   final BuildContext context;
   final SwimlanesConfig swimlanesConfig;
