@@ -55,7 +55,6 @@ class _SwimlaneHeadersState<T> extends State<SwimlaneHeaders<T>> {
             child: Container(
               color: swimlanesController.swimlaneHeaderColor,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: swimlaneSettings
                     .map((SwimlaneSetting<T> swimlaneSetting) => SwimlaneHeader<T>(
                           swimlanesController: swimlanesController,
@@ -725,10 +724,9 @@ class SwimlaneHeader<T> extends StatelessWidget {
       ),
       child: SizedBox(
         width: swimlanesController.swimlanesConfig.swimlaneWidth,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-          child: Align(
-            alignment: Alignment.topCenter,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text.rich(
               TextSpan(
                 children: [
