@@ -727,42 +727,59 @@ class SwimlaneHeader<T> extends StatelessWidget {
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  if (swimlaneSetting.movementLock.isPartiallyLocked)
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.middle,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Tooltip(
-                          message: swimlaneSetting.movementLockTooltip ??
-                              (swimlaneSetting.movementLock.isFullyLocked
-                                  ? 'Movement fully locked'
+            // When a movement lock is active, use a Stack to position the lock
+            // icon directly to the left of the centered text without affecting
+            // the text's centering. The icon is positioned outside the Stack's
+            // bounds using a negative left offset and clipBehavior: Clip.none.
+            child: swimlaneSetting.movementLock.isPartiallyLocked
+                ? Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Text(
+                        swimlaneSetting.header,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: swimlanesController.swimlaneHeaderTextColor,
+                        ),
+                      ),
+                      // Position the lock icon 28px to the left of the text
+                      // (20px icon + 8px gap) so it appears directly next to
+                      // the text without affecting centering.
+                      Positioned(
+                        left: -28,
+                        top: 0,
+                        bottom: 0,
+                        child: Center(
+                          child: Tooltip(
+                            message: swimlaneSetting.movementLockTooltip ??
+                                (swimlaneSetting.movementLock.isFullyLocked
+                                    ? 'Movement fully locked'
+                                    : swimlaneSetting.movementLock.incoming
+                                        ? 'Incoming movement locked'
+                                        : 'Outgoing movement locked'),
+                            child: Icon(
+                              swimlaneSetting.movementLock.isFullyLocked
+                                  ? Icons.lock_outline
                                   : swimlaneSetting.movementLock.incoming
-                                      ? 'Incoming movement locked'
-                                      : 'Outgoing movement locked'),
-                          child: Icon(
-                            swimlaneSetting.movementLock.isFullyLocked
-                                ? Icons.lock_outline
-                                : swimlaneSetting.movementLock.incoming
-                                    ? Icons.login
-                                    : Icons.logout,
-                            color: swimlanesController.swimlaneHeaderTextColor.withValues(alpha: 0.6),
-                            size: 20,
+                                      ? Icons.login
+                                      : Icons.logout,
+                              color: swimlanesController.swimlaneHeaderTextColor.withValues(alpha: 0.6),
+                              size: 20,
+                            ),
                           ),
                         ),
                       ),
+                    ],
+                  )
+                : Text(
+                    swimlaneSetting.header,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: swimlanesController.swimlaneHeaderTextColor,
                     ),
-                  TextSpan(text: swimlaneSetting.header),
-                ],
-              ),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 20,
-                color: swimlanesController.swimlaneHeaderTextColor,
-              ),
-            ),
+                  ),
           ),
         ),
       ),
