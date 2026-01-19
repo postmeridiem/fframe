@@ -41,28 +41,18 @@ class _SwimlaneHeadersState<T> extends State<SwimlaneHeaders<T>> {
       height: swimlanesController.headerHeight,
       child: Stack(
         children: [
-          MouseRegion(
-            onEnter: (PointerEvent details) {
-              setState(() {
-                filterMenuOpen = true;
-              });
-            },
-            onExit: (PointerEvent details) {
-              setState(() {
-                filterMenuOpen = false;
-              });
-            },
-            child: Container(
-              color: swimlanesController.swimlaneHeaderColor,
-              child: Row(
-                children: swimlaneSettings
-                    .map((SwimlaneSetting<T> swimlaneSetting) => SwimlaneHeader<T>(
-                          swimlanesController: swimlanesController,
-                          swimlanesConfig: widget.swimlanesConfig,
-                          swimlaneSetting: swimlaneSetting,
-                        ))
-                    .toList(),
-              ),
+          // Header row without MouseRegion wrapper to allow tooltips on
+          // individual header elements (like lock icons) to work properly.
+          Container(
+            color: swimlanesController.swimlaneHeaderColor,
+            child: Row(
+              children: swimlaneSettings
+                  .map((SwimlaneSetting<T> swimlaneSetting) => SwimlaneHeader<T>(
+                        swimlanesController: swimlanesController,
+                        swimlanesConfig: widget.swimlanesConfig,
+                        swimlaneSetting: swimlaneSetting,
+                      ))
+                  .toList(),
             ),
           ),
           (widget.swimlanesConfig.myId == null && widget.swimlanesConfig.customFilter == null)
@@ -708,71 +698,55 @@ class SwimlaneHeader<T> extends StatelessWidget {
     // if (swimlaneTaskCount != swimlaneTaskCountFiltered) {
     //   lanecountMessage = "$swimlaneTaskCount tasks";
     // }
-    return Container(
-      decoration: BoxDecoration(
-        // color: Colors.yellowAccent,
-        border: Border(
-          right: BorderSide(
-            width: 2,
-            color: swimlanesController.swimlaneHeaderSeparatorColor,
+
+    // SizedBox must be the outer widget with the border inside to ensure
+    // the total column width equals exactly swimlaneWidth. This matches
+    // the content swimlane structure and prevents cumulative width drift
+    // between headers and content columns (2px border per lane would
+    // otherwise cause headers to overflow).
+    return SizedBox(
+      width: swimlanesController.swimlanesConfig.swimlaneWidth,
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(
+            right: BorderSide(
+              width: 2,
+              color: swimlanesController.swimlaneHeaderSeparatorColor,
+            ),
           ),
-          // bottom: BorderSide(
-          //   width: 1,
-          //   color: swimlanesController.taskCardColor,
-          // ),
         ),
-      ),
-      child: SizedBox(
-        width: swimlanesController.swimlanesConfig.swimlaneWidth,
         child: Center(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            // When a movement lock is active, use a Stack to position the lock
-            // icon directly to the left of the centered text without affecting
-            // the text's centering. The icon is positioned outside the Stack's
-            // bounds using a negative left offset and clipBehavior: Clip.none.
-            child: swimlaneSetting.movementLock.isPartiallyLocked
-                ? Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      Text(
-                        swimlaneSetting.header,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: swimlanesController.swimlaneHeaderTextColor,
-                        ),
+            // When a movement lock is active, display the lock icon to the
+            // left of the text. We use a Row with MainAxisSize.min so the
+            // icon and text are grouped together and centered as a unit.
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (swimlaneSetting.movementLock.isPartiallyLocked)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: Tooltip(
+                      message: swimlaneSetting.movementLockTooltip ??
+                          (swimlaneSetting.movementLock.isFullyLocked
+                              ? 'Movement fully locked'
+                              : swimlaneSetting.movementLock.incoming
+                                  ? 'Incoming movement locked'
+                                  : 'Outgoing movement locked'),
+                      child: Icon(
+                        swimlaneSetting.movementLock.isFullyLocked
+                            ? Icons.lock_outline
+                            : swimlaneSetting.movementLock.incoming
+                                ? Icons.login
+                                : Icons.logout,
+                        color: swimlanesController.swimlaneHeaderTextColor.withValues(alpha: 0.6),
+                        size: 20,
                       ),
-                      // Position the lock icon 28px to the left of the text
-                      // (20px icon + 8px gap) so it appears directly next to
-                      // the text without affecting centering.
-                      Positioned(
-                        left: -28,
-                        top: 0,
-                        bottom: 0,
-                        child: Center(
-                          child: Tooltip(
-                            message: swimlaneSetting.movementLockTooltip ??
-                                (swimlaneSetting.movementLock.isFullyLocked
-                                    ? 'Movement fully locked'
-                                    : swimlaneSetting.movementLock.incoming
-                                        ? 'Incoming movement locked'
-                                        : 'Outgoing movement locked'),
-                            child: Icon(
-                              swimlaneSetting.movementLock.isFullyLocked
-                                  ? Icons.lock_outline
-                                  : swimlaneSetting.movementLock.incoming
-                                      ? Icons.login
-                                      : Icons.logout,
-                              color: swimlanesController.swimlaneHeaderTextColor.withValues(alpha: 0.6),
-                              size: 20,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  )
-                : Text(
+                    ),
+                  ),
+                Flexible(
+                  child: Text(
                     swimlaneSetting.header,
                     textAlign: TextAlign.center,
                     style: TextStyle(
@@ -780,6 +754,9 @@ class SwimlaneHeader<T> extends StatelessWidget {
                       color: swimlanesController.swimlaneHeaderTextColor,
                     ),
                   ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
