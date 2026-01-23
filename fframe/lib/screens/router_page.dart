@@ -133,6 +133,21 @@ class FRouter extends InheritedWidget {
     return SelectionState.instance.queryParameters?.containsKey(key) ?? false;
   }
 
+  /// Set a base query parameter that persists even when no document is open
+  void setBaseQueryParameter({required String key, required String value}) {
+    SelectionState.instance.setBaseQueryParameter(key: key, value: value);
+  }
+
+  /// Remove a base query parameter
+  void removeBaseQueryParameter({required String key}) {
+    SelectionState.instance.removeBaseQueryParameter(key: key);
+  }
+
+  /// Get a base query parameter value
+  String? baseQueryStringParam(String key) {
+    return SelectionState.instance.baseQueryStringParam(key);
+  }
+
   // //Get a value from the QueryString
   // String? queryStringParam(String key) {
   //   QueryState queryState = ref.read(queryStateProvider);

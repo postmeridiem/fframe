@@ -68,6 +68,9 @@ class SelectionState with ChangeNotifier {
   SelectionState._internal();
   final Map<String, SelectionStateTracker> _selectionState = {};
 
+  /// Base query parameters that persist even when no document is active
+  final Map<String, String> _baseQueryParameters = {};
+
   SelectionState();
 
   EdgeInsets _padding = EdgeInsets.zero;
@@ -260,12 +263,31 @@ class SelectionState with ChangeNotifier {
   }
 
   String get queryString {
+    Map<String, String> allParams = {..._baseQueryParameters};
     if (activeTracker != null) {
-      return activeTracker!.queryString;
+      // Merge document params, document params take precedence
+      allParams.addAll(activeTracker!.queryParameters);
     }
-    return "";
-    // return _queryParameters?.entries.map((queryParameter) => "${queryParameter.key}=${queryParameter.value}").join("&") ?? "";
+    if (allParams.isEmpty) return "";
+    return allParams.entries.map((e) => "${e.key}=${e.value}").join("&");
   }
+
+  /// Set a base query parameter (persists across document open/close)
+  void setBaseQueryParameter({required String key, required String value}) {
+    _baseQueryParameters[key] = value;
+    NavigationNotifier.instance.processRouteInformation();
+    notifyListeners();
+  }
+
+  /// Remove a base query parameter
+  void removeBaseQueryParameter({required String key}) {
+    _baseQueryParameters.remove(key);
+    NavigationNotifier.instance.processRouteInformation();
+    notifyListeners();
+  }
+
+  /// Get a base query parameter value
+  String? baseQueryStringParam(String key) => _baseQueryParameters[key];
 
   Map<String, String>? get queryParameters {
     return activeTracker?.queryParameters;
