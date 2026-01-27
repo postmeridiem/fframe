@@ -45,6 +45,7 @@ class TargetState extends ChangeNotifier {
     //Prevent naked URL
     if (uri.pathSegments.isEmpty) {
       navigationTarget = defaultRoute;
+      return; // Early return to prevent accessing .first on empty list
     }
 
     //Check if this is a login path
