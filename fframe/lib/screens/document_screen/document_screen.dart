@@ -233,12 +233,26 @@ class DocumentScreenLoader<T> extends StatefulWidget {
 class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with SingleTickerProviderStateMixin {
   late DocumentConfig<T> documentConfig = widget.documentConfig;
   late ViewType viewType = widget.documentConfig.currentViewType;
+
   @override
   void initState() {
     super.initState();
-    // this.documentConfig = widget.documentConfig;
     WidgetsBinding.instance.addPostFrameCallback((_) => NavigationNotifier.instance.markBuildDone(documentConfig));
     TargetState.instance.addListener(_changeListener);
+  }
+
+  /// Updates [documentConfig] and [viewType] when the parent provides a new
+  /// configuration (e.g. switching between boards). These fields are stored as
+  /// late-initialized state so they persist across rebuilds, but they must be
+  /// refreshed here when the actual config changes — otherwise the loader would
+  /// keep rendering the previous board's view.
+  @override
+  void didUpdateWidget(covariant DocumentScreenLoader<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.documentConfig != oldWidget.documentConfig) {
+      documentConfig = widget.documentConfig;
+      viewType = widget.documentConfig.currentViewType;
+    }
   }
 
   @override
