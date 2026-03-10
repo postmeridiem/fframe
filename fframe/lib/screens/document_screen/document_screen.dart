@@ -1,14 +1,7 @@
 part of 'package:fframe/fframe.dart';
 
-/// The main screen widget for displaying and managing Firestore documents.
-///
-/// This is a [StatefulWidget] so that the [GlobalKey] for the [Form] persists
-/// across parent rebuilds. If this were a [StatelessWidget], a new [GlobalKey]
-/// would be created on every parent rebuild (e.g. when a document is opened or
-/// closed), destroying the entire subtree — including scroll controllers and
-/// their positions.
-class DocumentScreen<T> extends StatefulWidget {
-  const DocumentScreen({
+class DocumentScreen<T> extends StatelessWidget {
+  DocumentScreen({
     super.key,
     required this.collection,
     required this.createNew,
@@ -35,6 +28,7 @@ class DocumentScreen<T> extends StatefulWidget {
     this.queryBuilder,
   });
 
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final Query<T> Function(Query<T> query)? queryBuilder;
   final DocumentList<T>? documentList;
   final DataGridConfig<T>? dataGrid;
@@ -60,15 +54,6 @@ class DocumentScreen<T> extends StatefulWidget {
   final DocumentScreenFooterBuilder? documentScreenFooterBuilder;
 
   @override
-  State<DocumentScreen<T>> createState() => _DocumentScreenState<T>();
-}
-
-class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
-  /// Persists across parent rebuilds so the Form subtree (and all descendants
-  /// including scroll controllers) is preserved when documents open/close.
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  @override
   Widget build(BuildContext context) {
     DocumentScreenConfig? parentDocumentScreenConfig = DocumentScreenConfig.of(context);
 
@@ -84,32 +69,32 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
     }
 
     bool hideTitle = false;
-    if (widget.headerBuilder == null) {
+    if (headerBuilder == null) {
       hideTitle = true;
     }
 
     DocumentConfig<T> documentConfig = DocumentConfig<T>(
       formKey: formKey,
-      collection: widget.collection,
-      documentList: widget.documentList,
-      dataGridConfig: widget.dataGrid,
-      listGridConfig: widget.listGrid,
-      customList: widget.customList,
-      swimlanes: widget.swimlanes,
-      initialViewType: widget.viewType,
-      autoSelectFirst: widget.autoSelectFirst,
-      queryStringIdParam: queryStringIdParam ?? widget.queryStringIdParam,
-      createNew: widget.createNew,
-      createDocumentId: widget.createDocumentId,
-      preSave: widget.preSave,
-      preOpen: widget.preOpen,
-      document: widget.document,
-      toFirestore: widget.toFirestore,
-      fromFirestore: widget.fromFirestore,
-      query: widget.query,
-      searchConfig: widget.searchConfig,
-      documentTitle: widget.documentTitle,
-      headerBuilder: widget.headerBuilder,
+      collection: collection,
+      documentList: documentList,
+      dataGridConfig: dataGrid,
+      listGridConfig: listGrid,
+      customList: customList,
+      swimlanes: swimlanes,
+      initialViewType: viewType,
+      autoSelectFirst: autoSelectFirst,
+      queryStringIdParam: queryStringIdParam ?? this.queryStringIdParam,
+      createNew: createNew,
+      createDocumentId: createDocumentId,
+      preSave: preSave,
+      preOpen: preOpen,
+      document: document,
+      toFirestore: toFirestore,
+      fromFirestore: fromFirestore,
+      query: query,
+      searchConfig: searchConfig,
+      documentTitle: documentTitle,
+      headerBuilder: headerBuilder,
       hideTitle: hideTitle,
       embeddedDocument: embeddedDocument ?? false,
     );
@@ -118,27 +103,27 @@ class _DocumentScreenState<T> extends State<DocumentScreen<T>> {
       children: [
         Column(
           children: [
-            if (widget.documentScreenHeaderBuilder != null) widget.documentScreenHeaderBuilder!(),
+            if (documentScreenHeaderBuilder != null) documentScreenHeaderBuilder!(),
             Expanded(
               child: Form(
                 key: formKey,
                 child: DocumentScreenConfig(
                   fireStoreQueryState: FireStoreQueryState<T>(
-                    collection: widget.collection,
-                    fromFirestore: widget.fromFirestore,
-                    initialQuery: widget.query,
-                    listQuery: widget.queryBuilder,
+                    collection: collection,
+                    fromFirestore: fromFirestore,
+                    initialQuery: query,
+                    listQuery: queryBuilder,
                   ),
                   fFrameUser: fFrameUser,
                   documentConfig: documentConfig,
                   child: DocumentScreenLoader<T>(
                     documentConfig: documentConfig,
-                    key: ValueKey("DocumentScreenLoader_${widget.collection}"),
+                    key: ValueKey("DocumentScreenLoader_$collection"),
                   ),
                 ),
               ),
             ),
-            if (widget.documentScreenFooterBuilder != null) widget.documentScreenFooterBuilder!(),
+            if (documentScreenFooterBuilder != null) documentScreenFooterBuilder!(),
           ],
         ),
         const DocumentBodyWatcher(),
