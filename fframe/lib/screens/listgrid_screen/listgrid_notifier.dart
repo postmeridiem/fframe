@@ -58,6 +58,15 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
   Query<T> get currentQuery => _currentQuery as Query<T>;
 
+  /// Updates the base query and rebuilds the current query.
+  ///
+  /// Called when the parent widget provides a new query (e.g. the user applies
+  /// a filter). Sorting and search are re-applied on top of the new base query.
+  void updateBaseQuery(Query<T> newQuery) {
+    _initialQuery = newQuery;
+    _queryBuilder();
+  }
+
   // final ListGridSearchConfig? searchConfig;
   // late List<ListGridColumn> columnSettings;
   late List<int> searchableColumns;
