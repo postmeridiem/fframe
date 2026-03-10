@@ -38,13 +38,13 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
     super.initState();
   }
 
-  /// Updates the [ListGridNotifier]'s base query when the parent provides a
-  /// new query (e.g. the user applies a filter via the parent's queryBuilder).
   @override
   void didUpdateWidget(covariant FirestoreListGrid<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.query != oldWidget.query) {
-      listGridNotifier.updateBaseQuery(widget.query);
+
+    if (widget.query.hashCode != oldWidget.query.hashCode) {
+      // _query = widget.query;
+      // _query = _unwrapQuery(widget.query);
     }
   }
 

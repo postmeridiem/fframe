@@ -32,13 +32,13 @@ class FirestoreSwimlanesState<T> extends State<FirestoreSwimlanes<T>> {
     super.initState();
   }
 
-  /// Updates the swimlanes notifier's base query when the parent provides a
-  /// new query (e.g. switching boards or applying a filter).
   @override
   void didUpdateWidget(covariant FirestoreSwimlanes<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.query != oldWidget.query) {
-      SwimlanesController.of(context).notifier.updateSourceQuery(widget.query);
+
+    if (widget.query.hashCode != oldWidget.query.hashCode) {
+      // _query = widget.query;
+      // _query = _unwrapQuery(widget.query);
     }
   }
 

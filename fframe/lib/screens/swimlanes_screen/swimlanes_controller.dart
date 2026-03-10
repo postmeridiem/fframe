@@ -228,7 +228,7 @@ class SwimlanesNotifier<T> extends ChangeNotifier {
     //update the collection count
     _updateCollectionCount(query: _currentQuery);
   }
-  Query sourceQuery;
+  final Query sourceQuery;
   final List<SwimlaneSetting> swimlaneSettings;
 
   late String? _searchString;
@@ -249,14 +249,6 @@ class SwimlanesNotifier<T> extends ChangeNotifier {
     } else {
       _searchString = null;
     }
-    _queryBuilder();
-  }
-
-  /// Updates the base query and rebuilds the current query.
-  ///
-  /// Called when the parent widget provides a new query (e.g. switching boards).
-  void updateSourceQuery(Query newQuery) {
-    sourceQuery = newQuery;
     _queryBuilder();
   }
 
