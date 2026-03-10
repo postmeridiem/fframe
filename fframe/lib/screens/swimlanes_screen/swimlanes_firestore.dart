@@ -96,17 +96,40 @@ class SwimlaneBuilder<T> extends StatefulWidget {
 }
 
 class _SwimlaneBuilderState<T> extends State<SwimlaneBuilder<T>> {
+  // Persists scroll offsets across state disposal (caused by DocumentScreen
+  // rebuilds on route changes). Keyed by collection name.
+  static final Map<String, double> _savedOffsets = {};
+
   final ScrollController _horizontal = ScrollController();
+
+  String get _scrollKey => widget.documentConfig.collection;
 
   @override
   void initState() {
     super.initState();
     widget.swimlanesController.dragAutoScrollService
         .attachHorizontalController(_horizontal);
+
+    // Restore saved scroll position after layout
+    final saved = _savedOffsets[_scrollKey];
+    if (saved != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (_horizontal.hasClients && _horizontal.position.maxScrollExtent >= saved) {
+          _horizontal.jumpTo(saved);
+        }
+      });
+    }
+
+    _horizontal.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    _savedOffsets[_scrollKey] = _horizontal.offset;
   }
 
   @override
   void dispose() {
+    _horizontal.removeListener(_onScroll);
     widget.swimlanesController.dragAutoScrollService
         .detachHorizontalController();
     _horizontal.dispose();
@@ -115,76 +138,59 @@ class _SwimlaneBuilderState<T> extends State<SwimlaneBuilder<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return ListenableBuilder(
-      listenable: SelectionState.instance,
-      builder: (BuildContext context, Widget? child) {
-        // SelectionState selectionState = SelectionState.instance;
-
-        return Stack(
+    return Stack(
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Expanded(
-                  child: Listener(
-                    onPointerMove: (PointerMoveEvent event) {
-                      // Only trigger auto-scroll when actively dragging a card
-                      if (widget.swimlanesController.isDragging) {
-                        widget.swimlanesController.dragAutoScrollService
-                            .onDragUpdate(event.position, context);
-                      }
-                    },
-                    onPointerUp: (_) {
-                      widget.swimlanesController.dragAutoScrollService.onDragEnd();
-                    },
-                    onPointerCancel: (_) {
-                      widget.swimlanesController.dragAutoScrollService.onDragEnd();
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: widget.swimlanesController.swimlaneBackgroundColor,
-                      ),
-                      child: Scrollbar(
-                        controller: _horizontal,
-                        thumbVisibility: true,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          controller: _horizontal,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SwimlaneHeaders<T>(
-                                swimlanesController: widget.swimlanesController,
-                                documentConfig: widget.documentConfig,
-                                swimlanesConfig: widget.swimlanesConfig,
-                              ),
-                              Swimlanes<T>(
-                                swimlanesController: widget.swimlanesController,
-                                documentConfig: widget.documentConfig,
-                                swimlanesConfig: widget.swimlanesConfig,
-                              ),
-                              // widget.swimlanesConfig.showFooter
-                              //     ? Column(
-                              //         mainAxisAlignment: MainAxisAlignment.end,
-                              //         children: [
-                              //           SwimlanesFooter(
-                              //             viewportWidth: swimlanes.viewportWidth,
-                              //           ),
-                              //         ],
-                              //       )
-                              //     : const IgnorePointer(),
-                            ],
+            Expanded(
+              child: Listener(
+                onPointerMove: (PointerMoveEvent event) {
+                  // Only trigger auto-scroll when actively dragging a card
+                  if (widget.swimlanesController.isDragging) {
+                    widget.swimlanesController.dragAutoScrollService
+                        .onDragUpdate(event.position, context);
+                  }
+                },
+                onPointerUp: (_) {
+                  widget.swimlanesController.dragAutoScrollService.onDragEnd();
+                },
+                onPointerCancel: (_) {
+                  widget.swimlanesController.dragAutoScrollService.onDragEnd();
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: widget.swimlanesController.swimlaneBackgroundColor,
+                  ),
+                  child: Scrollbar(
+                    controller: _horizontal,
+                    thumbVisibility: true,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      controller: _horizontal,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SwimlaneHeaders<T>(
+                            swimlanesController: widget.swimlanesController,
+                            documentConfig: widget.documentConfig,
+                            swimlanesConfig: widget.swimlanesConfig,
                           ),
-                        ),
+                          Swimlanes<T>(
+                            swimlanesController: widget.swimlanesController,
+                            documentConfig: widget.documentConfig,
+                            swimlanesConfig: widget.swimlanesConfig,
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
-              ],
+              ),
             ),
           ],
-        );
-      },
+        ),
+      ],
     );
   }
 }
