@@ -44,6 +44,8 @@ class _NotificationsListState extends State<NotificationsList> {
       notificationsQuery = notificationsBase.where('deleted', isEqualTo: false).where('read', isEqualTo: false).orderBy('notificationTime', descending: true);
     }
 
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -51,18 +53,18 @@ class _NotificationsListState extends State<NotificationsList> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Row(
             children: [
-              const Text(
+              Text(
                 'Notifications',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: colorScheme.onSurface,
                 ),
               ),
               const Spacer(),
-              const Text(
+              Text(
                 'Only show unread',
-                style: TextStyle(fontSize: 13, color: Colors.white70),
+                style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
               ),
               Switch(
                 value: onlyShowUnread,
@@ -101,7 +103,7 @@ class _NotificationsListState extends State<NotificationsList> {
                 return Center(
                   child: Text(
                     onlyShowUnread ? "No unread notifications" : "No notifications",
-                    style: const TextStyle(color: Colors.white54),
+                    style: TextStyle(color: colorScheme.onSurfaceVariant),
                   ),
                 );
               }
@@ -109,7 +111,7 @@ class _NotificationsListState extends State<NotificationsList> {
               return ListView.separated(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 itemCount: docs.length,
-                separatorBuilder: (_, __) => const Divider(height: 1, color: Colors.grey),
+                separatorBuilder: (_, __) => Divider(height: 1, color: colorScheme.outlineVariant),
                 itemBuilder: (context, index) {
                   final doc = docs[index];
                   final notification = FframeNotification.fromFirestore(
@@ -336,6 +338,7 @@ class _NotificationTileState extends State<NotificationTile> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     final timestamp = widget.notification.notificationTime?.toDate();
     final timeAgo = timestamp != null ? _timeAgoFormat(timestamp) : '';
 
@@ -355,7 +358,7 @@ class _NotificationTileState extends State<NotificationTile> {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: widget.notification.read ? Colors.grey[400] : Colors.white,
+                    color: widget.notification.read ? colorScheme.onSurfaceVariant : colorScheme.onSurface,
                   ),
                 ),
                 if (widget.notification.messageSubtitle?.isNotEmpty ?? false)
@@ -363,7 +366,7 @@ class _NotificationTileState extends State<NotificationTile> {
                     padding: const EdgeInsets.only(top: 2),
                     child: Text(
                       widget.notification.messageSubtitle!,
-                      style: const TextStyle(fontSize: 13, color: Colors.white70),
+                      style: TextStyle(fontSize: 13, color: colorScheme.onSurfaceVariant),
                     ),
                   ),
                 if (widget.notification.messageBody?.isNotEmpty ?? false)
@@ -371,7 +374,7 @@ class _NotificationTileState extends State<NotificationTile> {
                     padding: const EdgeInsets.only(top: 4),
                     child: Text(
                       widget.notification.messageBody!,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(fontSize: 12, color: colorScheme.onSurfaceVariant),
                     ),
                   ),
                 if (widget.notification.contextLinks != null && widget.notification.contextLinks!.isNotEmpty)
@@ -408,7 +411,7 @@ class _NotificationTileState extends State<NotificationTile> {
                       message: timestamp != null ? DateFormat('yyyy‑MM‑dd HH:mm:ss').format(timestamp) : '',
                       child: Text(
                         timeAgo,
-                        style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant),
                       ),
                     ),
                     const Spacer(),
