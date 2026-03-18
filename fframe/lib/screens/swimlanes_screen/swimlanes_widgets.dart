@@ -1046,6 +1046,12 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                       break;
                   }
 
+                  // When a filter is active, load all remaining pages so every matching card is shown.
+                  // Lanes are already scoped by boardId + status, so total card counts are manageable.
+                  if (filterType != SwimlanesFilterType.unfiltered && snapshot.hasMore) {
+                    snapshot.fetchMore();
+                  }
+
                   // Determine if the "Add a card" button should be displayed based on configuration.
                   // Role-based security is handled by the developer, who should conditionally
                   // set `allowCardCreation` in the `SwimlaneSetting`.
