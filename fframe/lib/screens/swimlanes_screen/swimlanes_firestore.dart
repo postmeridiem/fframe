@@ -100,6 +100,10 @@ class _SwimlaneBuilderState<T> extends State<SwimlaneBuilder<T>> {
   // rebuilds on route changes). Keyed by collection name.
   static final Map<String, double> _savedOffsets = {};
 
+  // Persists filter state across state disposal, following the same pattern.
+  static final Map<String, SwimlanesFilterType> _savedFilters = {};
+  static final Map<String, FFrameUser?> _savedAssignedToUsers = {};
+
   final ScrollController _horizontal = ScrollController();
 
   String get _scrollKey => widget.documentConfig.collection;
@@ -121,15 +125,37 @@ class _SwimlaneBuilderState<T> extends State<SwimlaneBuilder<T>> {
     }
 
     _horizontal.addListener(_onScroll);
+
+    // Listen to filter changes to persist them
+    widget.swimlanesController.notifier.addListener(_onFilterChange);
+
+    // Restore saved filter state
+    final savedFilter = _savedFilters[_scrollKey];
+    if (savedFilter != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final user = _savedAssignedToUsers[_scrollKey];
+        if (savedFilter == SwimlanesFilterType.assignedTo && user != null) {
+          widget.swimlanesController.notifier.setAssignedToFilter(user);
+        } else {
+          widget.swimlanesController.notifier.setFilter(savedFilter);
+        }
+      });
+    }
   }
 
   void _onScroll() {
     _savedOffsets[_scrollKey] = _horizontal.offset;
   }
 
+  void _onFilterChange() {
+    _savedFilters[_scrollKey] = widget.swimlanesController.notifier.filter;
+    _savedAssignedToUsers[_scrollKey] = widget.swimlanesController.notifier.assignedToUser;
+  }
+
   @override
   void dispose() {
     _horizontal.removeListener(_onScroll);
+    widget.swimlanesController.notifier.removeListener(_onFilterChange);
     widget.swimlanesController.dragAutoScrollService
         .detachHorizontalController();
     _horizontal.dispose();
