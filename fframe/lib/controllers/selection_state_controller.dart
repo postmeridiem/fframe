@@ -149,7 +149,10 @@ class SelectionState with ChangeNotifier {
         () => SelectionStateTracker<T>(
           selectedDocument: selectedDocument,
           trackerId: trackerId,
-          queryParameters: {selectedDocument.documentConfig.queryStringIdParam: selectedDocument.documentId},
+          queryParameters: {
+            ...?pendingUri?.queryParameters, // Preserve existing URL parameters (tabindex, etc.)
+            selectedDocument.documentConfig.queryStringIdParam: selectedDocument.documentId, // Add/override document ID
+          },
         ),
       );
 
@@ -261,6 +264,10 @@ class SelectionState with ChangeNotifier {
   String get queryString {
     if (activeTracker != null) {
       return activeTracker!.queryString;
+    }
+    // If no active tracker but we have pendingUri, preserve its query parameters
+    if (pendingUri != null && pendingUri!.hasQuery) {
+      return pendingUri!.query;
     }
     return "";
     // return _queryParameters?.entries.map((queryParameter) => "${queryParameter.key}=${queryParameter.value}").join("&") ?? "";
