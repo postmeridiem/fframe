@@ -42,6 +42,7 @@ doc/api/
 # IDE junk suppresion
 .idea
 .github
+.claude/settings.local.json
 
 # Firebase components
 .firebase
