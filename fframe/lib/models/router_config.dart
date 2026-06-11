@@ -2,7 +2,12 @@ part of '../../fframe.dart';
 
 class FRouterConfig {
   late NavigationConfig navigationConfig;
-  late NavigationConfig filteredNavigationConfig;
+
+  /// Snapshot of all navigation targets (with normalised paths) taken BEFORE
+  /// role-based filtering. Lets routing distinguish "this page exists but the
+  /// user lacks access" from "unknown URL".
+  late NavigationConfig unfilteredNavigationConfig;
+
   late Widget mainScreen;
   late RouterBuilder routerBuilder;
   late FFrameUser? user;
@@ -67,6 +72,10 @@ class FRouterConfig {
         }
       }),
     );
+
+    //Snapshot the full (unfiltered) config now that paths are normalised, so
+    //access-denied routing can tell "exists but no access" from "unknown URL".
+    instance.unfilteredNavigationConfig = NavigationConfig.clone(navigationConfig);
 
     //Filter navigation config for a specific user
     if (user != null) {
