@@ -594,6 +594,8 @@ class SelectedDocument<T> {
             fromFirestore: documentConfig.fromFirestore,
             toFirestore: documentConfig.toFirestore,
           );
+    _id = docId; //persist the written id
+    _isNew = false; //update() previously never flipped this; keep it consistent with save()
     //Update the fingerprint
     _fingerPrint = _createFingerPrint();
   }
@@ -641,6 +643,7 @@ class SelectedDocument<T> {
         //Success
         Console.log("Save was successfull", scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
         _isNew = false;
+        _id = docId; //persist the id actually written so a re-save updates in place instead of duplicating
         if (closeAfterSave) {
           if (context.mounted) {
             close(context: context, skipWarning: true);
