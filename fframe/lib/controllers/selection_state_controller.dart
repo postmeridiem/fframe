@@ -316,6 +316,7 @@ class SelectedDocument<T> {
   late Type type;
   late List<int> _fingerPrint;
   String? _id;
+  String? _savedDocumentId; //the id actually written to Firestore on create; used for in-place updates without changing _id/trackerId
   T? _data;
   bool? _readOnly;
   bool? _isNew;
@@ -363,6 +364,12 @@ class SelectedDocument<T> {
     _id = _id ?? _createNewDocumentId();
     return _id!;
   }
+
+  //The id the document is actually stored under in Firestore. For a freshly created doc this is the
+  //composed id written on create (captured in _savedDocumentId); for a loaded doc it is documentId.
+  //Kept separate from _id so trackerId/routing/Hero tags stay stable. Every Firestore read/write
+  //(update, delete) MUST target this, not documentId, or it will miss a just-created document.
+  String get _firestoreDocumentId => _savedDocumentId ?? documentId;
 
   String get collection => documentConfig.collection;
 
@@ -486,7 +493,7 @@ class SelectedDocument<T> {
     if (dialogResult == true) {
       SaveState saveResult = await DatabaseService<T>().deleteDocument(
         collection: collection,
-        documentId: documentId,
+        documentId: _firestoreDocumentId,
         fromFirestore: documentConfig.fromFirestore,
         toFirestore: documentConfig.toFirestore,
       );
@@ -572,7 +579,7 @@ class SelectedDocument<T> {
   }
 
   update({T? data}) async {
-    String? docId = documentId;
+    String? docId = _firestoreDocumentId;
     if (isNew == true) {
       docId = _createNewDocumentId(data: data as T);
     }
@@ -594,7 +601,7 @@ class SelectedDocument<T> {
             fromFirestore: documentConfig.fromFirestore,
             toFirestore: documentConfig.toFirestore,
           );
-    _id = docId; //persist the written id
+    _savedDocumentId = docId; //remember the id actually written so a re-save updates in place instead of duplicating
     _isNew = false; //update() previously never flipped this; keep it consistent with save()
     //Update the fingerprint
     _fingerPrint = _createFingerPrint();
@@ -602,7 +609,7 @@ class SelectedDocument<T> {
 
   save({required BuildContext context, bool closeAfterSave = true, T? data}) async {
     if (validate(context: context, moveToTab: true) == -1) {
-      String? docId = documentId;
+      String? docId = _firestoreDocumentId;
 
       if (data == null && _data != null) {
         //Accept the class level data
@@ -643,7 +650,7 @@ class SelectedDocument<T> {
         //Success
         Console.log("Save was successfull", scope: "fframeLog.DocumentScreen.save", level: LogLevel.dev);
         _isNew = false;
-        _id = docId; //persist the id actually written so a re-save updates in place instead of duplicating
+        _savedDocumentId = docId; //remember the id actually written so a re-save updates in place instead of duplicating (leaves _id/trackerId intact so close still works)
         if (closeAfterSave) {
           if (context.mounted) {
             close(context: context, skipWarning: true);
