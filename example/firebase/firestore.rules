@@ -1,39 +1,66 @@
 rules_version = '2';
+
+// Default-deny Firestore security rules.
+//
+// SECURITY: Do NOT reintroduce a broad `match /{document=**}` allow. A catch-all
+// read/write grant is *unioned* with every scoped rule below and silently defeats
+// per-document restrictions (any matching rule that allows access wins). Access to
+// new collections must be granted with an explicit, narrowly-scoped rule here.
+//
+// Privilege is never derived from the email string. Administrative access is granted
+// through server-managed custom claims set by the role-management Cloud Functions.
 service cloud.firestore {
-match /databases/{database}/documents {
+  match /databases/{database}/documents {
 
     function isSignedIn() {
-        return request.auth.uid != null && request.auth.token.firebase.sign_in_provider != 'anonymous';
+      return request.auth != null
+        && request.auth.uid != null
+        && request.auth.token.firebase.sign_in_provider != 'anonymous';
     }
 
-    function matchingUUID(userId) {
-        return request.auth.uid == userId; 
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
     }
 
-    function isDomainUser() {
-        return request["auth"]["token"]["email"].matches(".*@zwaag.net")||
-        request["auth"]["token"]["email"].matches(".*@postmeridiem.net")||
-        request["auth"]["token"]["email"].matches("dehlak@gmail.com")||
-        request["auth"]["token"]["email"].matches("edwardbrosens@gmail.com")||
-        request["auth"]["token"]["email"].matches(".*@imagin.studio")||
-        request["auth"]["token"]["email"].matches(".*@churned.nl");
-		}
+    // Admin privileges come from server-managed custom claims (set by the
+    // role-management Cloud Functions), never from parsing the email address.
+    function isAdmin() {
+      return isSignedIn()
+        && request.auth.token.roles is list
+        && request.auth.token.roles.hasAny(['SuperAdmin', 'superadmin', 'UserAdmin', 'useradmin']);
+    }
 
-    match /users/{userId}{
-        allow read,  write, create: if isSignedIn() && matchingUUID(userId); //The user self
+    // A user may read/write their own profile document; admins may manage any user.
+    match /users/{userId} {
+      allow read, write, create: if isOwner(userId) || isAdmin();
     }
-    
-    match /suggestions/{document=**}{
-        allow read: if isSignedIn();
+
+    // Framework configuration (pages, settings, menus, …) is client read-only.
+    // Writes must go through an admin or a Cloud Function — never an ordinary client.
+    match /fframe/{document=**} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
     }
-    
-    match /fframe/settings/collection/{document=**}{
-        allow read: if isSignedIn();
+
+    // Example suggestions collection: readable by any signed-in user.
+    match /suggestions/{document=**} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
     }
-    
-    match /{document=**} {
-        allow read, write : if isDomainUser();
-        allow delete: if false;
+
+    // Invites drive account/role provisioning via the createUser Cloud Function
+    // trigger, so creation is restricted to admins, the caller is pinned as the
+    // creator, and the roles payload is shape-validated. Defense in depth: the
+    // trigger itself must re-validate the requested roles before granting them.
+    match /invites/{inviteId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.customClaims.roles is list
+        && request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if isAdmin();
     }
-}
+
+    // Everything else: default deny. Add an explicit, scoped rule above per
+    // collection your application needs — do not add a catch-all allow.
+  }
 }
