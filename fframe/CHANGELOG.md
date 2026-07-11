@@ -117,6 +117,14 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
 * **Stopped logging recipient email (PII) at prod level** in the notification
   error path (`helpers/notifications.dart`).
 
+#### Example app
+
+* **Removed the `flutter_signin_button` dependency** from the example sign-in
+  screen (`example/lib/screens/signInPage/signin_page_screen.dart`), replacing it
+  with a standard `ElevatedButton.icon`. A prior upstream change dropped the
+  package from `fframe` but left the example referencing it, so the example app
+  no longer compiled; it now builds and its routing tests pass.
+
 ## 0.0.1
 
 * TODO: Describe initial release.
