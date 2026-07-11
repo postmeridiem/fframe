@@ -1017,31 +1017,52 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                   List<SelectedDocument<T>> selectedDocuments = [...unfilteredDocuments];
                   Console.log("Swimlane rebuild ${filterType.toString()} for ${selectedDocuments.length} ");
 
+                  // Read the filter-backing config into locals and null-guard
+                  // each branch: a board that does not define the callback the
+                  // active filter needs must skip filtering rather than
+                  // force-unwrap null and crash.
+                  final assignee = swimlanesConfig.assignee;
+                  final following = swimlanesConfig.following;
+                  final getPriority = swimlanesConfig.getPriority;
+                  final customFilter = swimlanesConfig.customFilter;
                   switch (filterType) {
                     case SwimlanesFilterType.unfiltered:
                       break;
                     case SwimlanesFilterType.assignedToMe:
-                      selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.fFrameUser));
+                      if (assignee != null) {
+                        selectedDocuments.removeWhere((selectedDocument) => !assignee.isAssignee(selectedDocument.data, widget.fFrameUser));
+                      }
                       break;
                     case SwimlanesFilterType.assignedTo:
-                      if (widget.swimlanesController.notifier.assignedToUser != null) {
-                        selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.assignee!.isAssignee(selectedDocument.data, widget.swimlanesController.notifier.assignedToUser!));
+                      final assignedToUser = widget.swimlanesController.notifier.assignedToUser;
+                      if (assignee != null && assignedToUser != null) {
+                        selectedDocuments.removeWhere((selectedDocument) => !assignee.isAssignee(selectedDocument.data, assignedToUser));
                       }
                       break;
                     case SwimlanesFilterType.followedTasks:
-                      selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.following!.isFollowing(selectedDocument.data, widget.fFrameUser));
+                      if (following != null) {
+                        selectedDocuments.removeWhere((selectedDocument) => !following.isFollowing(selectedDocument.data, widget.fFrameUser));
+                      }
                       break;
                     case SwimlanesFilterType.prioHigh:
-                      selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) < 4);
+                      if (getPriority != null) {
+                        selectedDocuments.removeWhere((selectedDocument) => getPriority(selectedDocument.data) < 4);
+                      }
                       break;
                     case SwimlanesFilterType.prioNormal:
-                      selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) >= 4 && swimlanesConfig.getPriority!(selectedDocument.data) < 7);
+                      if (getPriority != null) {
+                        selectedDocuments.removeWhere((selectedDocument) => getPriority(selectedDocument.data) >= 4 && getPriority(selectedDocument.data) < 7);
+                      }
                       break;
                     case SwimlanesFilterType.prioLow:
-                      selectedDocuments.removeWhere((selectedDocument) => swimlanesConfig.getPriority!(selectedDocument.data) >= 7);
+                      if (getPriority != null) {
+                        selectedDocuments.removeWhere((selectedDocument) => getPriority(selectedDocument.data) >= 7);
+                      }
                       break;
                     case SwimlanesFilterType.customFilter:
-                      selectedDocuments.removeWhere((selectedDocument) => !swimlanesConfig.customFilter!.matchesCustomFilter(selectedDocument.data));
+                      if (customFilter != null) {
+                        selectedDocuments.removeWhere((selectedDocument) => !customFilter.matchesCustomFilter(selectedDocument.data));
+                      }
                     default:
                       break;
                   }

@@ -64,6 +64,20 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
 * **Reconciled selection on query change** — sorting/searching clears the prior
   selection so the count and bulk actions can't operate on off-screen documents.
 
+#### Framework — swimlanes (`fframe/lib/screens/swimlanes_screen`)
+
+* **Stopped leaking a `SwimlanesNotifier` on every rebuild.** The notifier and
+  drag auto-scroll service are now owned by the screen `State` (created once,
+  disposed on teardown) and injected into the per-build controller, instead of
+  being allocated fresh inside the rebuilt `InheritedModel`.
+* **Fixed cross-board state leak / crash.** Persisted scroll and filter state is
+  keyed by collection *and* `trackerId`, and a restored filter the current board
+  cannot satisfy is coerced to `unfiltered` — boards sharing a collection no
+  longer inherit each other's filters or crash on restore.
+* **Removed force-unwraps in the filter switch.** Each filter branch null-guards
+  its backing config callback (`assignee`/`following`/`getPriority`/`customFilter`)
+  instead of `!`, so a mismatched filter skips filtering rather than crashing.
+
 ## 0.0.1
 
 * TODO: Describe initial release.

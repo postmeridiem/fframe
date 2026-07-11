@@ -11,9 +11,15 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
     required this.theme,
     required this.swimlanesConfig,
     required this.viewportSize,
+    required this.notifier,
+    required this.dragAutoScrollService,
   }) : super(child: child) {
-    // Initialize the drag auto-scroll service
-    dragAutoScrollService = DragAutoScrollService();
+    // The notifier and drag auto-scroll service are owned by the enclosing
+    // State (created once, disposed on teardown) and injected here — this
+    // InheritedModel is rebuilt on every frame, so it must not allocate a new
+    // ChangeNotifier/service each time (that leaked notifiers and left listeners
+    // pointing at superseded instances).
+
     // initialize the total width tracker
     double calculatedMinWidth = 0;
 
@@ -57,15 +63,9 @@ class SwimlanesController extends InheritedModel<SwimlanesController> {
     }
     _viewportWidth = _getViewportWidth(viewportSize: viewportSize);
     _calculatedWidth = _calculateWidth(calculatedMinWidth, viewportWidth);
-
-    // register the grid controller update notifier
-    notifier = SwimlanesNotifier(
-      sourceQuery: sourceQuery,
-      swimlaneSettings: swimlaneSettings,
-    );
   }
-  late SwimlanesNotifier notifier;
-  late DragAutoScrollService dragAutoScrollService;
+  final SwimlanesNotifier notifier;
+  final DragAutoScrollService dragAutoScrollService;
 
   final BuildContext context;
   final SwimlanesConfig swimlanesConfig;

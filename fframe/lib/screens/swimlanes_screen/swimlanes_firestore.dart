@@ -22,6 +22,11 @@ class FirestoreSwimlanes<T> extends StatefulWidget {
 class FirestoreSwimlanesState<T> extends State<FirestoreSwimlanes<T>> {
   late List<SwimlaneSetting<T>> swimlaneSettings;
 
+  // Owned here (not in the per-build InheritedModel) so a single instance lives
+  // for the lifetime of this screen and is disposed on teardown.
+  late final SwimlanesNotifier<T> _notifier;
+  late final DragAutoScrollService _dragAutoScrollService;
+
   @override
   void initState() {
     Console.log(
@@ -29,7 +34,19 @@ class FirestoreSwimlanesState<T> extends State<FirestoreSwimlanes<T>> {
       scope: "fframeLog.Swimlanes",
       level: LogLevel.fframe,
     );
+    _dragAutoScrollService = DragAutoScrollService();
+    _notifier = SwimlanesNotifier<T>(
+      sourceQuery: widget.query,
+      swimlaneSettings: (widget.documentConfig.swimlanes as SwimlanesConfig<T>).swimlaneSettings,
+    );
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _notifier.dispose();
+    _dragAutoScrollService.dispose();
+    super.dispose();
   }
 
   @override
@@ -50,6 +67,8 @@ class FirestoreSwimlanesState<T> extends State<FirestoreSwimlanes<T>> {
       swimlanesConfig: widget.documentConfig.swimlanes as SwimlanesConfig<T>,
       viewportSize: MediaQuery.of(context).size,
       theme: Theme.of(context),
+      notifier: _notifier,
+      dragAutoScrollService: _dragAutoScrollService,
       child: Builder(
         builder: (BuildContext context) {
           SwimlanesController swimlanesController = SwimlanesController.of(context);
@@ -106,7 +125,31 @@ class _SwimlaneBuilderState<T> extends State<SwimlaneBuilder<T>> {
 
   final ScrollController _horizontal = ScrollController();
 
-  String get _scrollKey => widget.documentConfig.collection;
+  // Keyed by collection AND board (trackerId): several boards can share one
+  // collection, so keying by collection alone leaked scroll/filter state — and
+  // a filter restored onto a board that cannot satisfy it would crash.
+  String get _scrollKey => '${widget.documentConfig.collection}:${widget.swimlanesConfig.trackerId}';
+
+  /// Whether this board's config can satisfy [filter]; used to coerce a restored
+  /// filter the current board does not support down to `unfiltered`.
+  bool _boardSupportsFilter(SwimlanesFilterType filter) {
+    final SwimlanesConfig config = widget.swimlanesConfig;
+    switch (filter) {
+      case SwimlanesFilterType.assignedToMe:
+      case SwimlanesFilterType.assignedTo:
+        return config.assignee != null;
+      case SwimlanesFilterType.followedTasks:
+        return config.following != null;
+      case SwimlanesFilterType.prioHigh:
+      case SwimlanesFilterType.prioNormal:
+      case SwimlanesFilterType.prioLow:
+        return config.getPriority != null;
+      case SwimlanesFilterType.customFilter:
+        return config.customFilter != null;
+      default:
+        return true;
+    }
+  }
 
   @override
   void initState() {
@@ -118,6 +161,7 @@ class _SwimlaneBuilderState<T> extends State<SwimlaneBuilder<T>> {
     final saved = _savedOffsets[_scrollKey];
     if (saved != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         if (_horizontal.hasClients && _horizontal.position.maxScrollExtent >= saved) {
           _horizontal.jumpTo(saved);
         }
@@ -133,11 +177,16 @@ class _SwimlaneBuilderState<T> extends State<SwimlaneBuilder<T>> {
     final savedFilter = _savedFilters[_scrollKey];
     if (savedFilter != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         final user = _savedAssignedToUsers[_scrollKey];
-        if (savedFilter == SwimlanesFilterType.assignedTo && user != null) {
+        // Coerce a restored filter this board cannot satisfy (e.g. a priority
+        // filter on a board without getPriority) down to unfiltered so the
+        // filter switch never force-unwraps a null config.
+        final effectiveFilter = _boardSupportsFilter(savedFilter) ? savedFilter : SwimlanesFilterType.unfiltered;
+        if (effectiveFilter == SwimlanesFilterType.assignedTo && user != null) {
           widget.swimlanesController.notifier.setAssignedToFilter(user);
         } else {
-          widget.swimlanesController.notifier.setFilter(savedFilter);
+          widget.swimlanesController.notifier.setFilter(effectiveFilter);
         }
       });
     }
