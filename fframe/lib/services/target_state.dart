@@ -51,11 +51,12 @@ class TargetState extends ChangeNotifier {
     //Check if this is a login path
     if (NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget.path == uri.pathSegments.first) {
       navigationTarget = NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget;
-      // return TargetState(navigationTarget: NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget);
+      return; // Handled — do not fall through to access-denied/error resolution.
     }
     //Check if this is an invite path
     if (NavigationNotifier.instance.navigationConfig.signInConfig.invitionTarget?.path == uri.pathSegments.first) {
       navigationTarget = NavigationNotifier.instance.navigationConfig.signInConfig.invitionTarget!;
+      return; // Handled — do not fall through to access-denied/error resolution.
     }
 
     //Default to an error path
@@ -106,6 +107,25 @@ class TargetState extends ChangeNotifier {
         }
         Console.log("Routing to ${navigationTarget.path}", scope: "fframeLog.TargetState.targetState", level: LogLevel.fframe);
         this.navigationTarget = navigationTarget;
+      } else {
+        //The path is not among the user's accessible targets. Distinguish a
+        //page that exists but is access-restricted from a genuinely unknown URL,
+        //so the user gets a clear message instead of a blank/grey screen.
+        bool existsButRestricted = FRouterConfig.instance.unfilteredNavigationConfig.navigationTargets.any(
+          (NavigationTarget navigationTarget) => navigationTarget.path.removeLeadingSlash() == uri.pathSegments.first,
+        );
+        if (existsButRestricted) {
+          Console.log(
+            "Access denied to /${uri.pathSegments.first}; user lacks the required role(s).",
+            scope: "fframeLog.TargetState.targetState",
+            level: LogLevel.fframe,
+            color: ConsoleColor.yellow,
+          );
+          navigationTarget = NavigationConfig.noAccessTarget;
+        } else {
+          Console.log("Unknown route /${uri.pathSegments.first}; routing to error page.", scope: "fframeLog.TargetState.targetState", level: LogLevel.fframe);
+          navigationTarget = NavigationNotifier.instance.navigationConfig.errorPage;
+        }
       }
     } catch (e) {
       Console.log("ERROR: Routing to ${uri.toString()} failed: ${e.toString()}", scope: "fframeLog.TargetState.targetState", level: LogLevel.fframe);
@@ -113,52 +133,45 @@ class TargetState extends ChangeNotifier {
   }
 
   NavigationTarget get defaultRoute {
-    if (NavigationNotifier.instance.navigationConfig.navigationTargets.isEmpty && NavigationNotifier.instance.navigationConfig.navigationTargets.isNotEmpty) {
-      //There are no unauthenticated routes
-
-      // if (NavigationNotifier.instance.pendingAuth == false && NavigationNotifier.instance.isSignedIn != true) {
-      if (NavigationNotifier.instance.isSignedIn != true) {
-        //Assume there are no applicable routes within the access control. Route to the signin page or wait page
-        return NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget;
-      }
-
-      //We are still awaiting the auth state.... wait for it to be known
-      //Store the current path
-      return NavigationNotifier.instance.navigationConfig.waitPage;
-    }
     List<NavigationTarget> navigationTargets = NavigationNotifier.instance.navigationConfig.navigationTargets;
-    TargetState targetState = TargetState(
-      navigationTarget: navigationTargets.firstWhere((NavigationTarget navigationTarget) => navigationTarget.landingPage, orElse: () {
-        Console.log(
-          "No public default route has been configured. Signed in: ${NavigationNotifier.instance.isSignedIn} ",
-          scope: "fframeLog.TargetState.defaultRoute",
-          level: LogLevel.fframe,
-          color: ConsoleColor.yellow,
-        );
-        if (NavigationNotifier.instance.isSignedIn != true) {
-          return NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget;
-        }
-        Console.log("***** No public default route has been configured. Please update the navigation config. *****", scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.dev, color: ConsoleColor.red);
-        return NavigationNotifier.instance.navigationConfig.errorPage;
-      }),
-    );
 
-    if (navigationTarget.navigationTabs?.isNotEmpty == true) {
-      Console.log("Route to the first available tab", scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.fframe);
-      return targetState.navigationTarget.navigationTabs!.first;
+    //Find the configured landing page among the targets the user can access.
+    NavigationTarget? landingTarget;
+    for (final NavigationTarget navigationTarget in navigationTargets) {
+      if (navigationTarget.landingPage) {
+        landingTarget = navigationTarget;
+        break;
+      }
     }
 
-    // if (NavigationNotifier.instance.nextState.isNotEmpty) {
-    //   Console.log("Route to ${NavigationNotifier.instance.nextState.first.targetState.navigationTarget.title} at ${NavigationNotifier.instance.nextState.first.targetState.navigationTarget.path}",
-    //       scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.fframe);
-    //   navigationTarget = NavigationNotifier.instance.nextState.first.targetState;
-    // }
+    if (landingTarget != null) {
+      //Landing page found. Route to its first tab when tabbed, otherwise the
+      //target itself (the latter previously fell through to the error page).
+      if (landingTarget.navigationTabs?.isNotEmpty == true) {
+        Console.log("Route to the first available tab", scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.fframe);
+        return landingTarget.navigationTabs!.first;
+      }
+      Console.log("DefaultRoute to ${landingTarget.title} at ${landingTarget.path}", scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.fframe);
+      return landingTarget;
+    }
 
-    Console.log("DefaultRoute to ${targetState.navigationTarget.title} at ${targetState.navigationTarget.path}", scope: "fframeLog.TargetState.defaultRoute", level: LogLevel.fframe);
-    // Return the resolved landing target. Previously this returned errorPage,
-    // so every naked root ("/") load rendered the error page instead of the
-    // configured landing page.
-    return targetState.navigationTarget;
+    //No landing page is accessible to this user.
+    if (NavigationNotifier.instance.isSignedIn != true) {
+      //Not signed in: send them to the sign-in page.
+      return NavigationNotifier.instance.navigationConfig.signInConfig.signInTarget;
+    }
+
+    //Signed in but no resolvable landing page — either no target is flagged as
+    //the landing page, or the user has no accessible routes at all. Surface a
+    //clear message instead of a blank/grey screen, and do NOT silently route to
+    //an unrelated target (which would undermine the access model).
+    Console.log(
+      "No accessible landing page for signed-in user. Showing fallback message.",
+      scope: "fframeLog.TargetState.defaultRoute",
+      level: LogLevel.dev,
+      color: ConsoleColor.red,
+    );
+    return NavigationConfig.noLandingPageTarget;
   }
 
   @override

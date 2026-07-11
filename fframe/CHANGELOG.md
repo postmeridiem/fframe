@@ -83,20 +83,21 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
 * **Fixed document-creation crash** when a `DocumentScreen` has no
   `createDocumentId`: `SelectedDocument.createNew()` no longer force-unwraps the
   optional callback.
-* **Fixed orphaned new documents.** `save()` now reuses the id assigned at
-  construction instead of regenerating a different one at save time, so the saved
-  document matches the tracker/URL that reference it.
+* _(New-document stable-id / orphaning was independently fixed upstream via the
+  `_savedDocumentId` design and is retained on merge; this branch keeps only the
+  `createNew` crash guard above.)_
 
 #### Framework — routing (`fframe/lib/services/target_state.dart`, `fframe/lib/models/router_config.dart`)
 
-* **Naked root URL routes to the landing page**, not the error page —
-  `defaultRoute` now returns the resolved landing target it computes.
 * **Bad subtab deep links route to the error page** instead of silently failing:
   the non-existent-tab fallback no longer casts `errorPage` to `NavigationTab`
   (which threw and was swallowed, leaving a stale screen).
 * **Signed-out tab filtering un-inverted.** Role-restricted tabs are now hidden
   from unauthenticated users and public tabs are kept, fixing a UI authorization
   gap that exposed role-gated destinations to signed-out visitors.
+* _(Naked-root / landing-page resolution was independently fixed upstream by the
+  `defaultRoute` rewrite and is retained on merge; this branch's superseded
+  one-liner was dropped during the merge.)_
 
 #### Framework — data grid, helpers & input hardening
 

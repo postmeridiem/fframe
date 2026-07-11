@@ -101,6 +101,7 @@ part 'package:fframe/screens/swimlanes_screen/swimlanes_widgets.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_classes.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_drag_auto_scroll_service.dart';
 part 'package:fframe/screens/router_page.dart';
+part 'package:fframe/screens/message_page.dart';
 
 part 'package:fframe/helpers/validator.dart';
 part 'package:fframe/helpers/load_extra_data.dart';

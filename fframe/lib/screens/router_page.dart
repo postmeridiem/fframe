@@ -361,42 +361,34 @@ class FRouter extends InheritedWidget {
               ),
           ];
 
-          if (NavigationNotifier.instance.navigationConfig.navigationTargets.length >= 2) {
-            NavigationNotifier.instance.selectedNavRailIndex = 0;
+          if (destinations.length >= 2) {
+            //Match the active target against the targets actually shown in the
+            //rail. If it isn't one of them (e.g. a framework message/error
+            //page), leave the rail unselected (null) instead of overflowing the
+            //index, which would trip NavigationRail's selectedIndex assertion.
+            final List<NavigationTarget> railTargets = NavigationNotifier.instance.navigationConfig.navigationTargets
+                .where((NavigationTarget navigationTarget) => navigationTarget.destination != null)
+                .toList();
             NavigationTarget? currentTarget = NavigationNotifier.instance.currentTarget?.navigationTarget;
 
+            int? selectedIndex;
             if (currentTarget != null) {
-              for (NavigationTarget navigationTarget in NavigationNotifier.instance.navigationConfig.navigationTargets.where(
-                ((NavigationTarget navigationTarget) => navigationTarget.destination != null),
-              )) {
-                if (currentTarget.path == navigationTarget.path) {
-                  //This is a single-item path
-                  break; //Jump from the loop
-                } else if (currentTarget.path.startsWith("${navigationTarget.path}/")) {
-                  //This is a subpath
-                  break; //Jump from the loop
-                } else {
-                  NavigationNotifier.instance.selectedNavRailIndex = NavigationNotifier.instance.selectedNavRailIndex! + 1;
+              for (int i = 0; i < railTargets.length; i++) {
+                final NavigationTarget railTarget = railTargets[i];
+                if (currentTarget.path == railTarget.path || currentTarget.path.startsWith("${railTarget.path}/")) {
+                  selectedIndex = i;
+                  break;
                 }
               }
             }
-
-            if (NavigationNotifier.instance.selectedNavRailIndex == null || NavigationNotifier.instance.selectedNavRailIndex! < 0 || NavigationNotifier.instance.selectedNavRailIndex! > NavigationNotifier.instance.navigationConfig.navigationTargets.length) {
-              NavigationNotifier.instance.selectedNavRailIndex = 0;
-            }
-
-            //Prevent null values
-            // print(NavigationNotifier.instance.selectedNavRailIndex);
-            // NavigationNotifier.instance.selectedNavRailIndex == 0 ? NavigationNotifier.instance.selectedNavRailIndex = 1 : NavigationNotifier.instance.selectedNavRailIndex;
-            // debugger(when: NavigationNotifier.instance.selectedNavRailIndex == null);
-            // debugger(when: NavigationNotifier.instance.selectedNavRailIndex! < destinations.length);
+            NavigationNotifier.instance.selectedNavRailIndex = selectedIndex;
 
             return NavigationRail(
-              selectedIndex: NavigationNotifier.instance.selectedNavRailIndex,
+              selectedIndex: selectedIndex,
               onDestinationSelected: (int index) {
-                if (index < NavigationNotifier.instance.navigationConfig.navigationTargets.length) {
+                if (index < railTargets.length) {
                   NavigationNotifier.instance.selectedNavRailIndex = index;
-                  NavigationTarget navigationTarget = NavigationNotifier.instance.navigationConfig.navigationTargets[index];
+                  NavigationTarget navigationTarget = railTargets[index];
                   navigateTo(navigationTarget: navigationTarget);
                 } else {
                   Console.log(

@@ -16,7 +16,6 @@ dependencies:
   firebase_core: 
   firebase_ui_oauth:
   firebase_ui_oauth_google:
-  flutter_signin_button:
   google_sign_in:
   google_sign_in_web:
   firebase_auth:
