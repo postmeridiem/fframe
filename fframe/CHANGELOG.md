@@ -50,6 +50,20 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
 * **`getUserRoles`** pins non-managers to their own uid (fixes IDOR) and returns
   a generic error on failure.
 
+#### Framework — list grid (`fframe/lib/screens/listgrid_screen`)
+
+* **Fixed crash when sorting a column after clearing the search box** — the range
+  filter no longer force-unwraps a null `searchString`.
+* **Bounded the `searchAsContains` prefetch** to a hard document limit so a large
+  collection is no longer fully loaded into memory (cost/OOM), with a log when the
+  cap is hit.
+* **Surface prefetch failures** with an error widget instead of an indefinite
+  loading spinner.
+* **Disposed the notifier, its debounce `Timer`, and the scroll controller** on
+  teardown, and guarded async callbacks so they no longer fire after dispose.
+* **Reconciled selection on query change** — sorting/searching clears the prior
+  selection so the count and bulk actions can't operate on off-screen documents.
+
 ## 0.0.1
 
 * TODO: Describe initial release.

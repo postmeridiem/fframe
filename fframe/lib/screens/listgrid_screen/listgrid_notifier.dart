@@ -82,6 +82,19 @@ class ListGridNotifier<T> extends ChangeNotifier {
   List<QueryDocumentSnapshot<T>>? get prefetchedDocs => _prefetchedDocs;
   Timer? _debounce;
 
+  /// The maximum number of documents fetched for client-side "contains" search.
+  /// Bounds cost and memory so a large collection is never fully materialized.
+  static const int _prefetchDocumentLimit = 2000;
+
+  /// Set when the prefetch query fails, so the UI can render an error state
+  /// instead of an indefinite loading spinner.
+  Object? _prefetchError;
+  Object? get prefetchError => _prefetchError;
+
+  /// True once this notifier is disposed; guards async callbacks that may
+  /// complete after teardown.
+  bool _disposed = false;
+
   String? get searchString {
     return _searchString;
   }
@@ -106,6 +119,13 @@ class ListGridNotifier<T> extends ChangeNotifier {
   }
 
   void _queryBuilder() {
+    // A rebuilt query changes which rows are visible, so a prior selection may
+    // now reference off-screen documents that can no longer be deselected. Clear
+    // it to keep the selection count and bulk actions in sync with the results.
+    if (_selectedDocuments.isNotEmpty) {
+      _selectedDocuments.clear();
+    }
+
     Query outputQuery = _initialQuery as Query<T>;
 
     // handle sorting
@@ -118,9 +138,12 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
       outputQuery = outputQuery.orderBy(sortedColumn.fieldName!, descending: sortedColumn.descending);
 
-      if (_columnSettings[sortedColumnIndex!].fieldName != null) {
+      // Only apply the range filter when a search string is present; sorting a
+      // column with an empty/cleared search box must not force-unwrap null.
+      final String? currentSearch = searchString;
+      if (_columnSettings[sortedColumnIndex!].fieldName != null && currentSearch != null && currentSearch.isNotEmpty) {
         String fieldName = _columnSettings[sortedColumnIndex!].fieldName!;
-        outputQuery = outputQuery.startsWith(fieldName, searchString!);
+        outputQuery = outputQuery.startsWith(fieldName, currentSearch);
       }
     } else {
       if (searchableColumns.isNotEmpty) {
@@ -252,6 +275,7 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
   void _updateCollectionCount({required Query<T> query}) async {
     AggregateQuerySnapshot snapshot = await query.count().get();
+    if (_disposed) return;
     int collectionCount = snapshot.count!;
     _collectionCount = collectionCount;
   }
@@ -264,16 +288,37 @@ class ListGridNotifier<T> extends ChangeNotifier {
   /// upon completion or if an error occurs.
   Future<void> _prefetchDocuments(Query<T> query) async {
     try {
-      final snapshot = await query.get();
+      // Bound the read so an unbounded collection is never fully loaded into
+      // memory (cost/OOM). Client-side "contains" search covers the capped set.
+      final snapshot = await query.limit(_prefetchDocumentLimit).get();
+      if (_disposed) return;
       _prefetchedDocs = snapshot.docs;
+      _prefetchError = null;
+      if (snapshot.docs.length >= _prefetchDocumentLimit) {
+        Console.log(
+          "fframeLog.ListGridNotifier: prefetch hit the $_prefetchDocumentLimit-document cap; client-side search may be incomplete. Disable searchAsContains for large collections.",
+          level: LogLevel.prod,
+        );
+      }
       Console.log("Pre-fetched ${_prefetchedDocs?.length ?? 0} documents for client-side search.", scope: "fframeLog.ListGridNotifier", level: LogLevel.fframe);
     } catch (e) {
-      Console.log("Error pre-fetching documents: $e");
+      if (_disposed) return;
+      // Record the error so the builder can surface it instead of spinning
+      // forever on a null prefetch result.
+      _prefetchError = e;
+      Console.log("Error pre-fetching documents: $e", level: LogLevel.prod);
     }
     notifyListeners(); // Notify that prefetched data is available or an error occurred.
   }
 
   void update() {
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _disposed = true;
+    _debounce?.cancel();
+    super.dispose();
   }
 }
