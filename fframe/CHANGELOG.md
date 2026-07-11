@@ -37,6 +37,19 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
   the racy `listUsers(2).length == 1` check that could mint two SuperAdmins (or
   none).
 
+#### Security — dev Cloud Functions (`dev/functions/src/auth/*`)
+
+* **`createUser` invite trigger hardened.** Requested roles are now validated as
+  a string array, privileged/management roles are stripped unless the invite's
+  (rules-pinned) creator is a superadmin, and the function no longer deletes an
+  existing auth account for the invited email — closing a privilege-escalation
+  and account-takeover path where any invite writer could provision a SuperAdmin
+  or wipe a victim's account.
+* **`addUserRole`/`removeUserRole`** now restrict privileged-role grant/revoke to
+  superadmins, validate inputs, await the mirror write, and return generic errors.
+* **`getUserRoles`** pins non-managers to their own uid (fixes IDOR) and returns
+  a generic error on failure.
+
 ## 0.0.1
 
 * TODO: Describe initial release.
