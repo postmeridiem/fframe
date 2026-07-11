@@ -78,6 +78,15 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
   its backing config callback (`assignee`/`following`/`getPriority`/`customFilter`)
   instead of `!`, so a mismatched filter skips filtering rather than crashing.
 
+#### Framework — document/selection lifecycle (`fframe/lib/controllers/selection_state_controller.dart`)
+
+* **Fixed document-creation crash** when a `DocumentScreen` has no
+  `createDocumentId`: `SelectedDocument.createNew()` no longer force-unwraps the
+  optional callback.
+* **Fixed orphaned new documents.** `save()` now reuses the id assigned at
+  construction instead of regenerating a different one at save time, so the saved
+  document matches the tracker/URL that reference it.
+
 ## 0.0.1
 
 * TODO: Describe initial release.

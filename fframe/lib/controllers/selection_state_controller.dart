@@ -609,9 +609,10 @@ class SelectedDocument<T> {
         throw ("Unable to save a document that does not hold data.");
       }
 
-      if (isNew == true) {
-        docId = _createNewDocumentId(data: data as T);
-      }
+      // For a new document, reuse the id already assigned at construction
+      // (`documentId`). Regenerating it here produced a *different* id than the
+      // tracker/URL already reference, writing the document under an id nothing
+      // pointed at and orphaning it.
 
       //optional presave script
       if (documentConfig.preSave != null) {
@@ -868,7 +869,10 @@ class SelectedDocument<T> {
     bool openAfterCreate = true,
   }) {
     T creationData = documentConfig.createNew();
-    String? createDocumentId = documentConfig.createDocumentId!(creationData);
+    // createDocumentId is optional: only derive an id from it when configured,
+    // otherwise let the constructor generate one. Force-unwrapping it here
+    // crashed document creation for any collection without a createDocumentId.
+    String? createDocumentId = documentConfig.createDocumentId != null ? documentConfig.createDocumentId!(creationData) : null;
     SelectedDocument<T> selectedDocument = SelectedDocument<T>(
       documentConfig: documentConfig,
       id: createDocumentId ?? "new",
