@@ -18,6 +18,25 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
   allowlist and the unanchored, unescaped email-domain regex — administrative
   access is now derived from server-managed custom claims, not the email string.
 
+#### Security — production Cloud Functions (`functions/src/fframe-auth/auth.ts`)
+
+* **Blocked SuperAdmin privilege escalation.** `addUserRole`/`removeUserRole` now
+  only allow a superadmin to grant or revoke privileged/management roles; a
+  delegated `useradmin`/`rolemanager` can no longer mint a superadmin they control.
+* **Fixed IDOR in `getUserRoles`.** Non-managers are pinned to their own uid;
+  only managers may read another user's roles (previously any authenticated user
+  could read anyone's roles via a caller-supplied uid).
+* **Stopped internal error-detail disclosure.** Callables no longer echo raw
+  exception text (a user-existence oracle); errors are logged server-side and a
+  generic message is returned, and genuine `permission-denied` errors are no
+  longer masked as `invalid-argument`.
+* **Awaited the Firestore mirror writes** so role changes no longer silently
+  diverge between custom claims and the `users/{uid}` document.
+* **Validated `uid`/`role` inputs** (non-empty strings) before any lookup or write.
+* **Deterministic first-admin bootstrap** via a Firestore transaction, replacing
+  the racy `listUsers(2).length == 1` check that could mint two SuperAdmins (or
+  none).
+
 ## 0.0.1
 
 * TODO: Describe initial release.
