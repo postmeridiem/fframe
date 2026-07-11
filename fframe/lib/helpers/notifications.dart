@@ -75,7 +75,9 @@ class FframeNotifications {
           Console.log("User not found for email: $email", scope: "fframeLog.FframeNotifications", level: LogLevel.dev);
         }
       } catch (e) {
-        Console.log("Error sending notification to $email: $e", scope: "fframeLog.FframeNotifications", level: LogLevel.prod);
+        // Do not log the recipient email (PII) at prod level; keep the error
+        // without the address.
+        Console.log("Error sending a notification: $e", scope: "fframeLog.FframeNotifications", level: LogLevel.prod);
       }
     }
 

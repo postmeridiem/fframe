@@ -4,7 +4,7 @@ String getSlug(String input) {
     return input
         .replaceAll('.', '-')
         // Replace occurrences of '[', ']', and ''' with '-'
-        .replaceAll(RegExp(r'[\\[\\]\' ']+'), '-')
+        .replaceAll(RegExp(r"[\[\]']+"), '-')
         // Replace occurrences of '{{}}' with '-'
         .replaceAll(RegExp(r'\{\{\}\}+'), '-')
         // Replace tilde with hyphens

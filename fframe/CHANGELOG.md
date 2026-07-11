@@ -98,6 +98,24 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
   from unauthenticated users and public tabs are kept, fixing a UI authorization
   gap that exposed role-gated destinations to signed-out visitors.
 
+#### Framework — data grid, helpers & input hardening
+
+* **Data grid selection pruned** against each incoming snapshot, so
+  `selectedRowCount` and bulk actions no longer reference deleted/filtered-out
+  documents (`datagrid_firestore.dart`).
+* **`L10n.string` no longer throws** when a key exists without a `translation`
+  field — it falls back to the placeholder (`helpers/l10n.dart`).
+* **`Query.startsWith` bound fixed for non-BMP characters** (emoji, supplementary
+  CJK) by incrementing the full last rune instead of a single UTF-16 code unit,
+  with surrogate/overflow guards (`extensions/query.dart`).
+* **Slug regex corrected** so `[`, `]`, and quotes are actually stripped
+  (`helpers/slug.dart`).
+* **Sign-in deep link hardened**: the attacker-controllable `hash` param is
+  decoded in a try/catch and a malformed link degrades to the sign-in page
+  instead of throwing during build (`fframe_main.dart`).
+* **Stopped logging recipient email (PII) at prod level** in the notification
+  error path (`helpers/notifications.dart`).
+
 ## 0.0.1
 
 * TODO: Describe initial release.

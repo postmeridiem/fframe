@@ -345,6 +345,17 @@ class FFrameDataTableSource<T> extends DataTableSource {
   void fromSnapShot(FirestoreQueryBuilderSnapshot<T>? snapshot) {
     if (snapshot == _previousSnapshot) return;
 
+    // Drop any selected ids that are no longer present in the incoming snapshot
+    // (deleted elsewhere or filtered out) before anything reads the selection.
+    // Otherwise selectedRowCount stays inflated, wereAllItemsSelected can
+    // mis-evaluate, and bulk actions reference documents that no longer exist.
+    if (snapshot != null) {
+      final newDocIds = snapshot.docs.map((doc) => doc.id).toSet();
+      _selectedRowIds.retainWhere(newDocIds.contains);
+    } else {
+      _selectedRowIds.clear();
+    }
+
     // Try to preserve the selection status when the snapshot got updated,
     // such as when more content got loaded.
     final wereAllItemsSelected = _previousSnapshot?.docs.length == _selectedRowIds.length && _previousSnapshot!.docs.isNotEmpty;
