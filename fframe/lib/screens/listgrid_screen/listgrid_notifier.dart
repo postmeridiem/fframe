@@ -13,7 +13,9 @@ class ListGridNotifier<T> extends ChangeNotifier {
     _collectionCount = 0;
     _initialQuery = initialQuery;
     _currentQuery = initialQuery;
-    // initialize the sorting object
+    // initialize the sorting object. Seeded from a column marked `sortedColumn` below, so a
+    // grid can open already sorted; null means no sort, which falls back to ordering by the
+    // first searchable column (see _queryBuilder).
     sortedColumnIndex = null;
     searchableColumns = [];
     // initialize the row selections
@@ -30,6 +32,13 @@ class ListGridNotifier<T> extends ChangeNotifier {
       if (columnSetting.searchable && columnSetting.fieldName != null) {
         enableSearchBar = true;
         searchableColumns.add(i);
+      }
+
+      // open sorted by this column, if one asks for it. First one wins, so a config with
+      // several is not ambiguous. The ListGridColumn constructor already asserts that
+      // sortedColumn implies sortable and a non-null fieldName, which _queryBuilder needs.
+      if (columnSetting.sortedColumn && sortedColumnIndex == null) {
+        sortedColumnIndex = i;
       }
     }
 

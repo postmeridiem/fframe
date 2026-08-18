@@ -106,6 +106,7 @@ class ListGridColumn<T> {
     this.searchMask,
     this.sortable = false,
     this.descending = false,
+    this.sortedColumn = false,
     this.valueBuilder,
     this.cellBuilder,
     this.columnSizing = ListGridColumnSizingMode.flex,
@@ -118,9 +119,13 @@ class ListGridColumn<T> {
     this.onTableCellClick,
     // this.dynamicTextStyle,
     // this.dynamicBackgroundColor,
-  }) : assert(
-          (searchable == false && sortable == false) || fieldName != null,
-          'fieldName must be provided if a column is searchable or sortable.',
+  })  : assert(
+          (searchable == false && sortable == false && sortedColumn == false) || fieldName != null,
+          'fieldName must be provided if a column is searchable, sortable or sortedColumn.',
+        ),
+        assert(
+          sortedColumn == false || sortable == true,
+          'sortedColumn requires sortable: the grid must be able to sort the column it opens sorted by.',
         );
 
   String label;
@@ -157,8 +162,19 @@ class ListGridColumn<T> {
   bool textSelectable;
   bool generateTooltip;
 
-  late int? columnIndex;
-  late bool sortedColumn = false;
+  /// Index of this column in [ListGridConfig.columnSettings]. Set by ListGridController for
+  /// every column. Nullable rather than `late` so a read before that can never throw.
+  int? columnIndex;
+
+  /// Whether the grid opens sorted by this column, before the user clicks a header.
+  ///
+  /// Without this the grid starts with no sort applied, and falls back to ordering by the
+  /// first [searchable] column — so a list whose natural order is, say, newest-first had no
+  /// way to say so. Set it on at most one column; the first one found wins.
+  ///
+  /// Pair it with [descending] to choose the direction. Clicking any header still overrides
+  /// this, and clicking this column's active arrow clears the sort as it always did.
+  final bool sortedColumn;
 
   OnTableCellClick<T>? onTableCellClick;
 }
