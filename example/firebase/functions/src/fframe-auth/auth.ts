@@ -9,6 +9,36 @@ admin.firestore().settings({ ignoreUndefinedProperties: true });
 const db = admin.firestore();
 const auth = admin.auth();
 
+// Roles that grant user/role-management privileges. A caller must hold one of
+// these to use the role-management callables.
+const MANAGEMENT_ROLES = ["superadmin", "useradmin", "rolemanager"];
+
+// Roles that only a superadmin may grant or revoke. Without this restriction a
+// delegated role-manager could mint a superadmin (or peer manager) they control
+// and escalate to full administrative access.
+const PRIVILEGED_ROLES = ["superadmin", "useradmin", "rolemanager"];
+
+const normalizeRoles = (roles: unknown): string[] =>
+  Array.isArray(roles)
+    ? roles.filter((r): r is string => typeof r === "string").map((r) => r.toLowerCase())
+    : [];
+
+const getRoles = async (uid: string): Promise<string[]> => {
+  const claims = (await auth.getUser(uid)).customClaims;
+  return claims && Array.isArray(claims["roles"]) ? (claims["roles"] as string[]) : [];
+};
+
+// Re-throw known HttpsErrors untouched; otherwise log the real cause server-side
+// and return a generic message so internal error detail — and user-existence
+// oracles from auth.getUser — never reach the client.
+const toClientError = (context: string, e: unknown): functions.https.HttpsError => {
+  if (e instanceof functions.https.HttpsError) {
+    return e;
+  }
+  console.error(`${context} failed:`, e);
+  return new functions.https.HttpsError("internal", "The request could not be completed.");
+};
+
 
 // On sign up.
 // TODO: get the function region into a config file
@@ -20,22 +50,37 @@ exports.processSignUp = functions.region("europe-west1").auth.user().onCreate(as
     user.emailVerified
   ) {
     try {
-      // Check if we already have users
-      const customClaims = (await auth.listUsers(2)).users.length == 1 ? config.initialUserRoles : config.defaultUserRoles;
+      // Atomically claim the "first user" slot so the initial SuperAdmin is
+      // assigned exactly once, even under concurrent first-time sign-ups — the
+      // previous `listUsers(2).length == 1` heuristic was a racy check-then-act.
+      const bootstrapRef = db.doc("fframe/bootstrap");
+      const isFirstUser = await db.runTransaction(async (tx) => {
+        const snap = await tx.get(bootstrapRef);
+        if (snap.exists && snap.get("initialAdminAssigned") === true) {
+          return false;
+        }
+        tx.set(
+          bootstrapRef,
+          { initialAdminAssigned: true, initialAdminUid: user.uid },
+          { merge: true },
+        );
+        return true;
+      });
+
+      const customClaims = isFirstUser ? config.initialUserRoles : config.defaultUserRoles;
 
       // Set custom user claims on this newly created user.
       await auth.setCustomUserClaims(user.uid, customClaims);
 
-      var tmpUser: any = (await auth.getUser(user.uid)).toJSON();
+      const tmpUser: any = (await auth.getUser(user.uid)).toJSON();
       tmpUser.active = true;
 
-      // Create an user firestore document in users collection. After refetching the user from auth
-      await db.collection("users").doc(user.uid).set(tmpUser).catch((reason) => {
-        throw new Error(reason);
-      });
+      // Create a user firestore document in the users collection after refetching
+      // the user from auth.
+      await db.collection("users").doc(user.uid).set(tmpUser);
       console.log(`Processed ${user.email}`);
     } catch (error) {
-      throw new Error(`${error}`);
+      throw new Error(`processSignUp failed: ${error}`);
     }
   } else {
     console.log(`Did not process ${user.email}`);
@@ -45,26 +90,22 @@ exports.processSignUp = functions.region("europe-west1").auth.user().onCreate(as
 
 exports.getUserRoles = functions.region("europe-west1").https.onCall(async (payLoad, context: functions.https.CallableContext) => {
   // Authentication / user information is automatically added to the request.
-  console.log(context.auth);
   if (!context.auth) {
-    throw new functions.https.HttpsError(
-      "permission-denied",
-      "Authentication failed",
-    );
+    throw new functions.https.HttpsError("permission-denied", "Authentication failed");
   }
   try {
-    const uid = payLoad["uid"] || context.auth.uid;
+    const callerRoles = normalizeRoles(await getRoles(context.auth.uid));
+    const callerIsManager = MANAGEMENT_ROLES.some((r) => callerRoles.includes(r));
 
+    // Only managers may read another user's roles; everyone else is pinned to
+    // their own uid regardless of the payload. Previously any authenticated user
+    // could read anyone's roles via a caller-supplied uid (IDOR).
+    const requestedUid = payLoad && payLoad["uid"];
+    const uid = callerIsManager && requestedUid ? requestedUid : context.auth.uid;
 
-    console.log("Request accepted");
-    const customClaims = (await auth.getUser(uid)).customClaims;
-    if (customClaims && customClaims["roles"]) {
-      return customClaims["roles"];
-    }
-
-    return [];
+    return await getRoles(uid);
   } catch (e) {
-    throw new functions.https.HttpsError("invalid-argument", `${e}`);
+    throw toClientError("getUserRoles", e);
   }
 });
 
@@ -72,77 +113,60 @@ exports.getUserRoles = functions.region("europe-west1").https.onCall(async (payL
 exports.addUserRole = functions.region("europe-west1").https.onCall(async (payLoad, context: functions.https.CallableContext) => {
   // Authentication / user information is automatically added to the request.
   if (!context.auth) {
-    throw new functions.https.HttpsError(
-      "permission-denied",
-      "Authentication failed",
-    );
+    throw new functions.https.HttpsError("permission-denied", "Authentication failed");
   }
   try {
-    console.log("Check caller roles");
+    const uid = payLoad && payLoad["uid"];
+    const role = payLoad && payLoad["role"];
 
-    // Get the payload
-    const uid = payLoad["uid"];
-    const role = payLoad["role"];
-
-    const callerClaims = (await auth.getUser(context.auth.uid)).customClaims;
-    let callerRoles: string[];
-    if (callerClaims && callerClaims["roles"]) {
-      callerRoles = callerClaims["roles"].map((role: string) => role.toLowerCase());
-      if (!(
-        callerRoles.includes("superadmin") ||
-        callerRoles.includes("useradmin") ||
-        callerRoles.includes("rolemanager"
-        ))) {
-        throw new functions.https.HttpsError(
-          "permission-denied",
-          `Calling user has insufficient role assignments: ${callerRoles.join(", ")}`,
-        );
-      }
-    } else {
+    // Validate inputs before any lookups; reject non-string/empty roles so no
+    // malformed value is ever written into the security-relevant claims array.
+    if (!uid || typeof uid !== "string" || !role || typeof role !== "string" || role.trim() === "") {
       throw new functions.https.HttpsError(
-        "permission-denied",
-        "Calling user has insufficient role assignments",
+        "failed-precondition",
+        "uid and role are mandatory non-empty strings.",
       );
     }
 
-    if (uid == context.auth.uid && !(callerRoles.includes("superadmin"))) {
+    const callerRoles = normalizeRoles(await getRoles(context.auth.uid));
+    if (!MANAGEMENT_ROLES.some((r) => callerRoles.includes(r))) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Calling user has insufficient role assignments.",
+      );
+    }
+
+    // Only a superadmin may grant a privileged/management role.
+    if (PRIVILEGED_ROLES.includes(role.toLowerCase()) && !callerRoles.includes("superadmin")) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        `Only a superadmin may grant the '${role}' role.`,
+      );
+    }
+
+    if (uid === context.auth.uid && !callerRoles.includes("superadmin")) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "User cannot change their own roles.",
       );
     }
-    console.log("Request accepted", payLoad);
-    // Process the request
 
-    if (!uid || !role) {
-      throw new functions.https.HttpsError(
-        "failed-precondition",
-        `uid and role are mandatory. received: uid= ${uid} role=${role}`,
-      );
+    // Add the requested role to the target's existing roles (deduplicated).
+    const roles = await getRoles(uid);
+    if (!roles.includes(role)) {
+      roles.push(role);
     }
+    const newClaims = { roles };
 
-    // Get the current roles and add the new role to the current listed roles
-    let customClaims = (await auth.getUser(uid)).customClaims;
-    if (customClaims) {
-      if (customClaims["roles"]) {
-        customClaims["roles"].push(role);
-      }
-    } else {
-      customClaims = { roles: [role] };
-    }
-
-    // Update the user auth in Firestore auth
-    customClaims["roles"] = customClaims["roles"].filter((value: string, index: number, self: string[]) => {
-      return self.indexOf(value) === index;
-    });
-    await auth.setCustomUserClaims(uid, customClaims);
-
-    db.doc(`users/${uid}`).set({ customClaims: customClaims }, { merge: true });
+    await auth.setCustomUserClaims(uid, newClaims);
+    // Await the mirror write so failures surface and claims/Firestore stay in
+    // sync rather than silently diverging.
+    await db.doc(`users/${uid}`).set({ customClaims: newClaims }, { merge: true });
 
     // Echo the current settings
-    return customClaims["roles"];
+    return roles;
   } catch (e) {
-    throw new functions.https.HttpsError("invalid-argument", `${e}`);
+    throw toClientError("addUserRole", e);
   }
 });
 
@@ -150,121 +174,51 @@ exports.addUserRole = functions.region("europe-west1").https.onCall(async (payLo
 exports.removeUserRole = functions.region("europe-west1").https.onCall(async (payLoad, context: functions.https.CallableContext) => {
   // Authentication / user information is automatically added to the request.
   if (!context.auth) {
-    throw new functions.https.HttpsError(
-      "permission-denied",
-      "Authentication failed",
-    );
+    throw new functions.https.HttpsError("permission-denied", "Authentication failed");
   }
   try {
-    console.log("Check caller roles");
+    const uid = payLoad && payLoad["uid"];
+    const role = payLoad && payLoad["role"];
 
-    // Get the payload
-    const uid = payLoad["uid"];
-    const role = payLoad["role"];
-
-    const callerClaims = (await auth.getUser(context.auth.uid)).customClaims;
-    let callerRoles: string[];
-    if (callerClaims && callerClaims["roles"]) {
-      callerRoles = callerClaims["roles"].map((role: string) => role.toLowerCase());
-      if (!(
-        callerRoles.includes("superadmin") ||
-        callerRoles.includes("useradmin") ||
-        callerRoles.includes("rolemanager"
-        ))) {
-        throw new functions.https.HttpsError(
-          "permission-denied",
-          `Calling user has insufficient role assignments: ${callerRoles.join(", ")}`,
-        );
-      }
-    } else {
+    if (!uid || typeof uid !== "string" || !role || typeof role !== "string" || role.trim() === "") {
       throw new functions.https.HttpsError(
-        "permission-denied",
-        "Calling user has insufficient role assignments",
+        "failed-precondition",
+        "uid and role are mandatory non-empty strings.",
       );
     }
 
-    if (uid == context.auth.uid && !(callerRoles.includes("superadmin"))) {
+    const callerRoles = normalizeRoles(await getRoles(context.auth.uid));
+    if (!MANAGEMENT_ROLES.some((r) => callerRoles.includes(r))) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Calling user has insufficient role assignments.",
+      );
+    }
+
+    // Only a superadmin may revoke a privileged/management role.
+    if (PRIVILEGED_ROLES.includes(role.toLowerCase()) && !callerRoles.includes("superadmin")) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        `Only a superadmin may revoke the '${role}' role.`,
+      );
+    }
+
+    if (uid === context.auth.uid && !callerRoles.includes("superadmin")) {
       throw new functions.https.HttpsError(
         "permission-denied",
         "User cannot change their own roles.",
       );
     }
-    console.log("Request accepted", payLoad);
-    // Process the request
 
-    if (!uid || !role) {
-      throw new functions.https.HttpsError(
-        "failed-precondition",
-        `uid and role are mandatory. received: uid= ${uid} role=${role}`,
-      );
-    }
+    const roles = (await getRoles(uid)).filter((r) => r !== role);
+    const newClaims = { roles };
 
-
-    // Get the current roles and add the new role to the current listed roles
-    let customClaims = (await auth.getUser(uid)).customClaims;
-    if (customClaims) {
-      if (customClaims["roles"]) {
-        customClaims["roles"];
-        const index = customClaims["roles"].indexOf(role, 0);
-        if (index > -1) {
-          customClaims["roles"].splice(index, 1);
-        }
-      }
-    } else {
-      customClaims = { roles: [] };
-    }
-
-    // Update the user auth in Firestore auth
-    customClaims["roles"] = customClaims["roles"].filter((value: string, index: number, self: string[]) => {
-      return self.indexOf(value) === index;
-    });
-    await auth.setCustomUserClaims(uid, customClaims);
-
-    db.doc(`users/${uid}`).set({ customClaims: customClaims }, { merge: true });
+    await auth.setCustomUserClaims(uid, newClaims);
+    await db.doc(`users/${uid}`).set({ customClaims: newClaims }, { merge: true });
 
     // Echo the current settings
-    return customClaims["roles"];
+    return roles;
   } catch (e) {
-    throw new functions.https.HttpsError("invalid-argument", `${e}`);
+    throw toClientError("removeUserRole", e);
   }
 });
-
-// /**
-//  * Adds two numbers together.
-//  * @param {string} url The first number.
-//  * @param {string} email The first number.
-//  * @param {string} displayName The first number.
-//  * @param {string} bundleId The first number.
-//  * @param {string} packageName The first number.
-// //  * @returns {bool} The sum of the two numbers.
-//  */
-// export async function inviteNewUser(url: string, email: string, displayName: string, bundleId: string, packageName: string,) {
-//   const actionCodeSettings = {
-//     // The URL to redirect to for sign-in completion. This is also the deep
-//     // link for mobile redirects. The domain (www.example.com) for this URL
-//     // must be whitelisted in the Firebase Console.
-//     url: url,
-//     iOS: {
-//       bundleId: bundleId,
-//     },
-//     android: {
-//       packageName: packageName,
-//       installApp: true,
-//       minimumVersion: "12",
-//     },
-//     // This must be true.
-//     handleCodeInApp: true,
-//     dynamicLinkDomain: "custom.page.link",
-//   };
-//   admin.auth()
-//     .generateSignInWithEmailLink(email, actionCodeSettings)
-//     .then(function(link) {
-//       // The link was successfully generated.
-//       // Construct sign-in with email link template, embed the link and
-//       // send using custom SMTP server.
-//       // return sendSignInEmail(email, displayName, link);
-//     })
-//     .catch(function(error) {
-//       // Some error occurred, you can inspect the code: error.code
-//     });
-// }

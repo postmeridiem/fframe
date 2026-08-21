@@ -159,8 +159,10 @@ class FRouterConfig {
 
         //Remove all tabs which are not public
         navigationTarget.navigationTabs?.removeWhere((NavigationTab navigationTab) {
-          //If the target does not require roles. Return true
-          return navigationTab.roles == null || navigationTab.roles!.isEmpty;
+          //Remove role-restricted tabs; keep public (no-role) tabs. The
+          //predicate was previously inverted, which hid public tabs and exposed
+          //role-gated tabs to signed-out users.
+          return navigationTab.roles != null && navigationTab.roles!.isNotEmpty;
         });
         return navigationTarget.navigationTabs?.isEmpty ?? false;
       });

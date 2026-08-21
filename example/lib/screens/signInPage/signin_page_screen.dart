@@ -1,7 +1,6 @@
 // ignore_for_file: depend_on_referenced_packages
 import 'package:fframe/fframe.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
 class SignInPage extends StatefulWidget {
@@ -52,14 +51,19 @@ class _SignInPageState extends State<SignInPage> {
           firstChild: SizedBox(
             width: 200,
             height: 40,
-            child: SignInButton(
-              Buttons.Google,
+            child: ElevatedButton.icon(
               onPressed: () {
                 setState(() {
                   isSigningIn = true;
                 });
                 signInWithGoogle();
               },
+              icon: const Icon(Icons.login),
+              label: const Text("Sign in with Google"),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black87,
+              ),
             ),
           ),
           secondChild: const SizedBox(

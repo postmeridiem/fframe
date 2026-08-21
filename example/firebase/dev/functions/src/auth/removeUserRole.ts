@@ -10,18 +10,35 @@ type Payload = {
   uid: string;
 };
 
-const canManageUsers = (callerRoles: string[]) => {
-  const roles = ["superadmin", "useradmin", "rolemanager"];
+// Roles that grant user/role-management privileges.
+const MANAGEMENT_ROLES = ["superadmin", "useradmin", "rolemanager"];
 
-  return roles.some((role) => callerRoles.includes(role));
-};
+// Roles that only a superadmin may grant or revoke.
+const PRIVILEGED_ROLES = ["superadmin", "useradmin", "rolemanager"];
+
+const canManageUsers = (callerRoles: string[]) =>
+  MANAGEMENT_ROLES.some((role) => callerRoles.includes(role));
 
 const getCustomClaims = async (uid: string): Promise<CustomClaims> => {
   const claims = (await auth.getUser(uid)).customClaims;
 
   return {
-    roles: claims?.roles || [],
+    roles: Array.isArray(claims?.roles) ? claims!.roles : [],
   };
+};
+
+const toClientError = (
+  context: string,
+  e: unknown
+): functions.https.HttpsError => {
+  if (e instanceof functions.https.HttpsError) {
+    return e;
+  }
+  console.error(`${context} failed:`, e);
+  return new functions.https.HttpsError(
+    "internal",
+    "The request could not be completed."
+  );
 };
 
 export const removeUserRole = makeFunction().https.onCall(
@@ -33,12 +50,18 @@ export const removeUserRole = makeFunction().https.onCall(
       );
     }
     try {
-      const { uid, role } = payLoad;
+      const { uid, role } = payLoad || ({} as Payload);
 
-      if (!uid || !role) {
+      if (
+        !uid ||
+        typeof uid !== "string" ||
+        !role ||
+        typeof role !== "string" ||
+        role.trim() === ""
+      ) {
         throw new functions.https.HttpsError(
           "failed-precondition",
-          `uid and role are mandatory. received: uid= ${uid} role=${role}`
+          "uid and role are mandatory non-empty strings."
         );
       }
 
@@ -51,16 +74,25 @@ export const removeUserRole = makeFunction().https.onCall(
         );
       }
 
-      const callerRoles = callerClaims.roles.map((role: string) =>
-        role.toLowerCase()
+      const callerRoles = callerClaims.roles.map((r: string) =>
+        String(r).toLowerCase()
       );
 
       if (!canManageUsers(callerRoles)) {
         throw new functions.https.HttpsError(
           "permission-denied",
-          `Calling user has insufficient role assignments: ${callerRoles.join(
-            ", "
-          )}`
+          "Calling user has insufficient role assignments"
+        );
+      }
+
+      // Only a superadmin may revoke a privileged/management role.
+      if (
+        PRIVILEGED_ROLES.includes(role.toLowerCase()) &&
+        !callerRoles.includes("superadmin")
+      ) {
+        throw new functions.https.HttpsError(
+          "permission-denied",
+          `Only a superadmin may revoke the '${role}' role.`
         );
       }
 
@@ -73,9 +105,7 @@ export const removeUserRole = makeFunction().https.onCall(
 
       const customClaims: CustomClaims = await getCustomClaims(uid);
 
-      const roles = customClaims.roles.filter(
-        (claimRole) => claimRole !== role
-      );
+      const roles = customClaims.roles.filter((claimRole) => claimRole !== role);
 
       const newClaims = {
         ...customClaims,
@@ -83,12 +113,12 @@ export const removeUserRole = makeFunction().https.onCall(
       };
 
       await auth.setCustomUserClaims(uid, newClaims);
-      db.doc(`users/${uid}`).set({ customClaims: newClaims }, { merge: true });
+      await db.doc(`users/${uid}`).set({ customClaims: newClaims }, { merge: true });
 
       // Echo the current settings
       return roles;
     } catch (e) {
-      throw new functions.https.HttpsError("invalid-argument", `${e}`);
+      throw toClientError("removeUserRole", e);
     }
   }
 );

@@ -878,7 +878,10 @@ class SelectedDocument<T> {
     bool openAfterCreate = true,
   }) {
     T creationData = documentConfig.createNew();
-    String? createDocumentId = documentConfig.createDocumentId!(creationData);
+    // createDocumentId is optional: only derive an id from it when configured,
+    // otherwise let the constructor generate one. Force-unwrapping it here
+    // crashed document creation for any collection without a createDocumentId.
+    String? createDocumentId = documentConfig.createDocumentId != null ? documentConfig.createDocumentId!(creationData) : null;
     SelectedDocument<T> selectedDocument = SelectedDocument<T>(
       documentConfig: documentConfig,
       id: createDocumentId ?? "new",

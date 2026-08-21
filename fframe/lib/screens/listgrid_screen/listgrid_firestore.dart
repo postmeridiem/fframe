@@ -49,6 +49,16 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
   }
 
   @override
+  void dispose() {
+    // Dispose the notifier (which cancels its debounce Timer) and the scroll
+    // controller created in this State, so navigating away does not leak them
+    // or fire notifyListeners()/timers after teardown.
+    listGridNotifier.dispose();
+    _horizontal.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListGridController(
       context: context,
@@ -139,12 +149,28 @@ class FirestoreListGridState<T> extends State<FirestoreListGrid<T>> {
                                               width: listGridController.calculatedWidth,
                                               child: listGridController.listGridConfig.searchAsContains
                                                   // For client-side search, wait for pre-fetched docs to be loaded.
-                                                  ? (listGridNotifier.prefetchedDocs == null
-                                                      ? const Center(child: CircularProgressIndicator())
-                                                      : ListGridEndless<T>(
-                                                          prefetchedDocs: listGridNotifier.prefetchedDocs,
-                                                          listGridController: listGridController,
-                                                        ))
+                                                  ? (listGridNotifier.prefetchError != null
+                                                      // Surface a prefetch failure instead of spinning forever.
+                                                      ? Card(
+                                                          child: Center(
+                                                            child: SizedBox(
+                                                              width: 500,
+                                                              height: double.infinity,
+                                                              child: Padding(
+                                                                padding: const EdgeInsets.all(40.0),
+                                                                child: SelectableText(
+                                                                  "error ${listGridNotifier.prefetchError}",
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : listGridNotifier.prefetchedDocs == null
+                                                          ? const Center(child: CircularProgressIndicator())
+                                                          : ListGridEndless<T>(
+                                                              prefetchedDocs: listGridNotifier.prefetchedDocs,
+                                                              listGridController: listGridController,
+                                                            ))
                                                   // For server-side search (the default), use FirestoreQueryBuilder for pagination.
                                                   : FirestoreQueryBuilder<T>(
                                                       pageSize: listGridController.dataMode.limit,

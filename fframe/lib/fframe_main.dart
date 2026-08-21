@@ -365,23 +365,33 @@ class SignInWithLinkState extends State<SignInWithLink> with WidgetsBindingObser
     if (FirebaseAuth.instance.isSignInWithEmailLink(uri.toString())) {
       if (uri.queryParameters.containsKey("hash")) {
         String hash = uri.queryParameters["hash"]!;
-        String emailAddress = utf8.decode(base64.decode(hash));
+        // The hash is attacker-controllable via the URL: base64/utf8 decoding
+        // throws on malformed input. Guard it so a bad link degrades to the
+        // normal sign-in page instead of throwing during build.
+        String? emailAddress;
+        try {
+          emailAddress = utf8.decode(base64.decode(hash));
+        } catch (e) {
+          Console.log("Invalid sign-in hash, falling back to sign-in page: $e", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
+        }
 
-        return FutureBuilder<UserCredential>(
-            future: FirebaseAuth.instance.signInWithEmailLink(email: emailAddress, emailLink: uri.toString()),
-            builder: (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
-              if (!snapshot.hasData) {
-                return FFWaitPage(
-                  message: "Running post sign in link",
-                );
-              } else if (snapshot.error != null) {
-                return FFErrorPage();
-              } else {
-                UserCredential? userCredential = snapshot.data;
-                Console.log("Resulting user: ${userCredential?.user?.email}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
-                return FFWaitPage(message: "Signing in with link");
-              }
-            });
+        if (emailAddress != null) {
+          return FutureBuilder<UserCredential>(
+              future: FirebaseAuth.instance.signInWithEmailLink(email: emailAddress, emailLink: uri.toString()),
+              builder: (BuildContext context, AsyncSnapshot<UserCredential> snapshot) {
+                if (!snapshot.hasData) {
+                  return FFWaitPage(
+                    message: "Running post sign in link",
+                  );
+                } else if (snapshot.error != null) {
+                  return FFErrorPage();
+                } else {
+                  UserCredential? userCredential = snapshot.data;
+                  Console.log("Resulting user: ${userCredential?.user?.email}", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
+                  return FFWaitPage(message: "Signing in with link");
+                }
+              });
+        }
       } else {
         Console.log("emailAddress not found in hash", scope: "fframeLog.EmailAutManager", level: LogLevel.fframe);
       }

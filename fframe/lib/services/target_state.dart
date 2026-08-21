@@ -82,12 +82,18 @@ class TargetState extends ChangeNotifier {
           Console.log("Search for subroutes, get the corresponding tab config", scope: "fframeLog.TargetState.targetState", level: LogLevel.fframe);
           String searchPath = "${navigationTarget.path}/${uri.pathSegments.last}";
 
-          navigationTarget = navigationTarget.navigationTabs!.firstWhere(
-            (NavigationTarget navigationTarget) => navigationTarget.path == searchPath,
-            orElse: () {
-              return NavigationNotifier.instance.navigationConfig.errorPage as NavigationTab;
-            },
-          );
+          NavigationTarget? matchedTab;
+          for (final tab in navigationTarget.navigationTabs!) {
+            if (tab.path == searchPath) {
+              matchedTab = tab;
+              break;
+            }
+          }
+          // A non-existent subtab must fall back to the error page. The previous
+          // `errorPage as NavigationTab` cast threw (errorPage is a
+          // NavigationTarget, not a NavigationTab) and was silently swallowed by
+          // the surrounding try/catch, leaving the router on a stale screen.
+          navigationTarget = matchedTab ?? NavigationNotifier.instance.navigationConfig.errorPage;
           //Assign the selected tab to the targetState
           // targetState = TargetState(navigationTarget: navigationTab);
         } else if (navigationTarget.navigationTabs != null && navigationTarget.navigationTabs!.isNotEmpty) {

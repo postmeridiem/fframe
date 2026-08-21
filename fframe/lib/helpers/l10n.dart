@@ -33,7 +33,14 @@ class L10n {
     if (L10n.instance.map.containsKey(namespace)) {
       var selectedNameSpace = L10n.instance.map[namespace];
       if (selectedNameSpace.containsKey(key)) {
-        output = selectedNameSpace[key]!['translation'];
+        // A key can exist without a `translation` entry (partial/malformed
+        // translation data). Only override the placeholder when a String
+        // translation is present; otherwise fall back to the placeholder
+        // instead of throwing a null-to-String type error.
+        final translation = selectedNameSpace[key]?['translation'];
+        if (translation is String) {
+          output = translation;
+        }
       } else {}
     } else {
       Console.log(
