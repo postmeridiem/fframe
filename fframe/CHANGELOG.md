@@ -63,6 +63,14 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
   teardown, and guarded async callbacks so they no longer fire after dispose.
 * **Reconciled selection on query change** — sorting/searching clears the prior
   selection so the count and bulk actions can't operate on off-screen documents.
+* **`ListGridColumn.sortedColumn`** — a column can declare that the grid opens
+  sorted by it, rather than always starting unsorted and falling back to the first
+  searchable column. Opt-in and inert unless set; requires `sortable`; at most one
+  column per grid (asserted). No effect under `searchAsContains`, which renders from
+  an unordered prefetch.
+* **Assigned `columnIndex` for every column, not only visible ones** — `sortColumn`
+  matches on it across the whole list, so a hidden column positioned before the
+  clicked one threw a `LateInitializationError`.
 
 #### Framework — swimlanes (`fframe/lib/screens/swimlanes_screen`)
 

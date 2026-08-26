@@ -40,9 +40,14 @@ class ListGridController extends InheritedModel<ListGridController> {
       // get the settings for the current column
       ListGridColumn columnSetting = columnSettings[i];
 
+      // Assign the index for EVERY column, visible or not. sortColumn() matches on
+      // columnIndex across the whole list (`_columnSettings.where((e) => e.columnIndex == ...)`),
+      // so an unset index on a hidden column threw a LateInitializationError — whenever a
+      // hidden column sat before the clicked one, since the lazy `.first` stops at a match.
+      columnSetting.columnIndex = i;
+
       // calculate the grid width based on visibility
       if (columnSetting.visible) {
-        columnSetting.columnIndex = i;
         // add this column's width to the min width.
         // each flex column will add the default column width
         // unless specified otherwise
