@@ -142,77 +142,75 @@ class ListGridNotifier<T> extends ChangeNotifier {
 
     Query outputQuery = _initialQuery as Query<T>;
 
-    // handle sorting
-    if (sortedColumnIndex != null) {
+    // Search decides the ordering when both are active: Firestore requires the field carrying
+    // a range filter to be the first field ordered, so `startsWith` can only be applied to a
+    // field this query orders by. Ordering by the sorted column instead put the filter on the
+    // wrong field, which returned nothing. A user's sort is therefore ignored while searching.
+    final bool isSearching = searchString != null && searchString!.isNotEmpty;
+
+    if (isSearching && searchableColumns.isNotEmpty) {
+
+      // For server-side searches (`startsWith`), Firestore requires the query to be
+      // ordered by the same field used in the range filter. We use the first
+      // available searchable column as the primary one for this purpose.
+      // The assertion in the constructor ensures that for server-side searches,
+      // there is only one searchable column configured.
+      final ListGridColumn primarySearchColumn = _columnSettings[searchableColumns.first];
+
+      if (primarySearchColumn.fieldName != null) {
+        String curSearch = searchString!;
+        String fieldName = primarySearchColumn.fieldName!;
+        // Never log the search term itself — it is user input and can carry customer names or
+        // email addresses. The field being filtered is the useful part for debugging.
+        Console.log(
+          "fframeLog.ListGridNotifier: search active, filtering and ordering on $fieldName",
+          level: LogLevel.fframe,
+        );
+        outputQuery = outputQuery.orderBy(fieldName, descending: primarySearchColumn.descending);
+
+        if (primarySearchColumn.searchMask == null) {
+          // For a "startsWith" search, apply the filter directly to the query.
+          // When 'searchAsContains' is true, this is skipped. The filtering is handled on the client-side
+          // in `ListGridEndless`, which allows for checking multiple columns.
+          if (_listGridConfig != null && !_listGridConfig!.searchAsContains) {
+            outputQuery = outputQuery.startsWith(fieldName, curSearch);
+          }
+        } else {
+          // Apply search mask if one is configured.
+          if (primarySearchColumn.searchMask!.toLowerCase) {
+            curSearch = curSearch.toLowerCase();
+          }
+          outputQuery = outputQuery.startsWith(
+            fieldName,
+            curSearch.replaceAll(
+              primarySearchColumn.searchMask!.from,
+              primarySearchColumn.searchMask!.to,
+            ),
+          );
+        }
+      }
+    } else if (sortedColumnIndex != null) {
+      // A column is sorted and nothing is being searched: order by it, no range filter.
       ListGridColumn sortedColumn = _columnSettings[sortedColumnIndex!];
       Console.log(
-        "fframeLog.ListGridNotifier: column sorted, search on the ${sortedColumn.fieldName!} column",
+        "fframeLog.ListGridNotifier: column sorted on ${sortedColumn.fieldName!}",
         level: LogLevel.fframe,
       );
 
       outputQuery = outputQuery.orderBy(sortedColumn.fieldName!, descending: sortedColumn.descending);
-
-      // Only apply the range filter when a search string is present; sorting a
-      // column with an empty/cleared search box must not force-unwrap null.
-      final String? currentSearch = searchString;
-      if (_columnSettings[sortedColumnIndex!].fieldName != null && currentSearch != null && currentSearch.isNotEmpty) {
-        String fieldName = _columnSettings[sortedColumnIndex!].fieldName!;
-        outputQuery = outputQuery.startsWith(fieldName, currentSearch);
+    } else if (searchableColumns.isNotEmpty) {
+      // Neither searching nor sorted: order by the primary searchable column so the grid
+      // still has a stable, predictable order.
+      if (_columnSettings[searchableColumns.first].fieldName != null) {
+        ListGridColumn curColumn = _columnSettings[searchableColumns.first];
+        String fieldName = curColumn.fieldName!;
+        outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
       }
     } else {
-      if (searchableColumns.isNotEmpty) {
-        if (searchString != null && searchString!.isNotEmpty) {
-          // A search string is present.
-          Console.log("fframeLog.ListGridNotifier: searching for: $searchString");
-
-          // For server-side searches (`startsWith`), Firestore requires the query to be
-          // ordered by the same field used in the range filter. We use the first
-          // available searchable column as the primary one for this purpose.
-          // The assertion in the constructor ensures that for server-side searches,
-          // there is only one searchable column configured.
-          final ListGridColumn primarySearchColumn = _columnSettings[searchableColumns.first];
-
-          if (primarySearchColumn.fieldName != null) {
-            String curSearch = searchString!;
-            String fieldName = primarySearchColumn.fieldName!;
-            outputQuery = outputQuery.orderBy(fieldName, descending: primarySearchColumn.descending);
-
-            if (primarySearchColumn.searchMask == null) {
-              // For a "startsWith" search, apply the filter directly to the query.
-              // When 'searchAsContains' is true, this is skipped. The filtering is handled on the client-side
-              // in `ListGridEndless`, which allows for checking multiple columns.
-              if (_listGridConfig != null && !_listGridConfig!.searchAsContains) {
-                outputQuery = outputQuery.startsWith(fieldName, curSearch);
-              }
-            } else {
-              // Apply search mask if one is configured.
-              if (primarySearchColumn.searchMask!.toLowerCase) {
-                curSearch = curSearch.toLowerCase();
-              }
-              outputQuery = outputQuery.startsWith(
-                fieldName,
-                curSearch.replaceAll(
-                  primarySearchColumn.searchMask!.from,
-                  primarySearchColumn.searchMask!.to,
-                ),
-              );
-            }
-          }
-        } else {
-          // no search string provided, and no column user sorted. make sure to sort the primary search column if available.
-
-          if (_columnSettings[searchableColumns.first].fieldName != null) {
-            ListGridColumn curColumn = _columnSettings[searchableColumns.first];
-            String fieldName = curColumn.fieldName!;
-            outputQuery = outputQuery.orderBy(fieldName, descending: curColumn.descending);
-          }
-        }
-      } else {
-        Console.log(
-          "fframeLog.ListGridNotifier: no searchable column specified",
-          level: LogLevel.fframe,
-        );
-      }
+      Console.log(
+        "fframeLog.ListGridNotifier: no searchable column specified",
+        level: LogLevel.fframe,
+      );
     }
 
     // apply the newly computedQuery as the current query
