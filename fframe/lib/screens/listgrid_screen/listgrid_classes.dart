@@ -106,6 +106,7 @@ class ListGridColumn<T> {
     this.searchMask,
     this.sortable = false,
     this.descending = false,
+    this.sortedColumn = false,
     this.valueBuilder,
     this.cellBuilder,
     this.columnSizing = ListGridColumnSizingMode.flex,
@@ -118,9 +119,13 @@ class ListGridColumn<T> {
     this.onTableCellClick,
     // this.dynamicTextStyle,
     // this.dynamicBackgroundColor,
-  }) : assert(
+  })  : assert(
           (searchable == false && sortable == false) || fieldName != null,
           'fieldName must be provided if a column is searchable or sortable.',
+        ),
+        assert(
+          sortedColumn == false || sortable == true,
+          'sortedColumn requires sortable: the grid must be able to sort the column it opens sorted by.',
         );
 
   String label;
@@ -157,8 +162,28 @@ class ListGridColumn<T> {
   bool textSelectable;
   bool generateTooltip;
 
-  late int? columnIndex;
-  late bool sortedColumn = false;
+  /// Index of this column in [ListGridConfig.columnSettings]. Set by ListGridController for
+  /// every column. Nullable rather than `late` so a read before that can never throw.
+  int? columnIndex;
+
+  /// Whether the grid opens sorted by this column, before the user clicks a header.
+  ///
+  /// Without this the grid starts with no sort applied and falls back to ordering by the
+  /// first [searchable] column — so a list whose natural order is, say, newest-first had no
+  /// way to say so. At most one column may set it; the notifier asserts on more.
+  ///
+  /// Requires [sortable]: without it no header arrow renders, so the user could neither see
+  /// the sort nor clear it.
+  ///
+  /// [descending] gives the initial direction, but note it is **not** immutable — a header
+  /// click writes the user's choice back onto this column, and column lists are conventionally
+  /// top-level, so that choice outlives the grid. The configured value is therefore the
+  /// direction on first use, not a value the grid returns to.
+  ///
+  /// **No effect when [ListGridConfig.searchAsContains] is true.** That mode renders from a
+  /// prefetched, unordered snapshot rather than the built query, so no ordering reaches the
+  /// list — header-click sorting is inert there too.
+  final bool sortedColumn;
 
   OnTableCellClick<T>? onTableCellClick;
 }

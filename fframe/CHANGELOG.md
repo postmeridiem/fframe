@@ -63,6 +63,25 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
   teardown, and guarded async callbacks so they no longer fire after dispose.
 * **Reconciled selection on query change** — sorting/searching clears the prior
   selection so the count and bulk actions can't operate on off-screen documents.
+* **`ListGridColumn.sortedColumn`** — a column can declare that the grid opens
+  sorted by it, rather than always starting unsorted and falling back to the first
+  searchable column. Opt-in and inert unless set; requires `sortable`; at most one
+  column per grid (asserted). No effect under `searchAsContains`, which renders from
+  an unordered prefetch.
+* **BEHAVIOUR CHANGE — searching now decides the ordering when a column is also
+  sorted.** Previously the query ordered by the sorted column and applied the
+  search's range filter to that same column, so searching while sorted filtered the
+  wrong field and returned nothing unless the sorted column happened to be the
+  searchable one. Firestore requires the range-filter field to be ordered first, so
+  the search branch now owns both. Consequence: a user's chosen sort is ignored while
+  they are searching, and the sorted column's header arrow stays highlighted even
+  though the results are in searchable-column order.
+* **Stopped logging the search term**, which is user input and can carry customer
+  names or email addresses, at `Console.log`'s default prod level. The field being
+  filtered is logged instead, at `fframe` level.
+* **Assigned `columnIndex` for every column, not only visible ones** — `sortColumn`
+  matches on it across the whole list, so a hidden column positioned before the
+  clicked one threw a `LateInitializationError`.
 
 #### Framework — swimlanes (`fframe/lib/screens/swimlanes_screen`)
 
