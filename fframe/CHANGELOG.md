@@ -101,16 +101,16 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
   When a tap opens a card, its lane now saves up to three visible cards (not the
   opened one) in a static store, keyed like the horizontal offset and tied to the
   lane's query, so a lane with the same id on another board (which can even hold the
-  same cards) never uses it. Each rebuilt instance of that lane pages forward until
-  those cards are loaded, and puts the
-  first one that still sits next to another at its old distance from the lane top.
-  So a card that moved elsewhere in the lane, like the opened card after a status
-  change, does not drag the view along. Paging stops one page past the deepest saved
-  card, so a lane whose saved cards all left lands at the top, as before. A user
-  scroll in that lane, a card drag or the next open drops the saved position. Lanes
-  now own a vertical `ScrollController` (`SwimlaneLaneScroll`, new file
-  `swimlanes_scroll_anchor.dart`), and `SwimlanesTaskCard` takes an optional
-  `onBeforeOpen` callback.
+  same cards) never uses it. A rebuilt instance of that lane sizes its first query to
+  reach those cards (one page past the deepest), so a deep position costs one round
+  trip instead of one per page, and pages further only if they moved down. It puts
+  the first one that still sits next to another at its old distance from the lane
+  top, so a card that moved elsewhere in the lane, like the opened card after a
+  status change, does not drag the view along. A lane whose saved cards all left
+  lands at the top, as before. A user scroll in that lane, a card drag or the next
+  open drops the saved position. Lanes now own a vertical `ScrollController`
+  (`SwimlaneLaneScroll`, new file `swimlanes_scroll_anchor.dart`), and
+  `SwimlanesTaskCard` takes an optional `onBeforeOpen` callback.
 
 #### Framework — document/selection lifecycle (`fframe/lib/controllers/selection_state_controller.dart`)
 

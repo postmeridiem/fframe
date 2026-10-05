@@ -889,6 +889,10 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
   // The lane's vertical scroll, kept across board rebuilds while a card is open.
   late final SwimlaneLaneScroll _laneScroll;
 
+  // Larger than _documentsPerPage when this lane restores a saved position, so one query
+  // reaches it. Set with the lane query and kept for the lane instance.
+  int? _pageSize;
+
   String get _boardKey => SwimlaneScrollAnchor.boardKey(widget.documentConfig.collection, widget.swimlanesConfig.trackerId);
 
   @override
@@ -1004,7 +1008,11 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
 
     // Tells this lane apart from a lane with the same id on another board (its board
     // filter differs). Only the where/orderBy clauses, never the converter.
-    _laneScroll.laneQuery = baseQuery.parameters.toString();
+    final String laneQuery = baseQuery.parameters.toString();
+    if (_pageSize == null || laneQuery != _laneScroll.laneQuery) {
+      _laneScroll.laneQuery = laneQuery;
+      _pageSize = _laneScroll.firstPageSize();
+    }
 
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       return SizedBox(
@@ -1012,7 +1020,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
         width: swimlanesConfig.swimlaneWidth,
         child: FirestoreQueryBuilder<T>(
           query: baseQuery,
-          pageSize: _documentsPerPage,
+          pageSize: _pageSize!,
           builder: (BuildContext context, FirestoreQueryBuilderSnapshot<T> snapshot, _) {
             if (snapshot.isFetching) {
               return const Center(

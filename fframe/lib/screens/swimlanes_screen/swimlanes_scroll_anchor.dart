@@ -110,6 +110,10 @@ class SwimlaneScrollAnchor {
   /// Whether this anchor was saved by the lane [laneId] with the query [laneQuery].
   bool isFor(String laneId, String? laneQuery) => this.laneId == laneId && this.laneQuery == laneQuery;
 
+  /// How many documents a lane loads, at most, to find these cards: one page past the
+  /// deepest one. Bounds the paging, and sizes the first page of a restoring lane.
+  int loadLimit(int pageSize) => cards.fold(0, (int deepest, card) => max(deepest, card.loadedIndex)) + 1 + pageSize;
+
   /// Picks up to [maxCards] cards that are at least partly visible, top first.
   ///
   /// Skips the opened card: it is the card most likely to move (its status or lane
@@ -130,8 +134,8 @@ class SwimlaneScrollAnchor {
   /// 1. An anchor card that is still next to another anchor card (same order, gap
   ///    changed by at most [gapTolerance]) wins, top first.
   /// 2. Otherwise, while anchor cards are missing and more pages can hold them: fetch more.
-  ///    Paging stops one page past the deepest anchor card: without that cap a lane whose
-  ///    anchor cards all left would page through the whole lane.
+  ///    Paging stops at [loadLimit]: without that cap a lane whose anchor cards all left
+  ///    would page through the whole lane.
   /// 3. Otherwise the loaded anchor card whose index moved least, top first on a tie.
   /// 4. Otherwise give up: the lane stays at the top.
   SwimlaneAnchorStep nextStep({
@@ -151,8 +155,7 @@ class SwimlaneScrollAnchor {
       if (inPlace) return SwimlaneAnchorStep.scrollTo(card);
     }
 
-    final int deepestLoadedIndex = cards.fold(0, (deepest, card) => max(deepest, card.loadedIndex));
-    if (present.length < cards.length && hasMore && loadedCount < deepestLoadedIndex + 1 + pageSize) {
+    if (present.length < cards.length && hasMore && loadedCount < loadLimit(pageSize)) {
       return const SwimlaneAnchorStep.fetchMore();
     }
 
@@ -224,6 +227,16 @@ class SwimlaneLaneScroll {
   void unregisterCard(String documentId, BuildContext context) {
     // The list reuses its items by index, so another item may already hold this id.
     if (identical(_builtCards[documentId], context)) _builtCards.remove(documentId);
+  }
+
+  /// The page size for this lane's first query. With a saved position for this lane it
+  /// reaches [SwimlaneScrollAnchor.loadLimit] at once: page by page, each page re-runs
+  /// the query with a larger limit, so card 500 would take 25 round trips and every
+  /// earlier card would be read again on each one. Read once per lane instance (after
+  /// [laneQuery] is set) and kept: a later change of page size re-runs the query.
+  int firstPageSize() {
+    final SwimlaneScrollAnchor? anchor = SwimlaneScrollAnchor.savedFor(boardKey);
+    return anchor != null && anchor.isFor(laneId, laneQuery) ? anchor.loadLimit(pageSize) : pageSize;
   }
 
   /// Saves the cards visible in this lane, just before the card [openedId] opens.

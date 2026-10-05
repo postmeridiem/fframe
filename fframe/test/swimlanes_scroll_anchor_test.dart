@@ -56,6 +56,47 @@ void main() {
     });
   });
 
+  group('SwimlaneScrollAnchor.loadLimit', () {
+    test('is one page past the deepest saved card', () {
+      const SwimlaneScrollAnchor anchor = SwimlaneScrollAnchor(laneId: 'lane', scrollOffset: 0, cards: [
+        SwimlaneAnchorCard(id: 'a', offsetInView: 0, shownIndex: 3, loadedIndex: 40),
+        SwimlaneAnchorCard(id: 'b', offsetInView: 0, shownIndex: 4, loadedIndex: 45),
+      ]);
+      expect(anchor.loadLimit(20), 66);
+    });
+  });
+
+  group('SwimlaneLaneScroll.firstPageSize', () {
+    const SwimlaneScrollAnchor saved = SwimlaneScrollAnchor(
+      laneId: 'To Do',
+      laneQuery: 'boardId == v5',
+      scrollOffset: 0,
+      cards: [SwimlaneAnchorCard(id: 'a', offsetInView: 0, shownIndex: 500, loadedIndex: 503)],
+    );
+
+    SwimlaneLaneScroll lane({String laneId = 'To Do', String? laneQuery = 'boardId == v5'}) {
+      final SwimlaneLaneScroll laneScroll = SwimlaneLaneScroll(boardKey: _boardKey, laneId: laneId, pageSize: 20)..laneQuery = laneQuery;
+      addTearDown(laneScroll.dispose);
+      return laneScroll;
+    }
+
+    test('is the normal page size without a saved position', () {
+      expect(lane().firstPageSize(), 20);
+    });
+
+    test('reaches the saved cards in one query for the lane that saved them', () {
+      // Card 504 page by page would take 26 round trips, each re-reading the earlier cards.
+      SwimlaneScrollAnchor.save(_boardKey, saved);
+      expect(lane().firstPageSize(), 524);
+    });
+
+    test('is the normal page size for another lane or the same lane on another board', () {
+      SwimlaneScrollAnchor.save(_boardKey, saved);
+      expect(lane(laneId: 'Done').firstPageSize(), 20);
+      expect(lane(laneQuery: 'boardId == v6').firstPageSize(), 20);
+    });
+  });
+
   group('SwimlaneScrollAnchor.pickVisible', () {
     List<String> pick(List<SwimlaneMeasuredCard> cards, {String? openedId}) => SwimlaneScrollAnchor.pickVisible(cards, viewportHeight: 400, openedId: openedId).map((card) => card.id).toList();
 
@@ -236,6 +277,30 @@ void main() {
       expect(_topOf(tester, 'c49'), closeTo(-80, 1));
     });
 
+    testWidgets('a lane whose first page is sized by firstPageSize finds the cards without paging', (tester) async {
+      // At 4460 px: c49 (top -80), c50, c51. The lane had paged to 100 cards.
+      await _scrollAndOpen(tester, cards: _ids(0, 100), scrollTo: 4460, open: 'c52', pageSize: 20, loaded: 100);
+
+      // The real lane asks for this page size before its first query.
+      final int firstPageSize = _firstPageSize();
+      expect(firstPageSize, 72);
+
+      final _Pager pager = _Pager(_ids(0, 100), pageSize: firstPageSize);
+      await _rebuild(tester, _ids(0, 100), pager: pager);
+      expect(pager.fetchCount, 0);
+      expect(_topOf(tester, 'c49'), closeTo(-80, 1));
+    });
+
+    testWidgets('saved cards gone: a lane sized by firstPageSize stops after its first query', (tester) async {
+      await _scrollAndOpen(tester, cards: _ids(0, 200), scrollTo: 4050, open: 'c48', pageSize: 20, loaded: 200);
+
+      final _Pager pager = _Pager(_ids(0, 200)..removeWhere(['c45', 'c46', 'c47'].contains), pageSize: _firstPageSize());
+      final _LaneState lane = await _rebuild(tester, pager.cards, pager: pager);
+      expect(pager.fetchCount, 0);
+      expect(lane.laneScroll.controller.offset, 0);
+      expect(SwimlaneScrollAnchor.savedFor(_boardKey), isNull);
+    });
+
     testWidgets('anchor cards gone from a long lane: paging stops at the cap', (tester) async {
       // At 4050 px: c45 (top 0), c46 (60), c47 (150), c48 (270).
       await _scrollAndOpen(tester, cards: _ids(0, 200), scrollTo: 4050, open: 'c48', pageSize: 20, loaded: 200);
@@ -386,6 +451,14 @@ SwimlaneScrollAnchor _anchor(List<String> ids, {String laneId = 'inProgress'}) =
       cards: [for (int index = 0; index < ids.length; index++) SwimlaneAnchorCard(id: ids[index], offsetInView: 0, shownIndex: index, loadedIndex: index)],
     );
 
+/// The page size the real lane gives its first query (lane 'inProgress', no lane query).
+int _firstPageSize() {
+  final SwimlaneLaneScroll probe = SwimlaneLaneScroll(boardKey: _boardKey, laneId: 'inProgress', pageSize: 20);
+  final int size = probe.firstPageSize();
+  probe.dispose();
+  return size;
+}
+
 double _topOf(WidgetTester tester, String id) => tester.getTopLeft(find.byKey(ValueKey('card-$id'))).dy - tester.getTopLeft(find.byType(ListView)).dy;
 
 List<String> _visibleIds(WidgetTester tester, Iterable<String> ids) => [
@@ -478,7 +551,8 @@ class _Lane extends StatefulWidget {
 }
 
 class _LaneState extends State<_Lane> {
-  late final SwimlaneLaneScroll laneScroll = SwimlaneLaneScroll(boardKey: _boardKey, laneId: widget.laneId, pageSize: widget.pager.pageSize);
+  // The real lane's page size (20) bounds the paging; only its first query can be larger.
+  late final SwimlaneLaneScroll laneScroll = SwimlaneLaneScroll(boardKey: _boardKey, laneId: widget.laneId, pageSize: 20);
 
   @override
   void dispose() {
