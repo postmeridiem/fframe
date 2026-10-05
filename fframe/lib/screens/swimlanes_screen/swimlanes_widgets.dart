@@ -1002,6 +1002,10 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
 
     baseQuery = baseQuery.orderBy("priority");
 
+    // Tells this lane apart from a lane with the same id on another board (its board
+    // filter differs). Only the where/orderBy clauses, never the converter.
+    _laneScroll.laneQuery = baseQuery.parameters.toString();
+
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       return SizedBox(
         height: constraints.maxHeight,

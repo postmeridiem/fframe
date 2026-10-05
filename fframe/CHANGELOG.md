@@ -99,8 +99,10 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
 * **A lane keeps its vertical position while a card is open.** Opening or closing a
   card rebuilds the board, which reset every lane to the top and to its first page.
   When a tap opens a card, its lane now saves up to three visible cards (not the
-  opened one) in a static store, keyed like the horizontal offset. Each rebuilt
-  instance of that lane pages forward until those cards are loaded, and puts the
+  opened one) in a static store, keyed like the horizontal offset and tied to the
+  lane's query, so a lane with the same id on another board (which can even hold the
+  same cards) never uses it. Each rebuilt instance of that lane pages forward until
+  those cards are loaded, and puts the
   first one that still sits next to another at its old distance from the lane top.
   So a card that moved elsewhere in the lane, like the opened card after a status
   change, does not drag the view along. Paging stops one page past the deepest saved

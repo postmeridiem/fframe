@@ -46,6 +46,16 @@ void main() {
     });
   });
 
+  group('SwimlaneScrollAnchor.isFor', () {
+    test('needs the same lane id and the same lane query', () {
+      const SwimlaneScrollAnchor anchor = SwimlaneScrollAnchor(laneId: 'To Do', laneQuery: 'boardId == v5', cards: [], scrollOffset: 0);
+      expect(anchor.isFor('To Do', 'boardId == v5'), isTrue);
+      // The same lane name on another board: its query has another board filter.
+      expect(anchor.isFor('To Do', 'boardId == v6'), isFalse);
+      expect(anchor.isFor('Done', 'boardId == v5'), isFalse);
+    });
+  });
+
   group('SwimlaneScrollAnchor.pickVisible', () {
     List<String> pick(List<SwimlaneMeasuredCard> cards, {String? openedId}) => SwimlaneScrollAnchor.pickVisible(cards, viewportHeight: 400, openedId: openedId).map((card) => card.id).toList();
 
@@ -338,6 +348,19 @@ void main() {
       expect(SwimlaneScrollAnchor.savedFor(_boardKey)?.laneId, 'inProgress');
     });
 
+    testWidgets('a lane with the same name on another board does not restore it', (tester) async {
+      // v5 and v6 boards share lane names, and a card placed on both boards is in both
+      // lanes. Only the lane query (its board filter) tells the lanes apart.
+      await _scrollAndOpen(tester, cards: _ids(0, 60), scrollTo: 700, open: 'c10', laneQuery: 'boardId == v5');
+
+      final _LaneState otherBoard = await _rebuild(tester, _ids(0, 60), laneQuery: 'boardId == v6');
+      expect(otherBoard.laneScroll.controller.offset, 0);
+      expect(SwimlaneScrollAnchor.savedFor(_boardKey)?.laneQuery, 'boardId == v5');
+
+      final _LaneState sameBoard = await _rebuild(tester, _ids(0, 60), laneQuery: 'boardId == v5', build: 3);
+      expect(sameBoard.laneScroll.controller.offset, closeTo(700, 1));
+    });
+
     testWidgets('a card opened with the lane at the top saves nothing and replaces an older anchor', (tester) async {
       // The older anchor is for another lane, so only the open can remove it.
       SwimlaneScrollAnchor.save(_boardKey, _anchor(['old'], laneId: 'done'));
@@ -370,7 +393,7 @@ List<String> _visibleIds(WidgetTester tester, Iterable<String> ids) => [
         if (find.byKey(ValueKey('card-$id')).evaluate().isNotEmpty && _topOf(tester, id) < 400 && _topOf(tester, id) + _heightOf(id) > 0) id,
     ];
 
-Future<_LaneState> _pumpLane(WidgetTester tester, _Pager pager, {required int build, String laneId = 'inProgress', bool Function(String id)? show}) async {
+Future<_LaneState> _pumpLane(WidgetTester tester, _Pager pager, {required int build, String laneId = 'inProgress', String? laneQuery, bool Function(String id)? show}) async {
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -379,7 +402,7 @@ Future<_LaneState> _pumpLane(WidgetTester tester, _Pager pager, {required int bu
           child: SizedBox(
             width: 300,
             height: 400,
-            child: _Lane(key: ValueKey(build), pager: pager, laneId: laneId, show: show),
+            child: _Lane(key: ValueKey(build), pager: pager, laneId: laneId, laneQuery: laneQuery, show: show),
           ),
         ),
       ),
@@ -396,8 +419,9 @@ Future<_LaneState> _scrollAndOpen(
   required String open,
   int pageSize = 200,
   int? loaded,
+  String? laneQuery,
 }) async {
-  final _LaneState lane = await _pumpLane(tester, _Pager(cards, pageSize: pageSize, loaded: loaded), build: 1);
+  final _LaneState lane = await _pumpLane(tester, _Pager(cards, pageSize: pageSize, loaded: loaded), build: 1, laneQuery: laneQuery);
   lane.laneScroll.controller.jumpTo(scrollTo);
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(ValueKey('card-$open')));
@@ -406,8 +430,8 @@ Future<_LaneState> _scrollAndOpen(
 }
 
 /// The board is thrown away and built again: a new lane State, back on page 1.
-Future<_LaneState> _rebuild(WidgetTester tester, List<String> cards, {_Pager? pager, int build = 2, String laneId = 'inProgress', bool Function(String id)? show}) {
-  return _pumpLane(tester, pager ?? _Pager(cards, pageSize: 200), build: build, laneId: laneId, show: show);
+Future<_LaneState> _rebuild(WidgetTester tester, List<String> cards, {_Pager? pager, int build = 2, String laneId = 'inProgress', String? laneQuery, bool Function(String id)? show}) {
+  return _pumpLane(tester, pager ?? _Pager(cards, pageSize: 200), build: build, laneId: laneId, laneQuery: laneQuery, show: show);
 }
 
 /// Stands in for FirestoreQueryBuilder: pages of [pageSize], fetchMore deferred like its setState.
@@ -442,10 +466,11 @@ class _Pager extends ChangeNotifier {
 
 /// A lane the way the swimlanes widget builds one, without Firestore.
 class _Lane extends StatefulWidget {
-  const _Lane({super.key, required this.pager, required this.laneId, this.show});
+  const _Lane({super.key, required this.pager, required this.laneId, this.laneQuery, this.show});
 
   final _Pager pager;
   final String laneId;
+  final String? laneQuery;
   final bool Function(String id)? show;
 
   @override
@@ -463,6 +488,8 @@ class _LaneState extends State<_Lane> {
 
   @override
   Widget build(BuildContext context) {
+    // Like the real lane, which sets it from its Firestore query on each build.
+    laneScroll.laneQuery = widget.laneQuery;
     return ListenableBuilder(
       listenable: widget.pager,
       builder: (context, _) {

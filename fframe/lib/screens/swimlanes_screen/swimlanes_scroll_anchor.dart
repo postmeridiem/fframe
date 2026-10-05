@@ -54,17 +54,24 @@ class SwimlaneAnchorStep {
 ///
 /// Saved when a card opens, in a static store that outlives the lane `State` (the
 /// same pattern as the horizontal offset in [_SwimlaneBuilderState]). Each new lane
-/// instance for [laneId] restores it. Only the lane of the opened card is kept.
+/// instance for [laneId] and [laneQuery] restores it. Only the lane of the opened card is kept.
 @immutable
 class SwimlaneScrollAnchor {
   const SwimlaneScrollAnchor({
     required this.laneId,
     required this.cards,
     required this.scrollOffset,
+    this.laneQuery,
   });
 
   /// The [SwimlaneSetting.id] of the lane the card opened from.
   final String laneId;
+
+  /// The lane's Firestore query, as text. Boards that share a collection and a
+  /// trackerId share this store, and two boards can have a lane with the same id
+  /// (and even the same card). Their queries differ (the board filter), so a saved
+  /// position only restores on the board it came from.
+  final String? laneQuery;
 
   /// Up to [maxCards] visible cards, top first.
   final List<SwimlaneAnchorCard> cards;
@@ -99,6 +106,9 @@ class SwimlaneScrollAnchor {
 
   @visibleForTesting
   static void resetAll() => _saved.clear();
+
+  /// Whether this anchor was saved by the lane [laneId] with the query [laneQuery].
+  bool isFor(String laneId, String? laneQuery) => this.laneId == laneId && this.laneQuery == laneQuery;
 
   /// Picks up to [maxCards] cards that are at least partly visible, top first.
   ///
@@ -186,6 +196,9 @@ class SwimlaneLaneScroll {
   /// The [SwimlaneSetting.id] of this lane. Updated when the lane widget is reused.
   String laneId;
 
+  /// See [SwimlaneScrollAnchor.laneQuery]. The lane sets it on each build.
+  String? laneQuery;
+
   /// The lane's page size, for the paging cap.
   final int pageSize;
 
@@ -244,7 +257,7 @@ class SwimlaneLaneScroll {
       SwimlaneScrollAnchor.clear(boardKey);
       return;
     }
-    SwimlaneScrollAnchor.save(boardKey, SwimlaneScrollAnchor(laneId: laneId, cards: cards, scrollOffset: position.pixels));
+    SwimlaneScrollAnchor.save(boardKey, SwimlaneScrollAnchor(laneId: laneId, laneQuery: laneQuery, cards: cards, scrollOffset: position.pixels));
     Console.log(
       "Kept lane $laneId at ${cards.map((card) => card.id).join(', ')}",
       scope: "fframeLog.Swimlanes",
@@ -269,7 +282,7 @@ class SwimlaneLaneScroll {
     _loadedIds = loadedIds;
 
     final SwimlaneScrollAnchor? anchor = SwimlaneScrollAnchor.savedFor(boardKey);
-    if (anchor == null || anchor.laneId != laneId) {
+    if (anchor == null || !anchor.isFor(laneId, laneQuery)) {
       _stopPlacing();
       return;
     }
@@ -316,7 +329,7 @@ class SwimlaneLaneScroll {
   void _onScroll() {
     if (!controller.hasClients || controller.position.userScrollDirection == ScrollDirection.idle) return;
     final SwimlaneScrollAnchor? anchor = SwimlaneScrollAnchor.savedFor(boardKey);
-    if (anchor == null || anchor.laneId != laneId) return;
+    if (anchor == null || !anchor.isFor(laneId, laneQuery)) return;
     _stopPlacing();
     SwimlaneScrollAnchor.clear(boardKey, only: anchor);
   }
