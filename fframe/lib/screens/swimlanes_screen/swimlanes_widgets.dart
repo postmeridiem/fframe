@@ -886,6 +886,35 @@ class Swimlane<T> extends StatefulWidget {
 class _SwimlaneState<T> extends State<Swimlane<T>> {
   final int _documentsPerPage = 20;
 
+  // The lane's vertical scroll, kept across board rebuilds while a card is open.
+  late final SwimlaneLaneScroll _laneScroll;
+
+  String get _boardKey => SwimlaneScrollAnchor.boardKey(widget.documentConfig.collection, widget.swimlanesConfig.trackerId);
+
+  @override
+  void initState() {
+    super.initState();
+    _laneScroll = SwimlaneLaneScroll(
+      boardKey: _boardKey,
+      laneId: widget.swimlaneSetting.id,
+      pageSize: _documentsPerPage,
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant Swimlane<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // The lanes are not keyed, so this State can be reused for another lane or board.
+    _laneScroll.boardKey = _boardKey;
+    _laneScroll.laneId = widget.swimlaneSetting.id;
+  }
+
+  @override
+  void dispose() {
+    _laneScroll.dispose();
+    super.dispose();
+  }
+
   /// Builds the "Add a card" button that appears at the bottom of a swimlane.
   ///
   /// This button, when pressed, triggers the [SwimlaneSetting.onNewCard] callback
@@ -1073,6 +1102,15 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                     snapshot.fetchMore();
                   }
 
+                  // Bring the lane back to the cards the user was looking at when a card opened.
+                  _laneScroll.onDocuments(
+                    shownIds: selectedDocuments.map((selectedDocument) => selectedDocument.documentId).toList(),
+                    loadedIds: unfilteredDocuments.map((selectedDocument) => selectedDocument.documentId).toList(),
+                    hasMore: snapshot.hasMore,
+                    isFetchingMore: snapshot.isFetchingMore,
+                    fetchMore: snapshot.fetchMore,
+                  );
+
                   // Determine if the "Add a card" button should be displayed based on configuration.
                   // Role-based security is handled by the developer, who should conditionally
                   // set `allowCardCreation` in the `SwimlaneSetting`.
@@ -1101,6 +1139,7 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                   lanePosition: lanePositionIncrement,
                                 )
                               : ListView.builder(
+                                  controller: _laneScroll.controller,
                                   itemCount: (swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2),
                                   itemBuilder: (context, index) {
                                     if (snapshot.hasMore && index + 1 == snapshot.docs.length) {
@@ -1114,13 +1153,18 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                       return Column(
                                         children: [
                                           Builder(builder: (context) {
-                                            return SwimlanesTaskCard<T>(
-                                              selectedDocument: selectedDocuments[index],
-                                              swimlanesController: widget.swimlanesController,
-                                              swimlanesConfig: swimlanesConfig,
-                                              color: widget.swimlanesController.taskCardColor,
-                                              fFrameUser: widget.fFrameUser,
-                                              width: swimlanesConfig.swimlaneWidth,
+                                            return SwimlaneCardAnchor(
+                                              laneScroll: _laneScroll,
+                                              documentId: selectedDocuments[index].documentId,
+                                              child: SwimlanesTaskCard<T>(
+                                                selectedDocument: selectedDocuments[index],
+                                                swimlanesController: widget.swimlanesController,
+                                                swimlanesConfig: swimlanesConfig,
+                                                color: widget.swimlanesController.taskCardColor,
+                                                fFrameUser: widget.fFrameUser,
+                                                width: swimlanesConfig.swimlaneWidth,
+                                                onBeforeOpen: () => _laneScroll.captureOnOpen(selectedDocuments[index].documentId),
+                                              ),
                                             );
                                           }),
                                           if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
@@ -1190,6 +1234,8 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                               widget.swimlanesController.setDraggedItemHeight(renderBox.size.height);
                                               // Enable auto-scroll detection
                                               widget.swimlanesController.taskDragging = true;
+                                              // The user is working on the board: stop keeping the old lane position
+                                              _laneScroll.onDragStarted();
                                             },
                                             onDragEnd: (details) {
                                               // Clean up the height in the controller when the drag is over
@@ -1217,14 +1263,19 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
                                               childWhenDragging: true,
                                             ),
                                             child: Builder(builder: (context) {
-                                              return SwimlanesTaskCard<T>(
-                                                key: dragContext.dragKey,
-                                                selectedDocument: selectedDocument,
-                                                swimlanesController: widget.swimlanesController,
-                                                swimlanesConfig: swimlanesConfig,
-                                                color: widget.swimlanesController.taskCardColor,
-                                                fFrameUser: widget.fFrameUser,
-                                                width: swimlanesConfig.swimlaneWidth,
+                                              return SwimlaneCardAnchor(
+                                                laneScroll: _laneScroll,
+                                                documentId: selectedDocument.documentId,
+                                                child: SwimlanesTaskCard<T>(
+                                                  key: dragContext.dragKey,
+                                                  selectedDocument: selectedDocument,
+                                                  swimlanesController: widget.swimlanesController,
+                                                  swimlanesConfig: swimlanesConfig,
+                                                  color: widget.swimlanesController.taskCardColor,
+                                                  fFrameUser: widget.fFrameUser,
+                                                  width: swimlanesConfig.swimlaneWidth,
+                                                  onBeforeOpen: () => _laneScroll.captureOnOpen(selectedDocument.documentId),
+                                                ),
                                               );
                                             }),
                                           ),
@@ -1536,6 +1587,7 @@ class SwimlanesTaskCard<T> extends StatefulWidget {
     this.feedback = false,
     this.isLocked = false,
     this.childWhenDragging = false,
+    this.onBeforeOpen,
   });
 
   final SwimlanesController swimlanesController;
@@ -1547,6 +1599,9 @@ class SwimlanesTaskCard<T> extends StatefulWidget {
   final bool isLocked;
   final double width;
   final Color color;
+
+  /// Called when a tap opens the card, before it opens (the lane saves its scroll position).
+  final VoidCallback? onBeforeOpen;
 
   @override
   State<SwimlanesTaskCard<T>> createState() => _SwimlanesTaskCardState<T>();
@@ -1575,6 +1630,7 @@ class _SwimlanesTaskCardState<T> extends State<SwimlanesTaskCard<T>> {
               child: GestureDetector(
                 onTap: () {
                   if (swimlanesConfig.openDocumentOnClick) {
+                    widget.onBeforeOpen?.call();
                     selectedDocument.open();
                   }
                 },

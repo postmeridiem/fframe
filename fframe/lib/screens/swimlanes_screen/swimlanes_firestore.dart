@@ -128,7 +128,7 @@ class _SwimlaneBuilderState<T> extends State<SwimlaneBuilder<T>> {
   // Keyed by collection AND board (trackerId): several boards can share one
   // collection, so keying by collection alone leaked scroll/filter state — and
   // a filter restored onto a board that cannot satisfy it would crash.
-  String get _scrollKey => '${widget.documentConfig.collection}:${widget.swimlanesConfig.trackerId}';
+  String get _scrollKey => SwimlaneScrollAnchor.boardKey(widget.documentConfig.collection, widget.swimlanesConfig.trackerId);
 
   /// Whether this board's config can satisfy [filter]; used to coerce a restored
   /// filter the current board does not support down to `unfiltered`.

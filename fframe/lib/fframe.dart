@@ -31,6 +31,7 @@ import 'package:fframe/services/navigation_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_ui_firestore/firebase_ui_firestore.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/rendering.dart' show RenderAbstractViewport, ScrollDirection;
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:google_sign_in_web/google_sign_in_web.dart';
@@ -100,6 +101,7 @@ part 'package:fframe/screens/swimlanes_screen/swimlanes_document.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_widgets.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_classes.dart';
 part 'package:fframe/screens/swimlanes_screen/swimlanes_drag_auto_scroll_service.dart';
+part 'package:fframe/screens/swimlanes_screen/swimlanes_scroll_anchor.dart';
 part 'package:fframe/screens/router_page.dart';
 part 'package:fframe/screens/message_page.dart';
 
