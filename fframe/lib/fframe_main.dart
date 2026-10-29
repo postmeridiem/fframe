@@ -226,9 +226,8 @@ class _FRouterLoaderState extends State<FRouterLoader> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      initialData: null,
+    return SignInStateBuilder(
+      waiting: (BuildContext context) => FFWaitPage(message: "Checking sign-in..."),
       builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
         if (!snapshot.hasData) {
           return const SignInWithLink();
@@ -318,6 +317,49 @@ class _FRouterLoaderState extends State<FRouterLoader> {
       await Fframe.of(context)!.postSignOut!(context);
     }
     return Future.value(true);
+  }
+}
+
+/// Builds from the sign-in state that Firebase reports, and shows [waiting] until the first report.
+///
+/// At a page load Firebase does not know the sign-in state yet: it restores a signed-in user a
+/// moment later. Until then the user is unknown, not signed out, so [builder] does not run yet.
+/// Otherwise a signed-in user gets the sign-in page for a moment. An app's sign-in page can start a
+/// silent Google sign-in, which signs in to Firebase again, and Firestore then restarts every
+/// running read.
+class SignInStateBuilder extends StatefulWidget {
+  const SignInStateBuilder({super.key, required this.waiting, required this.builder, this.authStateChanges});
+
+  /// Shown until Firebase reports the first sign-in state.
+  final WidgetBuilder waiting;
+
+  /// Builds from each sign-in state after that. The snapshot has no data when no user is signed in.
+  final AsyncWidgetBuilder<User?> builder;
+
+  /// The sign-in state stream, read once. The app leaves it out to use [FirebaseAuth.authStateChanges]; tests pass their own.
+  final Stream<User?>? authStateChanges;
+
+  @override
+  State<SignInStateBuilder> createState() => _SignInStateBuilderState();
+}
+
+class _SignInStateBuilderState extends State<SignInStateBuilder> {
+  // Kept for the life of this State. authStateChanges() returns a new stream on each call, and a new
+  // stream makes the StreamBuilder subscribe again and start over in waiting: a rebuild would then
+  // swap the running app for the wait page.
+  late final Stream<User?> _authStateChanges = widget.authStateChanges ?? FirebaseAuth.instance.authStateChanges();
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: _authStateChanges,
+      builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return widget.waiting(context);
+        }
+        return widget.builder(context, snapshot);
+      },
+    );
   }
 }
 

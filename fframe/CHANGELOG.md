@@ -133,6 +133,19 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
   `defaultRoute` rewrite and is retained on merge; this branch's superseded
   one-liner was dropped during the merge.)_
 
+#### Framework — sign-in at start-up (`fframe/lib/fframe_main.dart`)
+
+* **A signed-in user no longer sees the sign-in page at a page load.** The auth
+  `StreamBuilder` started with no user, and with no user `FRouterLoader` showed the
+  app's sign-in target until Firebase restored the signed-in user a moment later. An
+  app's sign-in page can start a silent Google sign-in there, which signs in to
+  Firebase again and makes Firestore restart every running read. The new
+  `SignInStateBuilder` shows a wait page ("Checking sign-in...") until
+  `authStateChanges()` sends its first event, and runs the existing builder from then
+  on. A user who is not signed in still gets the sign-in page, once Firebase reports
+  no user. The stream is now kept in State: `authStateChanges()` returns a new stream
+  on each call, and a new stream would send the builder back to the wait page.
+
 #### Framework — data grid, helpers & input hardening
 
 * **Data grid selection pruned** against each incoming snapshot, so
