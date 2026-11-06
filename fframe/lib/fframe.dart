@@ -87,6 +87,7 @@ part 'package:fframe/screens/document_screen/typedefs.dart';
 part 'package:fframe/screens/document_screen/document_minimized.dart';
 part 'package:fframe/screens/document_screen/document_context.dart';
 part 'package:fframe/screens/document_screen/document_screen.dart';
+part 'package:fframe/screens/document_screen/document_opener.dart';
 part 'package:fframe/screens/document_screen/document_body.dart';
 part 'package:fframe/screens/document_screen/document_list.dart';
 

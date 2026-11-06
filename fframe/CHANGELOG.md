@@ -146,6 +146,23 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
   no user. The stream is now kept in State: `authStateChanges()` returns a new stream
   on each call, and a new stream would send the builder back to the wait page.
 
+#### Framework — open a document by id (`fframe/lib/screens/document_screen/document_opener.dart`, `fframe/lib/screens/router_page.dart`)
+
+* **New `FRouter.of(context).openDocument(id: ...)` opens a document in the
+  DocumentScreen on screen, without a page load.** Before this, an app could open a
+  document by id only through a page load. A link change inside the page stored the
+  link as pending, and only a new `DocumentScreenLoader` opened it. The request runs
+  after the current frame, with the config of that frame's DocumentScreen. So an app
+  can rebuild its screen (with another query or other rights) and ask for a document
+  in the same event. The document opens as a list click opens it: `preOpen` runs and
+  the link gets the id. The returned future completes with false when the document
+  does not exist, cannot be read, or a newer request replaced it. A failed request is
+  dropped, and no later build tries it again. A request made while no DocumentScreen
+  is on screen waits for the next one. Each DocumentScreen that is not embedded
+  registers with the new `DocumentOpener` while it is mounted. Page loads with `?id=`
+  and `navigateToRoute` work as before. The one exception: when the app asks for a
+  document, a page-load link that no DocumentScreen has opened yet is dropped.
+
 #### Framework — data grid, helpers & input hardening
 
 * **Data grid selection pruned** against each incoming snapshot, so

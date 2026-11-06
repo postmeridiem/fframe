@@ -224,12 +224,24 @@ class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with 
     // this.documentConfig = widget.documentConfig;
     WidgetsBinding.instance.addPostFrameCallback((_) => NavigationNotifier.instance.markBuildDone(documentConfig));
     TargetState.instance.addListener(_changeListener);
+    // Register now, not after the frame. An app can rebuild this screen and ask for a
+    // document in the same event. Its request then runs after this frame, and this
+    // screen must already be registered at that time.
+    if (!widget.documentConfig.embeddedDocument) DocumentOpener.register(this, _readDocument);
   }
 
   @override
   void dispose() {
+    DocumentOpener.unregister(this);
     TargetState.instance.removeListener(_changeListener);
     super.dispose();
+  }
+
+  /// Reads document [id] for [DocumentOpener]. It uses `widget`, not the
+  /// `documentConfig` field, so the read takes the config of this screen's latest build.
+  Future<VoidCallback?> _readDocument(String id) async {
+    SelectedDocument<T>? selectedDocument = await DatabaseService<T>().selectedDocument(documentConfig: widget.documentConfig, documentId: id);
+    return selectedDocument?.open;
   }
 
   void _changeListener() {

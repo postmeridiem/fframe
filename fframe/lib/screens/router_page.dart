@@ -94,6 +94,17 @@ class FRouter extends InheritedWidget {
   //   NavigationNotifier.instance.processRouteInformation(targetState: targetState);
   // }
 
+  ///Open a document by id in the DocumentScreen on screen, without a page load
+  ///FRouter.of(context).openDocument(id: String);
+  ///The document opens after the current frame, with the config of that frame's
+  ///DocumentScreen, as a list click would: preOpen runs and the link gets the id.
+  ///A request made while no DocumentScreen is on screen waits for the next one.
+  ///Completes with false when the document does not exist, cannot be read, or a
+  ///newer request replaced this one. See [DocumentOpener].
+  Future<bool> openDocument({required String id}) {
+    return DocumentOpener.open(id);
+  }
+
   ///Only QS (persist path and existing QS values)
   ///FRouter.of(context).updateQueryString(queryString: {"id": "cow"});
   ///Only QS (replace path and existing QS values)
