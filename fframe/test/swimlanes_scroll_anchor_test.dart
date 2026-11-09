@@ -5,9 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Guards how a swimlane keeps its vertical position while a card is open.
 ///
-/// Opening or closing a card rebuilds the board, so each lane comes back with a fresh
-/// State, at the top, with only its first page loaded. The lane saves the cards it was
-/// showing when the card opened, and scrolls back to them.
+/// When the board is built again, each lane comes back with a fresh State, at the top,
+/// with only its first page loaded. The lane saves the cards it was showing when the card
+/// opened, and scrolls back to them. An app that keeps the DocumentScreen form key keeps
+/// the lanes across a card open and close; then the restore must leave them in place.
 ///
 /// The widget tests drive a plain [ListView] harness that behaves like a lane (cards of
 /// varied height, a pager that loads 20 more on fetchMore, a new State per rebuild), so
@@ -350,6 +351,19 @@ void main() {
       expect(_topOf(tester, 'c8'), closeTo(-10, 1));
     });
 
+    testWidgets('a lane kept across the card open and close does not move', (tester) async {
+      // The board is not built again: the same lane State builds again with the same cards,
+      // and the saved cards are still at their saved place.
+      final _LaneState lane = await _scrollAndOpen(tester, cards: _ids(0, 60), scrollTo: 700, open: 'c10');
+      int moves = 0;
+      lane.laneScroll.controller.addListener(() => moves++);
+
+      lane.widget.pager.update(_ids(0, 60));
+      await tester.pumpAndSettle();
+      expect(moves, 0);
+      expect(lane.laneScroll.controller.offset, 700);
+    });
+
     testWidgets('a second rebuild after a restore restores again', (tester) async {
       await _scrollAndOpen(tester, cards: _ids(0, 60), scrollTo: 700, open: 'c10');
       await _rebuild(tester, _ids(0, 60));
@@ -507,7 +521,7 @@ Future<_LaneState> _rebuild(WidgetTester tester, List<String> cards, {_Pager? pa
   return _pumpLane(tester, pager ?? _Pager(cards, pageSize: 200), build: build, laneId: laneId, laneQuery: laneQuery, show: show);
 }
 
-/// Stands in for FirestoreQueryBuilder: pages of [pageSize], fetchMore deferred like its setState.
+/// Stands in for SwimlaneLanePager: pages of [pageSize], fetchMore deferred like its notification.
 class _Pager extends ChangeNotifier {
   _Pager(this.cards, {this.pageSize = 20, int? loaded}) : loaded = loaded ?? pageSize;
 

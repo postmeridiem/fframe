@@ -12,10 +12,11 @@ import 'package:flutter_test/flutter_test.dart';
 /// unregisters in dispose. The reader records which config read which id, and its
 /// open callback records which config opened which id.
 ///
-/// The board around it can rebuild the screen in two ways. Today each rebuild makes
-/// a new screen (a new State), because DocumentScreen makes a new form key on each
-/// build. Later the screen may be kept and get the new config through its widget.
-/// The opener must give the latest config in both cases.
+/// The board around it can rebuild the screen in two ways. Without a form key from the
+/// app, each rebuild makes a new screen (a new State), because each new DocumentScreen
+/// makes a new form key. With a key that the app keeps (DocumentScreen.formKey), the
+/// screen is kept and gets the new config through its widget. The opener must give the
+/// latest config in both cases.
 void main() {
   setUpAll(() => Console(logThreshold: LogLevel.prod));
   setUp(DocumentOpener.reset);

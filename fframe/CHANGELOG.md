@@ -163,6 +163,33 @@ order across the framework (`fframe/lib`) and the example Firebase configuration
   and `navigateToRoute` work as before. The one exception: when the app asks for a
   document, a page-load link that no DocumentScreen has opened yet is dropped.
 
+#### Framework — keep the swimlanes across a rebuild (`fframe/lib/screens/document_screen/document_screen.dart`, `fframe/lib/screens/swimlanes_screen`)
+
+* **`DocumentScreen` takes an optional `formKey`.** Without it, each new DocumentScreen
+  makes a new form key, so each build of the parent throws the screen away and builds it
+  again. A swimlanes board then reads every lane again, and every card tile starts its
+  reads again. An app that keeps one key (for example one per board) and passes it keeps
+  the screen. The kept `DocumentScreenLoader` takes the config of each new build, and
+  opens a link that arrived while it was on screen, as a new loader does. Screens that do
+  not pass a key work as before.
+* **A lane loads its pages with a cursor.** `FirestoreQueryBuilder` loaded the next page
+  with the same query and a limit one page larger, so each page read every card above it
+  again. The new `SwimlaneLanePager` reads each page after the last card of the page
+  before it. A page that is complete keeps a listener on its two ends only, so a card
+  that joins or leaves it cannot push another card out, and no card is shown twice. To
+  close a page the pager reads that page once more. Every page stays a live listener.
+* **With a filter on, a lane reads on to the end of the lane in one listener.** It reads
+  from the start of its open page, so the cards of that page are read once more. A chain
+  of cursor pages would wait one round trip per page. When the filter goes, the lane goes
+  back to its first page, so it does not keep a listener on every card. It shows its
+  cards until that page answers.
+* **A lane does not load again when it builds again.** The lane compares the text of its
+  query, not the query: each build makes a query with a new converter, and that query is
+  not equal to the old one. So a window resize no longer starts every lane again.
+* **A card tile keeps its State.** Each tile has one key per card, kept while the card is
+  loaded, so a tile is not made again when the lane builds again or the card moves in the
+  lane.
+
 #### Framework — data grid, helpers & input hardening
 
 * **Data grid selection pruned** against each incoming snapshot, so

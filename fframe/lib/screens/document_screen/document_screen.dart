@@ -3,6 +3,7 @@ part of 'package:fframe/fframe.dart';
 class DocumentScreen<T> extends StatelessWidget {
   DocumentScreen({
     super.key,
+    GlobalKey<FormState>? formKey,
     required this.collection,
     required this.createNew,
     required this.documentTitle,
@@ -26,9 +27,16 @@ class DocumentScreen<T> extends StatelessWidget {
     this.documentScreenHeaderBuilder,
     this.documentScreenFooterBuilder,
     this.queryBuilder,
-  });
+  }) : formKey = formKey ?? GlobalKey<FormState>();
 
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  /// The key of the screen's form. Everything below the form lives as long as this key.
+  ///
+  /// Without a key from the app, each new DocumentScreen makes a new key. Then each build of
+  /// the parent throws the screen away and builds it again: a list reads its documents again,
+  /// and the swimlanes read every lane again. To keep the screen when the parent builds again,
+  /// keep one key in the parent (for example in its State) and pass it here. Pass another key
+  /// when the screen must start again, for example for another board.
+  final GlobalKey<FormState> formKey;
   final Query<T> Function(Query<T> query)? queryBuilder;
   final DocumentList<T>? documentList;
   final DataGridConfig<T>? dataGrid;
@@ -228,6 +236,17 @@ class _DocumentScreenLoaderState<T> extends State<DocumentScreenLoader<T>> with 
     // document in the same event. Its request then runs after this frame, and this
     // screen must already be registered at that time.
     if (!widget.documentConfig.embeddedDocument) DocumentOpener.register(this, _readDocument);
+  }
+
+  /// Called only when the app keeps the form key (see [DocumentScreen.formKey]). Without it,
+  /// each build of the parent makes a new loader. So do what a new loader does: take the new
+  /// config, and open a link that arrived while the screen was on screen (for example with
+  /// the browser's back button).
+  @override
+  void didUpdateWidget(covariant DocumentScreenLoader<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    documentConfig = widget.documentConfig;
+    WidgetsBinding.instance.addPostFrameCallback((_) => NavigationNotifier.instance.markBuildDone(documentConfig));
   }
 
   @override

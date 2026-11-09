@@ -5,10 +5,13 @@ typedef SwimlaneMeasuredCard = ({String id, double top, double height});
 
 /// One card a lane was showing when a card opened, and where it sat.
 ///
-/// Opening or closing a card rebuilds the board, so each lane loses its scroll
-/// position and its loaded pages. A pixel offset is not a stable reference: by the
-/// time the card closes the lane may have re-flowed (the opened card changed lane,
-/// a sync moved a card). The cards the user was looking at are.
+/// When the board is built again, each lane loses its scroll position and its loaded
+/// pages. Without a form key from the app (see [DocumentScreen.formKey]), each card open
+/// and close builds the board again. With that key the lanes stay, and the restore is only
+/// the fallback for a board that is still built again, for example after a switch to
+/// another board and back. A pixel offset is not a stable reference: by the time the card
+/// closes the lane may have re-flowed (the opened card changed lane, a sync moved a card).
+/// The cards the user was looking at are.
 @immutable
 class SwimlaneAnchorCard {
   const SwimlaneAnchorCard({
@@ -230,10 +233,9 @@ class SwimlaneLaneScroll {
   }
 
   /// The page size for this lane's first query. With a saved position for this lane it
-  /// reaches [SwimlaneScrollAnchor.loadLimit] at once: page by page, each page re-runs
-  /// the query with a larger limit, so card 500 would take 25 round trips and every
-  /// earlier card would be read again on each one. Read once per lane instance (after
-  /// [laneQuery] is set) and kept: a later change of page size re-runs the query.
+  /// reaches [SwimlaneScrollAnchor.loadLimit] at once: page by page, card 500 would take
+  /// 25 round trips, one after the other. Read once per lane instance, after [laneQuery]
+  /// is set.
   int firstPageSize() {
     final SwimlaneScrollAnchor? anchor = SwimlaneScrollAnchor.savedFor(boardKey);
     return anchor != null && anchor.isFor(laneId, laneQuery) ? anchor.loadLimit(pageSize) : pageSize;
@@ -283,7 +285,8 @@ class SwimlaneLaneScroll {
   ///
   /// The anchor is kept after a successful restore: the board can be rebuilt again at
   /// unrelated moments, and each new lane instance must restore again. The same call
-  /// also keeps the lane in place when cards move while the card is open.
+  /// also keeps the lane in place when cards move while the card is open. A lane that
+  /// shows the saved cards at their saved place does not move.
   void onDocuments({
     required List<String> shownIds,
     required List<String> loadedIds,
@@ -304,7 +307,7 @@ class SwimlaneLaneScroll {
     switch (step.action) {
       case SwimlaneAnchorAction.fetchMore:
         _stopPlacing();
-        // Safe from build: FirestoreQueryBuilder defers its own setState.
+        // Safe from build: SwimlaneLanePager tells its listeners after the build.
         if (!isFetchingMore) fetchMore();
         break;
       case SwimlaneAnchorAction.giveUp:

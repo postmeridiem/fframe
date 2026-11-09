@@ -860,7 +860,7 @@ class Swimlanes<T> extends StatelessWidget {
 
 /// A widget representing a single vertical lane in the swimlanes board.
 ///
-/// It uses a [FirestoreQueryBuilder] to fetch and display the documents (cards)
+/// It uses a [SwimlaneLanePager] to fetch and display the documents (cards)
 /// that belong to it. It also handles the filtering logic on the client side
 /// and provides the main list view for the cards.
 class Swimlane<T> extends StatefulWidget {
@@ -889,9 +889,14 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
   // The lane's vertical scroll, kept across board rebuilds while a card is open.
   late final SwimlaneLaneScroll _laneScroll;
 
-  // Larger than _documentsPerPage when this lane restores a saved position, so one query
-  // reaches it. Set with the lane query and kept for the lane instance.
-  int? _pageSize;
+  // Loads the lane's cards. Made again only when the lane query changes, so a build of the
+  // lane (a card open or close, a window resize) does not load the lane again. Its first
+  // page is larger than _documentsPerPage when this lane restores a saved position.
+  SwimlaneLanePager<QueryDocumentSnapshot<T>>? _pager;
+
+  // One key per loaded card. A tile keeps its State, and the reads it started, when the lane
+  // builds again or the card moves in the lane. A drag also measures the card with it.
+  final Map<String, GlobalKey> _tileKeys = {};
 
   String get _boardKey => SwimlaneScrollAnchor.boardKey(widget.documentConfig.collection, widget.swimlanesConfig.trackerId);
 
@@ -915,8 +920,18 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
 
   @override
   void dispose() {
+    _pager?.dispose();
     _laneScroll.dispose();
     super.dispose();
+  }
+
+  /// The lane query narrowed to the part of the lane in [bounds].
+  Query<T> _pageQuery(Query<T> laneQuery, SwimlanePageBounds<QueryDocumentSnapshot<T>> bounds) {
+    Query<T> pageQuery = laneQuery;
+    if (bounds.startAfter != null) pageQuery = pageQuery.startAfterDocument(bounds.startAfter!);
+    if (bounds.endAt != null) pageQuery = pageQuery.endAtDocument(bounds.endAt!);
+    if (bounds.limit != null) pageQuery = pageQuery.limit(bounds.limit!);
+    return pageQuery;
   }
 
   /// Builds the "Add a card" button that appears at the bottom of a swimlane.
@@ -1007,365 +1022,384 @@ class _SwimlaneState<T> extends State<Swimlane<T>> {
     baseQuery = baseQuery.orderBy("priority");
 
     // Tells this lane apart from a lane with the same id on another board (its board
-    // filter differs). Only the where/orderBy clauses, never the converter.
+    // filter differs). Only the where/orderBy clauses, never the converter. Each build
+    // makes a new query with a new converter, and a query with a new converter is not
+    // equal to the old one. So the lane compares this text, not the query.
     final String laneQuery = baseQuery.parameters.toString();
-    if (_pageSize == null || laneQuery != _laneScroll.laneQuery) {
+    if (_pager == null || laneQuery != _laneScroll.laneQuery) {
       _laneScroll.laneQuery = laneQuery;
-      _pageSize = _laneScroll.firstPageSize();
+      final Query<T> pagerQuery = baseQuery;
+      _pager?.dispose();
+      _tileKeys.clear();
+      _pager = SwimlaneLanePager<QueryDocumentSnapshot<T>>(
+        listen: (SwimlanePageBounds<QueryDocumentSnapshot<T>> bounds) => _pageQuery(pagerQuery, bounds).snapshots().map((QuerySnapshot<T> querySnapshot) => querySnapshot.docs),
+        idOf: (QueryDocumentSnapshot<T> document) => document.id,
+        firstPageSize: _laneScroll.firstPageSize(),
+        pageSize: _documentsPerPage,
+      );
     }
+    final SwimlaneLanePager<QueryDocumentSnapshot<T>> pager = _pager!;
 
     return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
       return SizedBox(
         height: constraints.maxHeight,
         width: swimlanesConfig.swimlaneWidth,
-        child: FirestoreQueryBuilder<T>(
-          query: baseQuery,
-          pageSize: _pageSize!,
-          builder: (BuildContext context, FirestoreQueryBuilderSnapshot<T> snapshot, _) {
-            if (snapshot.isFetching) {
+        child: ListenableBuilder(
+          listenable: pager,
+          builder: (BuildContext context, _) {
+            if (pager.isFetching) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
             }
 
-            if (snapshot.hasError) {
+            if (pager.error != null) {
               // Something has gone wrong
-              return Fframe.of(context)!.showErrorPage(context: context, errorText: snapshot.error.toString());
+              return Fframe.of(context)!.showErrorPage(context: context, errorText: pager.error.toString());
             }
 
-            if (snapshot.hasData) {
-              List<SelectedDocument<T>> unfilteredDocuments = snapshot.docs
-                  .map(
-                    (QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
-                      data: queryDocument.data(),
-                      documentReference: queryDocument.reference,
-                      fromFirestore: widget.documentConfig.fromFirestore,
-                      toFirestore: widget.documentConfig.toFirestore,
-                    ),
-                  )
-                  .map((FirestoreDocument<T> firestoreDocument) => SelectedDocument(
-                        documentConfig: widget.documentConfig,
-                        id: firestoreDocument.documentReference.id,
-                        data: firestoreDocument.data,
-                      ))
-                  .toList();
+            final List<QueryDocumentSnapshot<T>> loadedDocuments = pager.docs;
+            final Set<String> loadedIds = {for (final QueryDocumentSnapshot<T> document in loadedDocuments) document.id};
+            _tileKeys.removeWhere((String documentId, _) => !loadedIds.contains(documentId));
 
-              return ListenableBuilder(
-                listenable: widget.swimlanesController.notifier,
-                builder: (BuildContext context, Widget? child) {
-                  SwimlanesFilterType filterType = widget.swimlanesController.notifier.filter;
+            List<SelectedDocument<T>> unfilteredDocuments = loadedDocuments
+                .map(
+                  (QueryDocumentSnapshot<T> queryDocument) => FirestoreDocument<T>(
+                    data: queryDocument.data(),
+                    documentReference: queryDocument.reference,
+                    fromFirestore: widget.documentConfig.fromFirestore,
+                    toFirestore: widget.documentConfig.toFirestore,
+                  ),
+                )
+                .map((FirestoreDocument<T> firestoreDocument) => SelectedDocument(
+                      documentConfig: widget.documentConfig,
+                      id: firestoreDocument.documentReference.id,
+                      data: firestoreDocument.data,
+                    ))
+                .toList();
 
-                  List<SelectedDocument<T>> selectedDocuments = [...unfilteredDocuments];
-                  Console.log("Swimlane rebuild ${filterType.toString()} for ${selectedDocuments.length} ");
+            return ListenableBuilder(
+              listenable: widget.swimlanesController.notifier,
+              builder: (BuildContext context, Widget? child) {
+                SwimlanesFilterType filterType = widget.swimlanesController.notifier.filter;
 
-                  // Read the filter-backing config into locals and null-guard
-                  // each branch: a board that does not define the callback the
-                  // active filter needs must skip filtering rather than
-                  // force-unwrap null and crash.
-                  final assignee = swimlanesConfig.assignee;
-                  final following = swimlanesConfig.following;
-                  final getPriority = swimlanesConfig.getPriority;
-                  final customFilter = swimlanesConfig.customFilter;
-                  switch (filterType) {
-                    case SwimlanesFilterType.unfiltered:
-                      break;
-                    case SwimlanesFilterType.assignedToMe:
-                      if (assignee != null) {
-                        selectedDocuments.removeWhere((selectedDocument) => !assignee.isAssignee(selectedDocument.data, widget.fFrameUser));
-                      }
-                      break;
-                    case SwimlanesFilterType.assignedTo:
-                      final assignedToUser = widget.swimlanesController.notifier.assignedToUser;
-                      if (assignee != null && assignedToUser != null) {
-                        selectedDocuments.removeWhere((selectedDocument) => !assignee.isAssignee(selectedDocument.data, assignedToUser));
-                      }
-                      break;
-                    case SwimlanesFilterType.followedTasks:
-                      if (following != null) {
-                        selectedDocuments.removeWhere((selectedDocument) => !following.isFollowing(selectedDocument.data, widget.fFrameUser));
-                      }
-                      break;
-                    case SwimlanesFilterType.prioHigh:
-                      if (getPriority != null) {
-                        selectedDocuments.removeWhere((selectedDocument) => getPriority(selectedDocument.data) < 4);
-                      }
-                      break;
-                    case SwimlanesFilterType.prioNormal:
-                      if (getPriority != null) {
-                        selectedDocuments.removeWhere((selectedDocument) => getPriority(selectedDocument.data) >= 4 && getPriority(selectedDocument.data) < 7);
-                      }
-                      break;
-                    case SwimlanesFilterType.prioLow:
-                      if (getPriority != null) {
-                        selectedDocuments.removeWhere((selectedDocument) => getPriority(selectedDocument.data) >= 7);
-                      }
-                      break;
-                    case SwimlanesFilterType.customFilter:
-                      if (customFilter != null) {
-                        selectedDocuments.removeWhere((selectedDocument) => !customFilter.matchesCustomFilter(selectedDocument.data));
-                      }
-                    default:
-                      break;
-                  }
+                List<SelectedDocument<T>> selectedDocuments = [...unfilteredDocuments];
+                Console.log("Swimlane rebuild ${filterType.toString()} for ${selectedDocuments.length} ");
 
-                  // When a filter is active, load all remaining pages so every matching card is shown.
-                  // Lanes are already scoped by boardId + status, so total card counts are manageable.
-                  if (filterType != SwimlanesFilterType.unfiltered && snapshot.hasMore) {
-                    snapshot.fetchMore();
-                  }
+                // Read the filter-backing config into locals and null-guard
+                // each branch: a board that does not define the callback the
+                // active filter needs must skip filtering rather than
+                // force-unwrap null and crash.
+                final assignee = swimlanesConfig.assignee;
+                final following = swimlanesConfig.following;
+                final getPriority = swimlanesConfig.getPriority;
+                final customFilter = swimlanesConfig.customFilter;
+                switch (filterType) {
+                  case SwimlanesFilterType.unfiltered:
+                    break;
+                  case SwimlanesFilterType.assignedToMe:
+                    if (assignee != null) {
+                      selectedDocuments.removeWhere((selectedDocument) => !assignee.isAssignee(selectedDocument.data, widget.fFrameUser));
+                    }
+                    break;
+                  case SwimlanesFilterType.assignedTo:
+                    final assignedToUser = widget.swimlanesController.notifier.assignedToUser;
+                    if (assignee != null && assignedToUser != null) {
+                      selectedDocuments.removeWhere((selectedDocument) => !assignee.isAssignee(selectedDocument.data, assignedToUser));
+                    }
+                    break;
+                  case SwimlanesFilterType.followedTasks:
+                    if (following != null) {
+                      selectedDocuments.removeWhere((selectedDocument) => !following.isFollowing(selectedDocument.data, widget.fFrameUser));
+                    }
+                    break;
+                  case SwimlanesFilterType.prioHigh:
+                    if (getPriority != null) {
+                      selectedDocuments.removeWhere((selectedDocument) => getPriority(selectedDocument.data) < 4);
+                    }
+                    break;
+                  case SwimlanesFilterType.prioNormal:
+                    if (getPriority != null) {
+                      selectedDocuments.removeWhere((selectedDocument) => getPriority(selectedDocument.data) >= 4 && getPriority(selectedDocument.data) < 7);
+                    }
+                    break;
+                  case SwimlanesFilterType.prioLow:
+                    if (getPriority != null) {
+                      selectedDocuments.removeWhere((selectedDocument) => getPriority(selectedDocument.data) >= 7);
+                    }
+                    break;
+                  case SwimlanesFilterType.customFilter:
+                    if (customFilter != null) {
+                      selectedDocuments.removeWhere((selectedDocument) => !customFilter.matchesCustomFilter(selectedDocument.data));
+                    }
+                  default:
+                    break;
+                }
 
-                  // Bring the lane back to the cards the user was looking at when a card opened.
-                  _laneScroll.onDocuments(
-                    shownIds: selectedDocuments.map((selectedDocument) => selectedDocument.documentId).toList(),
-                    loadedIds: unfilteredDocuments.map((selectedDocument) => selectedDocument.documentId).toList(),
-                    hasMore: snapshot.hasMore,
-                    isFetchingMore: snapshot.isFetchingMore,
-                    fetchMore: snapshot.fetchMore,
-                  );
+                // When a filter is active, read on to the end of the lane so every matching card is
+                // shown. One listener: a chain of pages would wait one round trip per page.
+                // Lanes are already scoped by boardId + status, so total card counts are manageable.
+                // Not only when hasMore: while the lane goes back to its first page, hasMore is
+                // false, and only fetchAll stops that. fetchAll does nothing when it is not needed.
+                if (filterType != SwimlanesFilterType.unfiltered) {
+                  pager.fetchAll();
+                }
+                // When the filter goes, such a lane goes back to its first page, so it stops
+                // listening to every card. The board is not built again, so nothing else resets it.
+                if (filterType == SwimlanesFilterType.unfiltered && pager.readsRestOfLane) {
+                  pager.backToFirstPage();
+                }
 
-                  // Determine if the "Add a card" button should be displayed based on configuration.
-                  // Role-based security is handled by the developer, who should conditionally
-                  // set `allowCardCreation` in the `SwimlaneSetting`.
-                  final bool showAddButton = !swimlanesConfig.isReadOnly && widget.swimlaneSetting.allowCardCreation && widget.swimlaneSetting.onNewCard != null;
+                // Bring the lane back to the cards the user was looking at when a card opened.
+                _laneScroll.onDocuments(
+                  shownIds: selectedDocuments.map((selectedDocument) => selectedDocument.documentId).toList(),
+                  loadedIds: unfilteredDocuments.map((selectedDocument) => selectedDocument.documentId).toList(),
+                  hasMore: pager.hasMore,
+                  isFetchingMore: pager.isFetchingMore,
+                  fetchMore: pager.fetchMore,
+                );
 
-                  return Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        right: BorderSide(
-                          width: 2,
-                          color: widget.swimlanesController.swimlaneSeparatorColor,
-                        ),
+                // Determine if the "Add a card" button should be displayed based on configuration.
+                // Role-based security is handled by the developer, who should conditionally
+                // set `allowCardCreation` in the `SwimlaneSetting`.
+                final bool showAddButton = !swimlanesConfig.isReadOnly && widget.swimlaneSetting.allowCardCreation && widget.swimlaneSetting.onNewCard != null;
+
+                return Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      right: BorderSide(
+                        width: 2,
+                        color: widget.swimlanesController.swimlaneSeparatorColor,
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: (selectedDocuments.isEmpty && !swimlanesConfig.isReadOnly)
-                              ? SwimlaneDropZone(
-                                  swimlanesController: widget.swimlanesController,
-                                  swimlanesConfig: swimlanesConfig,
-                                  fFrameUser: widget.fFrameUser,
-                                  width: swimlanesConfig.swimlaneWidth,
-                                  swimlaneSetting: widget.swimlaneSetting,
-                                  priority: 1.0,
-                                  lanePosition: lanePositionIncrement,
-                                )
-                              : ListView.builder(
-                                  controller: _laneScroll.controller,
-                                  itemCount: (swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2),
-                                  itemBuilder: (context, index) {
-                                    if (snapshot.hasMore && index + 1 == snapshot.docs.length) {
-                                      // Tell FirestoreQueryBuilder to try to obtain more items.
-                                      // It is safe to call this function from within the build method.
-                                      snapshot.fetchMore();
-                                    }
+                  ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: (selectedDocuments.isEmpty && !swimlanesConfig.isReadOnly)
+                            ? SwimlaneDropZone(
+                                swimlanesController: widget.swimlanesController,
+                                swimlanesConfig: swimlanesConfig,
+                                fFrameUser: widget.fFrameUser,
+                                width: swimlanesConfig.swimlaneWidth,
+                                swimlaneSetting: widget.swimlaneSetting,
+                                priority: 1.0,
+                                lanePosition: lanePositionIncrement,
+                              )
+                            : ListView.builder(
+                                controller: _laneScroll.controller,
+                                itemCount: (swimlanesConfig.isReadOnly ? selectedDocuments.length : selectedDocuments.length * 2),
+                                itemBuilder: (context, index) {
+                                  if (pager.hasMore && index + 1 == loadedDocuments.length) {
+                                    // Tell the pager to load the next page.
+                                    // It is safe to call this function from within the build method.
+                                    pager.fetchMore();
+                                  }
 
-                                    // Return only task cards if the swimlanes are read-only
-                                    if (swimlanesConfig.isReadOnly) {
-                                      return Column(
-                                        children: [
-                                          Builder(builder: (context) {
-                                            return SwimlaneCardAnchor(
-                                              laneScroll: _laneScroll,
-                                              documentId: selectedDocuments[index].documentId,
-                                              child: SwimlanesTaskCard<T>(
-                                                selectedDocument: selectedDocuments[index],
-                                                swimlanesController: widget.swimlanesController,
-                                                swimlanesConfig: swimlanesConfig,
-                                                color: widget.swimlanesController.taskCardColor,
-                                                fFrameUser: widget.fFrameUser,
-                                                width: swimlanesConfig.swimlaneWidth,
-                                                onBeforeOpen: () => _laneScroll.captureOnOpen(selectedDocuments[index].documentId),
-                                              ),
-                                            );
-                                          }),
-                                          if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
-                                            const Center(
-                                              child: CircularProgressIndicator(),
-                                            )
-                                        ],
-                                      );
-                                    }
-
-                                    // Calculate index in the original documents list
-                                    int docIndex = index ~/ 2;
-                                    final selectedDocument = selectedDocuments[docIndex];
-
-                                    // int? nextPriority = isNextPriority(selectedDocuments, docIndex);
-
-                                    GlobalKey dragKey = GlobalKey();
-                                    if (index.isEven) {
-                                      final DragContext<T> dragContext = DragContext<T>(
-                                        sourceColumn: widget.swimlaneSetting,
-                                        selectedDocument: selectedDocument,
-                                        dragKey: dragKey,
-                                        buildContext: context,
-                                      );
-
-                                      double? topDropZoneLanePosition;
-                                      if (index == 0) {
-                                        if (swimlanesConfig.getLanePosition != null) {
-                                          // Calculate lane position for the 1st drop zone
-                                          double firstDocPos = swimlanesConfig.getLanePosition!(selectedDocument.data);
-                                          topDropZoneLanePosition = firstDocPos / 2.0;
-                                        } else {
-                                          // Fallback to a default starting value if getLanePosition is null
-                                          topDropZoneLanePosition = lanePositionIncrement / 2.0;
-                                        }
-                                      }
-
-                                      return Column(
-                                        children: [
-                                          if (index == 0)
-                                            // Insert drop zone for the top of the lane
-                                            SwimlaneDropZone(
+                                  // Return only task cards if the swimlanes are read-only
+                                  if (swimlanesConfig.isReadOnly) {
+                                    return Column(
+                                      children: [
+                                        Builder(builder: (context) {
+                                          return SwimlaneCardAnchor(
+                                            laneScroll: _laneScroll,
+                                            documentId: selectedDocuments[index].documentId,
+                                            child: SwimlanesTaskCard<T>(
+                                              key: _tileKeys.putIfAbsent(selectedDocuments[index].documentId, () => GlobalKey()),
+                                              selectedDocument: selectedDocuments[index],
                                               swimlanesController: widget.swimlanesController,
                                               swimlanesConfig: swimlanesConfig,
-                                              fFrameUser: widget.fFrameUser,
-                                              width: swimlanesConfig.swimlaneWidth,
-                                              swimlaneSetting: widget.swimlaneSetting,
-                                              priority: 1.0,
-                                              lanePosition: topDropZoneLanePosition,
-                                            ),
-                                          // if (nextPriority != null)
-                                          //   Padding(
-                                          //     padding: const EdgeInsets.all(8.0),
-                                          //     child: Stack(
-                                          //       alignment: AlignmentDirectional.centerStart,
-                                          //       children: [
-                                          //         const Divider(),
-                                          //         CircleAvatar(child: Text(nextPriority.toString())),
-                                          //       ],
-                                          //     ),
-                                          //   ),
-                                          Draggable<DragContext<T>>(
-                                            data: dragContext,
-                                            onDragStarted: () {
-                                              // The context is guaranteed to be valid at this moment
-                                              final RenderBox renderBox = dragKey.currentContext!.findRenderObject() as RenderBox;
-                                              widget.swimlanesController.setDraggedItemHeight(renderBox.size.height);
-                                              // Enable auto-scroll detection
-                                              widget.swimlanesController.taskDragging = true;
-                                              // The user is working on the board: stop keeping the old lane position
-                                              _laneScroll.onDragStarted();
-                                            },
-                                            onDragEnd: (details) {
-                                              // Clean up the height in the controller when the drag is over
-                                              widget.swimlanesController.setDraggedItemHeight(null);
-                                              // Disable auto-scroll and stop any active scrolling
-                                              widget.swimlanesController.taskDragging = false;
-                                              widget.swimlanesController.dragAutoScrollService.onDragEnd();
-                                            },
-                                            feedback: SwimlanesTaskCard<T>(
-                                              selectedDocument: selectedDocument,
-                                              swimlanesController: widget.swimlanesController,
-                                              swimlanesConfig: swimlanesConfig,
-                                              fFrameUser: widget.fFrameUser,
                                               color: widget.swimlanesController.taskCardColor,
-                                              width: swimlanesConfig.swimlaneWidth,
-                                              feedback: true,
-                                            ),
-                                            childWhenDragging: SwimlanesTaskCard<T>(
-                                              selectedDocument: selectedDocument,
-                                              swimlanesController: widget.swimlanesController,
-                                              swimlanesConfig: swimlanesConfig,
                                               fFrameUser: widget.fFrameUser,
-                                              color: widget.swimlanesController.taskCardColor,
                                               width: swimlanesConfig.swimlaneWidth,
-                                              childWhenDragging: true,
+                                              onBeforeOpen: () => _laneScroll.captureOnOpen(selectedDocuments[index].documentId),
                                             ),
-                                            child: Builder(builder: (context) {
-                                              return SwimlaneCardAnchor(
-                                                laneScroll: _laneScroll,
-                                                documentId: selectedDocument.documentId,
-                                                child: SwimlanesTaskCard<T>(
-                                                  key: dragContext.dragKey,
-                                                  selectedDocument: selectedDocument,
-                                                  swimlanesController: widget.swimlanesController,
-                                                  swimlanesConfig: swimlanesConfig,
-                                                  color: widget.swimlanesController.taskCardColor,
-                                                  fFrameUser: widget.fFrameUser,
-                                                  width: swimlanesConfig.swimlaneWidth,
-                                                  onBeforeOpen: () => _laneScroll.captureOnOpen(selectedDocument.documentId),
-                                                ),
-                                              );
-                                            }),
-                                          ),
-                                          if (index + 1 == snapshot.docs.length && snapshot.isFetchingMore)
-                                            const Center(
-                                              child: CircularProgressIndicator(),
-                                            )
-                                        ],
-                                      );
-                                    } else {
-                                      T docAbove = selectedDocuments[docIndex].data; // Doc before the drop zone
+                                          );
+                                        }),
+                                        if (index + 1 == loadedDocuments.length && pager.isFetchingMore)
+                                          const Center(
+                                            child: CircularProgressIndicator(),
+                                          )
+                                      ],
+                                    );
+                                  }
 
-                                      // Calculate lane position for drop zone (the primary ordering within lanes)
-                                      double? dropZoneLanePosition;
+                                  // Calculate index in the original documents list
+                                  int docIndex = index ~/ 2;
+                                  final selectedDocument = selectedDocuments[docIndex];
+
+                                  // int? nextPriority = isNextPriority(selectedDocuments, docIndex);
+
+                                  GlobalKey dragKey = _tileKeys.putIfAbsent(selectedDocument.documentId, () => GlobalKey());
+                                  if (index.isEven) {
+                                    final DragContext<T> dragContext = DragContext<T>(
+                                      sourceColumn: widget.swimlaneSetting,
+                                      selectedDocument: selectedDocument,
+                                      dragKey: dragKey,
+                                      buildContext: context,
+                                    );
+
+                                    double? topDropZoneLanePosition;
+                                    if (index == 0) {
                                       if (swimlanesConfig.getLanePosition != null) {
-                                        if (docIndex < selectedDocuments.length - 1) {
-                                          // Drop zone is between 2 docs
-                                          T docBelow = selectedDocuments[docIndex + 1].data;
-                                          double posAbove = swimlanesConfig.getLanePosition!(docAbove);
-                                          double posBelow = swimlanesConfig.getLanePosition!(docBelow);
-                                          dropZoneLanePosition = (posAbove + posBelow) / 2.0;
-                                        } else {
-                                          // Drop zone is after the last doc in the list
-                                          double posLast = swimlanesConfig.getLanePosition!(docAbove);
-                                          dropZoneLanePosition = posLast + lanePositionIncrement; // Lane position for the last item
-                                        }
+                                        // Calculate lane position for the 1st drop zone
+                                        double firstDocPos = swimlanesConfig.getLanePosition!(selectedDocument.data);
+                                        topDropZoneLanePosition = firstDocPos / 2.0;
+                                      } else {
+                                        // Fallback to a default starting value if getLanePosition is null
+                                        topDropZoneLanePosition = lanePositionIncrement / 2.0;
                                       }
-                                      // Calculate priority for drop zone
-                                      double? dropZonePriority;
-                                      if (swimlanesConfig.getPriority != null) {
-                                        if (docIndex < selectedDocuments.length - 1) {
-                                          // Drop zone is between 2 docs
-                                          dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
-                                        } else {
-                                          // Drop zone is after the last doc in the list
-                                          double lastPriority = swimlanesConfig.getPriority!(docAbove);
-                                          dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
-                                        }
-                                      }
-                                      // Add a drop zone between items
-                                      return Column(
-                                        children: [
-                                          // if (nextPriority != null)
-                                          //   Padding(
-                                          //     padding: const EdgeInsets.all(8.0),
-                                          //     child: Stack(
-                                          //       alignment: AlignmentDirectional.centerStart,
-                                          //       children: [
-                                          //         const Divider(),
-                                          //         CircleAvatar(child: Text(nextPriority.toString())),
-                                          //       ],
-                                          //     ),
-                                          //   ),
+                                    }
+
+                                    return Column(
+                                      children: [
+                                        if (index == 0)
+                                          // Insert drop zone for the top of the lane
                                           SwimlaneDropZone(
                                             swimlanesController: widget.swimlanesController,
                                             swimlanesConfig: swimlanesConfig,
                                             fFrameUser: widget.fFrameUser,
                                             width: swimlanesConfig.swimlaneWidth,
                                             swimlaneSetting: widget.swimlaneSetting,
-                                            priority: dropZonePriority,
-                                            lanePosition: dropZoneLanePosition,
-                                            customHeight: docIndex == selectedDocuments.length - 1 ? 48.0 : null, // More space below the last item
+                                            priority: 1.0,
+                                            lanePosition: topDropZoneLanePosition,
                                           ),
-                                        ],
-                                      );
-                                    }
-                                  },
-                                ),
-                        ),
-                        if (showAddButton) _buildAddCardButton(selectedDocuments),
-                      ],
-                    ),
-                  );
-                },
-              );
-            }
+                                        // if (nextPriority != null)
+                                        //   Padding(
+                                        //     padding: const EdgeInsets.all(8.0),
+                                        //     child: Stack(
+                                        //       alignment: AlignmentDirectional.centerStart,
+                                        //       children: [
+                                        //         const Divider(),
+                                        //         CircleAvatar(child: Text(nextPriority.toString())),
+                                        //       ],
+                                        //     ),
+                                        //   ),
+                                        Draggable<DragContext<T>>(
+                                          data: dragContext,
+                                          onDragStarted: () {
+                                            // The context is guaranteed to be valid at this moment
+                                            final RenderBox renderBox = dragKey.currentContext!.findRenderObject() as RenderBox;
+                                            widget.swimlanesController.setDraggedItemHeight(renderBox.size.height);
+                                            // Enable auto-scroll detection
+                                            widget.swimlanesController.taskDragging = true;
+                                            // The user is working on the board: stop keeping the old lane position
+                                            _laneScroll.onDragStarted();
+                                          },
+                                          onDragEnd: (details) {
+                                            // Clean up the height in the controller when the drag is over
+                                            widget.swimlanesController.setDraggedItemHeight(null);
+                                            // Disable auto-scroll and stop any active scrolling
+                                            widget.swimlanesController.taskDragging = false;
+                                            widget.swimlanesController.dragAutoScrollService.onDragEnd();
+                                          },
+                                          feedback: SwimlanesTaskCard<T>(
+                                            selectedDocument: selectedDocument,
+                                            swimlanesController: widget.swimlanesController,
+                                            swimlanesConfig: swimlanesConfig,
+                                            fFrameUser: widget.fFrameUser,
+                                            color: widget.swimlanesController.taskCardColor,
+                                            width: swimlanesConfig.swimlaneWidth,
+                                            feedback: true,
+                                          ),
+                                          childWhenDragging: SwimlanesTaskCard<T>(
+                                            selectedDocument: selectedDocument,
+                                            swimlanesController: widget.swimlanesController,
+                                            swimlanesConfig: swimlanesConfig,
+                                            fFrameUser: widget.fFrameUser,
+                                            color: widget.swimlanesController.taskCardColor,
+                                            width: swimlanesConfig.swimlaneWidth,
+                                            childWhenDragging: true,
+                                          ),
+                                          child: Builder(builder: (context) {
+                                            return SwimlaneCardAnchor(
+                                              laneScroll: _laneScroll,
+                                              documentId: selectedDocument.documentId,
+                                              child: SwimlanesTaskCard<T>(
+                                                key: dragContext.dragKey,
+                                                selectedDocument: selectedDocument,
+                                                swimlanesController: widget.swimlanesController,
+                                                swimlanesConfig: swimlanesConfig,
+                                                color: widget.swimlanesController.taskCardColor,
+                                                fFrameUser: widget.fFrameUser,
+                                                width: swimlanesConfig.swimlaneWidth,
+                                                onBeforeOpen: () => _laneScroll.captureOnOpen(selectedDocument.documentId),
+                                              ),
+                                            );
+                                          }),
+                                        ),
+                                        if (index + 1 == loadedDocuments.length && pager.isFetchingMore)
+                                          const Center(
+                                            child: CircularProgressIndicator(),
+                                          )
+                                      ],
+                                    );
+                                  } else {
+                                    T docAbove = selectedDocuments[docIndex].data; // Doc before the drop zone
 
-            return const Center(child: CircularProgressIndicator());
+                                    // Calculate lane position for drop zone (the primary ordering within lanes)
+                                    double? dropZoneLanePosition;
+                                    if (swimlanesConfig.getLanePosition != null) {
+                                      if (docIndex < selectedDocuments.length - 1) {
+                                        // Drop zone is between 2 docs
+                                        T docBelow = selectedDocuments[docIndex + 1].data;
+                                        double posAbove = swimlanesConfig.getLanePosition!(docAbove);
+                                        double posBelow = swimlanesConfig.getLanePosition!(docBelow);
+                                        dropZoneLanePosition = (posAbove + posBelow) / 2.0;
+                                      } else {
+                                        // Drop zone is after the last doc in the list
+                                        double posLast = swimlanesConfig.getLanePosition!(docAbove);
+                                        dropZoneLanePosition = posLast + lanePositionIncrement; // Lane position for the last item
+                                      }
+                                    }
+                                    // Calculate priority for drop zone
+                                    double? dropZonePriority;
+                                    if (swimlanesConfig.getPriority != null) {
+                                      if (docIndex < selectedDocuments.length - 1) {
+                                        // Drop zone is between 2 docs
+                                        dropZonePriority = calculateDropTargetPriority(selectedDocuments, docIndex);
+                                      } else {
+                                        // Drop zone is after the last doc in the list
+                                        double lastPriority = swimlanesConfig.getPriority!(docAbove);
+                                        dropZonePriority = lastPriority + (1 - (lastPriority % 1)) / 2; // For the last item
+                                      }
+                                    }
+                                    // Add a drop zone between items
+                                    return Column(
+                                      children: [
+                                        // if (nextPriority != null)
+                                        //   Padding(
+                                        //     padding: const EdgeInsets.all(8.0),
+                                        //     child: Stack(
+                                        //       alignment: AlignmentDirectional.centerStart,
+                                        //       children: [
+                                        //         const Divider(),
+                                        //         CircleAvatar(child: Text(nextPriority.toString())),
+                                        //       ],
+                                        //     ),
+                                        //   ),
+                                        SwimlaneDropZone(
+                                          swimlanesController: widget.swimlanesController,
+                                          swimlanesConfig: swimlanesConfig,
+                                          fFrameUser: widget.fFrameUser,
+                                          width: swimlanesConfig.swimlaneWidth,
+                                          swimlaneSetting: widget.swimlaneSetting,
+                                          priority: dropZonePriority,
+                                          lanePosition: dropZoneLanePosition,
+                                          customHeight: docIndex == selectedDocuments.length - 1 ? 48.0 : null, // More space below the last item
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                },
+                              ),
+                      ),
+                      if (showAddButton) _buildAddCardButton(selectedDocuments),
+                    ],
+                  ),
+                );
+              },
+            );
           },
         ),
       );
